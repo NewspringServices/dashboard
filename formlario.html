@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário GAMa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent; /* Fundo transparente */
+        }
+
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #28a745; /* Cor verde */
+            font-size: 24px; /* Tamanho do texto reduzido */
+            margin-bottom: 20px; /* Espaçamento abaixo do título */
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        select, input[type="text"], input[type="number"], button, input[type="radio"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .button-container button {
+            width: 48%;
+        }
+
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none; /* Inicialmente escondido */
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Produção - João Cardoso</h1>
+        <form id="gamaForm">
+            <div class="form-group">
+                <label for="processoGama">Processo:</label>
+                <input type="text" id="processoGama" name="processoGama" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="documentos">Documentos Tratados:</label>
+                <input type="number" id="documentos" name="documentos" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+                <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+                    <option value="Tarefa AP (Acidentes Pessoais)">Tarefa AP (Acidentes Pessoais)</option>
+                            <option value="E-mail Enviado/Tranferência Fila">E-mail Enviado/Tranferência Fila</option>
+
+                    <option value="Formação">Formação</option>              
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tempoTarefa">Tempo da Tarefa:</label>
+                <input type="text" id="tempoTarefa" name="tempoTarefa" readonly>
+            </div>
+
+            <div class="form-group button-container">
+                <button type="button" id="startButton">Iniciar Tarefa</button>
+                <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+            </div>
+
+            <div id="responseMessage" class="message"></div> <!-- Mensagem de resposta -->
+        </form>
+    </div>
+
+    <script>
+        let startTime;
+        let endTime;
+        let timerInterval;
+
+        const startButton = document.getElementById('startButton');
+        const endButton = document.getElementById('endButton');
+        const tempoTarefa = document.getElementById('tempoTarefa');
+        const responseMessage = document.getElementById('responseMessage');
+
+        // Função para formatar a data e hora no formato: YYYY-MM-DD HH:mm:ss
+        function formatDateTime(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        }
+
+        // Função para formatar o tempo em hh:mm:ss
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600); // Calcula as horas
+            const minutes = Math.floor((seconds % 3600) / 60); // Calcula os minutos
+            const remainingSeconds = seconds % 60; // Calcula os segundos restantes
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        startButton.addEventListener('click', function() {
+            startTime = new Date();
+            startButton.disabled = true;
+            endButton.disabled = false;
+
+            // Iniciar a contagem de tempo
+            timerInterval = setInterval(function() {
+                const timeSpent = Math.floor((new Date() - startTime) / 1000); // Tempo em segundos
+                tempoTarefa.value = formatTime(timeSpent); // Atualiza o campo de tempo com o formato hh:mm:ss
+            }, 1000); // Atualiza a cada 1 segundo
+        });
+
+        endButton.addEventListener('click', function() {
+            clearInterval(timerInterval);  // Para a contagem de tempo
+            endTime = new Date();
+            const timeSpent = Math.floor((endTime - startTime) / 1000); // Tempo em segundos
+            tempoTarefa.value = formatTime(timeSpent); // Exibe o tempo no campo do formulário no formato hh:mm:ss
+
+            endButton.disabled = true;
+
+            // Coletando os dados do formulário
+            const processoGama = document.getElementById('processoGama').value;
+            const documentos = document.getElementById('documentos').value;
+            const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;  
+            const tempo = tempoTarefa.value; 
+            const colaborador = "João Nuno da Silva Cardoso"; 
+
+            // Formatando as datas e horas no formato desejado
+            const startDateTime = startTime ? formatDateTime(startTime) : ''; 
+            const endDateTime = endTime ? formatDateTime(endTime) : ''; 
+
+            // Criando o objeto de dados para enviar ao Google Apps Script
+            const data = {
+                startDateTime: startDateTime,  // Hora Início
+                endDateTime: endDateTime,      // Hora Fim
+                colaborador: colaborador,      // Colaborador
+                processoGama: processoGama,    // Processo GAMA
+                documentos: documentos,       // Documentos
+                tarefaFinalizada: tarefaFinalizada,  // Tarefa Finalizada
+                tempoTarefa: tempo            // Tempo da Tarefa
+            };
+
+            // Enviar os dados para o Google Apps Script usando fetch()
+            fetch('https://script.google.com/macros/s/AKfycbyv7GqMO9tx-6N123LNIOsyVoZC2z6cMvqS_bWYaRWUcfOsGvNjnKH8Rpj_ZndzDudhwQ/exec', {  // Substitua pela URL do seu Google Apps Script
+                method: 'POST',
+                body: new URLSearchParams(data),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+            .then(response => response.text())
+            .then(result => {
+                showMessage(result, 'success');
+                document.getElementById('gamaForm').reset();
+                startButton.disabled = false;
+            })
+            .catch(error => {
+                showMessage('Erro ao enviar dados: ' + error.message, 'error');
+            });
+        });
+
+        function showMessage(message, type) {
+            responseMessage.textContent = message;
+            responseMessage.className = 'message ' + type;
+            responseMessage.style.display = 'block';
+
+            // Após 5 segundos, esconde a mensagem
+            setTimeout(function() {
+                responseMessage.style.display = 'none';
+            }, 5000); 
+        }
+    </script>
+
+</body>
+</html>
