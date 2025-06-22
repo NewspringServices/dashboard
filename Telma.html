@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-pt">
 <head>
   <meta charset="UTF-8" />
-  <title>Registo FYBDO</title>
+  <title>Área Colaborador</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      padding: 10px 5px;
+      padding: 20px;
       background: transparent;
       display: flex;
       flex-direction: column;
@@ -22,7 +22,7 @@
       align-items: center;
       justify-content: flex-start;
       width: 100%;
-      max-width: none;
+      max-width: 1200px;
       background-color: #fff;
       padding: 12px 16px;
       border-radius: 10px;
@@ -52,7 +52,7 @@
       white-space: nowrap;
     }
 
-    select, button {
+    select, button, input {
       padding: 8px 12px;
       font-size: 14px;
       border-radius: 6px;
@@ -78,21 +78,60 @@
       white-space: nowrap;
     }
 
-    /* Mensagem de status com margem extra para destacar */
     #mensagem {
       margin-left: 12px;
       font-weight: bold;
     }
 
+    .form-container {
+      margin-top: 40px;
+      max-width: 400px;
+      width: 100%;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group select {
+      width: 100%;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Barra de Registo -->
   <div class="barra-registo">
     <div id="infoData" class="info-data"></div>
     <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
 
-    <label for="tipo">Tipo de Registo:</label>
+    <label for="tipo">Registo:</label>
     <select id="tipo" onchange="mudarTipo()">
       <option value="">Selecione</option>
       <option value="login">Login</option>
@@ -114,6 +153,60 @@
     <span id="mensagem" class="status"></span>
   </div>
 
+  <!-- Formulário GAMA -->
+  <div class="form-container">
+    <h1>Produção</h1>
+    <form id="gamaForm">
+      <div class="form-group">
+        <label>Tipologia Puxada:</label>
+        <div class="tipologia-container" style="display:flex; justify-content:space-between;">
+          <div>
+            <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
+            <label for="aberturas">Aberturas</label>
+          </div>
+          <div>
+            <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
+            <label for="indexacoes">Indexações</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="processoGama">Processo GAMA:</label>
+        <input type="text" id="processoGama" name="processoGama" required />
+      </div>
+
+      <div class="form-group">
+        <label for="documentos">Documentos Tratados:</label>
+        <input type="number" id="documentos" name="documentos" required />
+      </div>
+
+      <div class="form-group">
+        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+          <option value="Tarefa Aberturas">Tarefa Aberturas</option>
+          <option value="Tarefa Indexações">Tarefa Indexações</option>
+          <option value="Pedido de Elementos">Pedido de Elementos</option>
+          <option value="Erros/SPAM">Erros/SPAM</option>
+          <option value="Formação/Meetings">Formação/Meetings</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="tempoTarefa">Tempo da Tarefa:</label>
+        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+      </div>
+
+      <div class="button-container">
+        <button type="button" id="startButton">Iniciar Tarefa</button>
+        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+      </div>
+
+      <div id="responseMessage" class="message"></div>
+    </form>
+  </div>
+
+  <!-- Script da Barra -->
   <script>
     const user = "EX04904";
     const nome = "Telma Sofia Pereira Rosa";
@@ -130,7 +223,6 @@
       if (tipoSelecionado) {
         document.getElementById('btnSubmeter').style.display = 'inline-block';
       }
-      // Atualiza a data exibida na barra para a data atual
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
@@ -217,8 +309,6 @@
         ]
       };
 
-      console.log("Payload para enviar:", JSON.stringify(payload, null, 2));
-
       return fetch("https://sheetdb.io/api/v1/86wt61zb7vvfz", {
         method: "POST",
         headers: {
@@ -253,11 +343,38 @@
       document.getElementById('infoData').textContent = "";
     }
 
-    // Inicializa a data na barra ao carregar a página
     window.onload = () => {
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
+  </script>
+
+  <!-- Script do Formulário GAMA -->
+  <script>
+    let startTime;
+    let endTime;
+
+    document.getElementById('startButton').addEventListener('click', () => {
+      startTime = new Date();
+      document.getElementById('startButton').disabled = true;
+      document.getElementById('endButton').disabled = false;
+    });
+
+    document.getElementById('endButton').addEventListener('click', () => {
+      endTime = new Date();
+      const duration = Math.floor((endTime - startTime) / 1000);
+      const minutes = Math.floor(duration / 60);
+      const seconds = duration % 60;
+      const formattedDuration = `${minutes}m ${seconds}s`;
+      document.getElementById('tempoTarefa').value = formattedDuration;
+
+      document.getElementById('startButton').disabled = false;
+      document.getElementById('endButton').disabled = true;
+
+      const responseMessage = document.getElementById('responseMessage');
+      responseMessage.style.display = 'block';
+      responseMessage.innerText = 'Tarefa finalizada!';
+    });
   </script>
 
 </body>
