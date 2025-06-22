@@ -2,254 +2,170 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Registo FYBDO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - FYBDO</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    * {
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #333;
       background: url('https://i.imgur.com/47SUZFz.png') no-repeat center center fixed;
       background-size: cover;
     }
 
-    .barra-registo {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: flex-start;
+    .container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      max-width: 400px;
       width: 100%;
-      background-color: #fff;
-      padding: 12px 16px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      gap: 8px;
-      overflow-x: auto;
-      white-space: nowrap;
-      box-sizing: border-box;
-    }
-
-    .info-data {
-      font-weight: bold;
-      margin-right: 8px;
-      white-space: nowrap;
-      color: #444;
-    }
-
-    .info-usuario {
-      font-weight: bold;
-      margin-right: 8px;
-      white-space: nowrap;
-    }
-
-    label {
-      margin-right: 4px;
-      white-space: nowrap;
-    }
-
-    select, button {
-      padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      white-space: nowrap;
+      text-align: center;
     }
 
     button {
-      background-color: #28a745;
-      color: white;
+      width: 100%;
+      padding: 15px;
+      margin: 10px 0;
+      font-size: 18px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
-      transition: background-color 0.3s;
+      transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    .btn-colaborador {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .btn-colaborador:hover {
       background-color: #218838;
     }
 
-    .status {
-      font-size: 14px;
-      margin-left: 4px;
-      white-space: nowrap;
+    .btn-administrador {
+      background-color: #007bff;
+      color: white;
     }
 
-    #mensagem {
-      margin-left: 12px;
-      font-weight: bold;
+    .btn-administrador:hover {
+      background-color: #0056b3;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 12px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: #6c63ff;
+      outline: none;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 30px;
+        width: 90%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="barra-registo">
-    <div id="infoData" class="info-data"></div>
-    <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
+  <div id="menu" class="container">
+    <button class="btn-colaborador" onclick="mostrarLoginColaborador()">Área Colaborador</button>
+    <button class="btn-administrador" onclick="alert('Área de Administrador ainda não implementada!')">Área de Administrador</button>
+  </div>
 
-    <label for="tipo">Tipo de Registo:</label>
-    <select id="tipo" onchange="mudarTipo()">
-      <option value="">Selecione</option>
-      <option value="login">Login</option>
-      <option value="logout">Logout</option>
-      <option value="pausa1">Pausa 1</option>
-      <option value="pausa2">Pausa 2</option>
-      <option value="refeicao">Refeição</option>
-      <option value="formacao">Formação</option>
-    </select>
-
-    <button id="btnSubmeter" onclick="submeter()">Submeter</button>
-
-    <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-    <span id="horaInicio" class="status" style="display:none;"></span>
-    <span id="horaFim" class="status" style="display:none;"></span>
-
-    <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
-
-    <span id="mensagem" class="status"></span>
+  <div id="loginColaborador" class="container" style="display:none;">
+    <h2>ÁREA DE COLABORADOR</h2>
+    <form id="loginForm" onsubmit="return validarLogin(event)">
+      <input type="text" id="username" placeholder="Usuário" required />
+      <input type="password" id="password" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="error-message" class="error-message"></p>
+    <button style="margin-top: 20px; background:#ccc; color:#333;" onclick="voltarMenu()">Voltar</button>
   </div>
 
   <script>
-    const user = "EX04904";
-    const nome = "Telma Sofia Pereira Rosa";
-
-    let tipoSelecionado = "";
-    let inicioDataHora;
-    let fimDataHora;
-    let timer;
-    let segundos = 0;
-
-    function mudarTipo() {
-      tipoSelecionado = document.getElementById('tipo').value;
-      resetar();
-      if (tipoSelecionado) {
-        document.getElementById('btnSubmeter').style.display = 'inline-block';
-      }
-      const hoje = new Date().toLocaleDateString();
-      document.getElementById('infoData').textContent = `📅 ${hoje}`;
+    function mostrarLoginColaborador() {
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('loginColaborador').style.display = 'block';
     }
 
-    function mostrarMensagem(texto, sucesso = true) {
-      const mensagemEl = document.getElementById('mensagem');
-      mensagemEl.textContent = texto;
-      mensagemEl.style.color = sucesso ? 'green' : 'red';
+    function voltarMenu() {
+      document.getElementById('loginColaborador').style.display = 'none';
+      document.getElementById('menu').style.display = 'block';
+      document.getElementById('error-message').textContent = '';
+      document.getElementById('loginForm').reset();
     }
 
-    function submeter() {
-      if (!tipoSelecionado) {
-        mostrarMensagem("Selecione um tipo de registo.", false);
-        return;
-      }
+    const usuarios = [
+      { usuario: "EX04904", senha: "Telma", pagina: "https://newspringservicesc.wixsite.com/newspring-services/blank" },
+      { usuario: "EX10357", senha: "FELIPE*NSS01", pagina: "https://newspringservicesc.wixsite.com/newspring-services/felipe-santana" },
+      { usuario: "EX10359", senha: "JOEL*NSS02", pagina: "https://newspringservicesc.wixsite.com/newspring-services/joel-mundjanga" },
+      { usuario: "EX10362", senha: "ORLANDA*NSS03", pagina: "https://newspringservicesc.wixsite.com/newspring-services/orlanda-francisco" },
+      { usuario: "EX10363", senha: "SAMIRA*NSS04", pagina: "https://newspringservicesc.wixsite.com/newspring-services/samira-cunegundes" },
+      { usuario: "EX10418", senha: "JOANA*NSS05", pagina: "https://newspringservicesc.wixsite.com/newspring-services/joana-figueiras" },
+      { usuario: "EX10563", senha: "ALEXANDRE*NSS06", pagina: "https://newspringservicesc.wixsite.com/newspring-services/alexandre-caldeira" },
+      { usuario: "EX10612", senha: "BARBARA*NSS07", pagina: "https://newspringservicesc.wixsite.com/newspring-services/b%C3%A1rbara-miguel" },
+      { usuario: "EX10613", senha: "CARLA*NSS08", pagina: "https://newspringservicesc.wixsite.com/newspring-services/carla-trindade" },
+      { usuario: "EX10622", senha: "NADIA*NSS09", pagina: "https://newspringservicesc.wixsite.com/newspring-services/n%C3%A1dia-oliveira" },
+      { usuario: "EX10867", senha: "GILDA*NSS10", pagina: "https://newspringservicesc.wixsite.com/newspring-services/gilda-anjos" },
+      { usuario: "EX10868", senha: "MARIANA*NSS11", pagina: "https://newspringservicesc.wixsite.com/newspring-services/mariana-serafim" },
+      { usuario: "EX1234", senha: "EX1234", pagina: "https://newspringservicesc.wixsite.com/newspring-services/mariana-serafim" },
+      { usuario: "EX10882", senha: "NSS*BRUNO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/bruno-silva" },
+      { usuario: "EX10883", senha: "NSS*JOAO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/jo%C3%A3o-cardoso" },
+      { usuario: "EX10884", senha: "NSS*RACHEL", pagina: "https://newspringservicesc.wixsite.com/newspring-services/rachel-cardoso" },
+      { usuario: "EX10885", senha: "NSS*RAFAELA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/rafaela-pinto" },
+      { usuario: "EX10886", senha: "NSS*SUSANA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/susana-bordalo" },
+      { usuario: "EX10887", senha: "NSS*BEATRIZ", pagina: "https://newspringservicesc.wixsite.com/newspring-services/beatriz-guedes" },
+      { usuario: "EX10943", senha: "NSS*JOAO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/jo%C3%A3o-borges" },
+      { usuario: "EX10888", senha: "NSS*SOFIA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/sofia-ferreira" },
+      { usuario: "EX10889", senha: "NSS*MARCOS", pagina: "https://newspringservicesc.wixsite.com/newspring-services/marcos-moura" },
+      { usuario: "EX10890", senha: "NSS*CONSTANÇA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/constan%C3%A7a-lopes" },
+      { usuario: "EX10891", senha: "NSS*SARA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/sara-chotumi%C3%A3" }
+    ];
 
-      inicioDataHora = new Date();
+    function validarLogin(event) {
+      event.preventDefault();
+      const usuario = document.getElementById("username").value.trim();
+      const senha = document.getElementById("password").value.trim();
+      const errorMessage = document.getElementById("error-message");
+      errorMessage.textContent = "";
 
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        document.getElementById('horaInicio').textContent = `✔️ Registado`;
-        document.getElementById('horaInicio').style.display = 'inline-block';
+      const usuarioValido = usuarios.find(u => u.usuario === usuario && u.senha === senha);
 
-        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioDataHora.toLocaleTimeString(), "", "")
-          .then(msg => mostrarMensagem("✔️ " + msg, true))
-          .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
+      if (usuarioValido) {
+        const novaAba = window.open(usuarioValido.pagina, '_blank', 'noopener,noreferrer');
+        if (!novaAba) {
+          errorMessage.textContent = "Não foi possível abrir a página. Permita pop-ups no navegador.";
+        }
       } else {
-        const inicioHoraStr = inicioDataHora.toLocaleTimeString();
-        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
-        document.getElementById('horaInicio').style.display = 'inline-block';
-
-        iniciarCronometro();
-        document.getElementById('btnSubmeter').style.display = 'none';
-        document.getElementById('btnTerminar').style.display = 'inline-block';
-        document.getElementById('cronometro').style.display = 'inline-block';
-        mostrarMensagem("");
+        errorMessage.textContent = "Usuário ou senha incorretos.";
       }
-    }
-
-    function iniciarCronometro() {
-      segundos = 0;
-      timer = setInterval(() => {
-        segundos++;
-        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-        const s = String(segundos % 60).padStart(2, '0');
-        document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
-      }, 1000);
-    }
-
-    function terminar() {
-      clearInterval(timer);
-      fimDataHora = new Date();
-      const fimHoraStr = fimDataHora.toLocaleTimeString();
-      const duracaoStr = document.getElementById('cronometro').textContent.replace('⏱ ', '');
-
-      document.getElementById('horaFim').textContent = `🕔 Fim: ${fimHoraStr}`;
-      document.getElementById('horaFim').style.display = 'inline-block';
-
-      enviarAoSheets(
-        tipoSelecionado,
-        inicioDataHora.toLocaleDateString(),
-        inicioDataHora.toLocaleTimeString(),
-        fimHoraStr,
-        duracaoStr
-      )
-      .then(msg => mostrarMensagem("✔️ " + msg, true))
-      .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
-
-      document.getElementById('btnTerminar').style.display = 'none';
-    }
-
-    function enviarAoSheets(tipo, data, inicio, fim, duracao) {
-      const payload = {
-        data: [
-          {
-            data: data,
-            user: user,
-            nome: nome,
-            tipo: tipo,
-            inicio: inicio,
-            fim: fim,
-            duracao: duracao
-          }
-        ]
-      };
-
-      console.log("Payload para enviar:", JSON.stringify(payload, null, 2));
-
-      return fetch("https://sheetdb.io/api/v1/86wt61zb7vvfz", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(payload)
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`Erro HTTP! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(data => {
-        if(data.created) {
-          return "Registo enviado com sucesso!";
-        } else {
-          throw new Error("Resposta inesperada da API.");
-        }
-      });
-    }
-
-    function resetar() {
-      clearInterval(timer);
-      document.getElementById('cronometro').textContent = "⏱ 00:00:00";
-      document.getElementById('cronometro').style.display = 'none';
-      document.getElementById('horaInicio').style.display = 'none';
-      document.getElementById('horaFim').style.display = 'none';
-      document.getElementById('btnTerminar').style.display = 'none';
-      document.getElementById('btnSubmeter').style.display = 'inline-block';
-      mostrarMensagem("");
-      document.getElementById('infoData').textContent = "";
-    }
-
-    window.onload = () => {
-      const hoje = new Date().toLocaleDateString();
-      document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
   </script>
 
 </body>
 </html>
-
