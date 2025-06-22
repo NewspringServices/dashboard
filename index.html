@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <title>Registo FYBDO</title>
   <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: url('https://i.imgur.com/47SUZFz.png') no-repeat center center fixed;
+      background-size: cover;
+    }
 
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 20px;
-  background: url('https://i.imgur.com/47SUZFz.png') no-repeat center center fixed;
-  background-size: cover;
-}
     .barra-registo {
       display: flex;
       flex-wrap: nowrap;
@@ -72,7 +72,6 @@ body {
       white-space: nowrap;
     }
 
-    /* Mensagem de status com margem extra para destacar */
     #mensagem {
       margin-left: 12px;
       font-weight: bold;
@@ -123,7 +122,6 @@ body {
       if (tipoSelecionado) {
         document.getElementById('btnSubmeter').style.display = 'inline-block';
       }
-      // Atualiza a data exibida na barra para a data atual
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
@@ -246,7 +244,6 @@ body {
       document.getElementById('infoData').textContent = "";
     }
 
-    // Inicializa a data na barra ao carregar a página
     window.onload = () => {
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
@@ -255,3 +252,4 @@ body {
 
 </body>
 </html>
+
