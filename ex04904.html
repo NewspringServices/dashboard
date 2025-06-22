@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registo FYBDO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: transparent;
+    }
+
+    .barra-registo {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      background-color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      box-sizing: border-box;
+    }
+
+    .info-usuario {
+      font-weight: bold;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    label {
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    select, button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      white-space: nowrap;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .status {
+      font-size: 14px;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="barra-registo">
+    <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
+
+    <label for="tipo">Tipo de Registo:</label>
+    <select id="tipo" onchange="mudarTipo()">
+      <option value="">Selecione</option>
+      <option value="login">Login</option>
+      <option value="logout">Logout</option>
+      <option value="pausa1">Pausa 1</option>
+      <option value="pausa2">Pausa 2</option>
+      <option value="refeicao">Refeição</option>
+      <option value="formacao">Formação</option>
+    </select>
+
+    <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+
+    <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
+    <span id="horaInicio" class="status" style="display:none;"></span>
+    <span id="horaFim" class="status" style="display:none;"></span>
+
+    <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+  </div>
+
+  <script>
+    // Dados estáticos do usuário
+    const user = "EX04904";
+    const nome = "Telma Sofia Pereira Rosa";
+
+    let tipoSelecionado = "";
+    let inicioDataHora;
+    let fimDataHora;
+    let timer;
+    let segundos = 0;
+
+    function mudarTipo() {
+      tipoSelecionado = document.getElementById('tipo').value;
+      resetar();
+      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+        document.getElementById('btnSubmeter').style.display = 'inline-block';
+      } else if (tipoSelecionado) {
+        document.getElementById('btnSubmeter').style.display = 'inline-block';
+      }
+    }
+
+    function submeter() {
+      if (!tipoSelecionado) {
+        alert("Selecione um tipo de registo.");
+        return;
+      }
+
+      inicioDataHora = new Date();
+      const inicioHoraStr = inicioDataHora.toLocaleTimeString();
+
+      document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
+      document.getElementById('horaInicio').style.display = 'inline-block';
+
+      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioHoraStr, "", "");
+      } else {
+        iniciarCronometro();
+        document.getElementById('btnSubmeter').style.display = 'none';
+        document.getElementById('btnTerminar').style.display = 'inline-block';
+        document.getElementById('cronometro').style.display = 'inline-block';
+      }
+    }
+
+    function iniciarCronometro() {
+      segundos = 0;
+      timer = setInterval(() => {
+        segundos++;
+        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
+        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
+        const s = String(segundos % 60).padStart(2, '0');
+        document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    function terminar() {
+      clearInterval(timer);
+      fimDataHora = new Date();
+      const fimHoraStr = fimDataHora.toLocaleTimeString();
+      const duracaoStr = document.getElementById('cronometro').textContent.replace('⏱ ', '');
+
+      document.getElementById('horaFim').textContent = `🕔 Fim: ${fimHoraStr}`;
+      document.getElementById('horaFim').style.display = 'inline-block';
+
+      enviarAoSheets(
+        tipoSelecionado,
+        inicioDataHora.toLocaleDateString(),
+        inicioDataHora.toLocaleTimeString(),
+        fimHoraStr,
+        duracaoStr
+      );
+
+      document.getElementById('btnTerminar').style.display = 'none';
+    }
+
+    function enviarAoSheets(tipo, data, inicio, fim, duracao) {
+      const payload = new URLSearchParams();
+      payload.append("user", user);
+      payload.append("nome", nome);
+      payload.append("tipo", tipo);
+      payload.append("data", data);
+      payload.append("inicio", inicio);
+      payload.append("fim", fim);
+      payload.append("duracao", duracao);
+
+      fetch("https://script.google.com/macros/s/AKfycbzB7QoCYET2-oJltBIaBRJvi_mL6w-iYNhAKg8bAPxeDbCUQZt3hsAu5qegzyr64EzgGw/exec", {
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        }
+      })
+      .then(response => response.text())
+      .then(msg => alert("✔️ " + msg))
+      .catch(err => alert("❌ Erro ao enviar: " + err));
+    }
+
+    function resetar() {
+      clearInterval(timer);
+      document.getElementById('cronometro').textContent = "⏱ 00:00:00";
+      document.getElementById('cronometro').style.display = 'none';
+      document.getElementById('horaInicio').style.display = 'none';
+      document.getElementById('horaFim').style.display = 'none';
+      document.getElementById('btnTerminar').style.display = 'none';
+    }
+  </script>
+
+</body>
+</html>
