@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registo FYBDO</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .barra-registo {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-start;
+      width: 100%;
+      max-width: 900px;
+      background-color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      box-sizing: border-box;
+      margin-bottom: 40px;
+    }
+
+    .info-data {
+      font-weight: bold;
+      margin-right: 8px;
+      white-space: nowrap;
+      color: #444;
+    }
+
+    .info-usuario {
+      font-weight: bold;
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    label {
+      margin-right: 4px;
+      white-space: nowrap;
+    }
+
+    select, button {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      white-space: nowrap;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .status {
+      font-size: 14px;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+
+    #mensagem {
+      margin-left: 12px;
+      font-weight: bold;
+    }
+
+    /* Container do iframe para centralizar e limitar largura */
+    .iframe-container {
+      width: 100%;
+      max-width: 900px;
+      height: 600px; /* pode ajustar a altura */
+      margin-bottom: 40px;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="barra-registo">
+    <div id="infoData" class="info-data"></div>
+    <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
+
+    <label for="tipo">Tipo de Registo:</label>
+    <select id="tipo" onchange="mudarTipo()">
+      <option value="">Selecione</option>
+      <option value="login">Login</option>
+      <option value="logout">Logout</option>
+      <option value="pausa1">Pausa 1</option>
+      <option value="pausa2">Pausa 2</option>
+      <option value="refeicao">Refeição</option>
+      <option value="formacao">Formação</option>
+    </select>
+
+    <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+
+    <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
+    <span id="horaInicio" class="status" style="display:none;"></span>
+    <span id="horaFim" class="status" style="display:none;"></span>
+
+    <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+
+    <span id="mensagem" class="status"></span>
+  </div>
+
+  <!-- Aqui está o iframe que incorpora o ORLANDA.html -->
+  <div class="iframe-container">
+    <iframe src="ORLANDA.html" title="Conteúdo Orlanda"></iframe>
+  </div>
+
+  <script>
+    // (Seu JavaScript aqui, sem alterações)
+    const user = "EX04904";
+    const nome = "Telma Sofia Pereira Rosa";
+
+    let tipoSelecionado = "";
+    let inicioDataHora;
+    let fimDataHora;
+    let timer;
+    let segundos = 0;
+
+    function mudarTipo() {
+      tipoSelecionado = document.getElementById('tipo').value;
+      resetar();
+      if (tipoSelecionado) {
+        document.getElementById('btnSubmeter').style.display = 'inline-block';
+      }
+      const hoje = new Date().toLocaleDateString();
+      document.getElementById('infoData').textContent = `📅 ${hoje}`;
+    }
+
+    function mostrarMensagem(texto, sucesso = true) {
+      const mensagemEl = document.getElementById('mensagem');
+      mensagemEl.textContent = texto;
+      mensagemEl.style.color = sucesso ? 'green' : 'red';
+    }
+
+    function submeter() {
+      if (!tipoSelecionado) {
+        mostrarMensagem("Selecione um tipo de registo.", false);
+        return;
+      }
+
+      inicioDataHora = new Date();
+
+      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+        document.getElementById('horaInicio').textContent = `✔️ Registado`;
+        document.getElementById('horaInicio').style.display = 'inline-block';
+
+        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioDataHora.toLocaleTimeString(), "", "")
+          .then(msg => mostrarMensagem("✔️ " + msg, true))
+          .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
+      } else {
+        const inicioHoraStr = inicioDataHora.toLocaleTimeString();
+        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
+        document.getElementById('horaInicio').style.display = 'inline-block';
+
+        iniciarCronometro();
+        document.getElementById('btnSubmeter').style.display = 'none';
+        document.getElementById('btnTerminar').style.display = 'inline-block';
+        document.getElementById('cronometro').style.display = 'inline-block';
+        mostrarMensagem("");
+      }
+    }
+
+    function iniciarCronometro() {
+      segundos = 0;
+      timer = setInterval(() => {
+        segundos++;
+        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
+        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
+        const s = String(segundos % 60).padStart(2, '0');
+        document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
+      }, 1000);
+    }
+
+    function terminar() {
+      clearInterval(timer);
+      fimDataHora = new Date();
+      const fimHoraStr = fimDataHora.toLocaleTimeString();
+      const duracaoStr = document.getElementById('cronometro').textContent.replace('⏱ ', '');
+
+      document.getElementById('horaFim').textContent = `🕔 Fim: ${fimHoraStr}`;
+      document.getElementById('horaFim').style.display = 'inline-block';
+
+      enviarAoSheets(
+        tipoSelecionado,
+        inicioDataHora.toLocaleDateString(),
+        inicioDataHora.toLocaleTimeString(),
+        fimHoraStr,
+        duracaoStr
+      )
+      .then(msg => mostrarMensagem("✔️ " + msg, true))
+      .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
+
+      document.getElementById('btnTerminar').style.display = 'none';
+    }
+
+    function enviarAoSheets(tipo, data, inicio, fim, duracao) {
+      const payload = {
+        data: [
+          {
+            data: data,
+            user: user,
+            nome: nome,
+            tipo: tipo,
+            inicio: inicio,
+            fim: fim,
+            duracao: duracao
+          }
+        ]
+      };
+
+      console.log("Payload para enviar:", JSON.stringify(payload, null, 2));
+
+      return fetch("https://sheetdb.io/api/v1/86wt61zb7vvfz", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Erro HTTP! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if(data.created) {
+          return "Registo enviado com sucesso!";
+        } else {
+          throw new Error("Resposta inesperada da API.");
+        }
+      });
+    }
+
+    function resetar() {
+      clearInterval(timer);
+      document.getElementById('cronometro').textContent = "⏱ 00:00:00";
+      document.getElementById('cronometro').style.display = 'none';
+      document.getElementById('horaInicio').style.display = 'none';
+      document.getElementById('horaFim').style.display = 'none';
+      document.getElementById('btnTerminar').style.display = 'none';
+      document.getElementById('btnSubmeter').style.display = 'inline-block';
+      mostrarMensagem("");
+      document.getElementById('infoData').textContent = "";
+    }
+
+    window.onload = () => {
+      const hoje = new Date().toLocaleDateString();
+      document.getElementById('infoData').textContent = `📅 ${hoje}`;
+    }
+  </script>
+
+</body>
+</html>
