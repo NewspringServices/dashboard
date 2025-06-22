@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Formulário GAMa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* background-color removido */
+        }
+        .form-container {
+            background: white; /* manter branco para o formulário */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            color: #28a745;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        select, input[type="text"], input[type="number"], button, input[type="radio"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .form-group .tipologia-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-group .tipologia-container div {
+            flex: 1;
+            text-align: center;
+        }
+        .button-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .button-container button {
+            width: 48%;
+        }
+        .message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h1>Produção - Orlanda Francisco</h1>
+        <form id="gamaForm">
+            <div class="form-group">
+                <label>Tipologia Puxada:</label>
+                <div class="tipologia-container">
+                    <div>
+                        <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
+                        <label for="aberturas">Aberturas</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
+                        <label for="indexacoes">Indexações</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="processoGama">Processo GAMA:</label>
+                <input type="text" id="processoGama" name="processoGama" required />
+            </div>
+
+            <div class="form-group">
+                <label for="documentos">Documentos Tratados:</label>
+                <input type="number" id="documentos" name="documentos" required />
+            </div>
+
+            <div class="form-group">
+                <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+                <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+                    <option value="Tarefa Aberturas">Tarefa Aberturas</option>
+                    <option value="Tarefa Indexações">Tarefa Indexações</option>
+                    <option value="Pedido de Elementos">Pedido de Elementos</option>
+                    <option value="Erros/SPAM">Erros/SPAM</option>
+                    <option value="Formação/Meetings">Formação/Meetings</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="tempoTarefa">Tempo da Tarefa:</label>
+                <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+            </div>
+
+            <div class="form-group button-container">
+                <button type="button" id="startButton">Iniciar Tarefa</button>
+                <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+            </div>
+
+            <div id="responseMessage" class="message"></div>
+        </form>
+    </div>
+
+<script>
+    let startTime;
+    let endTime;
+    let timerInterval;
+
+    const startButton = document.getElementById('startButton');
+    const endButton = document.getElementById('endButton');
+    const tempoTarefa = document.getElementById('tempoTarefa');
+    const responseMessage = document.getElementById('responseMessage');
+
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    }
+
+    // Função para formatar data para "DD/MM/YYYY HH:mm:ss"
+    function formatDate(date) {
+        const d = date.getDate().toString().padStart(2,'0');
+        const m = (date.getMonth() + 1).toString().padStart(2,'0');
+        const y = date.getFullYear();
+        const h = date.getHours().toString().padStart(2,'0');
+        const min = date.getMinutes().toString().padStart(2,'0');
+        const s = date.getSeconds().toString().padStart(2,'0');
+        return `${d}/${m}/${y} ${h}:${min}:${s}`;
+    }
+
+    startButton.addEventListener('click', function() {
+        startTime = new Date();
+        startButton.disabled = true;
+        endButton.disabled = false;
+
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((new Date() - startTime)/1000);
+            tempoTarefa.value = formatTime(elapsed);
+        }, 1000);
+    });
+
+    endButton.addEventListener('click', function() {
+        clearInterval(timerInterval);
+        endTime = new Date();
+        const elapsed = Math.floor((endTime - startTime) / 1000);
+        tempoTarefa.value = formatTime(elapsed);
+        endButton.disabled = true;
+
+        const processoGama = document.getElementById('processoGama').value;
+        const documentos = document.getElementById('documentos').value;
+        const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
+        const tempo = tempoTarefa.value;
+        const colaborador = "Orlanda Leizi Gomes Francisco";
+        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
+        const startFormatted = formatDate(startTime);
+        const endFormatted = formatDate(endTime);
+
+        // Enviar para a API do SheetDB
+        fetch('https://sheetdb.io/api/v1/8eguyk4xwr8uw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: {
+                    "Tipologia Puxada": tipologiaPuxada,
+                    "Inicio da Tarefa": startFormatted,
+                    "Fim da Tarefa": endFormatted,
+                    "Colaborador": colaborador,
+                    "Processo GAMA": processoGama,
+                    "Documentos": documentos,
+                    "Tarefa Finalizada": tarefaFinalizada,
+                    "Tempo com a tarefa": tempo
+                }
+            })
+        })
+        .then(response => {
+            if (response.ok) return response.json();
+            else throw new Error('Erro ao enviar os dados');
+        })
+        .then(data => {
+            showMessage('Dados enviados com sucesso!', 'success');
+            document.getElementById('gamaForm').reset();
+            startButton.disabled = false;
+            tempoTarefa.value = '';
+        })
+        .catch(error => {
+            showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
+            startButton.disabled = false;
+        });
+    });
+
+    function showMessage(message, type) {
+        responseMessage.textContent = message;
+        responseMessage.className = 'message ' + type;
+        responseMessage.style.display = 'block';
+        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+    }
+</script>
+
+</body>
+</html>
