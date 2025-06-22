@@ -2,36 +2,34 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
-  <title>Registo FYBDO com ORLANDA</title>
+  <title>Página com Barra de Registro e Orlanda</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 20px;
-      background: transparent;
+      background: #f0f0f0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      box-sizing: border-box;
+      align-items: center; /* centraliza horizontalmente todo o conteúdo */
     }
 
     .barra-registo {
+      background: white;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 800px; /* largura máxima da barra */
+      box-sizing: border-box;
+      margin-bottom: 20px;
       display: flex;
       flex-wrap: nowrap;
       align-items: center;
       justify-content: flex-start;
-      width: 100%;
-      max-width: 900px;
-      background-color: #fff;
-      padding: 12px 16px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       gap: 8px;
       overflow-x: auto;
       white-space: nowrap;
-      box-sizing: border-box;
-      margin-bottom: 30px;
     }
 
     .info-data {
@@ -78,27 +76,20 @@
       white-space: nowrap;
     }
 
+    /* Mensagem de status com margem extra para destacar */
     #mensagem {
       margin-left: 12px;
       font-weight: bold;
     }
 
-    /* Centraliza o iframe e define tamanho */
-    .centralizado {
+    iframe {
       width: 100%;
-      max-width: 900px;
-      height: 700px;
-      border: 2px solid #28a745;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .centralizado iframe {
-      width: 100%;
-      height: 100%;
+      max-width: 800px; /* largura máxima do iframe */
+      height: 600px; /* altura fixa, ajuste se quiser */
       border: none;
-      display: block;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: white;
     }
   </style>
 </head>
@@ -130,10 +121,7 @@
     <span id="mensagem" class="status"></span>
   </div>
 
-  <div class="centralizado">
-    <!-- Atualize o src abaixo com o caminho correto do seu ORLANDA.html no GitHub Pages -->
-    <iframe src="ORLANDA.html" title="Conteúdo Orlanda"></iframe>
-  </div>
+  <iframe src="ORLANDA.html" title="Conteúdo Orlanda"></iframe>
 
   <script>
     const user = "EX04904";
@@ -273,6 +261,7 @@
       document.getElementById('infoData').textContent = "";
     }
 
+    // Inicializa a data na barra ao carregar a página
     window.onload = () => {
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
