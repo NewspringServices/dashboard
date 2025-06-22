@@ -18,7 +18,7 @@
       justify-content: center;
       align-items: center;
       color: #333;
-      background: transparent; /* Fundo transparente */
+      background: transparent;
     }
 
     .container {
@@ -120,7 +120,7 @@
     }
 
     const usuarios = [
-      { usuario: "EX04904", senha: "Telma", pagina: "https://newspringservicesc.wixsite.com/newspring-services/blank" },
+      { usuario: "EX04904", senha: "Telma", pagina: "ex04904.html" },
       { usuario: "EX10357", senha: "FELIPE*NSS01", pagina: "https://newspringservicesc.wixsite.com/newspring-services/felipe-santana" },
       { usuario: "EX10359", senha: "JOEL*NSS02", pagina: "https://newspringservicesc.wixsite.com/newspring-services/joel-mundjanga" },
       { usuario: "EX10362", senha: "ORLANDA*NSS03", pagina: "https://newspringservicesc.wixsite.com/newspring-services/orlanda-francisco" },
@@ -156,9 +156,15 @@
       const usuarioValido = usuarios.find(u => u.usuario === usuario && u.senha === senha);
 
       if (usuarioValido) {
-        const novaAba = window.open(usuarioValido.pagina, '_blank', 'noopener,noreferrer');
-        if (!novaAba) {
-          errorMessage.textContent = "Não foi possível abrir a página. Permita pop-ups no navegador.";
+        // Se for o usuário EX04904, redireciona para ex04904.html
+        if (usuarioValido.usuario === "EX04904") {
+          window.location.href = "ex04904.html";
+        } else {
+          // Para os outros, abre o link em nova aba
+          const novaAba = window.open(usuarioValido.pagina, '_blank', 'noopener,noreferrer');
+          if (!novaAba) {
+            errorMessage.textContent = "Não foi possível abrir a página. Permita pop-ups no navegador.";
+          }
         }
       } else {
         errorMessage.textContent = "Usuário ou senha incorretos.";
