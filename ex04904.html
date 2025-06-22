@@ -27,6 +27,13 @@
       box-sizing: border-box;
     }
 
+    .info-data {
+      font-weight: bold;
+      margin-right: 8px;
+      white-space: nowrap;
+      color: #444;
+    }
+
     .info-usuario {
       font-weight: bold;
       margin-right: 8px;
@@ -74,6 +81,7 @@
 <body>
 
   <div class="barra-registo">
+    <div id="infoData" class="info-data"></div>
     <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
 
     <label for="tipo">Tipo de Registo:</label>
@@ -114,6 +122,9 @@
       if (tipoSelecionado) {
         document.getElementById('btnSubmeter').style.display = 'inline-block';
       }
+      // Atualiza a data exibida na barra para a data atual
+      const hoje = new Date().toLocaleDateString();
+      document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
 
     function mostrarMensagem(texto, sucesso = true) {
@@ -131,7 +142,6 @@
       inicioDataHora = new Date();
 
       if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        // Mostra "Registado" em vez do horário
         document.getElementById('horaInicio').textContent = `✔️ Registado`;
         document.getElementById('horaInicio').style.display = 'inline-block';
 
@@ -139,7 +149,6 @@
           .then(msg => mostrarMensagem("✔️ " + msg, true))
           .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
       } else {
-        // Para outros tipos, exibe o horário normal de início
         const inicioHoraStr = inicioDataHora.toLocaleTimeString();
         document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
         document.getElementById('horaInicio').style.display = 'inline-block';
@@ -148,7 +157,7 @@
         document.getElementById('btnSubmeter').style.display = 'none';
         document.getElementById('btnTerminar').style.display = 'inline-block';
         document.getElementById('cronometro').style.display = 'inline-block';
-        mostrarMensagem(""); // limpa mensagem
+        mostrarMensagem("");
       }
     }
 
@@ -189,10 +198,10 @@
       const payload = {
         data: [
           {
-            user: User,
-            nome: Nome,
-            tipo: Registo,
-            data: Data,
+            data: data,
+            user: user,
+            nome: nome,
+            tipo: tipo,
             inicio: inicio,
             fim: fim,
             duracao: duracao
@@ -232,7 +241,14 @@
       document.getElementById('horaFim').style.display = 'none';
       document.getElementById('btnTerminar').style.display = 'none';
       document.getElementById('btnSubmeter').style.display = 'inline-block';
-      mostrarMensagem(""); // limpa mensagem
+      mostrarMensagem("");
+      document.getElementById('infoData').textContent = "";
+    }
+
+    // Inicializa a data na barra ao carregar a página
+    window.onload = () => {
+      const hoje = new Date().toLocaleDateString();
+      document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
   </script>
 
