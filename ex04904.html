@@ -63,6 +63,12 @@
       margin-left: 4px;
       white-space: nowrap;
     }
+
+    /* Mensagem de status com margem extra para destacar */
+    #mensagem {
+      margin-left: 12px;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -88,10 +94,11 @@
     <span id="horaFim" class="status" style="display:none;"></span>
 
     <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+
+    <span id="mensagem" class="status"></span>
   </div>
 
   <script>
-    // Dados estáticos do usuário
     const user = "EX04904";
     const nome = "Telma Sofia Pereira Rosa";
 
@@ -104,32 +111,44 @@
     function mudarTipo() {
       tipoSelecionado = document.getElementById('tipo').value;
       resetar();
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        document.getElementById('btnSubmeter').style.display = 'inline-block';
-      } else if (tipoSelecionado) {
+      if (tipoSelecionado) {
         document.getElementById('btnSubmeter').style.display = 'inline-block';
       }
     }
 
+    function mostrarMensagem(texto, sucesso = true) {
+      const mensagemEl = document.getElementById('mensagem');
+      mensagemEl.textContent = texto;
+      mensagemEl.style.color = sucesso ? 'green' : 'red';
+    }
+
     function submeter() {
       if (!tipoSelecionado) {
-        alert("Selecione um tipo de registo.");
+        mostrarMensagem("Selecione um tipo de registo.", false);
         return;
       }
 
       inicioDataHora = new Date();
-      const inicioHoraStr = inicioDataHora.toLocaleTimeString();
-
-      document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
-      document.getElementById('horaInicio').style.display = 'inline-block';
 
       if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioHoraStr, "", "");
+        // Mostra "Registado" em vez do horário
+        document.getElementById('horaInicio').textContent = `✔️ Registado`;
+        document.getElementById('horaInicio').style.display = 'inline-block';
+
+        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioDataHora.toLocaleTimeString(), "", "")
+          .then(msg => mostrarMensagem("✔️ " + msg, true))
+          .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
       } else {
+        // Para outros tipos, exibe o horário normal de início
+        const inicioHoraStr = inicioDataHora.toLocaleTimeString();
+        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
+        document.getElementById('horaInicio').style.display = 'inline-block';
+
         iniciarCronometro();
         document.getElementById('btnSubmeter').style.display = 'none';
         document.getElementById('btnTerminar').style.display = 'inline-block';
         document.getElementById('cronometro').style.display = 'inline-block';
+        mostrarMensagem(""); // limpa mensagem
       }
     }
 
@@ -159,31 +178,50 @@
         inicioDataHora.toLocaleTimeString(),
         fimHoraStr,
         duracaoStr
-      );
+      )
+      .then(msg => mostrarMensagem("✔️ " + msg, true))
+      .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
 
       document.getElementById('btnTerminar').style.display = 'none';
     }
 
     function enviarAoSheets(tipo, data, inicio, fim, duracao) {
-      const payload = new URLSearchParams();
-      payload.append("user", user);
-      payload.append("nome", nome);
-      payload.append("tipo", tipo);
-      payload.append("data", data);
-      payload.append("inicio", inicio);
-      payload.append("fim", fim);
-      payload.append("duracao", duracao);
+      const payload = {
+        data: [
+          {
+            user: User,
+            nome: Nome,
+            tipo: Registo,
+            data: Data,
+            inicio: inicio,
+            fim: fim,
+            duracao: duracao
+          }
+        ]
+      };
 
-      fetch("https://script.google.com/macros/s/AKfycbzB7QoCYET2-oJltBIaBRJvi_mL6w-iYNhAKg8bAPxeDbCUQZt3hsAu5qegzyr64EzgGw/exec", {
+      console.log("Payload para enviar:", JSON.stringify(payload, null, 2));
+
+      return fetch("https://sheetdb.io/api/v1/86wt61zb7vvfz", {
         method: "POST",
-        body: payload,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded"
-        }
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
       })
-      .then(response => response.text())
-      .then(msg => alert("✔️ " + msg))
-      .catch(err => alert("❌ Erro ao enviar: " + err));
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`Erro HTTP! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if(data.created) {
+          return "Registo enviado com sucesso!";
+        } else {
+          throw new Error("Resposta inesperada da API.");
+        }
+      });
     }
 
     function resetar() {
@@ -193,6 +231,8 @@
       document.getElementById('horaInicio').style.display = 'none';
       document.getElementById('horaFim').style.display = 'none';
       document.getElementById('btnTerminar').style.display = 'none';
+      document.getElementById('btnSubmeter').style.display = 'inline-block';
+      mostrarMensagem(""); // limpa mensagem
     }
   </script>
 
