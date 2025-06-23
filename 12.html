@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>FYBDO + GAMa</title>
 
-  <!-- Estilos combinados -->
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -42,25 +41,53 @@
       display: block;
     }
 
-    /* Estilos específicos do primeiro HTML */
     .barra-registo {
       display: flex;
-      flex-wrap: nowrap;
+      flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      width: 100%;
       background-color: #fff;
-      padding: 12px 16px;
+      padding: 20px;
       border-radius: 10px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      gap: 8px;
-      overflow-x: auto;
-      white-space: nowrap;
-      margin-bottom: 20px;
-      box-sizing: border-box;
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto 20px auto;
     }
 
-    /* Estilos específicos do segundo HTML */
+    .barra-registo .info-usuario {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .barra-registo .select-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .barra-registo select {
+      width: 200px;
+      padding: 8px;
+    }
+
+    .barra-registo button#btnSubmeter {
+      padding: 6px 12px;
+      font-size: 14px;
+      width: auto;
+    }
+
+    .status {
+      font-size: 14px;
+    }
+
+    #mensagem {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
     .form-container {
       background: white;
       padding: 20px;
@@ -134,23 +161,28 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX04904 | Nome: Telma Sofia Pereira Rosa</div>
-      <label for="tipo">Tipo de Registo:</label>
-      <select id="tipo" onchange="mudarTipo()">
-        <option value="">Selecione</option>
-        <option value="login">Login</option>
-        <option value="logout">Logout</option>
-        <option value="pausa1">Pausa 1</option>
-        <option value="pausa2">Pausa 2</option>
-        <option value="refeicao">Refeição</option>
-        <option value="formacao">Formação</option>
-      </select>
-      <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+      <div class="info-usuario">User: EX04904<br>Nome: Telma Sofia Pereira Rosa</div>
+
+      <div class="select-row">
+        <label for="tipo">Tipo:</label>
+        <select id="tipo" onchange="mudarTipo()">
+          <option value="">Selecione</option>
+          <option value="login">Login</option>
+          <option value="logout">Logout</option>
+          <option value="pausa1">Pausa 1</option>
+          <option value="pausa2">Pausa 2</option>
+          <option value="refeicao">Refeição</option>
+          <option value="formacao">Formação</option>
+        </select>
+        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+      </div>
+
       <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
       <span id="horaInicio" class="status" style="display:none;"></span>
       <span id="horaFim" class="status" style="display:none;"></span>
       <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
-      <span id="mensagem" class="status" style="margin-left:12px;font-weight:bold;"></span>
+
+      <span id="mensagem" class="status"></span>
     </div>
   </div>
 
@@ -203,9 +235,8 @@
     </div>
   </div>
 
-  <!-- Scripts dos dois -->
+  <!-- Scripts -->
   <script>
-    // Aba
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -213,7 +244,6 @@
       event.target.classList.add('active');
     }
 
-    // FYBDO scripts
     const user = "EX04904";
     const nome = "Telma Sofia Pereira Rosa";
     let tipoSelecionado = "", inicioDataHora, fimDataHora, timer, segundos = 0;
