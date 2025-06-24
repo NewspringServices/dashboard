@@ -21,12 +21,22 @@
       box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
       width: 350px;
+      text-align: center;
+    }
+
+    .logo {
+      margin-bottom: 15px;
+    }
+
+    .logo img {
+      max-width: 150px;
+      height: auto;
+      display: inline-block;
     }
 
     h2 {
       font-size: 22px;
       margin-bottom: 15px;
-      text-align: center;
     }
 
     .section-title {
@@ -34,6 +44,7 @@
       margin-bottom: 10px;
       font-weight: bold;
       font-size: 18px;
+      text-align: left;
     }
 
     .options-btn, .logout-btn {
@@ -68,6 +79,10 @@
 <body>
 
   <div class="form-container">
+    <div class="logo">
+      <img src="https://i.imgur.com/ZeFVyGe.png" alt="Logotipo BPO" />
+    </div>
+
     <h2>BPO - Acesso Rápido</h2>
 
     <div class="section-title">Formulários</div>
@@ -80,7 +95,6 @@
     <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1Y_ktLVagJR51SAwcRTghgtIWk8BliUWa7n4saIkjr6k/edit?usp=sharing', '_blank')">BD de BH</button>
     <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1JR_H3Kti7C-NOHdcF_hnZ_35pBW7EdwsxBlZXrOyeDg/edit?usp=sharing', '_blank')">BD Erros de TT</button>
     <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1QMEWuGJQWQo98fAi-yCZhOm3QK1uB5dz-NR5Xh9VL8U/edit?gid=1248855494#gid=1248855494', '_blank')">Registos NSS</button>
-
   </div>
 
 </body>
