@@ -23,7 +23,7 @@
     }
 
     .container {
-      background-color: #ffffff; /* branco puro */
+      background-color: #ffffff;
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -109,17 +109,30 @@
 
   <div id="menu" class="container">
     <button class="btn-colaborador" onclick="mostrarLoginColaborador()">Área Colaborador</button>
-    <button class="btn-administrador" onclick="alert('Área de Administrador ainda não implementada!')">Área de Administrador</button>
+    <button class="btn-administrador" onclick="mostrarLoginAdministrador()">Área de Administrador</button>
   </div>
 
+  <!-- Área do Colaborador -->
   <div id="loginColaborador" class="container" style="display:none;">
     <h2>ÁREA DE COLABORADOR</h2>
-    <form id="loginForm" onsubmit="return validarLogin(event)">
+    <form id="loginFormColab" onsubmit="return validarLoginColaborador(event)">
       <input type="text" id="username" placeholder="Usuário" required />
       <input type="password" id="password" placeholder="Senha" required />
       <button type="submit">Entrar</button>
     </form>
     <p id="error-message" class="error-message"></p>
+    <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
+  </div>
+
+  <!-- Área do Administrador -->
+  <div id="loginAdministrador" class="container" style="display:none;">
+    <h2>ÁREA DE ADMINISTRADOR</h2>
+    <form id="loginFormAdmin" onsubmit="return validarLoginAdmin(event)">
+      <input type="text" id="adminUser" placeholder="Usuário" required />
+      <input type="password" id="adminPass" placeholder="Senha" required />
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="admin-error-message" class="error-message"></p>
     <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
   </div>
 
@@ -129,41 +142,32 @@
       document.getElementById('loginColaborador').style.display = 'block';
     }
 
+    function mostrarLoginAdministrador() {
+      document.getElementById('menu').style.display = 'none';
+      document.getElementById('loginAdministrador').style.display = 'block';
+    }
+
     function voltarMenu() {
       document.getElementById('loginColaborador').style.display = 'none';
+      document.getElementById('loginAdministrador').style.display = 'none';
       document.getElementById('menu').style.display = 'block';
       document.getElementById('error-message').textContent = '';
-      document.getElementById('loginForm').reset();
+      document.getElementById('admin-error-message').textContent = '';
+      document.getElementById('loginFormColab').reset();
+      document.getElementById('loginFormAdmin').reset();
     }
 
     const usuarios = [
       { usuario: "EX04904", senha: "Telma", pagina: "12.html" },
-      { usuario: "EX10357", senha: "FELIPE*NSS01", pagina: "https://newspringservicesc.wixsite.com/newspring-services/felipe-santana" },
-      { usuario: "EX10359", senha: "JOEL*NSS02", pagina: "https://newspringservicesc.wixsite.com/newspring-services/joel-mundjanga" },
-      { usuario: "EX10362", senha: "ORLANDA*NSS03", pagina: "https://newspringservicesc.wixsite.com/newspring-services/orlanda-francisco" },
-      { usuario: "EX10363", senha: "SAMIRA*NSS04", pagina: "https://newspringservicesc.wixsite.com/newspring-services/samira-cunegundes" },
-      { usuario: "EX10418", senha: "JOANA*NSS05", pagina: "https://newspringservicesc.wixsite.com/newspring-services/joana-figueiras" },
-      { usuario: "EX10563", senha: "ALEXANDRE*NSS06", pagina: "https://newspringservicesc.wixsite.com/newspring-services/alexandre-caldeira" },
-      { usuario: "EX10612", senha: "BARBARA*NSS07", pagina: "https://newspringservicesc.wixsite.com/newspring-services/b%C3%A1rbara-miguel" },
-      { usuario: "EX10613", senha: "CARLA*NSS08", pagina: "https://newspringservicesc.wixsite.com/newspring-services/carla-trindade" },
-      { usuario: "EX10622", senha: "NADIA*NSS09", pagina: "https://newspringservicesc.wixsite.com/newspring-services/n%C3%A1dia-oliveira" },
-      { usuario: "EX10867", senha: "GILDA*NSS10", pagina: "https://newspringservicesc.wixsite.com/newspring-services/gilda-anjos" },
-      { usuario: "EX10868", senha: "MARIANA*NSS11", pagina: "https://newspringservicesc.wixsite.com/newspring-services/mariana-serafim" },
-      { usuario: "EX1234", senha: "EX1234", pagina: "https://newspringservicesc.wixsite.com/newspring-services/mariana-serafim" },
-      { usuario: "EX10882", senha: "NSS*BRUNO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/bruno-silva" },
-      { usuario: "EX10883", senha: "NSS*JOAO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/jo%C3%A3o-cardoso" },
-      { usuario: "EX10884", senha: "NSS*RACHEL", pagina: "https://newspringservicesc.wixsite.com/newspring-services/rachel-cardoso" },
-      { usuario: "EX10885", senha: "NSS*RAFAELA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/rafaela-pinto" },
-      { usuario: "EX10886", senha: "NSS*SUSANA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/susana-bordalo" },
-      { usuario: "EX10887", senha: "NSS*BEATRIZ", pagina: "https://newspringservicesc.wixsite.com/newspring-services/beatriz-guedes" },
-      { usuario: "EX10943", senha: "NSS*JOAO", pagina: "https://newspringservicesc.wixsite.com/newspring-services/jo%C3%A3o-borges" },
-      { usuario: "EX10888", senha: "NSS*SOFIA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/sofia-ferreira" },
-      { usuario: "EX10889", senha: "NSS*MARCOS", pagina: "https://newspringservicesc.wixsite.com/newspring-services/marcos-moura" },
-      { usuario: "EX10890", senha: "NSS*CONSTANÇA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/constan%C3%A7a-lopes" },
-      { usuario: "EX10891", senha: "NSS*SARA", pagina: "https://newspringservicesc.wixsite.com/newspring-services/sara-chotumi%C3%A3" }
+      // (outros colaboradores)
     ];
 
-    function validarLogin(event) {
+    const administradores = [
+      { usuario: "BPO", senha: "Telma*Rosa", pagina: "admin1.html" },
+      { usuario: "Worten", senha: "NSS*Admin_worten", pagina: "admin2.html" }
+    ];
+
+    function validarLoginColaborador(event) {
       event.preventDefault();
       const usuario = document.getElementById("username").value.trim();
       const senha = document.getElementById("password").value.trim();
@@ -174,6 +178,25 @@
 
       if (usuarioValido) {
         const novaAba = window.open(usuarioValido.pagina, '_blank', 'noopener,noreferrer');
+        if (!novaAba) {
+          errorMessage.textContent = "Não foi possível abrir a página. Permita pop-ups no navegador.";
+        }
+      } else {
+        errorMessage.textContent = "Usuário ou senha incorretos.";
+      }
+    }
+
+    function validarLoginAdmin(event) {
+      event.preventDefault();
+      const usuario = document.getElementById("adminUser").value.trim();
+      const senha = document.getElementById("adminPass").value.trim();
+      const errorMessage = document.getElementById("admin-error-message");
+      errorMessage.textContent = "";
+
+      const adminValido = administradores.find(u => u.usuario === usuario && u.senha === senha);
+
+      if (adminValido) {
+        const novaAba = window.open(adminValido.pagina, '_blank', 'noopener,noreferrer');
         if (!novaAba) {
           errorMessage.textContent = "Não foi possível abrir a página. Permita pop-ups no navegador.";
         }
