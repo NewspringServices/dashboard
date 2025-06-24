@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Worten - Acesso Rápido</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: transparent;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      width: 350px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .options-btn, .logout-btn {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .options-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .options-btn:hover {
+      background-color: #45a049;
+    }
+
+    .logout-btn {
+      background-color: red;
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>Acesso Rápido Worten</h2>
+
+    <div class="section-title">Formulários</div>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1rpR4ZoVqus8BJ7tdU_7T_B_xsGqlsHaiZHckoilh_04/edit?usp=sharing', '_blank')">Ausências BD</button>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1v3aOqUrk_AsgIqpWMGFHqC83pNMu4IeDRIL8D5ziaHE/edit?usp=sharing', '_blank')">Erros de TT</button>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/10i8b2JTou8t4N2cWiDnUOIB0NdXMlab3YZJfF9LuX4U/edit?usp=sharing', '_blank')">BH</button>
+
+    <div class="section-title">Ficheiros</div>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbyb2CxprV-XU72xHqION0mlxpO8Myae3r8RQI7PbDLqUlCbjXgX9b6tUuVbcaQJBK5r/exec', '_blank')">BD Ausências</button>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbzKZGQ4TU0Nt7WudJuSuz8pK1UCcfsag0HJ58pbxWD_V83ANqVczWeuoozo8o4YZWcZ/exec', '_blank')">BD de BH</button>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbwqnIoGII05lhoVx4l5XeVkJ1y-cex0b_aKLtxiDA-ClMWp3mVsK955xqGWLqF-mwcJTw/exec', '_blank')">BD Erros de TT</button>
+
+  </div>
+
+
+</body>
+</html>

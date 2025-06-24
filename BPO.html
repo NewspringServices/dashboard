@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BPO - Acesso Rápido</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: transparent;
+    }
+
+    .form-container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      width: 350px;
+    }
+
+    h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .options-btn, .logout-btn {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .options-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .options-btn:hover {
+      background-color: #45a049;
+    }
+
+    .logout-btn {
+      background-color: red;
+      color: white;
+    }
+
+    .logout-btn:hover {
+      background-color: #d32f2f;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <h2>BPO - Acesso Rápido</h2>
+
+    <div class="section-title">Formulários</div>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbxce5lGlKCWhgaoi2f37jM7Zt9uFlxciVhYsfj9o-6LdA-Op-k2TTTPe0sE0uJSSRb-/exec', '_blank')">Ausências BD</button>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbxcKnS4Flrv0CD2Vp3zbTemb9mh-P3haAMGkIAhLXZ0cf2MltTPRcRFpxwzYLW4Nx4bGA/exec', '_blank')">Erros de TT</button>
+    <button class="options-btn" onclick="window.open('https://script.google.com/macros/s/AKfycbzZW6jiVljhp4d-MPQ7DOSXgsEl6Izm817bhQU_2c-GvuSm5kJNZuMHZf8Xi2eA8vRZ/exec', '_blank')">BH</button>
+
+    <div class="section-title">Ficheiros</div>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1pa_On0s6UagYzNFKWTcjy2lr__d_uVZAyPsbgTfpU2o/edit?usp=sharing', '_blank')">Intraday e BD Ausências</button>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1Y_ktLVagJR51SAwcRTghgtIWk8BliUWa7n4saIkjr6k/edit?usp=sharing', '_blank')">BD de BH</button>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1JR_H3Kti7C-NOHdcF_hnZ_35pBW7EdwsxBlZXrOyeDg/edit?usp=sharing', '_blank')">BD Erros de TT</button>
+    <button class="options-btn" onclick="window.open('https://docs.google.com/spreadsheets/d/1QMEWuGJQWQo98fAi-yCZhOm3QK1uB5dz-NR5Xh9VL8U/edit?gid=1248855494#gid=1248855494', '_blank')">Registos NSS</button>
+
+  </div>
+
+</body>
+</html>
