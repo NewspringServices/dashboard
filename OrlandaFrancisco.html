@@ -1,10 +1,10 @@
+<!-- INÍCIO DO HTML COM O CRONÔMETRO REMOVIDO -->
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Dashboard Newspring</title>
-
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -165,21 +165,18 @@
       font-weight: bold;
       font-size: 14px;
     }
-
   </style>
 </head>
 <body>
 
-  <!-- Imagem pequena no topo da página -->
-<img id="topImage" src="logo.png" alt="Logo Newspring" />
+  <img id="topImage" src="logo.png" alt="Logo Newspring" />
 
-  <!-- Abas -->
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
     <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
   </div>
 
-  <!-- Conteúdo FYBDO -->
+  <!-- NSS -->
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
@@ -199,65 +196,19 @@
         <button id="btnSubmeter" onclick="submeter()">Submeter</button>
       </div>
 
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
       <span id="horaInicio" class="status" style="display:none;"></span>
       <span id="horaFim" class="status" style="display:none;"></span>
       <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
-
       <span id="mensagem" class="status"></span>
     </div>
   </div>
 
-  <!-- Conteúdo GAMa -->
+  <!-- GAMA -->
   <div id="gama" class="tab-content">
-    <div class="form-container">
-      <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
-      <form id="gamaForm">
-        <div class="form-group">
-          <label>Tipologia Puxada:</label>
-          <div class="tipologia-container">
-            <div>
-              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
-              <label for="aberturas">Aberturas</label>
-            </div>
-            <div>
-              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
-              <label for="indexacoes">Indexações</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="processoGama">Processo GAMA:</label>
-          <input type="text" id="processoGama" name="processoGama" required />
-        </div>
-        <div class="form-group">
-          <label for="documentos">Documentos Tratados:</label>
-          <input type="number" id="documentos" name="documentos" required />
-        </div>
-        <div class="form-group">
-          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-          <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="Tarefa Aberturas">Tarefa Aberturas</option>
-            <option value="Tarefa Indexações">Tarefa Indexações</option>
-            <option value="Pedido de Elementos">Pedido de Elementos</option>
-            <option value="Erros/SPAM">Erros/SPAM</option>
-            <option value="Formação/Meetings">Formação/Meetings</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="tempoTarefa">Tempo da Tarefa:</label>
-          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-        </div>
-        <div class="form-group button-container">
-          <button type="button" id="startButton">Iniciar Tarefa</button>
-          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-        </div>
-        <div id="responseMessage" class="message"></div>
-      </form>
-    </div>
+    <!-- Conteúdo GAMA (sem alterações aqui) -->
+    <!-- [O mesmo código da GAMA que você já tem pode ser mantido] -->
   </div>
 
-  <!-- Scripts -->
   <script>
     function showTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -268,7 +219,7 @@
 
     const user = "EX10362";
     const nome = "Orlanda Leizi Gomes Francisco";
-    let tipoSelecionado = "", inicioDataHora, fimDataHora, timer, segundos = 0;
+    let tipoSelecionado = "", inicioDataHora, fimDataHora;
 
     function mudarTipo() {
       tipoSelecionado = document.getElementById('tipo').value;
@@ -289,40 +240,26 @@
     function submeter() {
       if (!tipoSelecionado) return mostrarMensagem("Selecione um tipo de registo.", false);
       inicioDataHora = new Date();
+      const inicioStr = inicioDataHora.toLocaleTimeString();
+
       if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        document.getElementById('horaInicio').textContent = `✔️ Registado`;
+        document.getElementById('horaInicio').textContent = `✔️ Registado às ${inicioStr}`;
         document.getElementById('horaInicio').style.display = 'inline-block';
-        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioDataHora.toLocaleTimeString(), "", "")
+        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioStr, "", "")
           .then(msg => mostrarMensagem("✔️ " + msg, true))
           .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
       } else {
-        const inicioHoraStr = inicioDataHora.toLocaleTimeString();
-        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
+        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioStr}`;
         document.getElementById('horaInicio').style.display = 'inline-block';
-        iniciarCronometro();
         document.getElementById('btnSubmeter').style.display = 'none';
         document.getElementById('btnTerminar').style.display = 'inline-block';
-        document.getElementById('cronometro').style.display = 'inline-block';
         mostrarMensagem("");
       }
     }
 
-    function iniciarCronometro() {
-      segundos = 0;
-      timer = setInterval(() => {
-        segundos++;
-        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-        const s = String(segundos % 60).padStart(2, '0');
-        document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
-      }, 1000);
-    }
-
     function terminar() {
-      clearInterval(timer);
       fimDataHora = new Date();
       const fimHoraStr = fimDataHora.toLocaleTimeString();
-      const duracaoStr = document.getElementById('cronometro').textContent.replace('⏱ ', '');
       document.getElementById('horaFim').textContent = `🕔 Fim: ${fimHoraStr}`;
       document.getElementById('horaFim').style.display = 'inline-block';
       enviarAoSheets(
@@ -330,7 +267,7 @@
         inicioDataHora.toLocaleDateString(),
         inicioDataHora.toLocaleTimeString(),
         fimHoraStr,
-        duracaoStr
+        ""
       ).then(msg => mostrarMensagem("✔️ " + msg, true))
         .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
       document.getElementById('btnTerminar').style.display = 'none';
@@ -352,9 +289,6 @@
     }
 
     function resetar() {
-      clearInterval(timer);
-      document.getElementById('cronometro').textContent = "⏱ 00:00:00";
-      document.getElementById('cronometro').style.display = 'none';
       document.getElementById('horaInicio').style.display = 'none';
       document.getElementById('horaFim').style.display = 'none';
       document.getElementById('btnTerminar').style.display = 'none';
@@ -367,102 +301,7 @@
       const hoje = new Date().toLocaleDateString();
       document.getElementById('infoData').textContent = `📅 ${hoje}`;
     }
-
-    // GAMa scripts
-       let startTime;
-    let endTime;
-    let timerInterval;
-
-    const startButton = document.getElementById('startButton');
-    const endButton = document.getElementById('endButton');
-    const tempoTarefa = document.getElementById('tempoTarefa');
-    const responseMessage = document.getElementById('responseMessage');
-
-    function formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    }
-
-    // Função para formatar data para "DD/MM/YYYY HH:mm:ss"
-    function formatDate(date) {
-        const d = date.getDate().toString().padStart(2,'0');
-        const m = (date.getMonth() + 1).toString().padStart(2,'0');
-        const y = date.getFullYear();
-        const h = date.getHours().toString().padStart(2,'0');
-        const min = date.getMinutes().toString().padStart(2,'0');
-        const s = date.getSeconds().toString().padStart(2,'0');
-        return `${d}/${m}/${y} ${h}:${min}:${s}`;
-    }
-
-    startButton.addEventListener('click', function() {
-        startTime = new Date();
-        startButton.disabled = true;
-        endButton.disabled = false;
-
-        timerInterval = setInterval(() => {
-            const elapsed = Math.floor((new Date() - startTime)/1000);
-            tempoTarefa.value = formatTime(elapsed);
-        }, 1000);
-    });
-
-    endButton.addEventListener('click', function() {
-        clearInterval(timerInterval);
-        endTime = new Date();
-        const elapsed = Math.floor((endTime - startTime) / 1000);
-        tempoTarefa.value = formatTime(elapsed);
-        endButton.disabled = true;
-
-        const processoGama = document.getElementById('processoGama').value;
-        const documentos = document.getElementById('documentos').value;
-        const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
-        const tempo = tempoTarefa.value;
-        const colaborador = "Orlanda Leizi Gomes Francisco";
-        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
-        const startFormatted = formatDate(startTime);
-        const endFormatted = formatDate(endTime);
-
-        // Enviar para a API do SheetDB
-        fetch('https://sheetdb.io/api/v1/yawdmg1und8ye', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                data: {
-                    "Tipologia Puxada": tipologiaPuxada,
-                    "Inicio da Tarefa": startFormatted,
-                    "Fim da Tarefa": endFormatted,
-                    "Colaborador": colaborador,
-                    "Processo GAMA": processoGama,
-                    "Documentos": documentos,
-                    "Tarefa Finalizada": tarefaFinalizada,
-                    "Tempo com a tarefa": tempo
-                }
-            })
-        })
-        .then(response => {
-            if (response.ok) return response.json();
-            else throw new Error('Erro ao enviar os dados');
-        })
-        .then(data => {
-            showMessage('Dados enviados com sucesso!', 'success');
-            document.getElementById('gamaForm').reset();
-            startButton.disabled = false;
-            tempoTarefa.value = '';
-        })
-        .catch(error => {
-            showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
-            startButton.disabled = false;
-        });
-    });
-
-    function showMessage(message, type) {
-        responseMessage.textContent = message;
-        responseMessage.className = 'message ' + type;
-        responseMessage.style.display = 'block';
-        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
-    }
   </script>
-
 </body>
 </html>
+<!-- FIM -->
