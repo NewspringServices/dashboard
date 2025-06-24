@@ -369,56 +369,99 @@
     }
 
     // GAMa scripts
+       let startTime;
+    let endTime;
+    let timerInterval;
+
     const startButton = document.getElementById('startButton');
     const endButton = document.getElementById('endButton');
     const tempoTarefa = document.getElementById('tempoTarefa');
     const responseMessage = document.getElementById('responseMessage');
 
-    let taskStartTime, taskTimer;
+    function formatTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    }
 
-    startButton.addEventListener('click', () => {
-      startButton.disabled = true;
-      endButton.disabled = false;
-      tempoTarefa.value = "";
-      taskStartTime = new Date();
-      responseMessage.style.display = 'none';
+    // Função para formatar data para "DD/MM/YYYY HH:mm:ss"
+    function formatDate(date) {
+        const d = date.getDate().toString().padStart(2,'0');
+        const m = (date.getMonth() + 1).toString().padStart(2,'0');
+        const y = date.getFullYear();
+        const h = date.getHours().toString().padStart(2,'0');
+        const min = date.getMinutes().toString().padStart(2,'0');
+        const s = date.getSeconds().toString().padStart(2,'0');
+        return `${d}/${m}/${y} ${h}:${min}:${s}`;
+    }
 
-      taskTimer = setInterval(() => {
-        const now = new Date();
-        const diff = new Date(now - taskStartTime);
-        const h = String(diff.getUTCHours()).padStart(2, '0');
-        const m = String(diff.getUTCMinutes()).padStart(2, '0');
-        const s = String(diff.getUTCSeconds()).padStart(2, '0');
-        tempoTarefa.value = `${h}:${m}:${s}`;
-      }, 1000);
+    startButton.addEventListener('click', function() {
+        startTime = new Date();
+        startButton.disabled = true;
+        endButton.disabled = false;
+
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((new Date() - startTime)/1000);
+            tempoTarefa.value = formatTime(elapsed);
+        }, 1000);
     });
 
-    endButton.addEventListener('click', () => {
-      clearInterval(taskTimer);
-      endButton.disabled = true;
-      startButton.disabled = false;
+    endButton.addEventListener('click', function() {
+        clearInterval(timerInterval);
+        endTime = new Date();
+        const elapsed = Math.floor((endTime - startTime) / 1000);
+        tempoTarefa.value = formatTime(elapsed);
+        endButton.disabled = true;
 
-      // Enviar dados para backend (exemplo)
-      const formData = new FormData(document.getElementById('gamaForm'));
-      fetch('https://sheetdb.io/api/v1/jl5xolk2g3t75', {
-        method: 'POST',
-        body: JSON.stringify(Object.fromEntries(formData.entries())),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(response => response.json())
-      .then(data => {
-        responseMessage.textContent = "✔️ Registo enviado com sucesso!";
-        responseMessage.className = "message success";
-        responseMessage.style.display = 'block';
-        document.getElementById('gamaForm').reset();
-        tempoTarefa.value = "";
-      })
-      .catch(error => {
-        responseMessage.textContent = "❌ Erro ao enviar registo.";
-        responseMessage.className = "message error";
-        responseMessage.style.display = 'block';
-      });
+        const processoGama = document.getElementById('processoGama').value;
+        const documentos = document.getElementById('documentos').value;
+        const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
+        const tempo = tempoTarefa.value;
+        const colaborador = "Orlanda Leizi Gomes Francisco";
+        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
+        const startFormatted = formatDate(startTime);
+        const endFormatted = formatDate(endTime);
+
+        // Enviar para a API do SheetDB
+        fetch('https://sheetdb.io/api/v1/yawdmg1und8ye', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                data: {
+                    "Tipologia Puxada": tipologiaPuxada,
+                    "Inicio da Tarefa": startFormatted,
+                    "Fim da Tarefa": endFormatted,
+                    "Colaborador": colaborador,
+                    "Processo GAMA": processoGama,
+                    "Documentos": documentos,
+                    "Tarefa Finalizada": tarefaFinalizada,
+                    "Tempo com a tarefa": tempo
+                }
+            })
+        })
+        .then(response => {
+            if (response.ok) return response.json();
+            else throw new Error('Erro ao enviar os dados');
+        })
+        .then(data => {
+            showMessage('Dados enviados com sucesso!', 'success');
+            document.getElementById('gamaForm').reset();
+            startButton.disabled = false;
+            tempoTarefa.value = '';
+        })
+        .catch(error => {
+            showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
+            startButton.disabled = false;
+        });
     });
+
+    function showMessage(message, type) {
+        responseMessage.textContent = message;
+        responseMessage.className = 'message ' + type;
+        responseMessage.style.display = 'block';
+        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+    }
   </script>
 
 </body>
