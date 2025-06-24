@@ -18,12 +18,12 @@
       justify-content: center;
       align-items: center;
       color: #333;
-      background: url('https://i.imgur.com/imxDDjt.jpeg') no-repeat center center fixed;
+      background: url('https://i.imgur.com/r3bhzVT.jpeg') no-repeat center center fixed;
       background-size: cover;
     }
 
     .container {
-      background-color: rgba(255, 255, 255, 0.9);
+      background-color: #ffffff; /* branco puro */
       padding: 40px;
       border-radius: 12px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
@@ -59,6 +59,22 @@
 
     .btn-administrador:hover {
       background-color: #0056b3;
+    }
+
+    .btn-voltar {
+      margin-top: 20px;
+      background-color: #dc3545;
+      color: white;
+      font-size: 14px;
+      padding: 10px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-voltar:hover {
+      background-color: #c82333;
     }
 
     input[type="text"], input[type="password"] {
@@ -104,7 +120,7 @@
       <button type="submit">Entrar</button>
     </form>
     <p id="error-message" class="error-message"></p>
-    <button style="margin-top: 20px; background:#ccc; color:#333;" onclick="voltarMenu()">Voltar</button>
+    <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
   </div>
 
   <script>
