@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+      <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -165,7 +166,8 @@
       font-weight: bold;
       font-size: 14px;
     }
-        #cronometro {
+        
+    #cronometro {
   display: none !important;
 }
 
@@ -262,118 +264,204 @@
 
   <!-- Scripts -->
   <script>
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    const user = "EX10359";
+   const user = "EX10359";
     const nome = "Joel Quissama Mundjanga"; 
 
-    let tipoSelecionado = "", inicioDataHora, fimDataHora, timer, segundos = 0;
 
-    function mudarTipo() {
-      tipoSelecionado = document.getElementById('tipo').value;
+    const tipoSelect = document.getElementById('tipo');
+    const btnSubmeter = document.getElementById('btnSubmeter');
+    const btnTerminar = document.getElementById('btnTerminar');
+    const infoData = document.getElementById('infoData');
+    const cronometroEl = document.getElementById('cronometro');
+    const horaInicioEl = document.getElementById('horaInicio');
+    const horaFimEl = document.getElementById('horaFim');
+    const mensagemEl = document.getElementById('mensagem');
+
+    let tipoSelecionado = "";
+    let inicioDataHora, fimDataHora, timer, segundos = 0;
+
+    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+    // Exibe a data atual no topo da barra
+    function mostrarDataAtual() {
+      const hoje = new Date();
+      const dataFormatada = hoje.toLocaleDateString('pt-BR');
+      infoData.textContent = `📅 ${dataFormatada}`;
+    }
+
+    mostrarDataAtual();
+
+    // Ativa ou desativa o botão submeter conforme seleção
+    tipoSelect.addEventListener('change', () => {
+      tipoSelecionado = tipoSelect.value;
       resetar();
-      if (tipoSelecionado) {
-        document.getElementById('btnSubmeter').style.display = 'inline-block';
-      }
-      const hoje = new Date().toLocaleDateString();
-      document.getElementById('infoData').textContent = `📅 ${hoje}`;
-    }
 
-    function mostrarMensagem(texto, sucesso = true) {
-      const mensagemEl = document.getElementById('mensagem');
-      mensagemEl.textContent = texto;
-      mensagemEl.style.color = sucesso ? 'green' : 'red';
-    }
+      btnSubmeter.disabled = !tipoSelecionado;
+      mensagemEl.textContent = "";
+    });
 
-    function submeter() {
-      if (!tipoSelecionado) return mostrarMensagem("Selecione um tipo de registo.", false);
-      inicioDataHora = new Date();
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        document.getElementById('horaInicio').textContent = `✔️ Registado`;
-        document.getElementById('horaInicio').style.display = 'inline-block';
-        enviarAoSheets(tipoSelecionado, inicioDataHora.toLocaleDateString(), inicioDataHora.toLocaleTimeString(), "", "")
-          .then(msg => mostrarMensagem("✔️ " + msg, true))
-          .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
-      } else {
-        const inicioHoraStr = inicioDataHora.toLocaleTimeString();
-        document.getElementById('horaInicio').textContent = `🕒 Início: ${inicioHoraStr}`;
-        document.getElementById('horaInicio').style.display = 'inline-block';
-        iniciarCronometro();
-        document.getElementById('btnSubmeter').style.display = 'none';
-        document.getElementById('btnTerminar').style.display = 'inline-block';
-        document.getElementById('cronometro').style.display = 'inline-block';
-        mostrarMensagem("");
-      }
-    }
-
+    // Função para iniciar cronometro visual
     function iniciarCronometro() {
       segundos = 0;
+      cronometroEl.style.display = 'inline-block';
+      cronometroEl.textContent = `⏱ 00:00:00`;
+
       timer = setInterval(() => {
         segundos++;
         const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
         const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
         const s = String(segundos % 60).padStart(2, '0');
-        document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
+        cronometroEl.textContent = `⏱ ${h}:${m}:${s}`;
       }, 1000);
     }
 
-    function terminar() {
+    // Função para parar cronometro
+    function pararCronometro() {
       clearInterval(timer);
-      fimDataHora = new Date();
-      const fimHoraStr = fimDataHora.toLocaleTimeString();
-      const duracaoStr = document.getElementById('cronometro').textContent.replace('⏱ ', '');
-      document.getElementById('horaFim').textContent = `🕔 Fim: ${fimHoraStr}`;
-      document.getElementById('horaFim').style.display = 'inline-block';
-      enviarAoSheets(
-        tipoSelecionado,
-        inicioDataHora.toLocaleDateString(),
-        inicioDataHora.toLocaleTimeString(),
-        fimHoraStr,
-        duracaoStr
-      ).then(msg => mostrarMensagem("✔️ " + msg, true))
-        .catch(err => mostrarMensagem("❌ Erro ao enviar: " + err, false));
-      document.getElementById('btnTerminar').style.display = 'none';
     }
 
-    function enviarAoSheets(tipo, data, inicio, fim, duracao) {
-      return fetch("https://sheetdb.io/api/v1/jl5xolk2g3t75", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          data: [{ data, user, nome, tipo, inicio, fim, duracao }]
-        })
-      })
-      .then(r => {
-        if (!r.ok) throw new Error(`Erro HTTP! status: ${r.status}`);
-        return r.json();
-      })
-      .then(d => d.created ? "Registo enviado com sucesso!" : "Erro inesperado");
+    // Exibe mensagem na tela (verde para sucesso, vermelho para erro)
+    function mostrarMensagem(texto, sucesso = true) {
+      mensagemEl.textContent = texto;
+      mensagemEl.style.color = sucesso ? 'green' : 'red';
     }
 
+    // Reseta visual e variáveis para novo registro
     function resetar() {
-      clearInterval(timer);
-      document.getElementById('cronometro').textContent = "⏱ 00:00:00";
-      document.getElementById('cronometro').style.display = 'none';
-      document.getElementById('horaInicio').style.display = 'none';
-      document.getElementById('horaFim').style.display = 'none';
-      document.getElementById('btnTerminar').style.display = 'none';
-      document.getElementById('btnSubmeter').style.display = 'inline-block';
-      mostrarMensagem("");
-      document.getElementById('infoData').textContent = "";
+      pararCronometro();
+      cronometroEl.style.display = 'none';
+      cronometroEl.textContent = '⏱ 00:00:00';
+
+      horaInicioEl.style.display = 'none';
+      horaInicioEl.textContent = '';
+
+      horaFimEl.style.display = 'none';
+      horaFimEl.textContent = '';
+
+      btnTerminar.style.display = 'none';
+      btnSubmeter.style.display = 'inline-block';
+      btnSubmeter.disabled = !tipoSelecionado;
+
+      mensagemEl.textContent = "";
     }
 
-    window.onload = () => {
-      const hoje = new Date().toLocaleDateString();
-      document.getElementById('infoData').textContent = `📅 ${hoje}`;
+    // Função para formatar data/hora local em ISO-like string sem o fuso UTC
+    function formatarDataHoraLocal(date) {
+      const ano = date.getFullYear();
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const dia = String(date.getDate()).padStart(2, '0');
+      const hora = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const seg = String(date.getSeconds()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
     }
+
+    // Enviar dados para Supabase
+    async function enviarAoSupabase(dados) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_API_KEY,
+          'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(dados)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
+      }
+
+      return await response.json();
+    }
+
+    // Clique no botão Submeter
+    btnSubmeter.addEventListener('click', async () => {
+      if (!tipoSelecionado) {
+        mostrarMensagem("Selecione um tipo de registo.", false);
+        return;
+      }
+
+      inicioDataHora = new Date();
+
+      // Se for login ou logout, não tem cronometro
+      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+        horaInicioEl.textContent = `✔️ Registado`;
+        horaInicioEl.style.display = 'inline-block';
+
+        const dados = {
+          data: formatarDataHoraLocal(inicioDataHora).split('T')[0], // só a data local
+          user,
+          nome,
+          tipo: tipoSelecionado,
+          inicio: formatarDataHoraLocal(inicioDataHora),
+          fim: null,
+          duracao: null
+        };
+
+        try {
+          await enviarAoSupabase(dados);
+          mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+          btnSubmeter.disabled = true;
+        } catch (err) {
+          mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
+        }
+      } else {
+        // Para outros tipos, iniciar cronometro e habilitar botão terminar
+        horaInicioEl.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
+        horaInicioEl.style.display = 'inline-block';
+
+        iniciarCronometro();
+
+        btnSubmeter.style.display = 'none';
+        btnTerminar.style.display = 'inline-block';
+        mostrarMensagem("");
+      }
+    });
+
+    // Clique no botão Terminar
+    btnTerminar.addEventListener('click', async () => {
+      pararCronometro();
+      fimDataHora = new Date();
+      const fimHoraStr = fimDataHora.toLocaleTimeString('pt-BR');
+      const duracaoSegundos = segundos;
+
+      horaFimEl.textContent = `🕔 Fim: ${fimHoraStr}`;
+      horaFimEl.style.display = 'inline-block';
+
+      // Calcula duração em horas decimais
+      const duracaoHoras = duracaoSegundos / 3600;
+
+      const dados = {
+        data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: formatarDataHoraLocal(fimDataHora),
+        duracao: parseFloat(duracaoHoras.toFixed(3))
+      };
+
+      try {
+        await enviarAoSupabase(dados);
+        mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+      } catch (err) {
+        mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
+      }
+
+      btnTerminar.style.display = 'none';
+      btnSubmeter.style.display = 'inline-block';
+      btnSubmeter.disabled = true;
+      tipoSelect.value = "";
+      tipoSelecionado = "";
+    });
+
 
     // GAMa scripts
-       let startTime;
+      let startTime;
     let endTime;
     let timerInterval;
 
@@ -389,7 +477,6 @@
         return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     }
 
-    // Função para formatar data para "DD/MM/YYYY HH:mm:ss"
     function formatDate(date) {
         const d = date.getDate().toString().padStart(2,'0');
         const m = (date.getMonth() + 1).toString().padStart(2,'0');
@@ -427,26 +514,31 @@
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
-        // Enviar para a API do SheetDB
-        fetch('https://sheetdb.io/api/v1/yawdmg1und8ye', {
+        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_registos', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+                'Prefer': 'return=representation'
+            },
             body: JSON.stringify({
-                data: {
-                    "Tipologia Puxada": tipologiaPuxada,
-                    "Inicio da Tarefa": startFormatted,
-                    "Fim da Tarefa": endFormatted,
-                    "Colaborador": colaborador,
-                    "Processo GAMA": processoGama,
-                    "Documentos": documentos,
-                    "Tarefa Finalizada": tarefaFinalizada,
-                    "Tempo com a tarefa": tempo
-                }
+                tipologiaPuxada: tipologiaPuxada,
+                inicio: startFormatted,
+                fim: endFormatted,
+                colaborador: colaborador,
+                processoGama: processoGama,
+                Documentos: Number(documentos),
+                tarefaFinalizada: tarefaFinalizada,
+                tempo: tempo
             })
         })
-        .then(response => {
-            if (response.ok) return response.json();
-            else throw new Error('Erro ao enviar os dados');
+        .then(async response => {
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`Erro ${response.status}: ${errorBody}`);
+            }
+            return response.json();
         })
         .then(data => {
             showMessage('Dados enviados com sucesso!', 'success');
@@ -455,7 +547,7 @@
             tempoTarefa.value = '';
         })
         .catch(error => {
-            showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
+            showMessage('Falha ao enviar os dados: ' + error.message, 'error');
             startButton.disabled = false;
         });
     });
@@ -466,6 +558,23 @@
         responseMessage.style.display = 'block';
         setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
     }
+    function showTab(tabId) {
+  // Remove a classe active de todas as abas
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  // Remove a classe active de todos os botões
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  // Adiciona a classe active na aba selecionada
+  document.getElementById(tabId).classList.add('active');
+
+  // Adiciona a classe active no botão correspondente
+  const button = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
+  if (button) button.classList.add('active');
+}
+
   </script>
 
 </body>
