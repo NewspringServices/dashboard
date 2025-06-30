@@ -353,7 +353,7 @@
       const hora = String(date.getHours()).padStart(2, '0');
       const min = String(date.getMinutes()).padStart(2, '0');
       const seg = String(date.getSeconds()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
+  return `${y}-${m}-${d} ${h}:${min}:${s}`; // aqui tem espaço ao invés do 'T'
     }
 
     // Enviar dados para Supabase
