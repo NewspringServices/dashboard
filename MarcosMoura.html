@@ -187,7 +187,8 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10889<br>Nome:Marcos Felipe Bastos Moura</div>  
+      <div class="info-usuario">User: EX10889<br>Nome:Marcos Felipe Bastos Moura
+</div>  
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -265,7 +266,7 @@
   <!-- Scripts -->
   <script>
     const user = "EX10889";
-    const nome = "Marcos Felipe Bastos Moura"; 
+    const nome = "Marcos Felipe Bastos Moura";  
 
     const tipoSelect = document.getElementById('tipo');
     const btnSubmeter = document.getElementById('btnSubmeter');
@@ -353,7 +354,7 @@
       const hora = String(date.getHours()).padStart(2, '0');
       const min = String(date.getMinutes()).padStart(2, '0');
       const seg = String(date.getSeconds()).padStart(2, '0');
-  return `${y}-${m}-${d} ${h}:${min}:${s}`; // aqui tem espaço ao invés do 'T'
+      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
     }
 
     // Enviar dados para Supabase
@@ -501,7 +502,7 @@
       const h = date.getHours().toString().padStart(2,'0');
       const min = date.getMinutes().toString().padStart(2,'0');
       const s = date.getSeconds().toString().padStart(2,'0');
-      return `${y}-${m}-${d}T${h}:${min}:${s}`; // formato ISO para banco
+  return `${y}-${m}-${d} ${h}:${min}:${s}`; // aqui tem espaço ao invés do 'T'
     }
 
     startButton.addEventListener('click', function() {
