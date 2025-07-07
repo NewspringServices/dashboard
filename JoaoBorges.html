@@ -1,22 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Formulário de Registo de Tarefa</title>
-
-  <!-- Link para a biblioteca do Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard Newspring</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f4f4f4;
-      color: #333;
+      margin: 0;
+      padding: 10px;
+      background: #f7f7f7;
     }
-    h1 {
-      text-align: center;
+
+    #topImage {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 150px;
+      height: auto;
     }
 
     .tabs {
@@ -25,24 +26,18 @@
       margin-bottom: 20px;
     }
 
-    .tab-btn {
+    .tabs button {
       padding: 10px 20px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: 1px solid #ddd;
-      border-radius: 5px;
       margin: 0 5px;
-      transition: background-color 0.3s;
+      border: none;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 5px;
     }
 
-    .tab-btn:hover {
-      background-color: #45a049;
-    }
-
-    .tab-btn.active {
-      background-color: #3e8e41;
-      font-weight: bold;
+    .tabs button.active {
+      background-color: #28a745;
+      color: white;
     }
 
     .tab-content {
@@ -53,179 +48,590 @@
       display: block;
     }
 
+    .barra-registo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto 20px auto;
+    }
+
+    .barra-registo .info-usuario {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .barra-registo .select-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .barra-registo select {
+      width: 200px;
+      padding: 8px;
+    }
+
+    .barra-registo button#btnSubmeter {
+      padding: 6px 12px;
+      font-size: 14px;
+      width: auto;
+    }
+
+    .status {
+      font-size: 14px;
+    }
+
+    #mensagem {
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .form-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
+    }
+
     .form-group {
       margin-bottom: 15px;
     }
 
-    .form-group label {
-      font-weight: bold;
-    }
-
-    .form-group input, .form-group textarea {
+    select, input[type="text"], input[type="number"], button, input[type="radio"] {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
       margin-top: 5px;
+      border-radius: 4px;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+      box-sizing: border-box;
     }
 
-    .btn {
-      padding: 10px 20px;
-      cursor: pointer;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
+    .tipologia-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tipologia-container div {
+      flex: 1;
+      text-align: center;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .button-container button {
+      width: 48%;
+    }
+
+    .message {
+      text-align: center;
       margin-top: 20px;
-      display: block;
-      width: 100%;
-      font-size: 18px;
-      transition: background-color 0.3s;
-    }
-
-    .btn:hover {
-      background-color: #45a049;
-    }
-
-    .btn:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-
-    .error {
-      color: red;
-      font-size: 14px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
     }
 
     .success {
-      color: green;
-      font-size: 14px;
+      background-color: #d4edda;
+      color: #155724;
     }
 
-    #timer {
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 10px;
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
     }
+
+    .titulo-gama {
+      font-size: 20px;
+      color: #28a745;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-container label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+        
+    #cronometro {
+  display: none !important;
+}
 
   </style>
 </head>
 <body>
-  <h1>Registo de Tarefa</h1>
 
-  <!-- Aba de navegação -->
+  <!-- Imagem pequena no topo da página -->
+<img id="topImage" src="logo.png" alt="Logo Newspring" />
+
+  <!-- Abas -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('tab1')">Informações da Tarefa</button>
-    <button class="tab-btn" onclick="showTab('tab2')">Cronômetro</button>
+    <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
+    <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
   </div>
 
-  <!-- Conteúdo da Tab 1 - Formulário -->
-  <div id="tab1" class="tab-content active">
-    <div class="form-group">
-      <label for="task_name">Nome da Tarefa:</label>
-      <input type="text" id="task_name" required>
-    </div>
+  <!-- Conteúdo FYBDO -->
+  <div id="fybdo" class="tab-content active">
+    <div class="barra-registo">
+      <div id="infoData" class="info-data"></div>
+      <div class="info-usuario">User: EX10883<br>XXXXX</div>
 
-    <div class="form-group">
-      <label for="task_description">Descrição da Tarefa:</label>
-      <textarea id="task_description" rows="4" required></textarea>
-    </div>
+      <div class="select-row">
+        <label for="tipo">Tipo:</label>
+        <select id="tipo" onchange="mudarTipo()">
+          <option value="">Selecione</option>
+          <option value="login">Login</option>
+          <option value="logout">Logout</option>
+          <option value="pausa1">Pausa 1</option>
+          <option value="pausa2">Pausa 2</option>
+          <option value="refeicao">Refeição</option>
+          <option value="formacao">Formação</option>
+        </select>
+        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+      </div>
 
-    <div class="form-group">
-      <label for="task_category">Categoria:</label>
-      <input type="text" id="task_category" required>
-    </div>
+      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
+      <span id="horaInicio" class="status" style="display:none;"></span>
+      <span id="horaFim" class="status" style="display:none;"></span>
+      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
 
-    <div class="form-group">
-      <button class="btn" id="start_task_btn" onclick="startTask()">Iniciar Tarefa</button>
+      <span id="mensagem" class="status"></span>
     </div>
-
-    <div id="error_message" class="error" style="display: none;"></div>
-    <div id="success_message" class="success" style="display: none;"></div>
   </div>
 
-  <!-- Conteúdo da Tab 2 - Cronômetro -->
-  <div id="tab2" class="tab-content">
-    <div id="timer">00:00</div>
-    <button class="btn" id="start_timer_btn" onclick="startTimer()">Iniciar Cronômetro</button>
-    <button class="btn" id="stop_timer_btn" onclick="stopTimer()" disabled>Parar Cronômetro</button>
+  <!-- Conteúdo GAMa -->
+  <div id="gama" class="tab-content">
+    <div class="form-container">
+      <h2 class="titulo-gama">Produção - GAMA</h2>
+    <form id="gamaForm">
+
+      <div class="form-group">
+        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+          <option value="">-- Selecione --</option>
+          <option value="AT">AT</option>
+          <option value="DNP">DNP</option>
+          <option value="AP">AP</option>
+          <option value="PETS">PETS</option>
+          <option value="Formação/Meetings">Formação/Meetings</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="suboptions" style="display: none;">
+        <label for="subopcao">Subopção:</label>
+        <select id="subopcao" name="subopcao">
+          <option value="">-- Escolha uma subopção --</option>
+          <option value="IBAN">IBAN</option>
+          <option value="IBAN+Indexação">IBAN+Indexação</option>
+          <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
+          <option value="Indexações">Indexações</option>
+        </select>
+      </div>
+
+<label for="numero-processo">Número de Processo/GAMA:</label>
+<input type="text" id="numero-processo" name="numero-processo" required>
+
+
+        <div class="form-group">
+          <label for="processoGama">Processo GAMA:</label>
+          <input type="text" id="processoGama" name="processoGama" required />
+        </div>
+
+      <div class="form-group" id="documentosGroup" style="display: none;">
+        <label for="documentos">Número de Documentos:</label>
+        <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
+      </div>
+
+      <div class="form-group">
+        <label for="tempoTarefa">Tempo da Tarefa:</label>
+        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+      </div>
+
+      <div class="form-group button-container">
+        <button type="button" id="startButton">Iniciar Tarefa</button>
+        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+      </div>
+
+      <div id="responseMessage" class="message"></div>
+    
+      </form>
+    </div>
   </div>
 
-  <!-- Link para o Supabase -->
+  <!-- Scripts -->
   <script>
-    // Configuração do Supabase
-    const supabaseUrl = 'https://xyzcompany.supabase.co';
-    const supabaseKey = 'your-supabase-api-key'; // Substitua pela sua chave de API
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const user = "EX10883";    
 
-    let timerInterval;
-    let timeElapsed = 0;
+    const nome = "João Nuno da Silva Cardoso";
 
-    // Função para mostrar as tabs
-    function showTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      const tabBtns = document.querySelectorAll('.tab-btn');
+    const tipoSelect = document.getElementById('tipo');
+    const btnSubmeter = document.getElementById('btnSubmeter');
+    const btnTerminar = document.getElementById('btnTerminar');
+    const infoData = document.getElementById('infoData');
+    const cronometroEl = document.getElementById('cronometro');
+    const horaInicioEl = document.getElementById('horaInicio');
+    const horaFimEl = document.getElementById('horaFim');
+    const mensagemEl = document.getElementById('mensagem');
+   const processoGama = document.getElementById('processoGama').value;
 
-      tabs.forEach(tab => tab.classList.remove('active'));
-      tabBtns.forEach(btn => btn.classList.remove('active'));
+    let tipoSelecionado = "";
+    let inicioDataHora, fimDataHora, timer, segundos = 0;
 
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+    // Exibe a data atual no topo da barra
+    function mostrarDataAtual() {
+      const hoje = new Date();
+      const dataFormatada = hoje.toLocaleDateString('pt-BR');
+      infoData.textContent = `📅 ${dataFormatada}`;
     }
 
-    // Função para iniciar a tarefa e o cronômetro
-    function startTask() {
-      const taskName = document.getElementById('task_name').value;
-      const taskDescription = document.getElementById('task_description').value;
-      const taskCategory = document.getElementById('task_category').value;
+    mostrarDataAtual();
 
-      if (!taskName || !taskDescription || !taskCategory) {
-        document.getElementById('error_message').style.display = 'block';
-        document.getElementById('error_message').textContent = 'Por favor, preencha todos os campos.';
-        return;
-      }
+    // Ativa ou desativa o botão submeter conforme seleção
+    tipoSelect.addEventListener('change', () => {
+      tipoSelecionado = tipoSelect.value;
+      resetar();
 
-      // Envia dados para o Supabase
-      supabase
-        .from('tasks')
-        .insert([
-          { name: taskName, description: taskDescription, category: taskCategory, start_time: new Date() }
-        ])
-        .then(response => {
-          if (response.error) {
-            document.getElementById('error_message').style.display = 'block';
-            document.getElementById('error_message').textContent = 'Erro ao enviar dados. Tente novamente.';
-          } else {
-            document.getElementById('error_message').style.display = 'none';
-            document.getElementById('success_message').style.display = 'block';
-            document.getElementById('success_message').textContent = 'Tarefa iniciada com sucesso!';
-          }
-        });
+      btnSubmeter.disabled = !tipoSelecionado;
+      mensagemEl.textContent = "";
+    });
 
-      // Muda para a aba do cronômetro
-      showTab('tab2');
-    }
+    // Função para iniciar cronometro visual
+    function iniciarCronometro() {
+      segundos = 0;
+      cronometroEl.style.display = 'inline-block';
+      cronometroEl.textContent = `⏱ 00:00:00`;
 
-    // Função para iniciar o cronômetro
-    function startTimer() {
-      document.getElementById('start_timer_btn').disabled = true;
-      document.getElementById('stop_timer_btn').disabled = false;
-
-      timerInterval = setInterval(function() {
-        timeElapsed++;
-        const minutes = Math.floor(timeElapsed / 60);
-        const seconds = timeElapsed % 60;
-        document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      timer = setInterval(() => {
+        segundos++;
+        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
+        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
+        const s = String(segundos % 60).padStart(2, '0');
+        cronometroEl.textContent = `⏱ ${h}:${m}:${s}`;
       }, 1000);
     }
 
-    // Função para parar o cronômetro
-    function stopTimer() {
-      clearInterval(timerInterval);
-      document.getElementById('start_timer_btn').disabled = false;
-      document.getElementById('stop_timer_btn').disabled = true;
+    // Função para parar cronometro
+    function pararCronometro() {
+      clearInterval(timer);
     }
+
+    // Exibe mensagem na tela (verde para sucesso, vermelho para erro)
+    function mostrarMensagem(texto, sucesso = true) {
+      mensagemEl.textContent = texto;
+      mensagemEl.style.color = sucesso ? 'green' : 'red';
+    }
+
+    // Reseta visual e variáveis para novo registro
+    function resetar() {
+      pararCronometro();
+      cronometroEl.style.display = 'none';
+      cronometroEl.textContent = '⏱ 00:00:00';
+
+      horaInicioEl.style.display = 'none';
+      horaInicioEl.textContent = '';
+
+      horaFimEl.style.display = 'none';
+      horaFimEl.textContent = '';
+
+      btnTerminar.style.display = 'none';
+      btnSubmeter.style.display = 'inline-block';
+      btnSubmeter.disabled = !tipoSelecionado;
+
+      mensagemEl.textContent = "";
+    }
+
+    // Função para formatar data/hora local em ISO-like string sem o fuso UTC
+    function formatarDataHoraLocal(date) {
+      const ano = date.getFullYear();
+      const mes = String(date.getMonth() + 1).padStart(2, '0');
+      const dia = String(date.getDate()).padStart(2, '0');
+      const hora = String(date.getHours()).padStart(2, '0');
+      const min = String(date.getMinutes()).padStart(2, '0');
+      const seg = String(date.getSeconds()).padStart(2, '0');
+      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
+    }
+
+    // Enviar dados para Supabase
+    async function enviarAoSupabase(dados) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_API_KEY,
+          'Authorization': `Bearer ${SUPABASE_API_KEY}`,
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(dados)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
+      }
+
+      return await response.json();
+    }
+
+    // Clique no botão Submeter
+    btnSubmeter.addEventListener('click', async () => {
+      if (!tipoSelecionado) {
+        mostrarMensagem("Selecione um tipo de registo.", false);
+        return;
+      }
+
+      inicioDataHora = new Date();
+
+      // Se for login ou logout, não tem cronometro
+      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+        horaInicioEl.textContent = `✔️ Registado`;
+        horaInicioEl.style.display = 'inline-block';
+
+        const dados = {
+          data: formatarDataHoraLocal(inicioDataHora).split('T')[0], // só a data local
+          user,
+          nome,
+          tipo: tipoSelecionado,
+          inicio: formatarDataHoraLocal(inicioDataHora),
+          fim: null,
+          duracao: null
+        };
+
+        try {
+          await enviarAoSupabase(dados);
+          mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+          btnSubmeter.disabled = true;
+        } catch (err) {
+          mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
+        }
+      } else {
+        // Para outros tipos, iniciar cronometro e habilitar botão terminar
+        horaInicioEl.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
+        horaInicioEl.style.display = 'inline-block';
+
+        iniciarCronometro();
+
+        btnSubmeter.style.display = 'none';
+        btnTerminar.style.display = 'inline-block';
+        mostrarMensagem("");
+      }
+    });
+
+    // Clique no botão Terminar
+    btnTerminar.addEventListener('click', async () => {
+      pararCronometro();
+      fimDataHora = new Date();
+      const fimHoraStr = fimDataHora.toLocaleTimeString('pt-BR');
+      const duracaoSegundos = segundos;
+
+      horaFimEl.textContent = `🕔 Fim: ${fimHoraStr}`;
+      horaFimEl.style.display = 'inline-block';
+
+      // Calcula duração em horas decimais
+      const duracaoHoras = duracaoSegundos / 3600;
+
+      const dados = {
+        data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: formatarDataHoraLocal(fimDataHora),
+        duracao: parseFloat(duracaoHoras.toFixed(3))
+      };
+
+      try {
+        await enviarAoSupabase(dados);
+        mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+      } catch (err) {
+        mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
+      }
+
+      btnTerminar.style.display = 'none';
+      btnSubmeter.style.display = 'inline-block';
+      btnSubmeter.disabled = true;
+      tipoSelect.value = "";
+      tipoSelecionado = "";
+    });
+
+
+    // GAMa scripts
+    let startTime;
+    let endTime;
+    let timerInterval;
+
+    const startButton = document.getElementById('startButton');
+    const endButton = document.getElementById('endButton');
+    const tempoTarefa = document.getElementById('tempoTarefa');
+    const responseMessage = document.getElementById('responseMessage');
+    const tarefaFinalizada = document.getElementById('tarefaFinalizada');
+    const suboptions = document.getElementById('suboptions');
+    const subopcao = document.getElementById('subopcao');
+    const documentosGroup = document.getElementById('documentosGroup');
+    const documentos = document.getElementById('documentos');
+    
+
+    tarefaFinalizada.addEventListener('change', function () {
+      if (this.value === 'AT') {
+        suboptions.style.display = 'block';
+        documentosGroup.style.display = 'none';
+      } else if (['AP', 'DNP', 'PETS', 'Formação/Meetings'].includes(this.value)) {
+        suboptions.style.display = 'none';
+        documentosGroup.style.display = 'block';
+      } else {
+        suboptions.style.display = 'none';
+        documentosGroup.style.display = 'none';
+      }
+    });
+
+    function formatTime(seconds) {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    }
+
+    function formatDate(date) {
+      const d = date.getDate().toString().padStart(2,'0');
+      const m = (date.getMonth() + 1).toString().padStart(2,'0');
+      const y = date.getFullYear();
+      const h = date.getHours().toString().padStart(2,'0');
+      const min = date.getMinutes().toString().padStart(2,'0');
+      const s = date.getSeconds().toString().padStart(2,'0');
+      return `${y}-${m}-${d}T${h}:${min}:${s}`; // formato ISO para banco
+    }
+
+    startButton.addEventListener('click', function() {
+      startTime = new Date();
+      startButton.disabled = true;
+      endButton.disabled = false;
+
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((new Date() - startTime)/1000);
+        tempoTarefa.value = formatTime(elapsed);
+      }, 1000);
+    });
+
+    // Função para enviar dados para Supabase
+    function enviarDados(data) {
+      return fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+          'Prefer': 'return=representation'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao enviar os dados');
+        return response.json();
+      });
+    }
+
+    endButton.addEventListener('click', function() {
+      clearInterval(timerInterval);
+      endTime = new Date();
+      const elapsed = Math.floor((endTime - startTime) / 1000);
+      tempoTarefa.value = formatTime(elapsed);
+      endButton.disabled = true;
+
+      const colaborador = "João Nuno da Silva Cardoso";
+      const tarefa = tarefaFinalizada.value;
+      const sub = subopcao.value;
+      const tempo = tempoTarefa.value;
+      const startFormatted = formatDate(startTime);
+      const endFormatted = formatDate(endTime);
+      const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
+        const processoGama = processoGama.value;       
+
+      const dataToSend = [{
+        colaborador: colaborador,
+        inicio_da_tarefa: startFormatted,
+        fim_da_tarefa: endFormatted,
+        tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
+        tempo_com_a_tarefa: tempo,
+        documentos: numDocumentos,
+        processoGama: processoGama
+        
+      }];
+
+      enviarDados(dataToSend)
+        .then(() => {
+          if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
+            const dataDuplicada = [{
+              colaborador: colaborador,
+              inicio_da_tarefa: startFormatted,
+              fim_da_tarefa: endFormatted,
+              tarefa_finalizada: "AT - Indexações",
+              tempo_com_a_tarefa: tempo,
+              documentos: "1",
+              processoGama: processoGama
+            }];
+            return enviarDados(dataDuplicada);
+          }
+        })
+        .then(() => {
+          showMessage('Dados enviados com sucesso!', 'success');
+          document.getElementById('gamaForm').reset();
+          startButton.disabled = false;
+          tempoTarefa.value = '';
+          suboptions.style.display = 'none';
+          documentosGroup.style.display = 'none';
+          endButton.disabled = true;
+        })
+        .catch(() => {
+          showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
+          startButton.disabled = false;
+        });
+    });
+
+    function showMessage(message, type) {
+      responseMessage.textContent = message;
+      responseMessage.className = 'message ' + type;
+      responseMessage.style.display = 'block';
+      setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+    }
+    function showMessage(message, type) {
+        responseMessage.textContent = message;
+        responseMessage.className = 'message ' + type;
+        responseMessage.style.display = 'block';
+        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+    }
+    function showTab(tabId) {
+  // Remove a classe active de todas as abas
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => tab.classList.remove('active'));
+
+  // Remove a classe active de todos os botões
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  // Adiciona a classe active na aba selecionada
+  document.getElementById(tabId).classList.add('active');
+
+  // Adiciona a classe active no botão correspondente
+  const button = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
+  if (button) button.classList.add('active');
+}
+
   </script>
+
 </body>
 </html>
