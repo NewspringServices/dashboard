@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Newspring</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário de Registo de Tarefa</title>
+
+  <!-- Link para a biblioteca do Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/supabase.js"></script>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-      background: #f7f7f7;
+      margin: 20px;
+      background-color: #f4f4f4;
+      color: #333;
     }
-
-    #topImage {
-      display: block;
-      margin: 0 auto 20px auto;
-      max-width: 150px;
-      height: auto;
+    h1 {
+      text-align: center;
     }
 
     .tabs {
@@ -26,18 +25,24 @@
       margin-bottom: 20px;
     }
 
-    .tabs button {
+    .tab-btn {
       padding: 10px 20px;
-      margin: 0 5px;
-      border: none;
       cursor: pointer;
-      background-color: #ccc;
+      background-color: #4CAF50;
+      color: white;
+      border: 1px solid #ddd;
       border-radius: 5px;
+      margin: 0 5px;
+      transition: background-color 0.3s;
     }
 
-    .tabs button.active {
-      background-color: #28a745;
-      color: white;
+    .tab-btn:hover {
+      background-color: #45a049;
+    }
+
+    .tab-btn.active {
+      background-color: #3e8e41;
+      font-weight: bold;
     }
 
     .tab-content {
@@ -48,313 +53,179 @@
       display: block;
     }
 
-    .barra-registo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      gap: 15px;
-      max-width: 500px;
-      margin: 0 auto 20px auto;
-    }
-
-    .barra-registo .info-usuario {
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .barra-registo .select-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .barra-registo select {
-      width: 200px;
-      padding: 8px;
-    }
-
-    .barra-registo button#btnSubmeter {
-      padding: 6px 12px;
-      font-size: 14px;
-      width: auto;
-    }
-
-    .status {
-      font-size: 14px;
-    }
-
-    #mensagem {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .form-container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-    }
-
     .form-group {
       margin-bottom: 15px;
     }
 
-    select, input[type="text"], input[type="number"], button, input[type="radio"] {
+    .form-group label {
+      font-weight: bold;
+    }
+
+    .form-group input, .form-group textarea {
       width: 100%;
-      padding: 10px;
+      padding: 8px;
       margin-top: 5px;
-      border-radius: 4px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
+      border-radius: 5px;
+      font-size: 16px;
     }
 
-    .tipologia-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .tipologia-container div {
-      flex: 1;
-      text-align: center;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .button-container button {
-      width: 48%;
-    }
-
-    .message {
-      text-align: center;
+    .btn {
+      padding: 10px 20px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
       margin-top: 20px;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
+      display: block;
+      width: 100%;
+      font-size: 18px;
+      transition: background-color 0.3s;
     }
 
-    .success {
-      background-color: #d4edda;
-      color: #155724;
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
     }
 
     .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    .titulo-gama {
-      font-size: 20px;
-      color: #28a745;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .form-container label {
-      font-weight: bold;
+      color: red;
       font-size: 14px;
     }
-        
-    #cronometro {
-  display: none !important;
-}
+
+    .success {
+      color: green;
+      font-size: 14px;
+    }
+
+    #timer {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
 
   </style>
 </head>
 <body>
+  <h1>Registo de Tarefa</h1>
 
-  <!-- Imagem pequena no topo da página -->
-<img id="topImage" src="logo.png" alt="Logo Newspring" />
-
-
-  <!-- Abas -->
+  <!-- Aba de navegação -->
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
-    <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
+    <button class="tab-btn active" onclick="showTab('tab1')">Informações da Tarefa</button>
+    <button class="tab-btn" onclick="showTab('tab2')">Cronômetro</button>
   </div>
 
-  <!-- Conteúdo FYBDO -->
-  <div id="fybdo" class="tab-content active">
-    <div class="barra-registo">
-      <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>Nome:TESTE</div>
-
-      <div class="select-row">
-        <label for="tipo">Tipo:</label>
-        <select id="tipo" onchange="mudarTipo()">
-          <option value="">Selecione</option>
-          <option value="login">Login</option>
-          <option value="logout">Logout</option>
-          <option value="pausa1">Pausa 1</option>
-          <option value="pausa2">Pausa 2</option>
-          <option value="refeicao">Refeição</option>
-          <option value="formacao">Formação</option>
-        </select>
-        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
-      </div>
-
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status" style="display:none;"></span>
-      <span id="horaFim" class="status" style="display:none;"></span>
-      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
-
-      <span id="mensagem" class="status"></span>
+  <!-- Conteúdo da Tab 1 - Formulário -->
+  <div id="tab1" class="tab-content active">
+    <div class="form-group">
+      <label for="task_name">Nome da Tarefa:</label>
+      <input type="text" id="task_name" required>
     </div>
-  </div>
 
-  <!-- Conteúdo GAMa -->
-  <div id="gama" class="tab-content">
-    <div class="form-container">
-      <h2 class="titulo-gama">Produção - GAMA</h2>
-    <form id="gamaForm">
-
-      <div class="form-group">
-        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-          <option value="">-- Selecione --</option>
-          <option value="AT">AT</option>
-          <option value="DNP">DNP</option>
-          <option value="AP">AP</option>
-          <option value="PETS">PETS</option>
-          <option value="Formação/Meetings">Formação/Meetings</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="numero-processo">Número de Processo/GAMA:</label>
-        <input type="text" id="numero-processo" name="numero-processo" required>
-      </div>
-
-      <div class="form-group">
-        <label for="tempoTarefa">Tempo da Tarefa:</label>
-        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-      </div>
-
-      <div class="form-group button-container">
-        <button type="button" id="startButton">Iniciar Tarefa</button>
-        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-      </div>
-
-      <div id="responseMessage" class="message"></div>
-    
-      </form>
+    <div class="form-group">
+      <label for="task_description">Descrição da Tarefa:</label>
+      <textarea id="task_description" rows="4" required></textarea>
     </div>
+
+    <div class="form-group">
+      <label for="task_category">Categoria:</label>
+      <input type="text" id="task_category" required>
+    </div>
+
+    <div class="form-group">
+      <button class="btn" id="start_task_btn" onclick="startTask()">Iniciar Tarefa</button>
+    </div>
+
+    <div id="error_message" class="error" style="display: none;"></div>
+    <div id="success_message" class="success" style="display: none;"></div>
   </div>
 
-  <!-- Scripts -->
+  <!-- Conteúdo da Tab 2 - Cronômetro -->
+  <div id="tab2" class="tab-content">
+    <div id="timer">00:00</div>
+    <button class="btn" id="start_timer_btn" onclick="startTimer()">Iniciar Cronômetro</button>
+    <button class="btn" id="stop_timer_btn" onclick="stopTimer()" disabled>Parar Cronômetro</button>
+  </div>
+
+  <!-- Link para o Supabase -->
   <script>
-const user = "EX10883";    
+    // Configuração do Supabase
+    const supabaseUrl = 'https://xyzcompany.supabase.co';
+    const supabaseKey = 'your-supabase-api-key'; // Substitua pela sua chave de API
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-    const nome = "João Nuno da Silva Cardoso";
+    let timerInterval;
+    let timeElapsed = 0;
 
-    const tipoSelect = document.getElementById('tipo');
-    const btnSubmeter = document.getElementById('btnSubmeter');
-    const btnTerminar = document.getElementById('btnTerminar');
-    const infoData = document.getElementById('infoData');
-    const cronometroEl = document.getElementById('cronometro');
-    const horaInicioEl = document.getElementById('horaInicio');
-    const horaFimEl = document.getElementById('horaFim');
-    const mensagemEl = document.getElementById('mensagem');
-
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora;
-    let intervaloCronometro;
-    
+    // Função para mostrar as tabs
     function showTab(tabId) {
       const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => {
-        tab.classList.remove('active');
-      });
+      const tabBtns = document.querySelectorAll('.tab-btn');
 
-      const buttons = document.querySelectorAll('.tab-btn');
-      buttons.forEach(button => {
-        button.classList.remove('active');
-      });
+      tabs.forEach(tab => tab.classList.remove('active'));
+      tabBtns.forEach(btn => btn.classList.remove('active'));
 
       document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
+      document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
     }
 
-    function mudarTipo() {
-      tipoSelecionado = tipoSelect.value;
-      if (tipoSelecionado) {
-        btnSubmeter.disabled = false;
-      } else {
-        btnSubmeter.disabled = true;
-      }
-    }
+    // Função para iniciar a tarefa e o cronômetro
+    function startTask() {
+      const taskName = document.getElementById('task_name').value;
+      const taskDescription = document.getElementById('task_description').value;
+      const taskCategory = document.getElementById('task_category').value;
 
-    function submeter() {
-      if (!tipoSelecionado) {
-        alert("Selecione um tipo!");
+      if (!taskName || !taskDescription || !taskCategory) {
+        document.getElementById('error_message').style.display = 'block';
+        document.getElementById('error_message').textContent = 'Por favor, preencha todos os campos.';
         return;
       }
 
-      // Registar dados na base de dados do Supabase
-      const { createClient } = supabase;
-      const supabaseUrl = 'https://your-project-url.supabase.co';
-      const supabaseKey = 'your-anon-key';
-      const supabase = createClient(supabaseUrl, supabaseKey);
-
+      // Envia dados para o Supabase
       supabase
-        .from('registos')
+        .from('tasks')
         .insert([
-          {
-            user_id: user,
-            nome_usuario: nome,
-            tipo: tipoSelecionado,
-            data_hora: new Date().toISOString()
-          }
+          { name: taskName, description: taskDescription, category: taskCategory, start_time: new Date() }
         ])
         .then(response => {
           if (response.error) {
-            console.error(response.error);
-            mensagemEl.textContent = "Erro ao submeter dados!";
-            mensagemEl.classList.add('error');
+            document.getElementById('error_message').style.display = 'block';
+            document.getElementById('error_message').textContent = 'Erro ao enviar dados. Tente novamente.';
           } else {
-            mensagemEl.textContent = "Registro enviado com sucesso!";
-            mensagemEl.classList.add('success');
+            document.getElementById('error_message').style.display = 'none';
+            document.getElementById('success_message').style.display = 'block';
+            document.getElementById('success_message').textContent = 'Tarefa iniciada com sucesso!';
           }
-        })
-        .catch(error => {
-          console.error(error);
-          mensagemEl.textContent = "Erro ao submeter dados!";
-          mensagemEl.classList.add('error');
         });
+
+      // Muda para a aba do cronômetro
+      showTab('tab2');
     }
 
-    function terminar() {
-      fimDataHora = new Date();
-      fimDataHora.setHours(fimDataHora.getHours() + 1); // Para fins de exemplo
-      clearInterval(intervaloCronometro);
-      mostrarTempoTotal();
+    // Função para iniciar o cronômetro
+    function startTimer() {
+      document.getElementById('start_timer_btn').disabled = true;
+      document.getElementById('stop_timer_btn').disabled = false;
 
-      // Aqui seria o código para salvar o fim do registo no Supabase
+      timerInterval = setInterval(function() {
+        timeElapsed++;
+        const minutes = Math.floor(timeElapsed / 60);
+        const seconds = timeElapsed % 60;
+        document.getElementById('timer').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }, 1000);
     }
 
-    function mostrarTempoTotal() {
-      let tempoTotal = new Date(fimDataHora - inicioDataHora);
-      let horas = tempoTotal.getUTCHours();
-      let minutos = tempoTotal.getUTCMinutes();
-      let segundos = tempoTotal.getUTCSeconds();
-      cronometroEl.textContent = `⏱ ${horas}:${minutos}:${segundos}`;
-      cronometroEl.style.display = 'block';
-      horaFimEl.textContent = `Fim: ${fimDataHora.toLocaleTimeString()}`;
-      horaFimEl.style.display = 'block';
+    // Função para parar o cronômetro
+    function stopTimer() {
+      clearInterval(timerInterval);
+      document.getElementById('start_timer_btn').disabled = false;
+      document.getElementById('stop_timer_btn').disabled = true;
     }
-
   </script>
 </body>
 </html>
-
