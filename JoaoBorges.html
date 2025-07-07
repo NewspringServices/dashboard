@@ -12,20 +12,17 @@
       padding: 10px;
       background: #f7f7f7;
     }
-
     #topImage {
       display: block;
       margin: 0 auto 20px auto;
       max-width: 150px;
       height: auto;
     }
-
     .tabs {
       display: flex;
       justify-content: center;
       margin-bottom: 20px;
     }
-
     .tabs button {
       padding: 10px 20px;
       margin: 0 5px;
@@ -34,61 +31,47 @@
       background-color: #ccc;
       border-radius: 5px;
     }
-
     .tabs button.active {
       background-color: #28a745;
       color: white;
     }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
 
     .barra-registo {
       display: flex;
       flex-direction: column;
       align-items: center;
-      background-color: #fff;
+      background: white;
       padding: 20px;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       gap: 15px;
       max-width: 500px;
-      margin: 0 auto 20px auto;
+      margin: auto 0 20px;
     }
-
     .barra-registo .info-usuario {
       font-weight: bold;
       text-align: center;
     }
-
     .barra-registo .select-row {
       display: flex;
-      align-items: center;
       gap: 10px;
       flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
     }
-
     .barra-registo select {
       width: 200px;
       padding: 8px;
     }
-
     .barra-registo button#btnSubmeter {
       padding: 6px 12px;
       font-size: 14px;
-      width: auto;
     }
-
     .status {
       font-size: 14px;
     }
-
     #mensagem {
       margin-top: 10px;
       font-weight: bold;
@@ -104,12 +87,10 @@
       max-width: 400px;
       margin: auto;
     }
-
     .form-group {
       margin-bottom: 15px;
     }
-
-    select, input[type="text"], input[type="number"], button, input[type="radio"] {
+    select, input[type="text"], input[type="number"], button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
@@ -117,26 +98,13 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
-
-    .tipologia-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .tipologia-container div {
-      flex: 1;
-      text-align: center;
-    }
-
     .button-container {
       display: flex;
       justify-content: space-between;
     }
-
     .button-container button {
       width: 48%;
     }
-
     .message {
       text-align: center;
       margin-top: 20px;
@@ -144,54 +112,34 @@
       border-radius: 4px;
       display: none;
     }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
     .titulo-gama {
       font-size: 20px;
       color: #28a745;
       text-align: center;
       margin-bottom: 20px;
     }
-    .form-container label {
-      font-weight: bold;
-      font-size: 14px;
-    }
-        
-    #cronometro {
-  display: none !important;
-}
-
+    #cronometro { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- Imagem pequena no topo da página -->
-<img id="topImage" src="logo.png" alt="Logo Newspring" />
+  <img id="topImage" src="logo.png" alt="Logo Newspring" />
 
-  <!-- Abas -->
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
     <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
   </div>
 
-  <!-- Conteúdo FYBDO -->
+  <!-- FYBDO -->
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
-      <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>Nome:João Nuno da Silva Cardoso</div>
-
+      <div id="infoData"></div>
+      <div class="info-usuario">User: EX10883<br>Nome: João Nuno da Silva Cardoso</div>
       <div class="select-row">
         <label for="tipo">Tipo:</label>
-        <select id="tipo" onchange="mudarTipo()">
+        <select id="tipo">
           <option value="">Selecione</option>
           <option value="login">Login</option>
           <option value="logout">Logout</option>
@@ -200,430 +148,236 @@
           <option value="refeicao">Refeição</option>
           <option value="formacao">Formação</option>
         </select>
-        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+        <button id="btnSubmeter">Submeter</button>
       </div>
-
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status" style="display:none;"></span>
-      <span id="horaFim" class="status" style="display:none;"></span>
-      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
-
-      <span id="mensagem" class="status"></span>
+      <span id="cronometro" class="status">⏱ 00:00:00</span>
+      <span id="horaInicio" class="status"></span>
+      <span id="horaFim" class="status"></span>
+      <button id="btnTerminar" class="status">Terminar</button>
+      <span id="mensagem"></span>
     </div>
   </div>
 
-  <!-- Conteúdo GAMa -->
+  <!-- GAMA -->
   <div id="gama" class="tab-content">
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA</h2>
-    <form id="gamaForm">
-
-      <div class="form-group">
-        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-          <option value="">-- Selecione --</option>
-          <option value="AT">AT</option>
-          <option value="DNP">DNP</option>
-          <option value="AP">AP</option>
-          <option value="PETS">PETS</option>
-          <option value="Formação/Meetings">Formação/Meetings</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="suboptions" style="display: none;">
-        <label for="subopcao">Subopção:</label>
-        <select id="subopcao" name="subopcao">
-          <option value="">-- Escolha uma subopção --</option>
-          <option value="IBAN">IBAN</option>
-          <option value="IBAN+Indexação">IBAN+Indexação</option>
-          <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
-          <option value="Indexações">Indexações</option>
-        </select>
-      </div>
-
-<label for="numero-processo">Número de Processo/GAMA:</label>
-<input type="text" id="numero-processo" name="numero-processo" required>
-
-      <div class="form-group" id="documentosGroup" style="display: none;">
-        <label for="documentos">Número de Documentos:</label>
-        <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
-      </div>
-
-      <div class="form-group">
-        <label for="tempoTarefa">Tempo da Tarefa:</label>
-        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-      </div>
-
-      <div class="form-group button-container">
-        <button type="button" id="startButton">Iniciar Tarefa</button>
-        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-      </div>
-
-      <div id="responseMessage" class="message"></div>
-    
+      <form id="gamaForm">
+        <div class="form-group">
+          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+          <select id="tarefaFinalizada" required>
+            <option value="">-- Selecione --</option>
+            <option value="AT">AT</option>
+            <option value="DNP">DNP</option>
+            <option value="AP">AP</option>
+            <option value="PETS">PETS</option>
+            <option value="Formação/Meetings">Formação/Meetings</option>
+          </select>
+        </div>
+        <div class="form-group" id="suboptions">
+          <label for="subopcao">Subopção:</label>
+          <select id="subopcao">
+            <option value="">-- Escolha --</option>
+            <option value="IBAN">IBAN</option>
+            <option value="IBAN+Indexação">IBAN+Indexação</option>
+            <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
+            <option value="Indexações">Indexações</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="numero-processo">Número de Processo/GAMA:</label>
+          <input type="text" id="numero-processo" name="numero-processo" required>
+        </div>
+        <div class="form-group" id="documentosGroup">
+          <label for="documentos">Número de Documentos:</label>
+          <input type="number" id="documentos" min="1" placeholder="Digite o número de documentos" />
+        </div>
+        <div class="form-group">
+          <label for="tempoTarefa">Tempo da Tarefa:</label>
+          <input type="text" id="tempoTarefa" readonly>
+        </div>
+        <div class="button-container">
+          <button type="button" id="startButton">Iniciar Tarefa</button>
+          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+        </div>
+        <div id="responseMessage" class="message"></div>
       </form>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script>
-const user = "EX10883";    
+<script>
+  // Configurações
+  const user = "EX10883";
+  const nome = "João Nuno da Silva Cardoso";
+  const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+  const SUPABASE_API_KEY = 'YOUR_SUPABASE_KEY';
 
-    const nome = "João Nuno da Silva Cardoso";
+  // Elementos FYBDO
+  const tipo = document.getElementById('tipo');
+  const btnSubmeter = document.getElementById('btnSubmeter');
+  const btnTerminar = document.getElementById('btnTerminar');
+  const infoData = document.getElementById('infoData');
+  const cronometro = document.getElementById('cronometro');
+  const horaInicio = document.getElementById('horaInicio');
+  const horaFim = document.getElementById('horaFim');
+  const mensagem = document.getElementById('mensagem');
+  let timer, segundos = 0, inicio;
 
-    const tipoSelect = document.getElementById('tipo');
-    const btnSubmeter = document.getElementById('btnSubmeter');
-    const btnTerminar = document.getElementById('btnTerminar');
-    const infoData = document.getElementById('infoData');
-    const cronometroEl = document.getElementById('cronometro');
-    const horaInicioEl = document.getElementById('horaInicio');
-    const horaFimEl = document.getElementById('horaFim');
-    const mensagemEl = document.getElementById('mensagem');
+  // GAMA elementos
+  const tarefaFinalizada = document.getElementById('tarefaFinalizada');
+  const subopcao = document.getElementById('subopcao');
+  const suboptions = document.getElementById('suboptions');
+  const documentosGroup = document.getElementById('documentosGroup');
+  const documentos = document.getElementById('documentos');
+  const numeroProcesso = document.getElementById('numero-processo');
+  const startButton = document.getElementById('startButton');
+  const endButton = document.getElementById('endButton');
+  const tempoTarefa = document.getElementById('tempoTarefa');
+  const responseMessage = document.getElementById('responseMessage');
+  let startTime, timerInterval;
 
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora, timer, segundos = 0;
+  // Inicia interface
+  infoData.textContent = '📅 ' + new Date().toLocaleDateString('pt-BR');
+  cronometro.style.display = horaInicio.style.display = horaFim.style.display =
+    btnTerminar.style.display = 'none';
 
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+  // Tab switching
+  function showTab(id) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.onclick.toString().includes(id)));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === id));
+  }
 
-    // Exibe a data atual no topo da barra
-    function mostrarDataAtual() {
-      const hoje = new Date();
-      const dataFormatada = hoje.toLocaleDateString('pt-BR');
-      infoData.textContent = `📅 ${dataFormatada}`;
-    }
+  // FYBDO registro
+  tipo.addEventListener('change', () => {
+    btnSubmeter.disabled = !tipo.value;
+    cronometro.textContent = '⏱ 00:00:00';
+    cronometro.style.display = horaInicio.style.display = horaFim.style.display = btnTerminar.style.display = 'none';
+    mensagem.textContent = '';
+  });
 
-    mostrarDataAtual();
-
-    // Ativa ou desativa o botão submeter conforme seleção
-    tipoSelect.addEventListener('change', () => {
-      tipoSelecionado = tipoSelect.value;
-      resetar();
-
-      btnSubmeter.disabled = !tipoSelecionado;
-      mensagemEl.textContent = "";
-    });
-
-    // Função para iniciar cronometro visual
-    function iniciarCronometro() {
-      segundos = 0;
-      cronometroEl.style.display = 'inline-block';
-      cronometroEl.textContent = `⏱ 00:00:00`;
-
+  btnSubmeter.addEventListener('click', () => {
+    if (!tipo.value) return;
+    inicio = new Date();
+    if (['login', 'logout'].includes(tipo.value)) {
+      horaInicio.textContent = '✔️ Registado';
+      horaInicio.style.display = 'inline-block';
+      enviar({ tipo: tipo.value, inicio, fim: null, duracao: null }, 'registosNSS');
+    } else {
+      cronometro.style.display = 'inline-block';
       timer = setInterval(() => {
         segundos++;
-        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-        const s = String(segundos % 60).padStart(2, '0');
-        cronometroEl.textContent = `⏱ ${h}:${m}:${s}`;
+        const h = String(Math.floor(segundos / 3600)).padStart(2,'0');
+        const m = String(Math.floor((segundos % 3600)/60)).padStart(2,'0');
+        const s = String(segundos % 60).padStart(2,'0');
+        cronometro.textContent = `⏱ ${h}:${m}:${s}`;
       }, 1000);
+      horaInicio.textContent = '🕒 Início: ' + inicio.toLocaleTimeString('pt-BR');
+      horaInicio.style.display = 'inline-block';
+      btnSubmeter.style.display = 'none';
+      btnTerminar.style.display = 'inline-block';
     }
+  });
 
-    // Função para parar cronometro
-    function pararCronometro() {
-      clearInterval(timer);
-    }
+  btnTerminar.addEventListener('click', () => {
+    clearInterval(timer);
+    const fim = new Date();
+    const dur = (segundos/3600).toFixed(3);
+    horaFim.textContent = '🕔 Fim: ' + fim.toLocaleTimeString('pt-BR');
+    horaFim.style.display = 'inline-block';
+    enviar({ tipo: tipo.value, inicio, fim, duracao: parseFloat(dur) }, 'registosNSS');
+    btnTerminar.style.display='none';
+    btnSubmeter.style.display='inline-block';
+    btnSubmeter.disabled=true;
+    tipo.value='';
+    segundos=0;
+  });
 
-    // Exibe mensagem na tela (verde para sucesso, vermelho para erro)
-    function mostrarMensagem(texto, sucesso = true) {
-      mensagemEl.textContent = texto;
-      mensagemEl.style.color = sucesso ? 'green' : 'red';
-    }
+  // GAMA lógica
+  tarefaFinalizada.addEventListener('change', () => {
+    suboptions.style.display = tarefaFinalizada.value==='AT' ? 'block' : 'none';
+    documentosGroup.style.display = ['AP','DNP','PETS','Formação/Meetings'].includes(tarefaFinalizada.value)
+      ? 'block' : 'none';
+  });
 
-    // Reseta visual e variáveis para novo registro
-    function resetar() {
-      pararCronometro();
-      cronometroEl.style.display = 'none';
-      cronometroEl.textContent = '⏱ 00:00:00';
+  startButton.addEventListener('click', () => {
+    startTime = new Date();
+    startButton.disabled = true;
+    endButton.disabled = false;
+    timerInterval = setInterval(() => {
+      const elapsed = Math.floor((new Date() - startTime)/1000);
+      const h = String(Math.floor(elapsed/3600)).padStart(2,'0');
+      const m = String(Math.floor((elapsed%3600)/60)).padStart(2,'0');
+      const s = String(elapsed%60).padStart(2,'0');
+      tempoTarefa.value = `${h}:${m}:${s}`;
+    }, 1000);
+  });
 
-      horaInicioEl.style.display = 'none';
-      horaInicioEl.textContent = '';
+  endButton.addEventListener('click', () => {
+    clearInterval(timerInterval);
+    endButton.disabled = true;
+    const fim = new Date();
+    const inicioStr = startTime.toISOString();
+    const fimStr = fim.toISOString();
+    const tempo = tempoTarefa.value;
+    const tarefa = tarefaFinalizada.value + (subopcao.value ? ` - ${subopcao.value}` : '');
+    const nrProc = numeroProcesso.value;
+    const documentosQtd = tarefaFinalizada.value==='AT'? '1' : documentos.value || '';
 
-      horaFimEl.style.display = 'none';
-      horaFimEl.textContent = '';
+    const payload = [{
+      colaborador: nome,
+      inicio_da_tarefa: inicioStr,
+      fim_da_tarefa: fimStr,
+      tarefa_finalizada: tarefa,
+      tempo_com_a_tarefa: tempo,
+      documentos: documentosQtd,
+      numero_processo: nrProc
+    }];
 
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = !tipoSelecionado;
-
-      mensagemEl.textContent = "";
-    }
-
-    // Função para formatar data/hora local em ISO-like string sem o fuso UTC
-    function formatarDataHoraLocal(date) {
-      const ano = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      const hora = String(date.getHours()).padStart(2, '0');
-      const min = String(date.getMinutes()).padStart(2, '0');
-      const seg = String(date.getSeconds()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
-    }
-
-    // Enviar dados para Supabase
-    async function enviarAoSupabase(dados) {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_API_KEY,
-          'Authorization': `Bearer ${SUPABASE_API_KEY}`,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(dados)
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
-      }
-
-      return await response.json();
-    }
-
-    // Clique no botão Submeter
-    btnSubmeter.addEventListener('click', async () => {
-      if (!tipoSelecionado) {
-        mostrarMensagem("Selecione um tipo de registo.", false);
-        return;
-      }
-
-      inicioDataHora = new Date();
-
-      // Se for login ou logout, não tem cronometro
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        horaInicioEl.textContent = `✔️ Registado`;
-        horaInicioEl.style.display = 'inline-block';
-
-        const dados = {
-          data: formatarDataHoraLocal(inicioDataHora).split('T')[0], // só a data local
-          user,
-          nome,
-          tipo: tipoSelecionado,
-          inicio: formatarDataHoraLocal(inicioDataHora),
-          fim: null,
-          duracao: null
-        };
-
-        try {
-          await enviarAoSupabase(dados);
-          mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-          btnSubmeter.disabled = true;
-        } catch (err) {
-          mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-        }
-      } else {
-        // Para outros tipos, iniciar cronometro e habilitar botão terminar
-        horaInicioEl.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
-        horaInicioEl.style.display = 'inline-block';
-
-        iniciarCronometro();
-
-        btnSubmeter.style.display = 'none';
-        btnTerminar.style.display = 'inline-block';
-        mostrarMensagem("");
-      }
-    });
-
-    // Clique no botão Terminar
-    btnTerminar.addEventListener('click', async () => {
-      pararCronometro();
-      fimDataHora = new Date();
-      const fimHoraStr = fimDataHora.toLocaleTimeString('pt-BR');
-      const duracaoSegundos = segundos;
-
-      horaFimEl.textContent = `🕔 Fim: ${fimHoraStr}`;
-      horaFimEl.style.display = 'inline-block';
-
-      // Calcula duração em horas decimais
-      const duracaoHoras = duracaoSegundos / 3600;
-
-      const dados = {
-        data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: formatarDataHoraLocal(fimDataHora),
-        duracao: parseFloat(duracaoHoras.toFixed(3))
-      };
-
-      try {
-        await enviarAoSupabase(dados);
-        mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-      } catch (err) {
-        mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-      }
-
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = true;
-      tipoSelect.value = "";
-      tipoSelecionado = "";
-    });
-
-
-    // GAMa scripts
-    let startTime;
-    let endTime;
-    let timerInterval;
-
-    const startButton = document.getElementById('startButton');
-    const endButton = document.getElementById('endButton');
-    const tempoTarefa = document.getElementById('tempoTarefa');
-    const responseMessage = document.getElementById('responseMessage');
-    const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const suboptions = document.getElementById('suboptions');
-    const subopcao = document.getElementById('subopcao');
-    const documentosGroup = document.getElementById('documentosGroup');
-    const documentos = document.getElementById('documentos');
-
-    tarefaFinalizada.addEventListener('change', function () {
-      if (this.value === 'AT') {
-        suboptions.style.display = 'block';
-        documentosGroup.style.display = 'none';
-      } else if (['AP', 'DNP', 'PETS', 'Formação/Meetings'].includes(this.value)) {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'block';
-      } else {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'none';
-      }
-    });
-
-    function formatTime(seconds) {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    }
-
-    function formatDate(date) {
-      const d = date.getDate().toString().padStart(2,'0');
-      const m = (date.getMonth() + 1).toString().padStart(2,'0');
-      const y = date.getFullYear();
-      const h = date.getHours().toString().padStart(2,'0');
-      const min = date.getMinutes().toString().padStart(2,'0');
-      const s = date.getSeconds().toString().padStart(2,'0');
-      return `${y}-${m}-${d}T${h}:${min}:${s}`; // formato ISO para banco
-    }
-
-    startButton.addEventListener('click', function() {
-      startTime = new Date();
-      startButton.disabled = true;
-      endButton.disabled = false;
-
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((new Date() - startTime)/1000);
-        tempoTarefa.value = formatTime(elapsed);
-      }, 1000);
-    });
-
-    // Função para enviar dados para Supabase
-    function enviarDados(data) {
-      return fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(data)
+    enviar(payload, 'gama_producao')
+      .then(() => {
+        responseMessage.textContent='✔️ Enviado com sucesso!';
+        responseMessage.className='message success';
+        responseMessage.style.display='block';
+        setTimeout(()=>responseMessage.style.display='none',5000);
+        document.getElementById('gamaForm').reset();
+        startButton.disabled=false;
+        tempoTarefa.value='';
+        suboptions.style.display='none';
+        documentosGroup.style.display='none';
+        endButton.disabled=true;
       })
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao enviar os dados');
-        return response.json();
+      .catch(()=> {
+        responseMessage.textContent='❌ Erro no envio';
+        responseMessage.className='message error';
+        responseMessage.style.display='block';
+        startButton.disabled=false;
       });
-    }
+  });
 
-    endButton.addEventListener('click', function() {
-      clearInterval(timerInterval);
-      endTime = new Date();
-      const elapsed = Math.floor((endTime - startTime) / 1000);
-      tempoTarefa.value = formatTime(elapsed);
-      endButton.disabled = true;
+  // Função de envio
+  async function enviar(data, tabela) {
+    const body = tabela==='registosNSS'
+      ? { data: new Date().toISOString().split('T')[0], user, nome, ...data }
+      : data;
 
-      const colaborador = "João Nuno da Silva Cardoso";
-      const tarefa = tarefaFinalizada.value;
-      const sub = subopcao.value;
-      const tempo = tempoTarefa.value;
-      const startFormatted = formatDate(startTime);
-      const endFormatted = formatDate(endTime);
-      const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
-
-      const dataToSend = [{
-        colaborador: colaborador,
-        inicio_da_tarefa: startFormatted,
-        fim_da_tarefa: endFormatted,
-        tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
-        tempo_com_a_tarefa: tempo,
-        documentos: numDocumentos
-        numero_processo: numeroProcessoValue  // Inclui o número de processo
-
-      }];
-
-      enviarDados(dataToSend)
-        .then(() => {
-          if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
-            const dataDuplicada = [{
-              colaborador: colaborador,
-              inicio_da_tarefa: startFormatted,
-              fim_da_tarefa: endFormatted,
-              tarefa_finalizada: "AT - Indexações",
-              tempo_com_a_tarefa: tempo,
-              documentos: "1"
-              numero_processo: numeroProcessoValue  // Inclui o número de processo
-
-            }];
-            return enviarDados(dataDuplicada);
-          }
-        })
-        .then(() => {
-          showMessage('Dados enviados com sucesso!', 'success');
-          document.getElementById('gamaForm').reset();
-          startButton.disabled = false;
-          tempoTarefa.value = '';
-          suboptions.style.display = 'none';
-          documentosGroup.style.display = 'none';
-          endButton.disabled = true;
-        })
-        .catch(() => {
-          showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
-          startButton.disabled = false;
-        });
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${tabela}`, {
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SUPABASE_API_KEY,
+        'Authorization':`Bearer ${SUPABASE_API_KEY}`,
+        'Prefer':'return=representation'
+      },
+      body: JSON.stringify(tabela==='registosNSS' ? body : data)
     });
+    if (!res.ok) throw new Error(res.status);
+    mensagem.textContent = '✔️ Sucesso';
+    mensagem.style.color='green';
+    setTimeout(()=>mensagem.textContent='',3000);
+    return res.json();
+  }
 
-    function showMessage(message, type) {
-      responseMessage.textContent = message;
-      responseMessage.className = 'message ' + type;
-      responseMessage.style.display = 'block';
-      setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
-    }
-    function showMessage(message, type) {
-        responseMessage.textContent = message;
-        responseMessage.className = 'message ' + type;
-        responseMessage.style.display = 'block';
-        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
-    }
-    function showTab(tabId) {
-  // Remove a classe active de todas as abas
-  const tabs = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => tab.classList.remove('active'));
-
-  // Remove a classe active de todos os botões
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-
-  // Adiciona a classe active na aba selecionada
-  document.getElementById(tabId).classList.add('active');
-
-  // Adiciona a classe active no botão correspondente
-  const button = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
-  if (button) button.classList.add('active');
-}
-
-  </script>
+</script>
 
 </body>
 </html>
