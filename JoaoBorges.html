@@ -6,71 +6,177 @@
   <title>Dashboard Newspring</title>
 
   <style>
-    /* Estilo das abas */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 10px;
+      background: #f7f7f7;
+    }
+
+    #topImage {
+      display: block;
+      margin: 0 auto 20px auto;
+      max-width: 150px;
+      height: auto;
+    }
+
     .tabs {
       display: flex;
+      justify-content: center;
       margin-bottom: 20px;
     }
-    .tab-btn {
+
+    .tabs button {
       padding: 10px 20px;
-      cursor: pointer;
-      background-color: #f1f1f1;
+      margin: 0 5px;
       border: none;
-      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 5px;
     }
-    .tab-btn.active {
-      background-color: #4CAF50;
+
+    .tabs button.active {
+      background-color: #28a745;
       color: white;
     }
+
     .tab-content {
       display: none;
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-top: none;
     }
+
     .tab-content.active {
       display: block;
     }
 
-    /* Estilo da barra de registro */
     .barra-registo {
       display: flex;
       flex-direction: column;
       align-items: center;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      gap: 15px;
+      max-width: 500px;
+      margin: 0 auto 20px auto;
     }
-    .info-data, .info-usuario, .status {
-      margin-bottom: 10px;
+
+    .barra-registo .info-usuario {
+      font-weight: bold;
+      text-align: center;
     }
-    .select-row {
-      margin-bottom: 20px;
+
+    .barra-registo .select-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
     }
+
+    .barra-registo select {
+      width: 200px;
+      padding: 8px;
+    }
+
+    .barra-registo button#btnSubmeter {
+      padding: 6px 12px;
+      font-size: 14px;
+      width: auto;
+    }
+
     .status {
-      font-size: 18px;
+      font-size: 14px;
     }
-    .message {
+
+    #mensagem {
       margin-top: 10px;
+      font-weight: bold;
+      text-align: center;
     }
-    .success {
-      color: green;
-    }
-    .error {
-      color: red;
-    }
+
     .form-container {
-      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      margin: auto;
     }
+
     .form-group {
       margin-bottom: 15px;
     }
-    .button-container button {
-      margin-top: 10px;
+
+    select, input[type="text"], input[type="number"], button, input[type="radio"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
+
+    .tipologia-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tipologia-container div {
+      flex: 1;
+      text-align: center;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .button-container button {
+      width: 48%;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+
+    .titulo-gama {
+      font-size: 20px;
+      color: #28a745;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .form-container label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+        
+    #cronometro {
+  display: none !important;
+}
+
   </style>
 </head>
 <body>
 
   <!-- Imagem pequena no topo da página -->
-  <img id="topImage" src="logo.png" alt="Logo Newspring" />
+<img id="topImage" src="logo.png" alt="Logo Newspring" />
+
 
   <!-- Abas -->
   <div class="tabs">
@@ -82,7 +188,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>Nome: João Nuno da Silva Cardoso</div>
+      <div class="info-usuario">User: EX10883<br>Nome:TESTE</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -111,130 +217,144 @@
   <div id="gama" class="tab-content">
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA</h2>
-      <form id="gamaForm">
-        <div class="form-group">
-          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-          <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="">-- Selecione --</option>
-            <option value="AT">AT</option>
-            <option value="DNP">DNP</option>
-            <option value="AP">AP</option>
-            <option value="PETS">PETS</option>
-            <option value="Formação/Meetings">Formação/Meetings</option>
-          </select>
-        </div>
+    <form id="gamaForm">
 
-        <div class="form-group">
-          <label for="numero-processo">Número de Processo/GAMA:</label>
-          <input type="text" id="numero-processo" name="numero-processo" required>
-        </div>
+      <div class="form-group">
+        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+          <option value="">-- Selecione --</option>
+          <option value="AT">AT</option>
+          <option value="DNP">DNP</option>
+          <option value="AP">AP</option>
+          <option value="PETS">PETS</option>
+          <option value="Formação/Meetings">Formação/Meetings</option>
+        </select>
+      </div>
 
-        <div class="form-group">
-          <label for="tempoTarefa">Tempo da Tarefa:</label>
-          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-        </div>
+      <div class="form-group">
+        <label for="numero-processo">Número de Processo/GAMA:</label>
+        <input type="text" id="numero-processo" name="numero-processo" required>
+      </div>
 
-        <div class="form-group button-container">
-          <button type="button" id="startButton" onclick="iniciarTarefa()">Iniciar Tarefa</button>
-          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-        </div>
+      <div class="form-group">
+        <label for="tempoTarefa">Tempo da Tarefa:</label>
+        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+      </div>
 
-        <div id="responseMessage" class="message"></div>
+      <div class="form-group button-container">
+        <button type="button" id="startButton">Iniciar Tarefa</button>
+        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+      </div>
+
+      <div id="responseMessage" class="message"></div>
+    
       </form>
     </div>
   </div>
 
   <!-- Scripts -->
   <script>
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'YOUR_API_KEY_HERE';
+const user = "EX10883";    
 
-    // Função para enviar dados ao Supabase
-    async function enviarAoSupabase(dados) {
-      console.log("Enviando dados para o Supabase:", dados);
-      try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_API_KEY,
-            'Authorization': `Bearer ${SUPABASE_API_KEY}`,
-            'Prefer': 'return=representation'
-          },
-          body: JSON.stringify(dados)
-        });
+    const nome = "João Nuno da Silva Cardoso";
 
-        if (!response.ok) {
-          console.error("Erro ao enviar dados:", response.statusText);
-          throw new Error('Erro ao enviar dados');
-        }
+    const tipoSelect = document.getElementById('tipo');
+    const btnSubmeter = document.getElementById('btnSubmeter');
+    const btnTerminar = document.getElementById('btnTerminar');
+    const infoData = document.getElementById('infoData');
+    const cronometroEl = document.getElementById('cronometro');
+    const horaInicioEl = document.getElementById('horaInicio');
+    const horaFimEl = document.getElementById('horaFim');
+    const mensagemEl = document.getElementById('mensagem');
 
-        const result = await response.json();
-        console.log("Dados enviados com sucesso:", result);
-        return result;
-      } catch (err) {
-        console.error("Erro de envio:", err);
-        throw err;
+    let tipoSelecionado = "";
+    let inicioDataHora, fimDataHora;
+    let intervaloCronometro;
+    
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(button => {
+        button.classList.remove('active');
+      });
+
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function mudarTipo() {
+      tipoSelecionado = tipoSelect.value;
+      if (tipoSelecionado) {
+        btnSubmeter.disabled = false;
+      } else {
+        btnSubmeter.disabled = true;
       }
     }
 
-    // Função para submeter o formulário na aba NSS
-    async function submeter() {
-      const colaborador = 'João Nuno da Silva Cardoso';
-      const tarefa = document.getElementById('tipo').value;
-      const numeroProcesso = document.getElementById('numero-processo').value;
-      const tempo = document.getElementById('tempoTarefa').value;
-
-      if (!tarefa || !numeroProcesso || !tempo) {
-        document.getElementById('mensagem').textContent = "Preencha todos os campos!";
-        document.getElementById('mensagem').classList.add('error');
+    function submeter() {
+      if (!tipoSelecionado) {
+        alert("Selecione um tipo!");
         return;
       }
 
-      const dados = {
-        colaborador: colaborador,
-        tarefa_finalizada: tarefa,
-        numero_process: numeroProcesso,
-        tempo_com_a_tarefa: tempo
-      };
+      // Registar dados na base de dados do Supabase
+      const { createClient } = supabase;
+      const supabaseUrl = 'https://your-project-url.supabase.co';
+      const supabaseKey = 'your-anon-key';
+      const supabase = createClient(supabaseUrl, supabaseKey);
 
-      try {
-        const resultado = await enviarAoSupabase(dados);
-        document.getElementById('mensagem').textContent = 'Dados enviados com sucesso!';
-        document.getElementById('mensagem').classList.add('success');
-      } catch (err) {
-        document.getElementById('mensagem').textContent = 'Erro ao enviar dados.';
-        document.getElementById('mensagem').classList.add('error');
-      }
+      supabase
+        .from('registos')
+        .insert([
+          {
+            user_id: user,
+            nome_usuario: nome,
+            tipo: tipoSelecionado,
+            data_hora: new Date().toISOString()
+          }
+        ])
+        .then(response => {
+          if (response.error) {
+            console.error(response.error);
+            mensagemEl.textContent = "Erro ao submeter dados!";
+            mensagemEl.classList.add('error');
+          } else {
+            mensagemEl.textContent = "Registro enviado com sucesso!";
+            mensagemEl.classList.add('success');
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          mensagemEl.textContent = "Erro ao submeter dados!";
+          mensagemEl.classList.add('error');
+        });
     }
 
-    // Função para mudar entre as abas
-    function showTab(tabName) {
-      const tabs = document.querySelectorAll('.tab-content');
-      const tabButtons = document.querySelectorAll('.tab-btn');
+    function terminar() {
+      fimDataHora = new Date();
+      fimDataHora.setHours(fimDataHora.getHours() + 1); // Para fins de exemplo
+      clearInterval(intervaloCronometro);
+      mostrarTempoTotal();
 
-      tabs.forEach(tab => tab.classList.remove('active'));
-      tabButtons.forEach(button => button.classList.remove('active'));
-
-      document.getElementById(tabName).classList.add('active');
-      const activeButton = [...tabButtons].find(button => button.textContent.toLowerCase() === tabName);
-      activeButton.classList.add('active');
+      // Aqui seria o código para salvar o fim do registo no Supabase
     }
 
-    // Função para iniciar a tarefa na aba GAMA
-    function iniciarTarefa() {
-      const tempoInput = document.getElementById('tempoTarefa');
-      const startButton = document.getElementById('startButton');
-      const endButton = document.getElementById('endButton');
-
-      tempoInput.value = '00:00:00';
-      startButton.disabled = true;
-      endButton.disabled = false;
-      // Aqui pode adicionar a lógica para cronometrar o tempo
+    function mostrarTempoTotal() {
+      let tempoTotal = new Date(fimDataHora - inicioDataHora);
+      let horas = tempoTotal.getUTCHours();
+      let minutos = tempoTotal.getUTCMinutes();
+      let segundos = tempoTotal.getUTCSeconds();
+      cronometroEl.textContent = `⏱ ${horas}:${minutos}:${segundos}`;
+      cronometroEl.style.display = 'block';
+      horaFimEl.textContent = `Fim: ${fimDataHora.toLocaleTimeString()}`;
+      horaFimEl.style.display = 'block';
     }
 
-    // A lógica para terminar a tarefa pode ser desenvolvida de forma semelhante
   </script>
-
 </body>
 </html>
+
