@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -187,7 +188,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>XXXXX</div>
+      <div class="info-usuario">User: EX10883<br>Nome:João Nuno da Silva Cardoso</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -241,19 +242,11 @@
         </select>
       </div>
 
-<label for="numero-processo">Número de Processo/GAMA:</label>
-<input type="text" id="numero-processo" name="numero-processo" required>
-
-
         <div class="form-group">
           <label for="processoGama">Processo GAMA:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
 
-      <div class="form-group" id="documentosGroup" style="display: none;">
-        <label for="documentos">Número de Documentos:</label>
-        <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
-      </div>
 
       <div class="form-group">
         <label for="tempoTarefa">Tempo da Tarefa:</label>
@@ -480,10 +473,8 @@ const user = "EX10883";
     const tempoTarefa = document.getElementById('tempoTarefa');
     const responseMessage = document.getElementById('responseMessage');
     const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const suboptions = document.getElementById('suboptions');
-    const subopcao = document.getElementById('subopcao');
-    const documentosGroup = document.getElementById('documentosGroup');
-    const documentos = document.getElementById('documentos');
+   const processoGama = document.getElementById('processoGama').value;
+
     
 
     tarefaFinalizada.addEventListener('change', function () {
@@ -558,7 +549,6 @@ const user = "EX10883";
       const tempo = tempoTarefa.value;
       const startFormatted = formatDate(startTime);
       const endFormatted = formatDate(endTime);
-      const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
         const processoGama = processoGama.value;       
 
       const dataToSend = [{
@@ -567,40 +557,23 @@ const user = "EX10883";
         fim_da_tarefa: endFormatted,
         tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
         tempo_com_a_tarefa: tempo,
-        documentos: numDocumentos,
         processoGama: processoGama
         
       }];
 
-      enviarDados(dataToSend)
-        .then(() => {
-          if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
-            const dataDuplicada = [{
-              colaborador: colaborador,
-              inicio_da_tarefa: startFormatted,
-              fim_da_tarefa: endFormatted,
-              tarefa_finalizada: "AT - Indexações",
-              tempo_com_a_tarefa: tempo,
-              documentos: "1",
-              processoGama: processoGama
-            }];
-            return enviarDados(dataDuplicada);
-          }
-        })
-        .then(() => {
-          showMessage('Dados enviados com sucesso!', 'success');
-          document.getElementById('gamaForm').reset();
-          startButton.disabled = false;
-          tempoTarefa.value = '';
-          suboptions.style.display = 'none';
-          documentosGroup.style.display = 'none';
-          endButton.disabled = true;
-        })
-        .catch(() => {
-          showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
-          startButton.disabled = false;
-        });
-    });
+enviarDados(dataToSend)
+  .then(() => {
+    showMessage('Dados enviados com sucesso!', 'success');
+    document.getElementById('gamaForm').reset();
+    startButton.disabled = false;
+    tempoTarefa.value = '';
+    suboptions.style.display = 'none';
+    endButton.disabled = true;
+  })
+  .catch(() => {
+    showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
+    startButton.disabled = false;
+  });
 
     function showMessage(message, type) {
       responseMessage.textContent = message;
