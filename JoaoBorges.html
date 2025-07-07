@@ -167,8 +167,8 @@
     }
         
     #cronometro {
-      display: none !important;
-    }
+  display: none !important;
+}
 
   </style>
 </head>
@@ -212,7 +212,7 @@
     </div>
   </div>
 
-  <!-- Conteúdo GAMA -->
+  <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA</h2>
@@ -230,6 +230,7 @@
           </select>
         </div>
 
+        <!-- Remover a seção de Subopções -->
         <div class="form-group" id="suboptions" style="display: none;">
           <label for="subopcao">Subopção:</label>
           <select id="subopcao" name="subopcao">
@@ -241,20 +242,10 @@
           </select>
         </div>
 
+        <!-- Substituir "Número de Documentos" por "Nº de Processo" -->
         <div class="form-group">
           <label for="numero-processo">Número de Processo/GAMA:</label>
           <input type="text" id="numero-processo" name="numero-processo" required>
-        </div>
-
-        <!-- NOVO CAMPO ADICIONADO -->
-        <div class="form-group">
-          <label for="numero-processo-2">Número de Processo 2:</label>
-          <input type="text" id="numero-processo-2" name="numero-processo-2" placeholder="Insira o segundo número de processo">
-        </div>
-
-        <div class="form-group" id="documentosGroup" style="display: none;">
-          <label for="documentos">Número de Documentos:</label>
-          <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
         </div>
 
         <div class="form-group">
@@ -267,119 +258,74 @@
           <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
         </div>
 
+        <div id="responseMessage" class="message"></div>
+      
       </form>
-      <div id="mensagemGama" class="message"></div>
     </div>
   </div>
 
+  <!-- Scripts -->
   <script>
-    // Controle das abas
-    function showTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(tab => {
+    const user = "EX10883";    
+    const nome = "João Nuno da Silva Cardoso";
+
+    // Exemplo de como alternar entre abas
+    function showTab(tabName) {
+      const tabs = document.querySelectorAll('.tab-content');
+      const buttons = document.querySelectorAll('.tab-btn');
+      
+      tabs.forEach(tab => {
         tab.classList.remove('active');
       });
-      document.querySelectorAll('.tabs button').forEach(btn => {
-        btn.classList.remove('active');
+      buttons.forEach(button => {
+        button.classList.remove('active');
       });
-      document.getElementById(tabId).classList.add('active');
-      event.target.classList.add('active');
+
+      document.getElementById(tabName).classList.add('active');
+      document.querySelector(`.tab-btn[onclick="showTab('${tabName}')"]`).classList.add('active');
     }
 
-    // FYBDO - Mudar tipo selecionado
-    function mudarTipo() {
-      // aqui pode colocar lógica para mudar estados conforme tipo selecionado
-    }
-
-    // FYBDO - Simulação submeter
+    // Função para submeter a tarefa
     function submeter() {
       const tipo = document.getElementById('tipo').value;
       const mensagem = document.getElementById('mensagem');
-      if (!tipo) {
-        mensagem.textContent = 'Selecione um tipo antes de submeter.';
+
+      if (tipo) {
+        mensagem.textContent = `Tarefa ${tipo} submetida com sucesso!`;
+        mensagem.style.color = 'green';
+      } else {
+        mensagem.textContent = 'Por favor, selecione um tipo de tarefa.';
         mensagem.style.color = 'red';
-        return;
       }
-      mensagem.textContent = `Registo de tipo "${tipo}" submetido com sucesso!`;
+    }
+
+    function mudarTipo() {
+      const tipo = document.getElementById('tipo').value;
+      const cronometro = document.getElementById('cronometro');
+      const horaInicio = document.getElementById('horaInicio');
+      const horaFim = document.getElementById('horaFim');
+      const btnTerminar = document.getElementById('btnTerminar');
+      
+      if (tipo === 'login') {
+        cronometro.style.display = 'inline-block';
+        horaInicio.style.display = 'inline-block';
+        horaFim.style.display = 'inline-block';
+        btnTerminar.style.display = 'inline-block';
+      } else {
+        cronometro.style.display = 'none';
+        horaInicio.style.display = 'none';
+        horaFim.style.display = 'none';
+        btnTerminar.style.display = 'none';
+      }
+    }
+
+    function terminar() {
+      const horaFim = document.getElementById('horaFim');
+      const mensagem = document.getElementById('mensagem');
+      horaFim.textContent = `Tarefa terminada às: ${new Date().toLocaleTimeString()}`;
+      mensagem.textContent = 'Tarefa finalizada com sucesso!';
       mensagem.style.color = 'green';
     }
-
-    // GAMA - Mostrar subopções conforme tarefa selecionada
-    const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const suboptions = document.getElementById('suboptions');
-    const documentosGroup = document.getElementById('documentosGroup');
-    const subopcao = document.getElementById('subopcao');
-
-    tarefaFinalizada.addEventListener('change', () => {
-      const valor = tarefaFinalizada.value;
-
-      if (valor === 'AP') {
-        suboptions.style.display = 'block';
-      } else {
-        suboptions.style.display = 'none';
-        subopcao.value = '';
-      }
-
-      if (valor === 'PETS') {
-        documentosGroup.style.display = 'block';
-      } else {
-        documentosGroup.style.display = 'none';
-        document.getElementById('documentos').value = '';
-      }
-    });
-
-    // GAMA - Cronómetro básico
-    let startTime, endTime, timerInterval;
-
-    const startButton = document.getElementById('startButton');
-    const endButton = document.getElementById('endButton');
-    const tempoTarefa = document.getElementById('tempoTarefa');
-    const mensagemGama = document.getElementById('mensagemGama');
-
-    function formatTime(ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
-    }
-
-    startButton.addEventListener('click', () => {
-      if (!tarefaFinalizada.value) {
-        mensagemGama.style.display = 'block';
-        mensagemGama.className = 'message error';
-        mensagemGama.textContent = 'Selecione uma tarefa antes de iniciar.';
-        return;
-      }
-      if (tarefaFinalizada.value === 'AP' && !subopcao.value) {
-        mensagemGama.style.display = 'block';
-        mensagemGama.className = 'message error';
-        mensagemGama.textContent = 'Selecione uma subopção para AP.';
-        return;
-      }
-      mensagemGama.style.display = 'none';
-      startTime = new Date();
-      startButton.disabled = true;
-      endButton.disabled = false;
-      tempoTarefa.value = '';
-      timerInterval = setInterval(() => {
-        const now = new Date();
-        tempoTarefa.value = formatTime(now - startTime);
-      }, 1000);
-    });
-
-    endButton.addEventListener('click', () => {
-      endTime = new Date();
-      clearInterval(timerInterval);
-      const diff = endTime - startTime;
-      tempoTarefa.value = formatTime(diff);
-      startButton.disabled = false;
-      endButton.disabled = true;
-      mensagemGama.style.display = 'block';
-      mensagemGama.className = 'message success';
-      mensagemGama.textContent = 'Tarefa finalizada com sucesso!';
-    });
   </script>
-
 </body>
 </html>
-
