@@ -33,7 +33,6 @@
       cursor: pointer;
       background-color: #ccc;
       border-radius: 5px;
-      transition: background-color 0.3s ease;
     }
 
     .tabs button.active {
@@ -78,29 +77,16 @@
     .barra-registo select {
       width: 200px;
       padding: 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
     }
 
     .barra-registo button#btnSubmeter {
-      padding: 8px 16px;
+      padding: 6px 12px;
       font-size: 14px;
       width: auto;
-      border-radius: 5px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-    .barra-registo button#btnSubmeter:disabled {
-      background-color: #a5d6a7;
-      cursor: not-allowed;
     }
 
     .status {
       font-size: 14px;
-      text-align: center;
     }
 
     #mensagem {
@@ -123,35 +109,32 @@
       margin-bottom: 15px;
     }
 
-    select, input[type="text"], input[type="number"], button {
+    select, input[type="text"], input[type="number"], button, input[type="radio"] {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
       border-radius: 4px;
       border: 1px solid #ccc;
       box-sizing: border-box;
-      font-size: 14px;
+    }
+
+    .tipologia-container {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tipologia-container div {
+      flex: 1;
+      text-align: center;
     }
 
     .button-container {
       display: flex;
       justify-content: space-between;
-      gap: 10px;
     }
 
     .button-container button {
       width: 48%;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s ease;
-    }
-    .button-container button:disabled {
-      background-color: #a5d6a7;
-      cursor: not-allowed;
     }
 
     .message {
@@ -160,7 +143,6 @@
       padding: 10px;
       border-radius: 4px;
       display: none;
-      font-weight: bold;
     }
 
     .success {
@@ -179,11 +161,15 @@
       text-align: center;
       margin-bottom: 20px;
     }
-
+    .form-container label {
+      font-weight: bold;
+      font-size: 14px;
+    }
+        
     #cronometro {
       display: none !important;
-      font-weight: bold;
     }
+
   </style>
 </head>
 <body>
@@ -201,7 +187,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>Nome: João Nuno da Silva Cardoso</div>
+      <div class="info-usuario">User: EX10883<br>Nome:João Nuno da Silva Cardoso</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -214,13 +200,13 @@
           <option value="refeicao">Refeição</option>
           <option value="formacao">Formação</option>
         </select>
-        <button id="btnSubmeter" disabled>Submeter</button>
+        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
       </div>
 
-      <span id="cronometro" class="status">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status"></span>
-      <span id="horaFim" class="status"></span>
-      <button id="btnTerminar" style="display:none;">Terminar</button>
+      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
+      <span id="horaInicio" class="status" style="display:none;"></span>
+      <span id="horaFim" class="status" style="display:none;"></span>
+      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
 
       <span id="mensagem" class="status"></span>
     </div>
@@ -230,7 +216,8 @@
   <div id="gama" class="tab-content">
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA</h2>
-      <form id="gamaForm" onsubmit="return false;">
+      <form id="gamaForm">
+
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
@@ -255,8 +242,14 @@
         </div>
 
         <div class="form-group">
-          <label for="processoGama">Processo:</label>
-          <input type="text" id="processoGama" name="processoGama" required />
+          <label for="numero-processo">Número de Processo/GAMA:</label>
+          <input type="text" id="numero-processo" name="numero-processo" required>
+        </div>
+
+        <!-- NOVO CAMPO ADICIONADO -->
+        <div class="form-group">
+          <label for="numero-processo-2">Número de Processo 2:</label>
+          <input type="text" id="numero-processo-2" name="numero-processo-2" placeholder="Insira o segundo número de processo">
         </div>
 
         <div class="form-group" id="documentosGroup" style="display: none;">
@@ -269,288 +262,124 @@
           <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
         </div>
 
-        <div class="button-container">
-          <button type="button" id="startButton">Iniciar</button>
-          <button type="button" id="endButton" disabled>Terminar</button>
+        <div class="form-group button-container">
+          <button type="button" id="startButton">Iniciar Tarefa</button>
+          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
         </div>
-      </form>
 
-      <div id="msgEnvio" class="message"></div>
+      </form>
+      <div id="mensagemGama" class="message"></div>
     </div>
   </div>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    // Configurações Supabase (substitua com suas credenciais reais)
-    const SUPABASE_URL = 'https://YOUR-SUPABASE-URL.supabase.co';
-    const SUPABASE_KEY = 'YOUR-ANON-KEY';
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Função para alternar abas
+  <script>
+    // Controle das abas
     function showTab(tabId) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.classList.remove('active'));
-
-      const buttons = document.querySelectorAll('.tab-btn');
-      buttons.forEach(btn => btn.classList.remove('active'));
-
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tabs button').forEach(btn => {
+        btn.classList.remove('active');
+      });
       document.getElementById(tabId).classList.add('active');
-      document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+      event.target.classList.add('active');
     }
 
-    // --- FYBDO ---
-
-    const tipo = document.getElementById('tipo');
-    const btnSubmeter = document.getElementById('btnSubmeter');
-    const cronometro = document.getElementById('cronometro');
-    const horaInicio = document.getElementById('horaInicio');
-    const horaFim = document.getElementById('horaFim');
-    const btnTerminar = document.getElementById('btnTerminar');
-    const mensagem = document.getElementById('mensagem');
-
-    let timerInterval;
-    let segundos = 0;
-    let registroIniciado = false;
-    let horaInicioRegisto;
-
-    function formatarTempo(segundos) {
-      const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-      const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-      const s = String(segundos % 60).padStart(2, '0');
-      return `${h}:${m}:${s}`;
-    }
-
-    function atualizarCronometro() {
-      segundos++;
-      cronometro.textContent = `⏱ ${formatarTempo(segundos)}`;
-    }
-
+    // FYBDO - Mudar tipo selecionado
     function mudarTipo() {
-      if (tipo.value) {
-        btnSubmeter.disabled = false;
-      } else {
-        btnSubmeter.disabled = true;
-      }
+      // aqui pode colocar lógica para mudar estados conforme tipo selecionado
     }
 
-    btnSubmeter.addEventListener('click', () => {
-      if (!registroIniciado) {
-        // Iniciar registro
-        segundos = 0;
-        cronometro.style.display = 'inline';
-        cronometro.textContent = '⏱ 00:00:00';
-        timerInterval = setInterval(atualizarCronometro, 1000);
-        horaInicioRegisto = new Date();
-        horaInicio.textContent = `Início: ${horaInicioRegisto.toLocaleTimeString()}`;
-        horaFim.textContent = '';
-        btnTerminar.style.display = 'inline-block';
-        btnSubmeter.disabled = true;
-        tipo.disabled = true;
-        mensagem.textContent = '';
-        registroIniciado = true;
+    // FYBDO - Simulação submeter
+    function submeter() {
+      const tipo = document.getElementById('tipo').value;
+      const mensagem = document.getElementById('mensagem');
+      if (!tipo) {
+        mensagem.textContent = 'Selecione um tipo antes de submeter.';
+        mensagem.style.color = 'red';
+        return;
       }
-    });
+      mensagem.textContent = `Registo de tipo "${tipo}" submetido com sucesso!`;
+      mensagem.style.color = 'green';
+    }
 
-    btnTerminar.addEventListener('click', () => {
-      if (registroIniciado) {
-        clearInterval(timerInterval);
-        const horaFimRegisto = new Date();
-        horaFim.textContent = `Fim: ${horaFimRegisto.toLocaleTimeString()}`;
-        btnTerminar.style.display = 'none';
-        tipo.disabled = false;
-        tipo.value = '';
-        btnSubmeter.disabled = true;
-        cronometro.style.display = 'none';
-        mensagem.textContent = 'Registro concluído com sucesso!';
-        mensagem.style.color = 'green';
-        registroIniciado = false;
-        // Aqui você pode adicionar a lógica para enviar os dados, se quiser
-      }
-    });
-
-    tipo.addEventListener('change', mudarTipo);
-
-    // --- GAMA ---
-
+    // GAMA - Mostrar subopções conforme tarefa selecionada
     const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const subopcao = document.getElementById('subopcao');
     const suboptions = document.getElementById('suboptions');
     const documentosGroup = document.getElementById('documentosGroup');
-    const documentos = document.getElementById('documentos');
-    const tempoTarefa = document.getElementById('tempoTarefa');
+    const subopcao = document.getElementById('subopcao');
+
+    tarefaFinalizada.addEventListener('change', () => {
+      const valor = tarefaFinalizada.value;
+
+      if (valor === 'AP') {
+        suboptions.style.display = 'block';
+      } else {
+        suboptions.style.display = 'none';
+        subopcao.value = '';
+      }
+
+      if (valor === 'PETS') {
+        documentosGroup.style.display = 'block';
+      } else {
+        documentosGroup.style.display = 'none';
+        document.getElementById('documentos').value = '';
+      }
+    });
+
+    // GAMA - Cronómetro básico
+    let startTime, endTime, timerInterval;
+
     const startButton = document.getElementById('startButton');
     const endButton = document.getElementById('endButton');
-    const msgEnvio = document.getElementById('msgEnvio');
-    const gamaForm = document.getElementById('gamaForm');
+    const tempoTarefa = document.getElementById('tempoTarefa');
+    const mensagemGama = document.getElementById('mensagemGama');
 
-    let startTime;
-    let endTime;
-    let timerIntervalGama;
-
-    // Mostrar subopções e campo documentos conforme seleção da tarefa
-    tarefaFinalizada.addEventListener('change', () => {
-      const tarefa = tarefaFinalizada.value;
-      if (tarefa === 'AT') {
-        suboptions.style.display = 'block';
-        documentosGroup.style.display = 'none';
-        documentos.value = '';
-      } else if (tarefa === 'DNP' || tarefa === 'AP') {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'block';
-      } else {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'none';
-        documentos.value = '';
-      }
-      tempoTarefa.value = '';
-      endButton.disabled = true;
-      startButton.disabled = false;
-    });
-
-    subopcao.addEventListener('change', () => {
-      // Se subopcao for 'IBAN', 'IBAN+Indexação', ou 'Reentrada c/ Indexação', documentos não aparecem
-      const sub = subopcao.value;
-      if (sub === 'IBAN' || sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação') {
-        documentosGroup.style.display = 'none';
-        documentos.value = '';
-      } else {
-        documentosGroup.style.display = 'block';
-      }
-    });
-
-    function formatTime(seconds) {
-      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
-      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
-      const s = (seconds % 60).toString().padStart(2, '0');
-      return `${h}:${m}:${s}`;
-    }
-
-    function formatDate(date) {
-      const d = date.getDate().toString().padStart(2, '0');
-      const m = (date.getMonth() + 1).toString().padStart(2, '0');
-      const y = date.getFullYear();
-      const hh = date.getHours().toString().padStart(2, '0');
-      const mm = date.getMinutes().toString().padStart(2, '0');
-      const ss = date.getSeconds().toString().padStart(2, '0');
-      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+    function formatTime(ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
     }
 
     startButton.addEventListener('click', () => {
       if (!tarefaFinalizada.value) {
-        alert('Por favor, selecione a tarefa finalizada.');
+        mensagemGama.style.display = 'block';
+        mensagemGama.className = 'message error';
+        mensagemGama.textContent = 'Selecione uma tarefa antes de iniciar.';
         return;
       }
-      if (tarefaFinalizada.value === 'AT' && !subopcao.value) {
-        alert('Por favor, selecione uma subopção para a tarefa AT.');
+      if (tarefaFinalizada.value === 'AP' && !subopcao.value) {
+        mensagemGama.style.display = 'block';
+        mensagemGama.className = 'message error';
+        mensagemGama.textContent = 'Selecione uma subopção para AP.';
         return;
       }
-      if ((tarefaFinalizada.value === 'DNP' || tarefaFinalizada.value === 'AP') && !documentos.value) {
-        alert('Por favor, informe o número de documentos.');
-        return;
-      }
+      mensagemGama.style.display = 'none';
       startTime = new Date();
-      tempoTarefa.value = '';
-      timerIntervalGama = setInterval(() => {
-        const elapsed = Math.floor((new Date() - startTime) / 1000);
-        tempoTarefa.value = formatTime(elapsed);
-      }, 1000);
       startButton.disabled = true;
       endButton.disabled = false;
-      tarefaFinalizada.disabled = true;
-      subopcao.disabled = true;
-      documentos.disabled = true;
-      msgEnvio.style.display = 'none';
+      tempoTarefa.value = '';
+      timerInterval = setInterval(() => {
+        const now = new Date();
+        tempoTarefa.value = formatTime(now - startTime);
+      }, 1000);
     });
 
-    endButton.addEventListener('click', async () => {
-      clearInterval(timerIntervalGama);
+    endButton.addEventListener('click', () => {
       endTime = new Date();
-      const elapsedSeconds = Math.floor((endTime - startTime) / 1000);
-      tempoTarefa.value = formatTime(elapsedSeconds);
+      clearInterval(timerInterval);
+      const diff = endTime - startTime;
+      tempoTarefa.value = formatTime(diff);
+      startButton.disabled = false;
       endButton.disabled = true;
-
-      const colaborador = "João Nuno da Silva Cardoso";
-      const tarefa = tarefaFinalizada.value;
-      const sub = subopcao.value;
-      const tempo = tempoTarefa.value;
-      const startFormatted = formatDate(startTime);
-      const endFormatted = formatDate(endTime);
-      const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
-      const processo = document.getElementById('processoGama').value;
-
-      if (!processo) {
-        alert('Por favor, informe o processo.');
-        startButton.disabled = false;
-        tarefaFinalizada.disabled = false;
-        subopcao.disabled = false;
-        documentos.disabled = false;
-        return;
-      }
-
-      const dataToSend = [{
-        colaborador: colaborador,
-        inicio_da_tarefa: startFormatted,
-        fim_da_tarefa: endFormatted,
-        tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
-        tempo_com_a_tarefa: tempo,
-        documentos: numDocumentos,
-        processo: processo
-      }];
-
-      try {
-        await enviarDados(dataToSend);
-        if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
-          const dataDuplicada = [{
-            colaborador: colaborador,
-            inicio_da_tarefa: startFormatted,
-            fim_da_tarefa: endFormatted,
-            tarefa_finalizada: "AT - Indexações",
-            tempo_com_a_tarefa: tempo,
-            documentos: "1",
-            processo: processo
-          }];
-          await enviarDados(dataDuplicada);
-        }
-        mostrarMensagem('Dados enviados com sucesso!', true);
-        gamaForm.reset();
-        startButton.disabled = false;
-        tarefaFinalizada.disabled = false;
-        subopcao.disabled = false;
-        documentos.disabled = false;
-        tempoTarefa.value = '';
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'none';
-        endButton.disabled = true;
-      } catch (error) {
-        console.error('Erro ao enviar dados:', error);
-        mostrarMensagem('Falha ao enviar os dados. Tente novamente.', false);
-        startButton.disabled = false;
-        tarefaFinalizada.disabled = false;
-        subopcao.disabled = false;
-        documentos.disabled = false;
-        endButton.disabled = false;
-      }
+      mensagemGama.style.display = 'block';
+      mensagemGama.className = 'message success';
+      mensagemGama.textContent = 'Tarefa finalizada com sucesso!';
     });
-
-    function mostrarMensagem(texto, sucesso) {
-      msgEnvio.textContent = texto;
-      msgEnvio.className = sucesso ? 'message success' : 'message error';
-      msgEnvio.style.display = 'block';
-      setTimeout(() => {
-        msgEnvio.style.display = 'none';
-      }, 5000);
-    }
-
-    async function enviarDados(data) {
-      const { data: response, error } = await supabase
-        .from('registos_nss')
-        .insert(data);
-
-      if (error) throw error;
-      return response;
-    }
   </script>
 
 </body>
 </html>
+
