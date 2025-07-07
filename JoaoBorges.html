@@ -33,6 +33,7 @@
       cursor: pointer;
       background-color: #ccc;
       border-radius: 5px;
+      transition: background-color 0.3s ease;
     }
 
     .tabs button.active {
@@ -77,16 +78,29 @@
     .barra-registo select {
       width: 200px;
       padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
 
     .barra-registo button#btnSubmeter {
-      padding: 6px 12px;
+      padding: 8px 16px;
       font-size: 14px;
       width: auto;
+      border-radius: 5px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .barra-registo button#btnSubmeter:disabled {
+      background-color: #a5d6a7;
+      cursor: not-allowed;
     }
 
     .status {
       font-size: 14px;
+      text-align: center;
     }
 
     #mensagem {
@@ -109,32 +123,35 @@
       margin-bottom: 15px;
     }
 
-    select, input[type="text"], input[type="number"], button, input[type="radio"] {
+    select, input[type="text"], input[type="number"], button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
       border-radius: 4px;
       border: 1px solid #ccc;
       box-sizing: border-box;
-    }
-
-    .tipologia-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .tipologia-container div {
-      flex: 1;
-      text-align: center;
+      font-size: 14px;
     }
 
     .button-container {
       display: flex;
       justify-content: space-between;
+      gap: 10px;
     }
 
     .button-container button {
       width: 48%;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+    .button-container button:disabled {
+      background-color: #a5d6a7;
+      cursor: not-allowed;
     }
 
     .message {
@@ -143,6 +160,7 @@
       padding: 10px;
       border-radius: 4px;
       display: none;
+      font-weight: bold;
     }
 
     .success {
@@ -161,21 +179,17 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    .form-container label {
-      font-weight: bold;
-      font-size: 14px;
-    }
-        
-    #cronometro {
-  display: none !important;
-}
 
+    #cronometro {
+      display: none !important;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
 
   <!-- Imagem pequena no topo da página -->
-<img id="topImage" src="logo.png" alt="Logo Newspring" />
+  <img id="topImage" src="logo.png" alt="Logo Newspring" />
 
   <!-- Abas -->
   <div class="tabs">
@@ -187,7 +201,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10883<br>Nome:Jo</div>
+      <div class="info-usuario">User: EX10883<br>Nome: João Nuno da Silva Cardoso</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -200,351 +214,260 @@
           <option value="refeicao">Refeição</option>
           <option value="formacao">Formação</option>
         </select>
-        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
+        <button id="btnSubmeter" disabled>Submeter</button>
       </div>
 
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status" style="display:none;"></span>
-      <span id="horaFim" class="status" style="display:none;"></span>
-      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+      <span id="cronometro" class="status">⏱ 00:00:00</span>
+      <span id="horaInicio" class="status"></span>
+      <span id="horaFim" class="status"></span>
+      <button id="btnTerminar" style="display:none;">Terminar</button>
 
       <span id="mensagem" class="status"></span>
     </div>
   </div>
 
-  <!-- Conteúdo GAMa -->
+  <!-- Conteúdo GAMA -->
   <div id="gama" class="tab-content">
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA</h2>
-    <form id="gamaForm">
+      <form id="gamaForm" onsubmit="return false;">
+        <div class="form-group">
+          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+          <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+            <option value="">-- Selecione --</option>
+            <option value="AT">AT</option>
+            <option value="DNP">DNP</option>
+            <option value="AP">AP</option>
+            <option value="PETS">PETS</option>
+            <option value="Formação/Meetings">Formação/Meetings</option>
+          </select>
+        </div>
 
-      <div class="form-group">
-        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-          <option value="">-- Selecione --</option>
-          <option value="AT">AT</option>
-          <option value="DNP">DNP</option>
-          <option value="AP">AP</option>
-          <option value="PETS">PETS</option>
-          <option value="Formação/Meetings">Formação/Meetings</option>
-        </select>
-      </div>
+        <div class="form-group" id="suboptions" style="display: none;">
+          <label for="subopcao">Subopção:</label>
+          <select id="subopcao" name="subopcao">
+            <option value="">-- Escolha uma subopção --</option>
+            <option value="IBAN">IBAN</option>
+            <option value="IBAN+Indexação">IBAN+Indexação</option>
+            <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
+            <option value="Indexações">Indexações</option>
+          </select>
+        </div>
 
-      <div class="form-group" id="suboptions" style="display: none;">
-        <label for="subopcao">Subopção:</label>
-        <select id="subopcao" name="subopcao">
-          <option value="">-- Escolha uma subopção --</option>
-          <option value="IBAN">IBAN</option>
-          <option value="IBAN+Indexação">IBAN+Indexação</option>
-          <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
-          <option value="Indexações">Indexações</option>
-        </select>
-      </div>
-
-         <label for="processo">Processo:</label>
+        <div class="form-group">
+          <label for="processoGama">Processo:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
 
-      <div class="form-group" id="documentosGroup" style="display: none;">
-        <label for="documentos">Número de Documentos:</label>
-        <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
-      </div>
+        <div class="form-group" id="documentosGroup" style="display: none;">
+          <label for="documentos">Número de Documentos:</label>
+          <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
+        </div>
 
-      <div class="form-group">
-        <label for="tempoTarefa">Tempo da Tarefa:</label>
-        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-      </div>
+        <div class="form-group">
+          <label for="tempoTarefa">Tempo da Tarefa:</label>
+          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+        </div>
 
-      <div class="form-group button-container">
-        <button type="button" id="startButton">Iniciar Tarefa</button>
-        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-      </div>
-
-      <div id="responseMessage" class="message"></div>
-    
+        <div class="button-container">
+          <button type="button" id="startButton">Iniciar</button>
+          <button type="button" id="endButton" disabled>Terminar</button>
+        </div>
       </form>
+
+      <div id="msgEnvio" class="message"></div>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script>
-const user = "EX10883";    
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const nome = "João Nuno da Silva Cardoso";
+    // Configurações Supabase (substitua com suas credenciais reais)
+    const SUPABASE_URL = 'https://YOUR-SUPABASE-URL.supabase.co';
+    const SUPABASE_KEY = 'YOUR-ANON-KEY';
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const tipoSelect = document.getElementById('tipo');
+    // Função para alternar abas
+    function showTab(tabId) {
+      const tabs = document.querySelectorAll('.tab-content');
+      tabs.forEach(tab => tab.classList.remove('active'));
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`.tab-btn[onclick="showTab('${tabId}')"]`).classList.add('active');
+    }
+
+    // --- FYBDO ---
+
+    const tipo = document.getElementById('tipo');
     const btnSubmeter = document.getElementById('btnSubmeter');
+    const cronometro = document.getElementById('cronometro');
+    const horaInicio = document.getElementById('horaInicio');
+    const horaFim = document.getElementById('horaFim');
     const btnTerminar = document.getElementById('btnTerminar');
-    const infoData = document.getElementById('infoData');
-    const cronometroEl = document.getElementById('cronometro');
-    const horaInicioEl = document.getElementById('horaInicio');
-    const horaFimEl = document.getElementById('horaFim');
-    const mensagemEl = document.getElementById('mensagem');
-            const processo = document.getElementById('processo').value;
+    const mensagem = document.getElementById('mensagem');
 
-
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora, timer, segundos = 0;
-
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-
-    // Exibe a data atual no topo da barra
-    function mostrarDataAtual() {
-      const hoje = new Date();
-      const dataFormatada = hoje.toLocaleDateString('pt-BR');
-      infoData.textContent = `📅 ${dataFormatada}`;
-    }
-
-    mostrarDataAtual();
-
-    // Ativa ou desativa o botão submeter conforme seleção
-    tipoSelect.addEventListener('change', () => {
-      tipoSelecionado = tipoSelect.value;
-      resetar();
-
-      btnSubmeter.disabled = !tipoSelecionado;
-      mensagemEl.textContent = "";
-    });
-
-    // Função para iniciar cronometro visual
-    function iniciarCronometro() {
-      segundos = 0;
-      cronometroEl.style.display = 'inline-block';
-      cronometroEl.textContent = `⏱ 00:00:00`;
-
-      timer = setInterval(() => {
-        segundos++;
-        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-        const s = String(segundos % 60).padStart(2, '0');
-        cronometroEl.textContent = `⏱ ${h}:${m}:${s}`;
-      }, 1000);
-    }
-
-    // Função para parar cronometro
-    function pararCronometro() {
-      clearInterval(timer);
-    }
-
-    // Exibe mensagem na tela (verde para sucesso, vermelho para erro)
-    function mostrarMensagem(texto, sucesso = true) {
-      mensagemEl.textContent = texto;
-      mensagemEl.style.color = sucesso ? 'green' : 'red';
-    }
-
-    // Reseta visual e variáveis para novo registro
-    function resetar() {
-      pararCronometro();
-      cronometroEl.style.display = 'none';
-      cronometroEl.textContent = '⏱ 00:00:00';
-
-      horaInicioEl.style.display = 'none';
-      horaInicioEl.textContent = '';
-
-      horaFimEl.style.display = 'none';
-      horaFimEl.textContent = '';
-
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = !tipoSelecionado;
-
-      mensagemEl.textContent = "";
-    }
-
-    // Função para formatar data/hora local em ISO-like string sem o fuso UTC
-    function formatarDataHoraLocal(date) {
-      const ano = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      const hora = String(date.getHours()).padStart(2, '0');
-      const min = String(date.getMinutes()).padStart(2, '0');
-      const seg = String(date.getSeconds()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
-    }
-
-    // Enviar dados para Supabase
-    async function enviarAoSupabase(dados) {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_API_KEY,
-          'Authorization': `Bearer ${SUPABASE_API_KEY}`,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(dados)
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
-      }
-
-      return await response.json();
-    }
-
-    // Clique no botão Submeter
-    btnSubmeter.addEventListener('click', async () => {
-      if (!tipoSelecionado) {
-        mostrarMensagem("Selecione um tipo de registo.", false);
-        return;
-      }
-
-      inicioDataHora = new Date();
-
-      // Se for login ou logout, não tem cronometro
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        horaInicioEl.textContent = `✔️ Registado`;
-        horaInicioEl.style.display = 'inline-block';
-
-        const dados = {
-          data: formatarDataHoraLocal(inicioDataHora).split('T')[0], // só a data local
-          user,
-          nome,
-          tipo: tipoSelecionado,
-          inicio: formatarDataHoraLocal(inicioDataHora),
-          fim: null,
-          duracao: null
-        };
-
-        try {
-          await enviarAoSupabase(dados);
-          mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-          btnSubmeter.disabled = true;
-        } catch (err) {
-          mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-        }
-      } else {
-        // Para outros tipos, iniciar cronometro e habilitar botão terminar
-        horaInicioEl.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
-        horaInicioEl.style.display = 'inline-block';
-
-        iniciarCronometro();
-
-        btnSubmeter.style.display = 'none';
-        btnTerminar.style.display = 'inline-block';
-        mostrarMensagem("");
-      }
-    });
-
-    // Clique no botão Terminar
-    btnTerminar.addEventListener('click', async () => {
-      pararCronometro();
-      fimDataHora = new Date();
-      const fimHoraStr = fimDataHora.toLocaleTimeString('pt-BR');
-      const duracaoSegundos = segundos;
-
-      horaFimEl.textContent = `🕔 Fim: ${fimHoraStr}`;
-      horaFimEl.style.display = 'inline-block';
-
-      // Calcula duração em horas decimais
-      const duracaoHoras = duracaoSegundos / 3600;
-
-      const dados = {
-        data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: formatarDataHoraLocal(fimDataHora),
-        duracao: parseFloat(duracaoHoras.toFixed(3))
-      };
-
-      try {
-        await enviarAoSupabase(dados);
-        mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-      } catch (err) {
-        mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-      }
-
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = true;
-      tipoSelect.value = "";
-      tipoSelecionado = "";
-    });
-
-
-    // GAMa scripts
-    let startTime;
-    let endTime;
     let timerInterval;
+    let segundos = 0;
+    let registroIniciado = false;
+    let horaInicioRegisto;
 
-    const startButton = document.getElementById('startButton');
-    const endButton = document.getElementById('endButton');
-    const tempoTarefa = document.getElementById('tempoTarefa');
-    const responseMessage = document.getElementById('responseMessage');
+    function formatarTempo(segundos) {
+      const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
+      const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
+      const s = String(segundos % 60).padStart(2, '0');
+      return `${h}:${m}:${s}`;
+    }
+
+    function atualizarCronometro() {
+      segundos++;
+      cronometro.textContent = `⏱ ${formatarTempo(segundos)}`;
+    }
+
+    function mudarTipo() {
+      if (tipo.value) {
+        btnSubmeter.disabled = false;
+      } else {
+        btnSubmeter.disabled = true;
+      }
+    }
+
+    btnSubmeter.addEventListener('click', () => {
+      if (!registroIniciado) {
+        // Iniciar registro
+        segundos = 0;
+        cronometro.style.display = 'inline';
+        cronometro.textContent = '⏱ 00:00:00';
+        timerInterval = setInterval(atualizarCronometro, 1000);
+        horaInicioRegisto = new Date();
+        horaInicio.textContent = `Início: ${horaInicioRegisto.toLocaleTimeString()}`;
+        horaFim.textContent = '';
+        btnTerminar.style.display = 'inline-block';
+        btnSubmeter.disabled = true;
+        tipo.disabled = true;
+        mensagem.textContent = '';
+        registroIniciado = true;
+      }
+    });
+
+    btnTerminar.addEventListener('click', () => {
+      if (registroIniciado) {
+        clearInterval(timerInterval);
+        const horaFimRegisto = new Date();
+        horaFim.textContent = `Fim: ${horaFimRegisto.toLocaleTimeString()}`;
+        btnTerminar.style.display = 'none';
+        tipo.disabled = false;
+        tipo.value = '';
+        btnSubmeter.disabled = true;
+        cronometro.style.display = 'none';
+        mensagem.textContent = 'Registro concluído com sucesso!';
+        mensagem.style.color = 'green';
+        registroIniciado = false;
+        // Aqui você pode adicionar a lógica para enviar os dados, se quiser
+      }
+    });
+
+    tipo.addEventListener('change', mudarTipo);
+
+    // --- GAMA ---
+
     const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const suboptions = document.getElementById('suboptions');
     const subopcao = document.getElementById('subopcao');
+    const suboptions = document.getElementById('suboptions');
     const documentosGroup = document.getElementById('documentosGroup');
     const documentos = document.getElementById('documentos');
+    const tempoTarefa = document.getElementById('tempoTarefa');
+    const startButton = document.getElementById('startButton');
+    const endButton = document.getElementById('endButton');
+    const msgEnvio = document.getElementById('msgEnvio');
+    const gamaForm = document.getElementById('gamaForm');
 
-    tarefaFinalizada.addEventListener('change', function () {
-      if (this.value === 'AT') {
+    let startTime;
+    let endTime;
+    let timerIntervalGama;
+
+    // Mostrar subopções e campo documentos conforme seleção da tarefa
+    tarefaFinalizada.addEventListener('change', () => {
+      const tarefa = tarefaFinalizada.value;
+      if (tarefa === 'AT') {
         suboptions.style.display = 'block';
         documentosGroup.style.display = 'none';
-      } else if (['AP', 'DNP', 'PETS', 'Formação/Meetings'].includes(this.value)) {
+        documentos.value = '';
+      } else if (tarefa === 'DNP' || tarefa === 'AP') {
         suboptions.style.display = 'none';
         documentosGroup.style.display = 'block';
       } else {
         suboptions.style.display = 'none';
         documentosGroup.style.display = 'none';
+        documentos.value = '';
+      }
+      tempoTarefa.value = '';
+      endButton.disabled = true;
+      startButton.disabled = false;
+    });
+
+    subopcao.addEventListener('change', () => {
+      // Se subopcao for 'IBAN', 'IBAN+Indexação', ou 'Reentrada c/ Indexação', documentos não aparecem
+      const sub = subopcao.value;
+      if (sub === 'IBAN' || sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação') {
+        documentosGroup.style.display = 'none';
+        documentos.value = '';
+      } else {
+        documentosGroup.style.display = 'block';
       }
     });
 
     function formatTime(seconds) {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+      const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+      const s = (seconds % 60).toString().padStart(2, '0');
+      return `${h}:${m}:${s}`;
     }
 
     function formatDate(date) {
-      const d = date.getDate().toString().padStart(2,'0');
-      const m = (date.getMonth() + 1).toString().padStart(2,'0');
+      const d = date.getDate().toString().padStart(2, '0');
+      const m = (date.getMonth() + 1).toString().padStart(2, '0');
       const y = date.getFullYear();
-      const h = date.getHours().toString().padStart(2,'0');
-      const min = date.getMinutes().toString().padStart(2,'0');
-      const s = date.getSeconds().toString().padStart(2,'0');
-      return `${y}-${m}-${d}T${h}:${min}:${s}`; // formato ISO para banco
+      const hh = date.getHours().toString().padStart(2, '0');
+      const mm = date.getMinutes().toString().padStart(2, '0');
+      const ss = date.getSeconds().toString().padStart(2, '0');
+      return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
     }
 
-    startButton.addEventListener('click', function() {
+    startButton.addEventListener('click', () => {
+      if (!tarefaFinalizada.value) {
+        alert('Por favor, selecione a tarefa finalizada.');
+        return;
+      }
+      if (tarefaFinalizada.value === 'AT' && !subopcao.value) {
+        alert('Por favor, selecione uma subopção para a tarefa AT.');
+        return;
+      }
+      if ((tarefaFinalizada.value === 'DNP' || tarefaFinalizada.value === 'AP') && !documentos.value) {
+        alert('Por favor, informe o número de documentos.');
+        return;
+      }
       startTime = new Date();
-      startButton.disabled = true;
-      endButton.disabled = false;
-
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((new Date() - startTime)/1000);
+      tempoTarefa.value = '';
+      timerIntervalGama = setInterval(() => {
+        const elapsed = Math.floor((new Date() - startTime) / 1000);
         tempoTarefa.value = formatTime(elapsed);
       }, 1000);
+      startButton.disabled = true;
+      endButton.disabled = false;
+      tarefaFinalizada.disabled = true;
+      subopcao.disabled = true;
+      documentos.disabled = true;
+      msgEnvio.style.display = 'none';
     });
 
-    // Função para enviar dados para Supabase
-    function enviarDados(data) {
-      return fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao enviar os dados');
-        return response.json();
-      });
-    }
-
-    endButton.addEventListener('click', function() {
-      clearInterval(timerInterval);
+    endButton.addEventListener('click', async () => {
+      clearInterval(timerIntervalGama);
       endTime = new Date();
-      const elapsed = Math.floor((endTime - startTime) / 1000);
-      tempoTarefa.value = formatTime(elapsed);
+      const elapsedSeconds = Math.floor((endTime - startTime) / 1000);
+      tempoTarefa.value = formatTime(elapsedSeconds);
       endButton.disabled = true;
 
       const colaborador = "João Nuno da Silva Cardoso";
@@ -554,8 +477,16 @@ const user = "EX10883";
       const startFormatted = formatDate(startTime);
       const endFormatted = formatDate(endTime);
       const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
-      const processo = document.getElementById('processo').value;
+      const processo = document.getElementById('processoGama').value;
 
+      if (!processo) {
+        alert('Por favor, informe o processo.');
+        startButton.disabled = false;
+        tarefaFinalizada.disabled = false;
+        subopcao.disabled = false;
+        documentos.disabled = false;
+        return;
+      }
 
       const dataToSend = [{
         colaborador: colaborador,
@@ -564,68 +495,61 @@ const user = "EX10883";
         tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
         tempo_com_a_tarefa: tempo,
         documentos: numDocumentos,
-        processoGama: processoGama
-
+        processo: processo
       }];
 
-      enviarDados(dataToSend)
-        .then(() => {
-          if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
-            const dataDuplicada = [{
-              colaborador: colaborador,
-              inicio_da_tarefa: startFormatted,
-              fim_da_tarefa: endFormatted,
-              tarefa_finalizada: "AT - Indexações",
-              tempo_com_a_tarefa: tempo,
-              documentos: "1"
-            }];
-            return enviarDados(dataDuplicada);
-          }
-        })
-        .then(() => {
-          showMessage('Dados enviados com sucesso!', 'success');
-          document.getElementById('gamaForm').reset();
-          startButton.disabled = false;
-          tempoTarefa.value = '';
-          suboptions.style.display = 'none';
-          documentosGroup.style.display = 'none';
-          endButton.disabled = true;
-        })
-        .catch(() => {
-          showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
-          startButton.disabled = false;
-        });
+      try {
+        await enviarDados(dataToSend);
+        if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
+          const dataDuplicada = [{
+            colaborador: colaborador,
+            inicio_da_tarefa: startFormatted,
+            fim_da_tarefa: endFormatted,
+            tarefa_finalizada: "AT - Indexações",
+            tempo_com_a_tarefa: tempo,
+            documentos: "1",
+            processo: processo
+          }];
+          await enviarDados(dataDuplicada);
+        }
+        mostrarMensagem('Dados enviados com sucesso!', true);
+        gamaForm.reset();
+        startButton.disabled = false;
+        tarefaFinalizada.disabled = false;
+        subopcao.disabled = false;
+        documentos.disabled = false;
+        tempoTarefa.value = '';
+        suboptions.style.display = 'none';
+        documentosGroup.style.display = 'none';
+        endButton.disabled = true;
+      } catch (error) {
+        console.error('Erro ao enviar dados:', error);
+        mostrarMensagem('Falha ao enviar os dados. Tente novamente.', false);
+        startButton.disabled = false;
+        tarefaFinalizada.disabled = false;
+        subopcao.disabled = false;
+        documentos.disabled = false;
+        endButton.disabled = false;
+      }
     });
 
-    function showMessage(message, type) {
-      responseMessage.textContent = message;
-      responseMessage.className = 'message ' + type;
-      responseMessage.style.display = 'block';
-      setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+    function mostrarMensagem(texto, sucesso) {
+      msgEnvio.textContent = texto;
+      msgEnvio.className = sucesso ? 'message success' : 'message error';
+      msgEnvio.style.display = 'block';
+      setTimeout(() => {
+        msgEnvio.style.display = 'none';
+      }, 5000);
     }
-    function showMessage(message, type) {
-        responseMessage.textContent = message;
-        responseMessage.className = 'message ' + type;
-        responseMessage.style.display = 'block';
-        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
+
+    async function enviarDados(data) {
+      const { data: response, error } = await supabase
+        .from('registos_nss')
+        .insert(data);
+
+      if (error) throw error;
+      return response;
     }
-    function showTab(tabId) {
-  // Remove a classe active de todas as abas
-  const tabs = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => tab.classList.remove('active'));
-
-  // Remove a classe active de todos os botões
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-
-  // Adiciona a classe active na aba selecionada
-  document.getElementById(tabId).classList.add('active');
-
-  // Adiciona a classe active no botão correspondente
-  const button = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
-  if (button) button.classList.add('active');
-}
-
   </script>
 
 </body>
