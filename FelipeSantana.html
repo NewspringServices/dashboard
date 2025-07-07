@@ -222,39 +222,60 @@
           <label>Tipologia Puxada:</label>
           <div class="tipologia-container">
             <div>
-              <input type="radio" id="mtc" name="tipologia" value="Multicare" required>
-              <label for="mtc">Multicare</label>
-            </div>
+       <!-- Formulário GAMA -->
+<div id="gama" class="tab-content">
+    <div class="form-container">
+      <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
+      <form id="gamaForm">
+        <!-- Tipologia Puxada -->
+        <div class="form-group">
+          <label>Tipologia Puxada:</label>
+          <div class="tipologia-container">
             <div>
-
+              <input type="radio" id="reembolsosMulticare" name="tipologia" value="Reembolsos Multicare" required>
+              <label for="reembolsosMulticare">Reembolsos Multicare</label>
+            </div>
+          </div>
         </div>
+
+        <!-- Processo GAMA -->
         <div class="form-group">
           <label for="processoGama">Processo GAMA:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
+
+        <!-- Documentos Tratados -->
         <div class="form-group">
           <label for="documentos">Documentos Tratados:</label>
           <input type="number" id="documentos" name="documentos" required />
         </div>
+
+        <!-- Tarefa Finalizada -->
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="Reembolso Multicare">Reembolso Multicare</option>
-            <option value="Erros/SPAM">Erros/SPAM</option>
+            <option value="Reembolsos Multicare">Reembolsos Multicare</option>
           </select>
         </div>
+
+        <!-- Tempo da Tarefa -->
         <div class="form-group">
           <label for="tempoTarefa">Tempo da Tarefa:</label>
           <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
         </div>
+
+        <!-- Botões -->
         <div class="form-group button-container">
           <button type="button" id="startButton">Iniciar Tarefa</button>
           <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
         </div>
+
+        <!-- Mensagem de resposta -->
         <div id="responseMessage" class="message"></div>
       </form>
     </div>
-  </div>
+</div>
+
 
   <!-- Scripts -->
   <script>
