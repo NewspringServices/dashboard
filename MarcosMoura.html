@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+      <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -187,8 +188,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10889<br>Nome:Marcos Felipe Bastos Moura
-</div>  
+      <div class="info-usuario">User: EX10889<br>Nome:Marcos Felipe Bastos Moura</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -216,57 +216,48 @@
   <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
-      <h2 class="titulo-gama">Produção - GAMA</h2>
-    <form id="gamaForm">
+      <h2 class="titulo-gama">Produção</h2>
+      <form id="gamaForm">
 
-      <div class="form-group">
-        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-          <option value="">-- Selecione --</option>
-          <option value="AT">AT</option>
-          <option value="DNP">DNP</option>
-          <option value="AP">AP</option>
-          <option value="PETS">PETS</option>
-          <option value="Formação/Meetings">Formação/Meetings</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="suboptions" style="display: none;">
-        <label for="subopcao">Subopção:</label>
-        <select id="subopcao" name="subopcao">
-          <option value="">-- Escolha uma subopção --</option>
-          <option value="IBAN">IBAN</option>
-          <option value="IBAN+Indexação">IBAN+Indexação</option>
-          <option value="Reentrada c/ Indexação">Reentrada c/ Indexação</option>
-          <option value="Indexações">Indexações</option>
-        </select>
-      </div>
-
-      <div class="form-group" id="documentosGroup" style="display: none;">
-        <label for="documentos">Número de Documentos:</label>
-        <input type="number" id="documentos" name="documentos" min="1" placeholder="Digite o número de documentos" />
-      </div>
-
-      <div class="form-group">
-        <label for="tempoTarefa">Tempo da Tarefa:</label>
-        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-      </div>
-
-      <div class="form-group button-container">
-        <button type="button" id="startButton">Iniciar Tarefa</button>
-        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-      </div>
-
-      <div id="responseMessage" class="message"></div>
-    
+        <div class="form-group">
+          <label for="processoGama">Processo:</label>
+          <input type="text" id="processoGama" name="processoGama" required />
+        </div>
+        <div class="form-group">
+          <label for="documentos">Documentos Tratados:</label>
+          <input type="number" id="documentos" name="documentos" required />
+        </div>
+        <div class="form-group">
+          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+          <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+               <option value="PETS">PETS</option>
+     <option value="DNP">DNP</option>
+            <option value="AP index">AP - Indexações</option>
+                        <option value="AP ABERT">AP - Entradas</option>
+ <option value="AT Index">AT - Indexações</option>
+  <option value="AT ABERT">AT - Participações</option>
+            <option value="Formação/Meetings">Formação/Meetings</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tempoTarefa">Tempo da Tarefa:</label>
+          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+        </div>
+        <div class="form-group button-container">
+          <button type="button" id="startButton">Iniciar Tarefa</button>
+          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+        </div>
+        <div id="responseMessage" class="message"></div>
       </form>
     </div>
   </div>
 
   <!-- Scripts -->
   <script>
-    const user = "EX10889";
-    const nome = "Marcos Felipe Bastos Moura";  
+   const user = "EX10889";
+    const nome = "Marcos Felipe Bastos Moura"; 
+
+
 
     const tipoSelect = document.getElementById('tipo');
     const btnSubmeter = document.getElementById('btnSubmeter');
@@ -461,7 +452,7 @@
 
 
     // GAMa scripts
-    let startTime;
+      let startTime;
     let endTime;
     let timerInterval;
 
@@ -469,130 +460,87 @@
     const endButton = document.getElementById('endButton');
     const tempoTarefa = document.getElementById('tempoTarefa');
     const responseMessage = document.getElementById('responseMessage');
-    const tarefaFinalizada = document.getElementById('tarefaFinalizada');
-    const suboptions = document.getElementById('suboptions');
-    const subopcao = document.getElementById('subopcao');
-    const documentosGroup = document.getElementById('documentosGroup');
-    const documentos = document.getElementById('documentos');
-
-    tarefaFinalizada.addEventListener('change', function () {
-      if (this.value === 'AT') {
-        suboptions.style.display = 'block';
-        documentosGroup.style.display = 'none';
-      } else if (['AP', 'DNP', 'PETS', 'Formação/Meetings'].includes(this.value)) {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'block';
-      } else {
-        suboptions.style.display = 'none';
-        documentosGroup.style.display = 'none';
-      }
-    });
 
     function formatTime(seconds) {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
     }
 
     function formatDate(date) {
-      const d = date.getDate().toString().padStart(2,'0');
-      const m = (date.getMonth() + 1).toString().padStart(2,'0');
-      const y = date.getFullYear();
-      const h = date.getHours().toString().padStart(2,'0');
-      const min = date.getMinutes().toString().padStart(2,'0');
-      const s = date.getSeconds().toString().padStart(2,'0');
-  return `${y}-${m}-${d} ${h}:${min}:${s}`; // aqui tem espaço ao invés do 'T'
+        const d = date.getDate().toString().padStart(2,'0');
+        const m = (date.getMonth() + 1).toString().padStart(2,'0');
+        const y = date.getFullYear();
+        const h = date.getHours().toString().padStart(2,'0');
+        const min = date.getMinutes().toString().padStart(2,'0');
+        const s = date.getSeconds().toString().padStart(2,'0');
+        return `${d}/${m}/${y} ${h}:${min}:${s}`;
     }
 
     startButton.addEventListener('click', function() {
-      startTime = new Date();
-      startButton.disabled = true;
-      endButton.disabled = false;
+        startTime = new Date();
+        startButton.disabled = true;
+        endButton.disabled = false;
 
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((new Date() - startTime)/1000);
-        tempoTarefa.value = formatTime(elapsed);
-      }, 1000);
+        timerInterval = setInterval(() => {
+            const elapsed = Math.floor((new Date() - startTime)/1000);
+            tempoTarefa.value = formatTime(elapsed);
+        }, 1000);
     });
 
-    // Função para enviar dados para Supabase
-    function enviarDados(data) {
-      return fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(data)
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao enviar os dados');
-        return response.json();
-      });
-    }
-
     endButton.addEventListener('click', function() {
-      clearInterval(timerInterval);
-      endTime = new Date();
-      const elapsed = Math.floor((endTime - startTime) / 1000);
-      tempoTarefa.value = formatTime(elapsed);
-      endButton.disabled = true;
+        clearInterval(timerInterval);
+        endTime = new Date();
+        const elapsed = Math.floor((endTime - startTime) / 1000);
+        tempoTarefa.value = formatTime(elapsed);
+        endButton.disabled = true;
 
-      const colaborador = "Marcos Felipe Bastos Moura";
-      const tarefa = tarefaFinalizada.value;
-      const sub = subopcao.value;
-      const tempo = tempoTarefa.value;
-      const startFormatted = formatDate(startTime);
-      const endFormatted = formatDate(endTime);
-      const numDocumentos = (tarefa === 'AT') ? "1" : ((documentosGroup.style.display === 'block') ? documentos.value : "");
+        const processoGama = document.getElementById('processoGama').value;
+        const documentos = document.getElementById('documentos').value;
+        const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
+        const tempo = tempoTarefa.value;
+        const colaborador = "Marcos Felipe Bastos Moura";
+        const startFormatted = formatDate(startTime);
+        const endFormatted = formatDate(endTime);
 
-      const dataToSend = [{
-        colaborador: colaborador,
-        inicio_da_tarefa: startFormatted,
-        fim_da_tarefa: endFormatted,
-        tarefa_finalizada: tarefa + (tarefa === 'AT' && sub ? ` - ${sub}` : ''),
-        tempo_com_a_tarefa: tempo,
-        documentos: numDocumentos
-      }];
-
-      enviarDados(dataToSend)
-        .then(() => {
-          if (tarefa === 'AT' && (sub === 'IBAN+Indexação' || sub === 'Reentrada c/ Indexação')) {
-            const dataDuplicada = [{
-              colaborador: colaborador,
-              inicio_da_tarefa: startFormatted,
-              fim_da_tarefa: endFormatted,
-              tarefa_finalizada: "AT - Indexações",
-              tempo_com_a_tarefa: tempo,
-              documentos: "1"
-            }];
-            return enviarDados(dataDuplicada);
-          }
+        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_registos', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
+                'Prefer': 'return=representation'
+            },
+            body: JSON.stringify({
+                inicio: startFormatted,
+                fim: endFormatted,
+                colaborador: colaborador,
+                processoGama: processoGama,
+                Documentos: Number(documentos),
+                tarefaFinalizada: tarefaFinalizada,
+                tempo: tempo
+            })
         })
-        .then(() => {
-          showMessage('Dados enviados com sucesso!', 'success');
-          document.getElementById('gamaForm').reset();
-          startButton.disabled = false;
-          tempoTarefa.value = '';
-          suboptions.style.display = 'none';
-          documentosGroup.style.display = 'none';
-          endButton.disabled = true;
+        .then(async response => {
+            if (!response.ok) {
+                const errorBody = await response.text();
+                throw new Error(`Erro ${response.status}: ${errorBody}`);
+            }
+            return response.json();
         })
-        .catch(() => {
-          showMessage('Falha ao enviar os dados. Tente novamente.', 'error');
-          startButton.disabled = false;
+        .then(data => {
+            showMessage('Dados enviados com sucesso!', 'success');
+            document.getElementById('gamaForm').reset();
+            startButton.disabled = false;
+            tempoTarefa.value = '';
+        })
+        .catch(error => {
+            showMessage('Falha ao enviar os dados: ' + error.message, 'error');
+            startButton.disabled = false;
         });
     });
 
-    function showMessage(message, type) {
-      responseMessage.textContent = message;
-      responseMessage.className = 'message ' + type;
-      responseMessage.style.display = 'block';
-      setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
-    }
     function showMessage(message, type) {
         responseMessage.textContent = message;
         responseMessage.className = 'message ' + type;
