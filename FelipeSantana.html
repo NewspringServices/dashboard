@@ -1,5 +1,4 @@
-
-     <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -178,7 +177,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10357<br>Nome:Felipe Valverde Santana</div>
+      <div class="info-usuario">User: EX10357<br>Nome:Santana</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -231,8 +230,8 @@
           <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
         </div>
         <div class="form-group button-container">
-          <button type="button" id="startButton">Iniciar Tarefa</button>
-          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+          <button type="button" id="startButton" onclick="iniciarTarefa()">Iniciar Tarefa</button>
+          <button type="button" id="endButton" onclick="finalizarTarefa()" disabled>Finalizar Tarefa</button>
         </div>
         <div id="responseMessage" class="message"></div>
       </form>
@@ -253,12 +252,13 @@
     const horaFimEl = document.getElementById('horaFim');
     const mensagemEl = document.getElementById('mensagem');
 
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora, timer, segundos = 0;
+    let tipoSelecionado = null;
+    let inicioDataHora = '';
+    let fimDataHora = '';
+    let segundos = 0;
+    let timer;
 
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOiJiaWpuZGY2a3J6aml3cmR2d21zIiwic3ViIjoiY2FsbGJlY2tzdWIiLCJpYXQiOjE2ODczMTY5MzgsImV4cCI6MjAwMjY5MjkzOH0.WwaWS66Jm-4ih7J-8eHqNpr55Xqf0o0L9ftHj0wIE6o';
-
+    // Mostra a aba selecionada
     function showTab(tabName) {
       const tabs = document.querySelectorAll('.tab-content');
       tabs.forEach(tab => tab.classList.remove('active'));
@@ -271,6 +271,7 @@
       activeTabBtn.classList.add('active');
     }
 
+    // Função para alterar tipo de registo
     function mudarTipo() {
       tipoSelecionado = tipoSelect.value;
       if (tipoSelecionado) {
@@ -281,6 +282,7 @@
       }
     }
 
+    // Função de envio de registo
     function submeter() {
       if (!tipoSelecionado) {
         mensagemEl.textContent = "Selecione o tipo de registo!";
@@ -304,8 +306,12 @@
       segundos = 0;
       clearInterval(timer);
       timer = setInterval(updateCronometro, 1000);
+
+      // Enviar para Supabase
+      sendDataToSupabase(inicioDataHora);
     }
 
+    // Função para atualizar o cronômetro
     function updateCronometro() {
       segundos++;
       const horas = String(Math.floor(segundos / 3600)).padStart(2, '0');
@@ -314,15 +320,26 @@
       cronometroEl.textContent = `⏱ ${horas}:${minutos}:${segundosDisplay}`;
     }
 
+    // Função de término
     function terminar() {
       clearInterval(timer);
       fimDataHora = new Date().toLocaleString();
       horaFimEl.textContent = `Fim: ${fimDataHora}`;
       horaFimEl.style.display = 'inline-block';
-
       btnTerminar.style.display = 'none';
     }
 
+    // Função para enviar dados para o Supabase
+    function sendDataToSupabase(inicioDataHora) {
+      // Seu código para enviar para a Supabase vai aqui.
+      console.log('Enviado para Supabase:', {
+        user: user,
+        tipo: tipoSelecionado,
+        inicioDataHora: inicioDataHora,
+      });
+    }
+
   </script>
+
 </body>
 </html>
