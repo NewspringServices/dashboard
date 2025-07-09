@@ -499,13 +499,14 @@
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
-        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_registos', {
+        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
                 'Prefer': 'return=representation'
+            
             },
             body: JSON.stringify({
                 inicio: startFormatted,
