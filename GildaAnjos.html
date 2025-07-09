@@ -216,23 +216,11 @@
   <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
-      <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
+      <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
       <form id="gamaForm">
+
         <div class="form-group">
-          <label>Tipologia Puxada:</label>
-          <div class="tipologia-container">
-            <div>
-              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
-              <label for="aberturas">Aberturas</label>
-            </div>
-            <div>
-              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
-              <label for="indexacoes">Indexações</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="processoGama">Processo GAMA:</label>
+          <label for="processoGama">Processo:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
         <div class="form-group">
@@ -242,10 +230,7 @@
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="Tarefa Aberturas">Tarefa Aberturas</option>
-            <option value="Tarefa Indexações">Tarefa Indexações</option>
-            <option value="Pedido de Elementos">Pedido de Elementos</option>
-            <option value="Erros/SPAM">Erros/SPAM</option>
+            <option value="Reembolsos Multicare">Reembolsos Multicare</option>>
             <option value="Formação/Meetings">Formação/Meetings</option>
           </select>
         </div>
@@ -264,9 +249,10 @@
 
   <!-- Scripts -->
   <script>
-  const user = "EX10867";
+   const user = "EX10867";
     const nome = "Gilda Maria Infante Anjos"; 
-    
+
+
     const tipoSelect = document.getElementById('tipo');
     const btnSubmeter = document.getElementById('btnSubmeter');
     const btnTerminar = document.getElementById('btnTerminar');
@@ -509,7 +495,6 @@
         const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
         const tempo = tempoTarefa.value;
         const colaborador = "Gilda Maria Infante Anjos";
-        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
@@ -522,7 +507,6 @@
                 'Prefer': 'return=representation'
             },
             body: JSON.stringify({
-                tipologiaPuxada: tipologiaPuxada,
                 inicio: startFormatted,
                 fim: endFormatted,
                 colaborador: colaborador,
