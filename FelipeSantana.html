@@ -6,76 +6,128 @@
     <title>Formulário de Registo</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f8f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #388e3c;
+            margin-bottom: 30px;
         }
         .campo {
-            margin-bottom: 10px;
+            margin-bottom: 20px;
         }
         label {
-            font-weight: bold;
+            font-weight: 600;
+            color: #388e3c;
+            margin-bottom: 5px;
+            display: block;
         }
-        select, input[type="text"] {
-            padding: 5px;
+        select, input[type="text"], input[type="number"] {
             width: 100%;
-            max-width: 300px;
+            padding: 12px 15px;
+            border: 2px solid #388e3c;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            background-color: #f1f9f4;
+            transition: border-color 0.3s ease;
+        }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+        button {
+            background-color: #388e3c;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #66bb6a;
+        }
+        .subopcao {
+            margin-top: 10px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <h1>Formulário de Registo</h1>
-    <form action="#" method="post">
-        <div class="campo">
-            <label for="tipo-registo">Tipo de registo</label>
-            <select id="tipo-registo" name="tipo-registo" onchange="mostrarSubopcoes()">
-                <option value="">Selecione...</option>
-                <option value="ausencia">Ausência</option>
-                <option value="erro-teletrabalho">Erro de Teletrabalho</option>
-            </select>
-        </div>
-
-        <div class="campo">
-            <label for="nome">Nome</label>
-            <select id="nome" name="nome">
-                <option value="nome1">Nome 1</option>
-                <option value="nome2">Nome 2</option>
-            </select>
-        </div>
-
-        <div class="campo">
-            <label for="observacoes">Observações (opcional)</label>
-            <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
-        </div>
-
-        <!-- Subopções para Ausência -->
-        <div id="subausencia" style="display: none;">
+    <div class="container">
+        <h1>Formulário de Registo</h1>
+        <form action="#" method="post">
             <div class="campo">
-                <label for="ausencia-opcao">Selecione uma opção para Ausência</label>
-                <select id="ausencia-opcao" name="ausencia-opcao">
-                    <option value="total">Total</option>
-                    <option value="parcial">Parcial</option>
-                    <option value="tempo">Tempo</option>
+                <label for="tipo-registo">Tipo de Registo</label>
+                <select id="tipo-registo" name="tipo-registo" onchange="mostrarSubopcoes()">
+                    <option value="">Selecione...</option>
+                    <option value="ausencia">Ausência</option>
+                    <option value="erro-teletrabalho">Erro de Teletrabalho</option>
                 </select>
             </div>
-        </div>
 
-        <!-- Subopções para Erro de Teletrabalho -->
-        <div id="suberro" style="display: none;">
             <div class="campo">
-                <label for="erro-opcao">Selecione uma opção para Erro de Teletrabalho</label>
-                <select id="erro-opcao" name="erro-opcao">
-                    <option value="pc-atualizacoes">PC em atualizações</option>
-                    <option value="sem-luz">Sem Luz</option>
-                    <option value="sem-internet">Sem Internet</option>
-                    <option value="outro">Outro</option>
+                <label for="nome">Nome</label>
+                <select id="nome" name="nome">
+                    <option value="nome1">Nome 1</option>
+                    <option value="nome2">Nome 2</option>
                 </select>
             </div>
-        </div>
 
-        <div class="campo">
+            <div class="campo">
+                <label for="observacoes">Observações (opcional)</label>
+                <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
+            </div>
+
+            <!-- Subopções para Ausência -->
+            <div id="subausencia" class="subopcao">
+                <div class="campo">
+                    <label for="ausencia-opcao">Selecione uma opção para Ausência</label>
+                    <select id="ausencia-opcao" name="ausencia-opcao">
+                        <option value="total">Total</option>
+                        <option value="parcial">Parcial</option>
+                    </select>
+                </div>
+                <div class="campo">
+                    <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
+                    <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas">
+                </div>
+            </div>
+
+            <!-- Subopções para Erro de Teletrabalho -->
+            <div id="suberro" class="subopcao">
+                <div class="campo">
+                    <label for="erro-opcao">Selecione uma opção para Erro de Teletrabalho</label>
+                    <select id="erro-opcao" name="erro-opcao">
+                        <option value="pc-atualizacoes">PC em atualizações</option>
+                        <option value="sem-luz">Sem Luz</option>
+                        <option value="sem-internet">Sem Internet</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+            </div>
+
             <button type="submit">Submeter</button>
-        </div>
-    </form>
+        </form>
+    </div>
 
     <script>
         function mostrarSubopcoes() {
@@ -98,8 +150,4 @@
 </body>
 </html>
 
-     
-   
-
- 
     
