@@ -1,5 +1,5 @@
 
-      <!DOCTYPE html>
+       <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -188,7 +188,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10886<br>Nome:Susana Carina Marques Bordalo</div>
+      <div class="info-usuario">User: EX10886<br>Nome: Susana Carina Marques Bordalo</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -500,11 +500,11 @@
         const documentos = document.getElementById('documentos').value;
         const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
         const tempo = tempoTarefa.value;
-        const colaborador = "Susana Carina Marques Bordalo";
+        const colaborador = "Susana Carina Marques Bordalo"; 
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
-        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
+         fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -512,7 +512,6 @@
                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
                 'Prefer': 'return=representation'
             
-            },efer': 'return=representation'
             },
             body: JSON.stringify({
                 inicio: startFormatted,
