@@ -76,15 +76,7 @@
     <div class="container">
         <h1>Formulário de Registo</h1>
         <form action="#" method="post">
-            <div class="campo">
-                <label for="tipo-registo">Tipo de Registo</label>
-                <select id="tipo-registo" name="tipo-registo" onchange="mostrarSubopcoes()">
-                    <option value="">Selecione...</option>
-                    <option value="ausencia">Ausência</option>
-                    <option value="erro-teletrabalho">Erro de Teletrabalho</option>
-                </select>
-            </div>
-
+            <!-- Nome primeiro -->
             <div class="campo">
                 <label for="nome">Nome</label>
                 <select id="nome" name="nome">
@@ -93,9 +85,14 @@
                 </select>
             </div>
 
+            <!-- Tipo de Registo -->
             <div class="campo">
-                <label for="observacoes">Observações (opcional)</label>
-                <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
+                <label for="tipo-registo">Tipo de Registo</label>
+                <select id="tipo-registo" name="tipo-registo" onchange="mostrarSubopcoes()">
+                    <option value="">Selecione...</option>
+                    <option value="ausencia">Ausência</option>
+                    <option value="erro-teletrabalho">Erro de Teletrabalho</option>
+                </select>
             </div>
 
             <!-- Subopções para Ausência -->
@@ -126,6 +123,13 @@
                 </div>
             </div>
 
+            <!-- Observações (opcional) -->
+            <div class="campo">
+                <label for="observacoes">Observações (opcional)</label>
+                <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
+            </div>
+
+            <!-- Botão de envio -->
             <button type="submit">Submeter</button>
         </form>
     </div>
