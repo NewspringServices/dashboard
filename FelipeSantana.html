@@ -70,12 +70,31 @@
             margin-top: 10px;
             display: none;
         }
+
+        .mensagem-erro, .mensagem-sucesso {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .mensagem-erro {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .mensagem-sucesso {
+            background-color: #4CAF50;
+            color: white;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Formulário de Registo</h1>
-        <form action="#" method="post">
+        <form id="form-registo" action="#" method="post">
             <!-- Nome primeiro -->
             <div class="campo">
                 <label for="nome">Nome</label>
@@ -132,6 +151,9 @@
                 <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
             </div>
 
+            <!-- Mensagens de erro ou sucesso -->
+            <div id="mensagem" class="mensagem-erro" style="display: none;"></div>
+
             <!-- Botão de envio -->
             <button type="submit">Submeter</button>
         </form>
@@ -156,13 +178,21 @@
         }
 
         // Função para enviar os dados do formulário
-        document.querySelector("form").addEventListener("submit", function(e) {
+        document.querySelector("#form-registo").addEventListener("submit", function(e) {
             e.preventDefault(); // Impede o envio padrão do formulário
+
+            // Limpa qualquer mensagem anterior
+            const mensagem = document.getElementById("mensagem");
+            mensagem.style.display = "none";
+            mensagem.classList.remove("mensagem-erro", "mensagem-sucesso");
 
             // Verificar se o tempo-ausencia foi preenchido
             const tempoAusencia = document.getElementById("tempo-ausencia").value;
             if (tempoAusencia === "" || tempoAusencia < 0) {
-                alert("Por favor, insira um tempo de ausência válido.");
+                // Exibe a mensagem de erro
+                mensagem.style.display = "block";
+                mensagem.textContent = "Por favor, insira um tempo de ausência válido.";
+                mensagem.classList.add("mensagem-erro");
                 return;
             }
 
@@ -184,12 +214,19 @@
             })
             .then(response => response.text())
             .then(data => {
-                alert("Formulário enviado com sucesso!");
-                console.log(data);
+                // Exibe a mensagem de sucesso
+                mensagem.style.display = "block";
+                mensagem.textContent = "Formulário enviado com sucesso!";
+                mensagem.classList.add("mensagem-sucesso");
+
+                // Reseta o formulário
+                document.getElementById("form-registo").reset();
             })
             .catch(error => {
-                console.error("Erro ao enviar o formulário:", error);
-                alert("Ocorreu um erro ao enviar o formulário.");
+                // Exibe a mensagem de erro
+                mensagem.style.display = "block";
+                mensagem.textContent = "Ocorreu um erro ao enviar o formulário.";
+                mensagem.classList.add("mensagem-erro");
             });
         });
     </script>
