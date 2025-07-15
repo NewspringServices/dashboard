@@ -74,7 +74,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Formulário de Registo</h1>
+        <h1>TESTE</h1>
         <form action="#" method="post">
             <!-- Nome primeiro -->
             <div class="campo">
@@ -82,6 +82,7 @@
                 <select id="nome" name="nome">
                     <option value="nome1">Nome 1</option>
                     <option value="nome2">Nome 2</option>
+                    <option value="nome3">Nome 3</option>
                 </select>
             </div>
 
@@ -151,6 +152,37 @@
                 suberro.style.display = "block";
             }
         }
+
+        // Função para enviar os dados do formulário
+        document.querySelector("form").addEventListener("submit", function(e) {
+            e.preventDefault(); // Impede o envio padrão do formulário
+            
+            const formData = new FormData(this);
+
+            // Atribuindo a equipe de acordo com o nome
+            const nome = formData.get('nome');
+            let equipe;
+            if (nome === 'nome1') equipe = 'Equipe A';
+            else if (nome === 'nome2') equipe = 'Equipe B';
+            else if (nome === 'nome3') equipe = 'Equipe C';
+
+            // Adicionando a equipe ao FormData
+            formData.append('equipe', equipe);
+
+            fetch('https://script.google.com/macros/s/AKfycbyQ-_cWZbFb6C_af4hssb9veMXXLtvY99nS_I5FRgZdR8fCOyjoX6W7kBMW7otjfqtW3A/exec', { // Substitua pelo seu ID de script
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("Formulário enviado com sucesso!");
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("Erro ao enviar o formulário:", error);
+                alert("Ocorreu um erro ao enviar o formulário.");
+            });
+        });
     </script>
 </body>
 </html>
