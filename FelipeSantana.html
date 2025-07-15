@@ -105,10 +105,6 @@
                         <option value="parcial">Parcial</option>
                     </select>
                 </div>
-                <div class="campo">
-                    <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
-                    <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas" min="0" max="24" step="0.5">
-                </div>
             </div>
 
             <!-- Subopções para Erro de Teletrabalho -->
@@ -124,7 +120,13 @@
                 </div>
             </div>
 
-            <!-- Observações (opcional) -->
+            <!-- Campo Tempo Ausente (Visível independentemente da escolha) -->
+            <div class="campo">
+                <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
+                <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas" min="0" max="24" step="0.5">
+            </div>
+
+            <!-- Observações (opcional) (Visível independentemente da escolha) -->
             <div class="campo">
                 <label for="observacoes">Observações (opcional)</label>
                 <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
