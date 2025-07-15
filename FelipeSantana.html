@@ -74,7 +74,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>TESTE</h1>
+        <h1>Formulário de Registo</h1>
         <form action="#" method="post">
             <!-- Nome primeiro -->
             <div class="campo">
@@ -107,7 +107,7 @@
                 </div>
                 <div class="campo">
                     <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
-                    <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas">
+                    <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas" min="0" max="24" step="0.5">
                 </div>
             </div>
 
@@ -156,7 +156,14 @@
         // Função para enviar os dados do formulário
         document.querySelector("form").addEventListener("submit", function(e) {
             e.preventDefault(); // Impede o envio padrão do formulário
-            
+
+            // Verificar se o tempo-ausencia foi preenchido
+            const tempoAusencia = document.getElementById("tempo-ausencia").value;
+            if (tempoAusencia === "" || tempoAusencia < 0) {
+                alert("Por favor, insira um tempo de ausência válido.");
+                return;
+            }
+
             const formData = new FormData(this);
 
             // Atribuindo a equipe de acordo com o nome
