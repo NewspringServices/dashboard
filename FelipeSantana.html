@@ -1,348 +1,160 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Newspring</title>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-      background: #f7f7f7;
-    }
-
-    #topImage {
-      display: block;
-      margin: 0 auto 20px auto;
-      max-width: 150px;
-      height: auto;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .tabs button {
-      padding: 10px 20px;
-      margin: 0 5px;
-      border: none;
-      cursor: pointer;
-      background-color: #ccc;
-      border-radius: 5px;
-    }
-
-    .tabs button.active {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .barra-registo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      gap: 15px;
-      max-width: 500px;
-      margin: 0 auto 20px auto;
-    }
-
-    .barra-registo .info-usuario {
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .barra-registo .select-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .barra-registo select {
-      width: 200px;
-      padding: 8px;
-    }
-
-    .barra-registo button#btnSubmeter {
-      padding: 6px 12px;
-      font-size: 14px;
-      width: auto;
-    }
-
-    .status {
-      font-size: 14px;
-    }
-
-    #mensagem {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .form-container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    select, input[type="text"], input[type="number"], button, input[type="radio"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    .tipologia-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .tipologia-container div {
-      flex: 1;
-      text-align: center;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .button-container button {
-      width: 48%;
-    }
-
-    .message {
-      text-align: center;
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    .titulo-gama {
-      font-size: 20px;
-      color: #28a745;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .form-container label {
-      font-weight: bold;
-      font-size: 14px;
-    }
-        
-    #cronometro {
-      display: none !important;
-    }
-
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Registo</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f8f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+        h1 {
+            text-align: center;
+            color: #388e3c;
+            margin-bottom: 30px;
+        }
+        .campo {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 600;
+            color: #388e3c;
+            margin-bottom: 5px;
+            display: block;
+        }
+        select, input[type="text"], input[type="number"], button {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #388e3c;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            background-color: #f1f9f4;
+            transition: border-color 0.3s ease;
+            box-sizing: border-box;
+        }
+        select:focus, input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #66bb6a;
+            outline: none;
+        }
+        button {
+            background-color: #388e3c;
+            color: white;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #66bb6a;
+        }
+        .subopcao {
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Formulário de Registo</h1>
+        <form action="#" method="post">
+            <!-- Nome primeiro -->
+            <div class="campo">
+                <label for="nome">Nome</label>
+                <select id="nome" name="nome">
+                    <option value="nome1">Nome 1</option>
+                    <option value="nome2">Nome 2</option>
+                    <option value="nome3">Nome 3</option>
+                </select>
+            </div>
 
-  <!-- Imagem pequena no topo da página -->
-  <img id="topImage" src="logo.png" alt="Logo Newspring" />
+            <!-- Tipo de Registo -->
+            <div class="campo">
+                <label for="tipo-registo">Tipo de Registo</label>
+                <select id="tipo-registo" name="tipo-registo" onchange="mostrarSubopcoes()">
+                    <option value="">Selecione...</option>
+                    <option value="ausencia">Ausência</option>
+                    <option value="erro-teletrabalho">Erro de Teletrabalho</option>
+                </select>
+            </div>
 
-  <!-- Abas -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
-    <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
-  </div>
+            <!-- Subopções para Ausência -->
+            <div id="subausencia" class="subopcao">
+                <div class="campo">
+                    <label for="ausencia-opcao">Selecione uma opção para Ausência</label>
+                    <select id="ausencia-opcao" name="ausencia-opcao">
+                        <option value="total">Total</option>
+                        <option value="parcial">Parcial</option>
+                    </select>
+                </div>
+            </div>
 
-  <!-- Conteúdo FYBDO -->
-  <div id="fybdo" class="tab-content active">
-    <div class="barra-registo">
-      <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10867<br>Nome:Gilda Maria Infante Anjos</div>
+            <!-- Subopções para Erro de Teletrabalho -->
+            <div id="suberro" class="subopcao">
+                <div class="campo">
+                    <label for="erro-opcao">Selecione uma opção para Erro de Teletrabalho</label>
+                    <select id="erro-opcao" name="erro-opcao">
+                        <option value="pc-atualizacoes">PC em atualizações</option>
+                        <option value="sem-luz">Sem Luz</option>
+                        <option value="sem-internet">Sem Internet</option>
+                        <option value="outro">Erro de VDI</option>
+                        <option value="outro">Outro</option>
+                    </select>
+                </div>
+            </div>
 
-      <div class="select-row">
-        <label for="tipo">Tipo:</label>
-        <select id="tipo" onchange="mudarTipo()">
-          <option value="">Selecione</option>
-          <option value="login">Login</option>
-          <option value="logout">Logout</option>
-          <option value="pausa1">Pausa 1</option>
-          <option value="pausa2">Pausa 2</option>
-          <option value="refeicao">Refeição</option>
-          <option value="formacao">Formação</option>
-        </select>
-        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
-      </div>
+            <!-- Tempo de Ausência (Sempre Visível) -->
+            <div class="campo">
+                <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
+                <input type="number" id="tempo-ausencia" name="tempo-ausencia" placeholder="Exemplo: 4 horas" required>
+            </div>
 
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status" style="display:none;"></span>
-      <span id="horaFim" class="status" style="display:none;"></span>
-      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+            <!-- Observações (opcional) -->
+            <div class="campo">
+                <label for="observacoes">Observações (opcional)</label>
+                <input type="text" id="observacoes" name="observacoes" placeholder="Digite aqui...">
+            </div>
 
-      <span id="mensagem" class="status"></span>
+            <!-- Botão de envio -->
+            <button type="submit">Submeter</button>
+        </form>
     </div>
-  </div>
 
-  <!-- Conteúdo GAMa -->
-  <div id="gama" class="tab-content">
-    <div class="form-container">
-      <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
-      <form id="gamaForm">
+    <script>
+        function mostrarSubopcoes() {
+            const tipoRegisto = document.getElementById("tipo-registo").value;
+            const subausencia = document.getElementById("subausencia");
+            const suberro = document.getElementById("suberro");
 
-        <div class="form-group">
-          <label for="processoGama">Processo:</label>
-          <input type="text" id="processoGama" name="processoGama" required />
-        </div>
-        <div class="form-group">
-          <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-          <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="Reembolsos Multicare">Reembolsos Multicare</option>
-            <option value="Formação/Meetings">Formação/Meetings</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="tempoTarefa">Tempo da Tarefa:</label>
-          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-        </div>
-        <div class="form-group button-container">
-          <button type="button" id="startButton">Iniciar Tarefa</button>
-          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-        </div>
-        <div id="responseMessage" class="message"></div>
-      </form>
-    </div>
-  </div>
+            // Esconde todas as subopções
+            subausencia.style.display = "none";
+            suberro.style.display = "none";
 
-  <!-- Scripts -->
-  <script>
-    const user = "EX10867";
-    const nome = "Gilda Maria Infante Anjos"; 
-
-    const tipoSelect = document.getElementById('tipo');
-    const btnSubmeter = document.getElementById('btnSubmeter');
-    const btnTerminar = document.getElementById('btnTerminar');
-    const infoData = document.getElementById('infoData');
-    const cronometroEl = document.getElementById('cronometro');
-    const horaInicioEl = document.getElementById('horaInicio');
-    const horaFimEl = document.getElementById('horaFim');
-    const mensagemEl = document.getElementById('mensagem');
-
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora, timer, segundos = 0;
-
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-
-    function showTab(tabName) {
-      const tabs = document.querySelectorAll('.tab-content');
-      tabs.forEach(tab => tab.classList.remove('active'));
-
-      const buttons = document.querySelectorAll('.tab-btn');
-      buttons.forEach(button => button.classList.remove('active'));
-
-      document.getElementById(tabName).classList.add('active');
-      event.target.classList.add('active');
-    }
-
-    function submeter() {
-      const tipo = tipoSelect.value;
-      const currentDate = new Date();
-      infoData.innerHTML = `Data e Hora: ${currentDate.toLocaleString()}`;
-
-      tipoSelecionado = tipo;
-      if (tipo) {
-        btnTerminar.style.display = 'inline-block';
-        if (tipo === 'login') {
-          iniciarCronometro();
+            // Mostra as subopções conforme a escolha
+            if (tipoRegisto === "ausencia") {
+                subausencia.style.display = "block";
+            } else if (tipoRegisto === "erro-teletrabalho") {
+                suberro.style.display = "block";
+            }
         }
-      }
-    }
-
-    function iniciarCronometro() {
-      segundos = 0;
-      cronometroEl.style.display = 'inline-block';
-      timer = setInterval(function() {
-        segundos++;
-        let horas = Math.floor(segundos / 3600);
-        let minutos = Math.floor((segundos % 3600) / 60);
-        let segundosRestantes = segundos % 60;
-        cronometroEl.textContent = `⏱ ${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundosRestantes).padStart(2, '0')}`;
-      }, 1000);
-    }
-
-    function terminar() {
-      clearInterval(timer);
-      fimDataHora = new Date();
-      horaInicioEl.innerText = `Início: ${inicioDataHora.toLocaleString()}`;
-      horaFimEl.innerText = `Fim: ${fimDataHora.toLocaleString()}`;
-
-      const tempoTotal = new Date(fimDataHora - inicioDataHora);
-      const horas = tempoTotal.getUTCHours();
-      const minutos = tempoTotal.getUTCMinutes();
-      const segundos = tempoTotal.getUTCSeconds();
-      const tempoFormatado = `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
-
-      document.getElementById('tempoTarefa').value = tempoFormatado;
-      mensagemEl.style.display = 'block';
-      mensagemEl.textContent = `Tarefa Finalizada! Tempo: ${tempoFormatado}`;
-
-      // Chamar API de Supabase para registrar
-      fetch(SUPABASE_URL + '/rest/v1/gama_registos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_API_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_API_KEY,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify({
-          inicio: inicioDataHora.toISOString(),
-          fim: fimDataHora.toISOString(),
-          colaborador: nome,
-          processoGama: document.getElementById('processoGama').value,
-          tarefaFinalizada: document.getElementById('tarefaFinalizada').value,
-          tempo: tempoFormatado
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        mensagemEl.textContent = 'Dados enviados com sucesso!';
-        mensagemEl.classList.add('success');
-      })
-      .catch(error => {
-        mensagemEl.textContent = 'Falha ao enviar os dados!';
-        mensagemEl.classList.add('error');
-      });
-    }
-  </script>
+    </script>
 </body>
 </html>
