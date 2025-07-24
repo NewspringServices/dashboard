@@ -75,7 +75,7 @@
 <body>
     <div class="container">
         <h1>Formulário de Registo</h1>
-        <form action="#" method="post">
+        <form id="form-registo">
             <!-- Nome primeiro -->
             <div class="campo">
                 <label for="nome">Nome</label>
@@ -121,11 +121,9 @@
                 </div>
             </div>
 
-    
-
-                  <!-- tempo-ausencia (opcional) -->
+            <!-- Tempo de Ausência (opcional) -->
             <div class="campo">
-                <label for="tempo-ausencia">TESTE</label>
+                <label for="tempo-ausencia">Tempo Ausente (em horas)</label>
                 <input type="text" id="tempo-ausencia" name="tempo-ausencia" placeholder="Digite aqui...">
             </div>
 
@@ -141,6 +139,7 @@
     </div>
 
     <script>
+        // Função para exibir as subopções
         function mostrarSubopcoes() {
             const tipoRegisto = document.getElementById("tipo-registo").value;
             const subausencia = document.getElementById("subausencia");
@@ -156,6 +155,29 @@
             } else if (tipoRegisto === "erro-teletrabalho") {
                 suberro.style.display = "block";
             }
+        }
+
+        // Função para enviar o formulário para o Google Sheets via Apps Script
+        document.getElementById("form-registo").onsubmit = function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const dados = {};
+
+            formData.forEach((value, key) => {
+                dados[key] = value;
+            });
+
+            // Enviar os dados para o Apps Script (URL fornecida)
+            const url = 'https://script.google.com/macros/s/AKfycbzVqlFMQN0WBTLfPOGM10OxdAG-wo6-fQwBhzO35kBRf__6UWZCaPsAQCwlRmuCg_hM/exec'; // URL do seu Google Apps Script
+
+            fetch(url, {
+                method: 'POST',
+                body: new URLSearchParams(dados)
+            })
+            .then(response => response.text())
+            .then(result => alert("Dados registrados com sucesso!"))
+            .catch(error => console.error('Erro ao enviar dados:', error));
         }
     </script>
 </body>
