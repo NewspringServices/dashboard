@@ -188,7 +188,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX11397<br>Nome:Carolina Adelaide Viegas Gomes Padeiro</div>
+      <div class="info-usuario">User: EX11397<br>Nome: Carolina Adelaide Viegas Gomes Padeiro</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -216,11 +216,23 @@
   <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
-      <h2 class="titulo-gama">Produção</h2>
+      <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
       <form id="gamaForm">
-
         <div class="form-group">
-          <label for="processoGama">Processo:</label>
+          <label>Tipologia Puxada:</label>
+          <div class="tipologia-container">
+            <div>
+              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
+              <label for="aberturas">Aberturas</label>
+            </div>
+            <div>
+              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
+              <label for="indexacoes">Indexações</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="processoGama">Processo GAMA:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
         <div class="form-group">
@@ -230,7 +242,10 @@
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-               <option value="PETS MIB">PETS MIB</option>
+            <option value="Tarefa Aberturas">Tarefa Aberturas</option>
+            <option value="Tarefa Indexações">Tarefa Indexações</option>
+            <option value="Pedido de Elementos">Pedido de Elementos</option>
+            <option value="Erros/SPAM">Erros/SPAM</option>
             <option value="Formação/Meetings">Formação/Meetings</option>
           </select>
         </div>
@@ -249,9 +264,8 @@
 
   <!-- Scripts -->
   <script>
-   const user = "EX11397";
+    const user = "EX11397";
     const nome = "Carolina Adelaide Viegas Gomes Padeiro"; 
-
 
 
     const tipoSelect = document.getElementById('tipo');
@@ -496,10 +510,11 @@
         const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
         const tempo = tempoTarefa.value;
         const colaborador = "Carolina Adelaide Viegas Gomes Padeiro";
+        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
-        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
+        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_registos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -508,6 +523,7 @@
                 'Prefer': 'return=representation'
             },
             body: JSON.stringify({
+                tipologiaPuxada: tipologiaPuxada,
                 inicio: startFormatted,
                 fim: endFormatted,
                 colaborador: colaborador,
