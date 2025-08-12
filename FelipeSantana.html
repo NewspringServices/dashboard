@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -218,12 +218,18 @@
       <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
       <form id="gamaForm">
         <div class="form-group">
-          <label>Tipologia Tratada:</label>
+          <label>Tipologia Puxada:</label>
           <div class="tipologia-container">
             <div>
-              <input type="radio" id="aberturas" name="tipologia" value="Auto" required>
-              <label for="auto">Auto</label>
+              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
+              <label for="aberturas">Aberturas</label>
             </div>
+            <div>
+              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
+              <label for="indexacoes">Indexações</label>
+            </div>
+          </div>
+        </div>
         <div class="form-group">
           <label for="processoGama">Processo GAMA:</label>
           <input type="text" id="processoGama" name="processoGama" required />
