@@ -1,4 +1,6 @@
-!DOCTYPE html>
+
+      
+      <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -187,7 +189,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX11531<br>Nome: Fábio Rúben de Abreu Assunção</div>
+      <div class="info-usuario">User: EX11529<br>Nome: Ana Carolina Duarte Tuna Filipe</div>
 
       <div class="select-row">
         <label for="tipo">Tipo:</label>
@@ -217,19 +219,6 @@
     <div class="form-container">
       <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
       <form id="gamaForm">
-        <div class="form-group">
-          <label>Tipologia Puxada:</label>
-          <div class="tipologia-container">
-            <div>
-              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
-              <label for="aberturas">Aberturas</label>
-            </div>
-            <div>
-              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
-              <label for="indexacoes">Indexações</label>
-            </div>
-          </div>
-        </div>
         <div class="form-group">
           <label for="processoGama">Processo GAMA:</label>
           <input type="text" id="processoGama" name="processoGama" required />
@@ -263,8 +252,8 @@
 
   <!-- Scripts -->
   <script>
-    const user = "EX11531";
-    const nome = "Fábio Rúben de Abreu Assunção"; 
+    const user = "EX11529";
+    const nome = "Ana Carolina Duarte Tuna Filipe"; 
 
 
     const tipoSelect = document.getElementById('tipo');
@@ -508,7 +497,7 @@
         const documentos = document.getElementById('documentos').value;
         const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
         const tempo = tempoTarefa.value;
-        const colaborador = "Fábio Rúben de Abreu Assunção";
+        const colaborador = "Ana Carolina Duarte Tuna Filipe";
         const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
@@ -578,3 +567,4 @@
 
 </body>
 </html>
+
