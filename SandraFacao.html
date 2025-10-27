@@ -1,5 +1,4 @@
-
-      <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8" />
@@ -188,8 +187,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX04695<br>Nome:Sandra Isabel Domingues Facão</div>
-
+      <div class="info-usuario">User: EX04695 <br>Nome:Sandra Isabel Domingues Facão</div>
       <div class="select-row">
         <label for="tipo">Tipo:</label>
         <select id="tipo" onchange="mudarTipo()">
@@ -216,7 +214,7 @@
   <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
-      <h2 class="titulo-gama">Produção</h2>
+      <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
       <form id="gamaForm">
 
         <div class="form-group">
@@ -230,8 +228,7 @@
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-               <option value="PETS">PETS</option>
-               <option value="AT Origem DNT">AT Origem DNT</option>
+            <option value="Reembolsos Multicare">Reembolsos Multicare</option>>
             <option value="Formação/Meetings">Formação/Meetings</option>
           </select>
         </div>
@@ -252,7 +249,6 @@
   <script>
    const user = "EX04695";
     const nome = "Sandra Isabel Domingues Facão"; 
-
 
 
     const tipoSelect = document.getElementById('tipo');
@@ -500,14 +496,16 @@
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
 
-        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_producao', {
+
+
+
+        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_multicare', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
                 'Prefer': 'return=representation'
-            
             },
             body: JSON.stringify({
                 inicio: startFormatted,
@@ -565,4 +563,6 @@
 
 </body>
 </html>
+
+
 
