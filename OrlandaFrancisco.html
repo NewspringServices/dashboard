@@ -187,8 +187,7 @@
   <div id="fybdo" class="tab-content active">
     <div class="barra-registo">
       <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10362<br>Nome:Orlanda Leizi Gomes Francisco</div>
-
+      <div class="info-usuario">User: EX10362 <br>Nome:Orlanda Leizi Gomes Francisco</div>
       <div class="select-row">
         <label for="tipo">Tipo:</label>
         <select id="tipo" onchange="mudarTipo()">
@@ -203,6 +202,7 @@
         <button id="btnSubmeter" onclick="submeter()">Submeter</button>
       </div>
 
+
       <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
       <span id="horaInicio" class="status" style="display:none;"></span>
       <span id="horaFim" class="status" style="display:none;"></span>
@@ -215,23 +215,11 @@
   <!-- Conteúdo GAMa -->
   <div id="gama" class="tab-content">
     <div class="form-container">
-      <h2 class="titulo-gama">Produção - GAMA AUTO</h2>
+      <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
       <form id="gamaForm">
+
         <div class="form-group">
-          <label>Tipologia Puxada:</label>
-          <div class="tipologia-container">
-            <div>
-              <input type="radio" id="aberturas" name="tipologia" value="Aberturas" required>
-              <label for="aberturas">Aberturas</label>
-            </div>
-            <div>
-              <input type="radio" id="indexacoes" name="tipologia" value="Indexações" required>
-              <label for="indexacoes">Indexações</label>
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="processoGama">Processo GAMA:</label>
+          <label for="processoGama">Processo:</label>
           <input type="text" id="processoGama" name="processoGama" required />
         </div>
         <div class="form-group">
@@ -241,10 +229,13 @@
         <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-            <option value="Tarefa Aberturas">Tarefa Aberturas</option>
-            <option value="Tarefa Indexações">Tarefa Indexações</option>
-            <option value="Pedido de Elementos">Pedido de Elementos</option>
-            <option value="Erros/SPAM">Erros/SPAM</option>
+            <option value="Indexação">Indexação</option>
+                        <option value="Abertura">Abertura</option>
+                              <option value="SPAM/ERROS">SPAM/ERROS</option>
+      <option value="Devolução E-mail">Devolução E-mail</option>
+
+   <option value="DNE - Indexação">DNE - Indexação</option>
+
             <option value="Formação/Meetings">Formação/Meetings</option>
           </select>
         </div>
@@ -265,6 +256,7 @@
   <script>
 const user = "EX10362";
     const nome = "Orlanda Leizi Gomes Francisco";
+
 
     const tipoSelect = document.getElementById('tipo');
     const btnSubmeter = document.getElementById('btnSubmeter');
@@ -508,9 +500,9 @@ const user = "EX10362";
         const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
         const tempo = tempoTarefa.value;
         const colaborador = "Orlanda Leizi Gomes Francisco";
-        const tipologiaPuxada = document.querySelector('input[name="tipologia"]:checked').value;
         const startFormatted = formatDate(startTime);
         const endFormatted = formatDate(endTime);
+
 
         fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/gama_registos', {
             method: 'POST',
@@ -521,7 +513,6 @@ const user = "EX10362";
                 'Prefer': 'return=representation'
             },
             body: JSON.stringify({
-                tipologiaPuxada: tipologiaPuxada,
                 inicio: startFormatted,
                 fim: endFormatted,
                 colaborador: colaborador,
