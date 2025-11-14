@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+    <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -11,14 +12,12 @@
     button { padding: 10px 20px; cursor: pointer; margin-top: 5px; }
 </style>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
 <script>
   const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
   const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk";
   const supabase = supabase.createClient(SUPABASE_URL, supabaseKey);
 </script>
-
 </head>
 <body>
 
@@ -35,7 +34,6 @@
 
 <div id="formInscricao" class="box hidden">
     <h3>Inscrição</h3>
-
     <label>Coordenação</label><br>
     <select id="coordenacao">
         <option value="">Selecione</option>
@@ -49,22 +47,19 @@
     <label>E-mail</label><br>
     <input type="email" id="email"><br>
 
-    <button onclick="gerarImagemInscricao()">Gerar imagem</button>
-
+    <button onclick="gerarInscricao()">Gerar imagem</button>
     <p id="msgInscricao"></p>
 </div>
 
 <div id="formNegar" class="box hidden">
     <h3>Negar convite</h3>
-
     <label>Nome completo</label><br>
     <input type="text" id="nomeNegar"><br>
 
     <label>E-mail</label><br>
     <input type="email" id="emailNegar"><br>
 
-    <button onclick="gerarImagemNegativa()">Gerar imagem</button>
-
+    <button onclick="gerarNegativa()">Gerar imagem</button>
     <p id="msgNegar" style="font-weight:bold;"></p>
 </div>
 
@@ -77,10 +72,10 @@ function mostrarOpcao() {
     else document.getElementById("formNegar").classList.remove("hidden");
 }
 
-// ====================
+// ----------------------------
 // INSCRIÇÃO
-// ====================
-async function gerarImagemInscricao() {
+// ----------------------------
+async function gerarInscricao() {
     const nome = document.getElementById("nome").value.trim();
     const email = document.getElementById("email").value.trim();
     const coord = document.getElementById("coordenacao").value;
@@ -96,26 +91,26 @@ async function gerarImagemInscricao() {
     const mensagem = `Inscrição realizada com sucesso!\nNome: ${nome}\nCoordenação: ${coord}\nE-mail: ${email}\nSite: ${site}`;
     document.getElementById("msgInscricao").innerText = mensagem;
 
-    // Salvar no Supabase na tabela única 'participantes'
-    const { data, error } = await supabase
-        .from('participantes')
-        .insert([{
-            nome,
-            email,
-            coordenacao: coord,
-            site,
-            codigo_negativa: null
-        }]);
+    // Salvar no Supabase
+    try {
+        const { data, error } = await supabase
+            .from('participantes')
+            .insert([{ nome, email, coordenacao: coord, site, codigo_negativa: null }]);
 
-    if(error) console.error("Erro ao salvar inscrição:", error);
+        if(error) throw error;
+        console.log("Inscrição salva:", data);
+    } catch (err) {
+        console.error("Erro ao salvar inscrição:", err);
+        alert("Erro ao salvar no banco.");
+    }
 
     gerarImagem(mensagem, "inscricao.png");
 }
 
-// ====================
+// ----------------------------
 // NEGATIVA
-// ====================
-async function gerarImagemNegativa() {
+// ----------------------------
+async function gerarNegativa() {
     const nome = document.getElementById("nomeNegar").value.trim();
     const email = document.getElementById("emailNegar").value.trim();
 
@@ -128,36 +123,34 @@ async function gerarImagemNegativa() {
     const mensagem = `Negativa registrada!\nNome: ${nome}\nE-mail: ${email}\nCódigo: ${codigo}`;
     document.getElementById("msgNegar").innerText = mensagem;
 
-    // Salvar no Supabase na mesma tabela 'participantes'
-    const { data, error } = await supabase
-        .from('participantes')
-        .insert([{
-            nome,
-            email,
-            coordenacao: null,
-            site: null,
-            codigo_negativa: codigo
-        }]);
+    // Salvar no Supabase
+    try {
+        const { data, error } = await supabase
+            .from('participantes')
+            .insert([{ nome, email, coordenacao: null, site: null, codigo_negativa: codigo }]);
 
-    if(error) console.error("Erro ao salvar negativa:", error);
+        if(error) throw error;
+        console.log("Negativa salva:", data);
+    } catch (err) {
+        console.error("Erro ao salvar negativa:", err);
+        alert("Erro ao salvar no banco.");
+    }
 
     gerarImagem(mensagem, "negativa.png");
 }
 
-// ====================
-// FUNÇÃO PARA GERAR IMAGEM
-// ====================
+// ----------------------------
+// GERAR IMAGEM
+// ----------------------------
 function gerarImagem(texto, nomeArquivo) {
     const canvas = document.createElement("canvas");
     canvas.width = 800;
     canvas.height = 400;
     const ctx = canvas.getContext("2d");
 
-    // Fundo branco
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Texto centralizado
     ctx.fillStyle = "#000000";
     ctx.font = "24px Arial";
     ctx.textAlign = "center";
@@ -171,9 +164,7 @@ function gerarImagem(texto, nomeArquivo) {
     const link = document.createElement("a");
     link.download = nomeArquivo;
     link.href = canvas.toDataURL("image/png");
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
 }
 </script>
 
