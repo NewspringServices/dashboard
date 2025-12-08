@@ -16,7 +16,7 @@ body {
     justify-content: center;
     padding-top: 40px;
 }
-#passwordPrompt, #formContainer {
+#formContainer {
     background-color: white;
     padding: 30px;
     border-radius: 12px;
@@ -26,7 +26,7 @@ body {
     margin-bottom: 20px;
 }
 label { display: block; margin-bottom: 10px; color: #0f3d2e; }
-select, input[type="date"], input[type="password"] {
+select, input[type="date"] {
     padding: 8px; margin-bottom: 15px; width: 100%;
     border: 1px solid #0f3d2e; border-radius: 6px;
     background-color: #f8fdfb; color: #0f3d2e;
@@ -39,7 +39,6 @@ button:hover { background-color: #0c3326; }
 .error { color: #a33; margin-top: 10px; display: none; }
 .success { color: green; font-weight: bold; margin-top: 15px; }
 #detalhesReserva { margin-top: 20px; }
-#formContainer { display: none; }
 h1, h2 { text-align: center; }
 #resumoPedidos div {
     border: 1px solid #0f3d2e;
@@ -51,15 +50,6 @@ h1, h2 { text-align: center; }
 </style>
 </head>
 <body>
-
-<!-- LOGIN -->
-<div id="passwordPrompt">
-<h1>Pedidos de Férias 2026</h1>
-<label for="password">Digite a senha para acessar o formulário:</label>
-<input type="password" id="password" required>
-<button id="btnEntrar">Entrar</button>
-<div id="senhaErro" class="error">Senha incorreta. Tente novamente.</div>
-</div>
 
 <!-- FORMULÁRIO -->
 <div id="formContainer">
@@ -147,7 +137,7 @@ function calcularDiasEntreDatas(dataInicio,dataFim){
 // --- DUPLICADAS ---
 async function verificarDatasDuplicadas(nome,dataInicio,dataFim){
     const { data } = await supabase
-        .from('FID_COORDENAÇÃO')
+        .from('fid_coordenacao')
         .select('data_inicio,data_fim')
         .eq('nome',nome);
 
@@ -163,14 +153,13 @@ async function verificarDatasDuplicadas(nome,dataInicio,dataFim){
 
 // --- LIMITES ---
 async function verificarLimites(nome,tipoDias,diasNovo){
-
     const limites = {
         "Andreia Gralha": { "F25": 0, "Preferenciais": 5, "Não Preferenciais": 10 },
         "Telma Rosa": { "F25": 2, "Preferenciais": 2, "Não Preferenciais": 2 }
     };
 
     const { data } = await supabase
-        .from('FID_COORDENAÇÃO')
+        .from('fid_coordenacao')
         .select('total_dias,tipo_dias')
         .eq('nome',nome)
         .eq('tipo_dias',tipoDias);
@@ -249,7 +238,6 @@ document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
 
     const limite = await verificarLimites(nome,tipoDias,totalDias);
     if(!limite.pode){
-
         let msg = "";
         let autorizados = limite.limiteTotal;
 
@@ -268,7 +256,7 @@ document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
         return;
     }
 
-    await supabase.from("FID_COORDENAÇÃO").insert([{
+    await supabase.from("fid_coordenacao").insert([{
         nome,
         tipo_dias: tipoDias,
         data_inicio: dataInicio,
@@ -293,16 +281,6 @@ document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
 
     e.target.reset();
     document.getElementById("diasCalculados").innerText = "Dias úteis calculados: 0";
-});
-
-// --- LOGIN ---
-document.getElementById("btnEntrar").addEventListener("click",()=>{
-    if(document.getElementById("password").value === "FID2026_COORD"){
-        document.getElementById("passwordPrompt").style.display="none";
-        document.getElementById("formContainer").style.display="block";
-    } else {
-        document.getElementById("senhaErro").style.display="block";
-    }
 });
 </script>
 
