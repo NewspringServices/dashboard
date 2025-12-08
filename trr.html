@@ -16,6 +16,287 @@ body {
     justify-content: center;
     padding-top: 40px;
 }
+#passwordPrompt, #formContainer {
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(15, 61, 46, 0.2);
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+label { display: block; margin-bottom: 10px; color: #0f3d2e; }
+select, input[type="date"], input[type="password"] {
+    padding: 8px; margin-bottom: 15px; width: 100%;
+    border: 1px solid #0f3d2e; border-radius: 6px;
+    background-color: #f8fdfb; color: #0f3d2e;
+}
+button {
+    padding: 10px 15px; background-color: #0f3d2e; color: white;
+    border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;
+}
+button:hover { background-color: #0c3326; }
+.error { color: #a33; margin-top: 10px; display: none; }
+.success { color: green; font-weight: bold; margin-top: 15px; }
+#detalhesReserva { margin-top: 20px; }
+#formContainer { display: none; }
+h1, h2 { text-align: center; }
+#resumoPedidos div {
+    border: 1px solid #0f3d2e;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+    background-color: #e6ffec;
+}
+</style>
+</head>
+<body>
+
+
+<!-- FORMULÁRIO -->
+<div id="formContainer">
+<h1>Pedidos de Férias 2026</h1>
+
+<form id="reservaForm">
+<label for="nome">Nome:</label>
+<select id="nome" required>
+    <option value="Andreia Gralha">Andreia Gralha</option>
+    <option value="Telma Rosa">Telma Rosa</option>
+</select>
+
+<label for="tipoDias">Tipo de Dias:</label>
+<select id="tipoDias" required>
+    <option value="F25">Férias 2025</option>
+    <option value="Preferenciais">2026 - Preferenciais</option>
+    <option value="Não Preferenciais">2026 - Não Preferenciais</option>
+</select>
+
+<label for="dataInicio">Data de Início:</label>
+<input type="date" id="dataInicio" required>
+
+<label for="dataFim">Data de Fim:</label>
+<input type="date" id="dataFim" required>
+
+<div id="diasCalculados">Dias úteis calculados: 0</div>
+
+<div id="errorMessages" class="error"></div>
+<div id="successMessage" class="success"></div>
+
+<button type="submit">Enviar</button>
+</form>
+
+<div id="resumoPedidos"></div>
+</div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+
+const supabase = createClient(
+    'https://bijndfsxrzjviwrdvwms.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk'
+);
+
+// ---- FERIADOS ----
+const feriados = [
+    "2025-04-25",
+    "2025-04-18",
+    "2025-05-01",
+    "2025-12-25",
+    "2026-01-01"
+];
+
+// ---- VERIFICAÇÃO FIM-DE-SEMANA / FERIADO COM LISTA ----
+function listarConflitosFDS_FERIADOS(dataInicio,dataFim){
+    let conflitos = [];
+    let start = new Date(dataInicio);
+    let end = new Date(dataFim);
+
+    for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+        let f = d.toISOString().split("T")[0];
+        let dia = d.getDay();
+
+        if(dia===0 || dia===6 || feriados.includes(f)){
+            conflitos.push(f);
+        }
+    }
+    return conflitos;
+}
+
+function calcularDiasEntreDatas(dataInicio,dataFim){
+    const start = new Date(dataInicio);
+    const end = new Date(dataFim);
+    let dias = 0;
+
+    for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+        const f = d.toISOString().split("T")[0];
+        const dia = d.getDay();
+        if(dia===0 || dia===6 || feriados.includes(f)) continue;
+        dias++;
+    }
+    return dias;
+}
+
+// --- DUPLICADAS ---
+async function verificarDatasDuplicadas(nome,dataInicio,dataFim){
+    const { data } = await supabase
+        .from('fid_coordenacao')
+        .select('data_inicio,data_fim')
+        .eq('nome',nome);
+
+    const inicioNovo = new Date(dataInicio);
+    const fimNovo = new Date(dataFim);
+
+    return data.filter(p=>{
+        const inicio = new Date(p.data_inicio);
+        const fim = new Date(p.data_fim);
+        return inicioNovo <= fim && fimNovo >= inicio;
+    });
+}
+
+// --- LIMITES ---
+async function verificarLimites(nome,tipoDias,diasNovo){
+
+    const limites = {
+        "Andreia Gralha": { "F25": 0, "Preferenciais": 5, "Não Preferenciais": 10 },
+        "Telma Rosa": { "F25": 2, "Preferenciais": 2, "Não Preferenciais": 2 }
+    };
+
+    const { data } = await supabase
+        .from('fid_coordenacao')
+        .select('total_dias,tipo_dias')
+        .eq('nome',nome)
+        .eq('tipo_dias',tipoDias);
+
+    let usados = data.reduce((s,p)=>s+p.total_dias,0);
+    let limite = limites[nome][tipoDias];
+
+    if(usados + diasNovo > limite){
+        return { pode:false, limiteTotal: limite };
+    }
+    return { pode:true };
+}
+
+// --- SUBMIT ---
+document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value;
+    const tipoDias = document.getElementById("tipoDias").value;
+    const dataInicio = document.getElementById("dataInicio").value;
+    const dataFim = document.getElementById("dataFim").value;
+
+    // 🔥 REGRA 1 - FÉRIAS 2025 ATÉ 30/04/2026
+    if(tipoDias === "F25"){
+        const limiteF25 = "2026-04-30";
+        if(dataInicio > limiteF25 || dataFim > limiteF25){
+            document.getElementById("errorMessages").innerText =
+            "❌ Férias 2025 só podem ser marcadas até 30/04/2026.";
+            document.getElementById("errorMessages").style.display="block";
+            return;
+        }
+    }
+
+    // 🔥 REGRA 2 - BLOQUEAR DEZEMBRO 2026 (exceto 24/12/2026)
+    const inicioDec = "2026-12-01";
+    const fimDec = "2026-12-30";
+    const excecao = "2026-12-24";
+
+    function intervaloTemDezembro(d1,d2){
+        let start = new Date(d1);
+        let end = new Date(d2);
+        for(let d=new Date(start); d<=end; d.setDate(d.getDate()+1)){
+            let f = d.toISOString().split("T")[0];
+            if(f >= inicioDec && f <= fimDec && f !== excecao){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    if(intervaloTemDezembro(dataInicio,dataFim)){
+        document.getElementById("errorMessages").innerText =
+        "❌ Mês de Dezembro 2026 está bloqueado, exceto 24/12/2026.";
+        document.getElementById("errorMessages").style.display="block";
+        return;
+    }
+
+    const conflitosDatas = listarConflitosFDS_FERIADOS(dataInicio,dataFim);
+    if(conflitosDatas.length > 0){
+        document.getElementById("errorMessages").innerText =
+        "❌ Pedido não pode conter Fins de Semana ou Feriados: " + conflitosDatas.join(", ");
+        document.getElementById("errorMessages").style.display="block";
+        return;
+    }
+
+    const totalDias = calcularDiasEntreDatas(dataInicio,dataFim);
+
+    const duplicadas = await verificarDatasDuplicadas(nome,dataInicio,dataFim);
+    if(duplicadas.length > 0){
+        let conflitoMsg = duplicadas.map(c=>`${c.data_inicio} a ${c.data_fim}`).join(", ");
+        document.getElementById("errorMessages").innerText =
+        "❌ Datas em conflito: " + conflitoMsg;
+        document.getElementById("errorMessages").style.display="block";
+        return;
+    }
+
+    const limite = await verificarLimites(nome,tipoDias,totalDias);
+    if(!limite.pode){
+
+        let msg = "";
+        let autorizados = limite.limiteTotal;
+
+        if(tipoDias === "F25"){
+            msg = `❌ ${autorizados} dias autorizados em Férias 2025.`;
+        }
+        else if(tipoDias === "Preferenciais"){
+            msg = `❌ ${autorizados} dias autorizados em Preferenciais 2026.`;
+        }
+        else if(tipoDias === "Não Preferenciais"){
+            msg = `❌ ${autorizados} dias autorizados em Não Preferenciais 2026.`;
+        }
+
+        document.getElementById("errorMessages").innerText = msg;
+        document.getElementById("errorMessages").style.display="block";
+        return;
+    }
+
+
+    await supabase.from("fid_coordenacao").insert([{
+        nome,
+        tipo_dias: tipoDias,
+        data_inicio: dataInicio,
+        data_fim: dataFim,
+        total_dias: totalDias
+    }]);
+
+    document.getElementById("successMessage").innerText =
+    `✔️ Pedido Registado: ${nome} (${tipoDias}) ${dataInicio} a ${dataFim} (${totalDias} dias úteis)`;
+    document.getElementById("errorMessages").style.display="none";
+
+    const div = document.createElement("div");
+    div.innerHTML = `
+        <strong>Pedido Registado:</strong><br>
+        Nome: ${nome}<br>
+        Tipo: ${tipoDias}<br>
+        Data Início: ${dataInicio}<br>
+        Data Fim: ${dataFim}<br>
+        Dias Úteis: ${totalDias}
+    `;
+    document.getElementById("resumoPedidos").appendChild(div);
+
+    e.target.reset();
+    document.getElementById("diasCalculados").innerText = "Dias úteis calculados: 0";
+});
+
+</script>
+
+</body>
+</html>
+
+
+    justify-content: center;
+    padding-top: 40px;
+}
 #formContainer {
     background-color: white;
     padding: 30px;
