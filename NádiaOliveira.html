@@ -350,7 +350,7 @@ const user = "EX10622";
 
     // Enviar dados para Supabase
     async function enviarAoSupabase(dados) {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/registosNSS`, {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/BPO_registosNSS`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -570,5 +570,6 @@ const user = "EX10622";
 
 </body>
 </html>
+
 
 
