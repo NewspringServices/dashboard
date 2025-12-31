@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+  <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8" />
@@ -11,6 +12,13 @@ body {
   margin: 0;
   padding: 10px;
   background: #f7f7f7;
+
+  /* Centralização completa */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 #topImage {
@@ -18,19 +26,6 @@ body {
   margin: 0 auto 20px auto;
   max-width: 150px;
   height: auto;
-}
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background: #f7f7f7;
-
-  /* Centralização completa */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* horizontal */
-  justify-content: center; /* vertical */
-  min-height: 100vh;
 }
 
 .form-container {
@@ -40,11 +35,12 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 400px;
-  margin: 20px auto; /* já centraliza horizontalmente */
+  margin: 20px auto;
 }
+
 /* Botões tipo registro */
 .tipo-btn {
-  padding: 10px 20px;       
+  padding: 10px 20px;
   border: none;
   border-radius: 6px;
   color: white;
@@ -52,12 +48,13 @@ body {
   font-weight: bold;
   font-size: 16px;
   transition: background 0.2s;
+  margin: 3px;
 }
 
 /* Cores por tipo */
 .tipo-btn[data-tipo="login"],
 .tipo-btn[data-tipo="logout"] {
-  background-color: #e53935; /* vermelho vivo */
+  background-color: #d50000; /* vermelho forte */
 }
 
 .tipo-btn[data-tipo="pausa1"],
@@ -67,40 +64,52 @@ body {
 }
 
 .tipo-btn[data-tipo="formacao"] {
-  background-color: #0b3d91; /* azul muito escuro */
+  background-color: #0b1f5e; /* azul muito escuro */
 }
 
 /* Hover */
 .tipo-btn[data-tipo="login"]:hover,
-.tipo-btn[data-tipo="logout"]:hover { background-color: #d32f2f; }
+.tipo-btn[data-tipo="logout"]:hover { background-color: #b71c1c; }
 .tipo-btn[data-tipo="pausa1"]:hover,
 .tipo-btn[data-tipo="pausa2"]:hover,
 .tipo-btn[data-tipo="refeicao"]:hover { background-color: #7cb342; }
-.tipo-btn[data-tipo="formacao"]:hover { background-color: #08296f; }
+.tipo-btn[data-tipo="formacao"]:hover { background-color: #041437; }
 
 /* Ativo */
 .tipo-btn.active { filter: brightness(85%); }
 
-/* Botões Submeter e Terminar */
-#btnSubmeter, #btnTerminar {
-  padding: 10px 20px;       
+#btnTerminar {
+  padding: 10px 20px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
   font-size: 16px;
-  background-color: #28a745; 
+  background-color: #d50000; /* vermelho forte */
   color: white;
   transition: background 0.2s;
 }
 
-#btnSubmeter:hover, #btnTerminar:hover {
-  background-color: #218838;
+#btnTerminar:hover {
+  background-color: #b71c1c; /* vermelho hover */
 }
 
 
+#btnSubmeter {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  transition: background 0.2s;
+}
 
-
+#btnSubmeter:hover {
+  background-color: #218838;
+}
 
 /* Status e mensagens */
 #statusContainer {
@@ -114,29 +123,6 @@ body {
   font-weight: bold;
   font-size: 14px;
   color: green;
-}
-
-#btnSubmeter, #btnTerminar {
-  padding: 5px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  margin: 0 5px;
-}
-
-#btnSubmeter { background-color: #28a745; color:white; }
-#btnTerminar { background-color: #dc3545; color:white; }
-
-/* GAMa */
-.form-container {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-  width: 100%;
-  max-width: 400px;
-  margin: auto 0;
 }
 
 .form-group {
@@ -183,6 +169,12 @@ select, input[type="text"], input[type="number"], input[type="radio"] {
 <body>
 
 <img id="topImage" src="logo.png" alt="Logo Newspring" />
+
+<!-- Área da data e nome -->
+<div id="infoContainer">
+  <div id="infoData" style="font-weight:bold;text-align:center;margin-bottom:5px;">📅 </div>
+  <div id="infoNome" style="font-weight:bold;text-align:center;margin-bottom:15px;">👤 </div>
+</div>
 
 <!-- Botões tipo registro horizontais -->
 <div id="tipoButtons">
@@ -256,16 +248,14 @@ const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
 // Mostrar data
-const infoData = document.createElement('div');
-infoData.style.fontWeight='bold';
-infoData.style.textAlign='center';
-infoData.style.marginBottom='15px';
-document.body.insertBefore(infoData, document.getElementById('tipoButtons'));
 function mostrarDataAtual() {
   const hoje = new Date();
-  infoData.textContent = `📅 ${hoje.toLocaleDateString('pt-BR')}`;
+  document.getElementById('infoData').textContent = `📅 ${hoje.toLocaleDateString('pt-BR')}`;
 }
 mostrarDataAtual();
+
+// Mostrar nome
+document.getElementById('infoNome').textContent = `👤 ${nome}`;
 
 // Seleção tipo
 tipoBtns.forEach(btn=>{
@@ -366,7 +356,7 @@ async function submeter(){
   }
 }
 
-// Terminar registro (pausas, refeição, formação)
+// Terminar registro
 async function terminar(){
   pararCronometro();
   fimDataHora = new Date();
@@ -390,7 +380,6 @@ async function terminar(){
     mostrarMensagem("❌ Erro ao enviar: "+err.message,false);
   }
 
-  // Reset
   btnTerm.style.display='none';
   btnSub.style.display='inline-block';
   btnSub.disabled=true;
@@ -426,7 +415,7 @@ endButton.addEventListener('click',function(){
   const documentos=document.getElementById('documentos').value;
   const tarefaFinalizada=document.getElementById('tarefaFinalizada').value;
   const tempo=tempoTarefa.value;
-  const colaborador="Telma Sofia Pereira Rosa";
+  const colaborador=nome;
   const startFormatted=formatDate(startTime);
   const endFormatted=formatDate(endTime);
 
@@ -445,5 +434,3 @@ function showMessage(message,type){ responseMessage.textContent=message; respons
 
 </body>
 </html>
-
-
