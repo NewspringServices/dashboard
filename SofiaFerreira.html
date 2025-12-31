@@ -1,577 +1,441 @@
 
-      <!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dashboard Newspring</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Newspring</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 10px;
-      background: #f7f7f7;
-    }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 10px;
+  background: #f7f7f7;
 
-    #topImage {
-      display: block;
-      margin: 0 auto 20px auto;
-      max-width: 150px;
-      height: auto;
-    }
-
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-
-    .tabs button {
-      padding: 10px 20px;
-      margin: 0 5px;
-      border: none;
-      cursor: pointer;
-      background-color: #ccc;
-      border-radius: 5px;
-    }
-
-    .tabs button.active {
-      background-color: #28a745;
-      color: white;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .barra-registo {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      gap: 15px;
-      max-width: 500px;
-      margin: 0 auto 20px auto;
-    }
-
-    .barra-registo .info-usuario {
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .barra-registo .select-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .barra-registo select {
-      width: 200px;
-      padding: 8px;
-    }
-
-    .barra-registo button#btnSubmeter {
-      padding: 6px 12px;
-      font-size: 14px;
-      width: auto;
-    }
-
-    .status {
-      font-size: 14px;
-    }
-
-    #mensagem {
-      margin-top: 10px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .form-container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-    }
-
-    .form-group {
-      margin-bottom: 15px;
-    }
-
-    select, input[type="text"], input[type="number"], button, input[type="radio"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-
-    .tipologia-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .tipologia-container div {
-      flex: 1;
-      text-align: center;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: space-between;
-    }
-
-    .button-container button {
-      width: 48%;
-    }
-
-    .message {
-      text-align: center;
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 4px;
-      display: none;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-
-    .titulo-gama {
-      font-size: 20px;
-      color: #28a745;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .form-container label {
-      font-weight: bold;
-      font-size: 14px;
-    }
-        
-    #cronometro {
-  display: none !important;
+  /* Centralização completa */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
-  </style>
+#topImage {
+  display: block;
+  margin: 0 auto 20px auto;
+  max-width: 150px;
+  height: auto;
+}
+
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+/* Botões tipo registro */
+.tipo-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  transition: background 0.2s;
+  margin: 3px;
+}
+
+/* Cores por tipo */
+.tipo-btn[data-tipo="login"],
+.tipo-btn[data-tipo="logout"] {
+  background-color: #d50000; /* vermelho forte */
+}
+
+.tipo-btn[data-tipo="pausa1"],
+.tipo-btn[data-tipo="pausa2"],
+.tipo-btn[data-tipo="refeicao"] {
+  background-color: #8bc34a; /* verde claro */
+}
+
+.tipo-btn[data-tipo="formacao"] {
+  background-color: #0b1f5e; /* azul muito escuro */
+}
+
+/* Hover */
+.tipo-btn[data-tipo="login"]:hover,
+.tipo-btn[data-tipo="logout"]:hover { background-color: #b71c1c; }
+.tipo-btn[data-tipo="pausa1"]:hover,
+.tipo-btn[data-tipo="pausa2"]:hover,
+.tipo-btn[data-tipo="refeicao"]:hover { background-color: #7cb342; }
+.tipo-btn[data-tipo="formacao"]:hover { background-color: #041437; }
+
+/* Ativo */
+.tipo-btn.active { filter: brightness(85%); }
+
+#btnTerminar {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #d50000; /* vermelho forte */
+  color: white;
+  transition: background 0.2s;
+}
+
+#btnTerminar:hover {
+  background-color: #b71c1c; /* vermelho hover */
+}
+
+
+#btnSubmeter {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  transition: background 0.2s;
+}
+
+#btnSubmeter:hover {
+  background-color: #218838;
+}
+
+/* Status e mensagens */
+#statusContainer {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#cronometro, #horaInicio, #horaFim, #mensagem {
+  display: block;
+  margin: 5px 0;
+  font-weight: bold;
+  font-size: 14px;
+  color: green;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+select, input[type="text"], input[type="number"], input[type="radio"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-container button {
+  width: 48%;
+}
+
+.message {
+  text-align: center;
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  display: none;
+}
+
+.success { background-color: #d4edda; color: #155724; }
+.error { background-color: #f8d7da; color: #721c24; }
+
+.titulo-gama {
+  font-size: 20px;
+  color: #28a745;
+  text-align: center;
+  margin-bottom: 20px;
+}
+</style>
 </head>
 <body>
 
-  <!-- Imagem pequena no topo da página -->
 <img id="topImage" src="logo.png" alt="Logo Newspring" />
 
-  <!-- Abas -->
-  <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
-    <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
-  </div>
+<!-- Área da data e nome -->
+<div id="infoContainer">
+  <div id="infoData" style="font-weight:bold;text-align:center;margin-bottom:5px;">📅 </div>
+  <div id="infoNome" style="font-weight:bold;text-align:center;margin-bottom:15px;">👤 </div>
+</div>
 
-  <!-- Conteúdo FYBDO -->
-  <div id="fybdo" class="tab-content active">
-    <div class="barra-registo">
-      <div id="infoData" class="info-data"></div>
-      <div class="info-usuario">User: EX10888<br>Nome:Sofia Isabel Martins Cruz Mendes Ferreira</div>
+<!-- Botões tipo registro horizontais -->
+<div id="tipoButtons">
+  <button class="tipo-btn" data-tipo="login">Login</button>
+  <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
+  <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
+  <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
+  <button class="tipo-btn" data-tipo="formacao">Formação</button>
+  <button class="tipo-btn" data-tipo="logout">Logout</button>
+</div>
 
-      <div class="select-row">
-        <label for="tipo">Tipo:</label>
-        <select id="tipo" onchange="mudarTipo()">
-          <option value="">Selecione</option>
-          <option value="login">Login</option>
-          <option value="logout">Logout</option>
-          <option value="pausa1">Pausa 1</option>
-          <option value="pausa2">Pausa 2</option>
-          <option value="refeicao">Refeição</option>
-          <option value="formacao">Formação</option>
-        </select>
-        <button id="btnSubmeter" onclick="submeter()">Submeter</button>
-      </div>
+<!-- Status -->
+<div id="statusContainer">
+  <span id="cronometro">⏱ 00:00:00</span>
+  <span id="horaInicio"></span>
+  <span id="horaFim"></span>
+  <span id="mensagem"></span>
+</div>
 
-      <span id="cronometro" class="status" style="display:none;">⏱ 00:00:00</span>
-      <span id="horaInicio" class="status" style="display:none;"></span>
-      <span id="horaFim" class="status" style="display:none;"></span>
-      <button id="btnTerminar" style="display:none;" onclick="terminar()">Terminar</button>
+<!-- Botões submeter/terminar -->
+<div style="text-align:center; margin-bottom:20px;">
+  <button id="btnSubmeter" onclick="submeter()" disabled>Submeter</button>
+  <button id="btnTerminar" onclick="terminar()" style="display:none;">Terminar</button>
+</div>
 
-      <span id="mensagem" class="status"></span>
+<!-- Formulário GAMa -->
+<div class="form-container">
+  <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
+  <form id="gamaForm">
+    <div class="form-group">
+      <label for="processoGama">Processo:</label>
+      <input type="text" id="processoGama" name="processoGama" required />
     </div>
-  </div>
-
-  <!-- Conteúdo GAMa -->
-  <div id="gama" class="tab-content">
-    <div class="form-container">
-      <h2 class="titulo-gama">Produção</h2>
-      <form id="gamaForm">
-
-        <div class="form-group">
-          <label for="processoGama">Processo:</label>
-          <input type="text" id="processoGama" name="processoGama" required />
-        </div>
-        <div class="form-group">
-          <label for="documentos">Documentos Tratados:</label>
-          <input type="number" id="documentos" name="documentos" required />
-        </div>
-        <div class="form-group">
+    <div class="form-group">
+      <label for="documentos">Documentos Tratados:</label>
+      <input type="number" id="documentos" name="documentos" required />
+    </div>
+    <div class="form-group">
           <label for="tarefaFinalizada">Tarefa Finalizada:</label>
           <select id="tarefaFinalizada" name="tarefaFinalizada" required>
                             <option value="AP index">AP - Indexações</option>
-
                <option value="PETS">PETS</option>
      <option value="DNP">DNP</option>
                      <option value="DNE">DNE</option>
-                        <option value="AP ABERT">AP - Entradas</option>
  <option value="AT Index">AT - Indexações</option>
-  <option value="AT ABERT">AT - Participações</option>
             <option value="Formação/Meetings">Formação/Meetings</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="tempoTarefa">Tempo da Tarefa:</label>
-          <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-        </div>
-        <div class="form-group button-container">
-          <button type="button" id="startButton">Iniciar Tarefa</button>
-          <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-        </div>
-        <div id="responseMessage" class="message"></div>
-      </form>
-    </div>
-  </div>
 
-  <!-- Scripts -->
-  <script>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tempoTarefa">Tempo da Tarefa:</label>
+      <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+    </div>
+    <div class="form-group button-container">
+      <button type="button" id="startButton">Iniciar Tarefa</button>
+      <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+    </div>
+    <div id="responseMessage" class="message"></div>
+  </form>
+</div>
+
+<script>
    const user = "EX10888";
     const nome = "Sofia Isabel Martins Cruz Mendes Ferreira"; 
+const tipoBtns = document.querySelectorAll('.tipo-btn');
+const btnSub = document.getElementById('btnSubmeter');
+const btnTerm = document.getElementById('btnTerminar');
+const cronometro = document.getElementById('cronometro');
+const horaIni = document.getElementById('horaInicio');
+const horaFim = document.getElementById('horaFim');
+const msgEl = document.getElementById('mensagem');
+let tipoSelecionado = "";
+let inicioDataHora, fimDataHora, timer, segundos=0;
 
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
+// Mostrar data
+function mostrarDataAtual() {
+  const hoje = new Date();
+  document.getElementById('infoData').textContent = `📅 ${hoje.toLocaleDateString('pt-BR')}`;
+}
+mostrarDataAtual();
 
-    const tipoSelect = document.getElementById('tipo');
-    const btnSubmeter = document.getElementById('btnSubmeter');
-    const btnTerminar = document.getElementById('btnTerminar');
-    const infoData = document.getElementById('infoData');
-    const cronometroEl = document.getElementById('cronometro');
-    const horaInicioEl = document.getElementById('horaInicio');
-    const horaFimEl = document.getElementById('horaFim');
-    const mensagemEl = document.getElementById('mensagem');
+// Mostrar nome
+document.getElementById('infoNome').textContent = `👤 ${nome}`;
 
-    let tipoSelecionado = "";
-    let inicioDataHora, fimDataHora, timer, segundos = 0;
+// Seleção tipo
+tipoBtns.forEach(btn=>{
+  btn.addEventListener('click', ()=> {
+    tipoSelecionado = btn.getAttribute('data-tipo');
+    tipoBtns.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    resetar();
+    btnSub.disabled = false;
+    msgEl.textContent = "";
+  });
+});
 
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-    const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-
-    // Exibe a data atual no topo da barra
-    function mostrarDataAtual() {
-      const hoje = new Date();
-      const dataFormatada = hoje.toLocaleDateString('pt-BR');
-      infoData.textContent = `📅 ${dataFormatada}`;
-    }
-
-    mostrarDataAtual();
-
-    // Ativa ou desativa o botão submeter conforme seleção
-    tipoSelect.addEventListener('change', () => {
-      tipoSelecionado = tipoSelect.value;
-      resetar();
-
-      btnSubmeter.disabled = !tipoSelecionado;
-      mensagemEl.textContent = "";
-    });
-
-    // Função para iniciar cronometro visual
-    function iniciarCronometro() {
-      segundos = 0;
-      cronometroEl.style.display = 'inline-block';
-      cronometroEl.textContent = `⏱ 00:00:00`;
-
-      timer = setInterval(() => {
-        segundos++;
-        const h = String(Math.floor(segundos / 3600)).padStart(2, '0');
-        const m = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
-        const s = String(segundos % 60).padStart(2, '0');
-        cronometroEl.textContent = `⏱ ${h}:${m}:${s}`;
-      }, 1000);
-    }
-
-    // Função para parar cronometro
-    function pararCronometro() {
-      clearInterval(timer);
-    }
-
-    // Exibe mensagem na tela (verde para sucesso, vermelho para erro)
-    function mostrarMensagem(texto, sucesso = true) {
-      mensagemEl.textContent = texto;
-      mensagemEl.style.color = sucesso ? 'green' : 'red';
-    }
-
-    // Reseta visual e variáveis para novo registro
-    function resetar() {
-      pararCronometro();
-      cronometroEl.style.display = 'none';
-      cronometroEl.textContent = '⏱ 00:00:00';
-
-      horaInicioEl.style.display = 'none';
-      horaInicioEl.textContent = '';
-
-      horaFimEl.style.display = 'none';
-      horaFimEl.textContent = '';
-
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = !tipoSelecionado;
-
-      mensagemEl.textContent = "";
-    }
-
-    // Função para formatar data/hora local em ISO-like string sem o fuso UTC
-    function formatarDataHoraLocal(date) {
-      const ano = date.getFullYear();
-      const mes = String(date.getMonth() + 1).padStart(2, '0');
-      const dia = String(date.getDate()).padStart(2, '0');
-      const hora = String(date.getHours()).padStart(2, '0');
-      const min = String(date.getMinutes()).padStart(2, '0');
-      const seg = String(date.getSeconds()).padStart(2, '0');
-      return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
-    }
-
-    // Enviar dados para Supabase
-    async function enviarAoSupabase(dados) {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/BPO_registosNSS`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_API_KEY,
-          'Authorization': `Bearer ${SUPABASE_API_KEY}`,
-          'Prefer': 'return=representation'
-        },
-        body: JSON.stringify(dados)
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
-      }
-
-      return await response.json();
-    }
-
-    // Clique no botão Submeter
-    btnSubmeter.addEventListener('click', async () => {
-      if (!tipoSelecionado) {
-        mostrarMensagem("Selecione um tipo de registo.", false);
-        return;
-      }
-
-      inicioDataHora = new Date();
-
-      // Se for login ou logout, não tem cronometro
-      if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-        horaInicioEl.textContent = `✔️ Registado`;
-        horaInicioEl.style.display = 'inline-block';
-
-        const dados = {
-          data: formatarDataHoraLocal(inicioDataHora).split('T')[0], // só a data local
-          user,
-          nome,
-          tipo: tipoSelecionado,
-          inicio: formatarDataHoraLocal(inicioDataHora),
-          fim: null,
-          duracao: null
-        };
-
-        try {
-          await enviarAoSupabase(dados);
-          mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-          btnSubmeter.disabled = true;
-        } catch (err) {
-          mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-        }
-      } else {
-        // Para outros tipos, iniciar cronometro e habilitar botão terminar
-        horaInicioEl.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
-        horaInicioEl.style.display = 'inline-block';
-
-        iniciarCronometro();
-
-        btnSubmeter.style.display = 'none';
-        btnTerminar.style.display = 'inline-block';
-        mostrarMensagem("");
-      }
-    });
-
-    // Clique no botão Terminar
-    btnTerminar.addEventListener('click', async () => {
-      pararCronometro();
-      fimDataHora = new Date();
-      const fimHoraStr = fimDataHora.toLocaleTimeString('pt-BR');
-      const duracaoSegundos = segundos;
-
-      horaFimEl.textContent = `🕔 Fim: ${fimHoraStr}`;
-      horaFimEl.style.display = 'inline-block';
-
-      // Calcula duração em horas decimais
-      const duracaoHoras = duracaoSegundos / 3600;
-
-      const dados = {
-        data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: formatarDataHoraLocal(fimDataHora),
-        duracao: parseFloat(duracaoHoras.toFixed(3))
-      };
-
-      try {
-        await enviarAoSupabase(dados);
-        mostrarMensagem("✔️ Registo enviado com sucesso!", true);
-      } catch (err) {
-        mostrarMensagem("❌ Erro ao enviar: " + err.message, false);
-      }
-
-      btnTerminar.style.display = 'none';
-      btnSubmeter.style.display = 'inline-block';
-      btnSubmeter.disabled = true;
-      tipoSelect.value = "";
-      tipoSelecionado = "";
-    });
-
-
-    // GAMa scripts
-      let startTime;
-    let endTime;
-    let timerInterval;
-
-    const startButton = document.getElementById('startButton');
-    const endButton = document.getElementById('endButton');
-    const tempoTarefa = document.getElementById('tempoTarefa');
-    const responseMessage = document.getElementById('responseMessage');
-
-    function formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-    }
-
-    function formatDate(date) {
-        const d = date.getDate().toString().padStart(2,'0');
-        const m = (date.getMonth() + 1).toString().padStart(2,'0');
-        const y = date.getFullYear();
-        const h = date.getHours().toString().padStart(2,'0');
-        const min = date.getMinutes().toString().padStart(2,'0');
-        const s = date.getSeconds().toString().padStart(2,'0');
-        return `${d}/${m}/${y} ${h}:${min}:${s}`;
-    }
-
-    startButton.addEventListener('click', function() {
-        startTime = new Date();
-        startButton.disabled = true;
-        endButton.disabled = false;
-
-        timerInterval = setInterval(() => {
-            const elapsed = Math.floor((new Date() - startTime)/1000);
-            tempoTarefa.value = formatTime(elapsed);
-        }, 1000);
-    });
-
-    endButton.addEventListener('click', function() {
-        clearInterval(timerInterval);
-        endTime = new Date();
-        const elapsed = Math.floor((endTime - startTime) / 1000);
-        tempoTarefa.value = formatTime(elapsed);
-        endButton.disabled = true;
-
-        const processoGama = document.getElementById('processoGama').value;
-        const documentos = document.getElementById('documentos').value;
-        const tarefaFinalizada = document.getElementById('tarefaFinalizada').value;
-        const tempo = tempoTarefa.value;
-        const colaborador = "Sofia Isabel Martins Cruz Mendes Ferreira";
-        const startFormatted = formatDate(startTime);
-        const endFormatted = formatDate(endTime);
-
-        fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/BPO_dadosprodução', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-                'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk',
-                'Prefer': 'return=representation'
-            
-            },
-            body: JSON.stringify({
-                inicio: startFormatted,
-                fim: endFormatted,
-                colaborador: colaborador,
-                processoGama: processoGama,
-                Documentos: Number(documentos),
-                tarefaFinalizada: tarefaFinalizada,
-                tempo: tempo
-            })
-        })
-        .then(async response => {
-            if (!response.ok) {
-                const errorBody = await response.text();
-                throw new Error(`Erro ${response.status}: ${errorBody}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            showMessage('Dados enviados com sucesso!', 'success');
-            document.getElementById('gamaForm').reset();
-            startButton.disabled = false;
-            tempoTarefa.value = '';
-        })
-        .catch(error => {
-            showMessage('Falha ao enviar os dados: ' + error.message, 'error');
-            startButton.disabled = false;
-        });
-    });
-
-    function showMessage(message, type) {
-        responseMessage.textContent = message;
-        responseMessage.className = 'message ' + type;
-        responseMessage.style.display = 'block';
-        setTimeout(() => { responseMessage.style.display = 'none'; }, 5000);
-    }
-    function showTab(tabId) {
-  // Remove a classe active de todas as abas
-  const tabs = document.querySelectorAll('.tab-content');
-  tabs.forEach(tab => tab.classList.remove('active'));
-
-  // Remove a classe active de todos os botões
-  const buttons = document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn => btn.classList.remove('active'));
-
-  // Adiciona a classe active na aba selecionada
-  document.getElementById(tabId).classList.add('active');
-
-  // Adiciona a classe active no botão correspondente
-  const button = Array.from(buttons).find(b => b.getAttribute('onclick').includes(tabId));
-  if (button) button.classList.add('active');
+function iniciarCronometro(){
+  segundos=0;
+  cronometro.style.display='inline-block';
+  cronometro.textContent=`⏱ 00:00:00`;
+  timer=setInterval(()=>{
+    segundos++;
+    const h=String(Math.floor(segundos/3600)).padStart(2,'0');
+    const m=String(Math.floor((segundos%3600)/60)).padStart(2,'0');
+    const s=String(segundos%60).padStart(2,'0');
+    cronometro.textContent=`⏱ ${h}:${m}:${s}`;
+  },1000);
+}
+function pararCronometro(){ clearInterval(timer); }
+function mostrarMensagem(texto, sucesso=true){ msgEl.textContent = texto; msgEl.style.color = sucesso?'green':'red'; }
+function resetar(){
+  pararCronometro();
+  cronometro.style.display='none';
+  cronometro.textContent='⏱ 00:00:00';
+  horaIni.style.display='none'; horaIni.textContent='';
+  horaFim.style.display='none'; horaFim.textContent='';
+  btnTerm.style.display='none';
+  btnSub.style.display='inline-block';
+  btnSub.disabled = !tipoSelecionado;
+  msgEl.textContent="";
 }
 
-  </script>
+// Enviar ao Supabase
+async function enviarAoSupabase(dados) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/BPO_registosNSS`, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'apikey':SUPABASE_API_KEY,
+      'Authorization':`Bearer ${SUPABASE_API_KEY}`,
+      'Prefer':'return=representation'
+    },
+    body:JSON.stringify(dados)
+  });
+  if(!response.ok){
+    const error = await response.json();
+    throw new Error(`Erro ${response.status}: ${JSON.stringify(error)}`);
+  }
+  return await response.json();
+}
+
+function formatarDataHoraLocal(date){
+  const ano = date.getFullYear();
+  const mes = String(date.getMonth()+1).padStart(2,'0');
+  const dia = String(date.getDate()).padStart(2,'0');
+  const hora = String(date.getHours()).padStart(2,'0');
+  const min = String(date.getMinutes()).padStart(2,'0');
+  const seg = String(date.getSeconds()).padStart(2,'0');
+  return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
+}
+
+// Submeter registro
+async function submeter(){
+  if(!tipoSelecionado){ mostrarMensagem("Selecione um tipo de registo.", false); return; }
+  inicioDataHora = new Date();
+
+  if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
+    horaIni.textContent = `✔️ Registado`;
+    horaIni.style.display='inline-block';
+    const dados = {
+      data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+      user, nome,
+      tipo: tipoSelecionado,
+      inicio: formatarDataHoraLocal(inicioDataHora),
+      fim: null,
+      duracao: null
+    };
+    try{
+      await enviarAoSupabase(dados);
+      mostrarMensagem("✔️ Registo enviado com sucesso!");
+      btnSub.disabled=true;
+    }catch(err){
+      mostrarMensagem("❌ Erro ao enviar: "+err.message, false);
+    }
+  } else {
+    horaIni.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
+    horaIni.style.display='inline-block';
+    iniciarCronometro();
+    btnSub.style.display='none';
+    btnTerm.style.display='inline-block';
+  }
+}
+
+// Terminar registro
+async function terminar(){
+  pararCronometro();
+  fimDataHora = new Date();
+  horaFim.textContent = `🕔 Fim: ${fimDataHora.toLocaleTimeString('pt-BR')}`;
+  horaFim.style.display='inline-block';
+
+  const duracaoHoras = segundos / 3600;
+  const dados = {
+    data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+    user, nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: formatarDataHoraLocal(fimDataHora),
+    duracao: parseFloat(duracaoHoras.toFixed(3))
+  };
+
+  try{
+    await enviarAoSupabase(dados);
+    mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+  }catch(err){
+    mostrarMensagem("❌ Erro ao enviar: "+err.message,false);
+  }
+
+  btnTerm.style.display='none';
+  btnSub.style.display='inline-block';
+  btnSub.disabled=true;
+  tipoSelecionado="";
+  tipoBtns.forEach(b=>b.classList.remove('active'));
+}
+
+// Scripts GAMa
+let startTime,endTime,timerInterval;
+const startButton=document.getElementById('startButton');
+const endButton=document.getElementById('endButton');
+const tempoTarefa=document.getElementById('tempoTarefa');
+const responseMessage=document.getElementById('responseMessage');
+
+function formatTime(seconds){const hours=Math.floor(seconds/3600);const minutes=Math.floor((seconds%3600)/60);const secs=seconds%60;return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;}
+function formatDate(date){const d=date.getDate().toString().padStart(2,'0');const m=(date.getMonth()+1).toString().padStart(2,'0');const y=date.getFullYear();const h=date.getHours().toString().padStart(2,'0');const min=date.getMinutes().toString().padStart(2,'0');const s=date.getSeconds().toString().padStart(2,'0');return `${d}/${m}/${y} ${h}:${min}:${s}`;}
+
+startButton.addEventListener('click',function(){
+  startTime=new Date();
+  startButton.disabled=true;
+  endButton.disabled=false;
+  timerInterval=setInterval(()=>{ const elapsed=Math.floor((new Date()-startTime)/1000); tempoTarefa.value=formatTime(elapsed);},1000);
+});
+
+endButton.addEventListener('click',function(){
+  clearInterval(timerInterval);
+  endTime=new Date();
+  const elapsed=Math.floor((endTime-startTime)/1000);
+  tempoTarefa.value=formatTime(elapsed);
+  endButton.disabled=true;
+
+  const processoGama=document.getElementById('processoGama').value;
+  const documentos=document.getElementById('documentos').value;
+  const tarefaFinalizada=document.getElementById('tarefaFinalizada').value;
+  const tempo=tempoTarefa.value;
+  const colaborador=nome;
+  const startFormatted=formatDate(startTime);
+  const endFormatted=formatDate(endTime);
+
+  fetch(`${SUPABASE_URL}/rest/v1/BPO_dadosprodução`,{
+    method:'POST',
+    headers:{ 'Content-Type':'application/json','apikey': SUPABASE_API_KEY,'Authorization':`Bearer ${SUPABASE_API_KEY}`,'Prefer':'return=representation'},
+    body:JSON.stringify({ inicio:startFormatted, fim:endFormatted, colaborador, processoGama, Documentos:Number(documentos), tarefaFinalizada, tempo })
+  }).then(async response=>{ if(!response.ok){ const errorBody=await response.text(); throw new Error(`Erro ${response.status}: ${errorBody}`); } return response.json();})
+  .then(data=>{ showMessage('Dados enviados com sucesso!','success'); document.getElementById('gamaForm').reset(); startButton.disabled=false; tempoTarefa.value='';})
+  .catch(error=>{ showMessage('Falha ao enviar os dados: '+error.message,'error'); startButton.disabled=false;});
+
+});
+
+function showMessage(message,type){ responseMessage.textContent=message; responseMessage.className='message '+type; responseMessage.style.display='block'; setTimeout(()=>{ responseMessage.style.display='none'; },5000);}
+</script>
 
 </body>
 </html>
-
-
-
-
