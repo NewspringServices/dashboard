@@ -57,35 +57,31 @@ body {
 /* Cores por tipo */
 .tipo-btn[data-tipo="login"],
 .tipo-btn[data-tipo="logout"] {
-  background-color: #dc3545; /* vermelho */
+  background-color: #e53935; /* vermelho vivo */
 }
 
 .tipo-btn[data-tipo="pausa1"],
-.tipo-btn[data-tipo="pausa2"] {
-  background-color: #ffc107; /* amarelo */
-  color: black; /* melhor contraste */
-}
-
+.tipo-btn[data-tipo="pausa2"],
 .tipo-btn[data-tipo="refeicao"] {
-  background-color: #fd7e14; /* laranja */
+  background-color: #8bc34a; /* verde claro */
 }
 
 .tipo-btn[data-tipo="formacao"] {
-  background-color: #0d6efd; /* azul escuro */
+  background-color: #0b3d91; /* azul muito escuro */
 }
 
 /* Hover */
 .tipo-btn[data-tipo="login"]:hover,
-.tipo-btn[data-tipo="logout"]:hover { background-color: #c82333; }
+.tipo-btn[data-tipo="logout"]:hover { background-color: #d32f2f; }
 .tipo-btn[data-tipo="pausa1"]:hover,
-.tipo-btn[data-tipo="pausa2"]:hover { background-color: #e0a800; color: black; }
-.tipo-btn[data-tipo="refeicao"]:hover { background-color: #e36a0c; }
-.tipo-btn[data-tipo="formacao"]:hover { background-color: #084298; }
+.tipo-btn[data-tipo="pausa2"]:hover,
+.tipo-btn[data-tipo="refeicao"]:hover { background-color: #7cb342; }
+.tipo-btn[data-tipo="formacao"]:hover { background-color: #08296f; }
 
 /* Ativo */
 .tipo-btn.active { filter: brightness(85%); }
 
-/* Botões Submeter e Terminar ficam verdes */
+/* Botões Submeter e Terminar */
 #btnSubmeter, #btnTerminar {
   padding: 10px 20px;       
   border: none;
@@ -101,6 +97,7 @@ body {
 #btnSubmeter:hover, #btnTerminar:hover {
   background-color: #218838;
 }
+
 
 
 
@@ -448,4 +445,5 @@ function showMessage(message,type){ responseMessage.textContent=message; respons
 
 </body>
 </html>
+
 
