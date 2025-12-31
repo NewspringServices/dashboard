@@ -1,4 +1,3 @@
-  
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -20,41 +19,30 @@ body {
   max-width: 150px;
   height: auto;
 }
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f7f7f7;
 
-.tabs {
+  /* Centralização completa */
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center; /* horizontal */
+  justify-content: center; /* vertical */
+  min-height: 100vh;
 }
 
-.tabs button {
-  padding: 10px 20px;
-  margin: 0 5px;
-  border: none;
-  cursor: pointer;
-  background-color: #ccc;
-  border-radius: 5px;
-  font-weight: bold;
+.form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 400px;
+  margin: 20px auto; /* já centraliza horizontalmente */
 }
-
-.tabs button.active {
-  background-color: #28a745;
-  color: white;
-}
-
-.tab-content {
-  display: none;
-}
-
-.tab-content.active {
-  display: block;
-}
-
-.status {
-  font-size: 14px;
-}
-
-/* Botões tipo registro horizontais, pequenos e fora da caixa */
+/* Botões tipo registro horizontais */
 #tipoButtons {
   display: flex;
   gap: 5px;
@@ -117,7 +105,7 @@ body {
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
   width: 100%;
   max-width: 400px;
-  margin: auto;
+  margin: auto 0;
 }
 
 .form-group {
@@ -165,12 +153,6 @@ select, input[type="text"], input[type="number"], input[type="radio"] {
 
 <img id="topImage" src="logo.png" alt="Logo Newspring" />
 
-<!-- Abas -->
-<div class="tabs">
-  <button class="tab-btn active" onclick="showTab('fybdo')">Registos NSS</button>
-  <button class="tab-btn" onclick="showTab('gama')">Plataforma Produção</button>
-</div>
-
 <!-- Botões tipo registro horizontais -->
 <div id="tipoButtons">
   <button class="tipo-btn" data-tipo="login">Login</button>
@@ -178,8 +160,7 @@ select, input[type="text"], input[type="number"], input[type="radio"] {
   <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
   <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
   <button class="tipo-btn" data-tipo="formacao">Formação</button>
-    <button class="tipo-btn" data-tipo="logout">Logout</button>
-
+  <button class="tipo-btn" data-tipo="logout">Logout</button>
 </div>
 
 <!-- Status -->
@@ -196,47 +177,40 @@ select, input[type="text"], input[type="number"], input[type="radio"] {
   <button id="btnTerminar" onclick="terminar()" style="display:none;">Terminar</button>
 </div>
 
-<!-- Conteúdo FYBDO -->
-<div id="fybdo" class="tab-content active">
-</div>
-
-<!-- Conteúdo GAMa -->
-<div id="gama" class="tab-content">
-  <div class="form-container">
-    <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
-    <form id="gamaForm">
-      <div class="form-group">
-        <label for="processoGama">Processo:</label>
-        <input type="text" id="processoGama" name="processoGama" required />
-      </div>
-      <div class="form-group">
-        <label for="documentos">Documentos Tratados:</label>
-        <input type="number" id="documentos" name="documentos" required />
-      </div>
-      <div class="form-group">
-        <label for="tarefaFinalizada">Tarefa Finalizada:</label>
-        <select id="tarefaFinalizada" name="tarefaFinalizada" required>
-          <option value="Reembolsos Multicare">Reembolsos Multicare</option>
-          <option value="Formação/Meetings">Formação/Meetings</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="tempoTarefa">Tempo da Tarefa:</label>
-        <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
-      </div>
-      <div class="form-group button-container">
-        <button type="button" id="startButton">Iniciar Tarefa</button>
-        <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
-      </div>
-      <div id="responseMessage" class="message"></div>
-    </form>
-  </div>
+<!-- Formulário GAMa -->
+<div class="form-container">
+  <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
+  <form id="gamaForm">
+    <div class="form-group">
+      <label for="processoGama">Processo:</label>
+      <input type="text" id="processoGama" name="processoGama" required />
+    </div>
+    <div class="form-group">
+      <label for="documentos">Documentos Tratados:</label>
+      <input type="number" id="documentos" name="documentos" required />
+    </div>
+    <div class="form-group">
+      <label for="tarefaFinalizada">Tarefa Finalizada:</label>
+      <select id="tarefaFinalizada" name="tarefaFinalizada" required>
+        <option value="Reembolsos Multicare">Reembolsos Multicare</option>
+        <option value="Formação/Meetings">Formação/Meetings</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="tempoTarefa">Tempo da Tarefa:</label>
+      <input type="text" id="tempoTarefa" name="tempoTarefa" readonly />
+    </div>
+    <div class="form-group button-container">
+      <button type="button" id="startButton">Iniciar Tarefa</button>
+      <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+    </div>
+    <div id="responseMessage" class="message"></div>
+  </form>
 </div>
 
 <script>
 const user = "EX04904";
 const nome = "Telma Sofia Pereira Rosa";
-
 const tipoBtns = document.querySelectorAll('.tipo-btn');
 const btnSub = document.getElementById('btnSubmeter');
 const btnTerm = document.getElementById('btnTerminar');
@@ -244,7 +218,6 @@ const cronometro = document.getElementById('cronometro');
 const horaIni = document.getElementById('horaInicio');
 const horaFim = document.getElementById('horaFim');
 const msgEl = document.getElementById('mensagem');
-
 let tipoSelecionado = "";
 let inicioDataHora, fimDataHora, timer, segundos=0;
 
@@ -256,7 +229,7 @@ const infoData = document.createElement('div');
 infoData.style.fontWeight='bold';
 infoData.style.textAlign='center';
 infoData.style.marginBottom='15px';
-document.getElementById('fybdo').appendChild(infoData);
+document.body.insertBefore(infoData, document.getElementById('tipoButtons'));
 function mostrarDataAtual() {
   const hoje = new Date();
   infoData.textContent = `📅 ${hoje.toLocaleDateString('pt-BR')}`;
@@ -287,29 +260,21 @@ function iniciarCronometro(){
     cronometro.textContent=`⏱ ${h}:${m}:${s}`;
   },1000);
 }
-
 function pararCronometro(){ clearInterval(timer); }
-
-function mostrarMensagem(texto, sucesso=true){
-  msgEl.textContent = texto;
-  msgEl.style.color = sucesso?'green':'red';
-}
-
+function mostrarMensagem(texto, sucesso=true){ msgEl.textContent = texto; msgEl.style.color = sucesso?'green':'red'; }
 function resetar(){
   pararCronometro();
   cronometro.style.display='none';
   cronometro.textContent='⏱ 00:00:00';
-  horaIni.style.display='none';
-  horaIni.textContent='';
-  horaFim.style.display='none';
-  horaFim.textContent='';
+  horaIni.style.display='none'; horaIni.textContent='';
+  horaFim.style.display='none'; horaFim.textContent='';
   btnTerm.style.display='none';
   btnSub.style.display='inline-block';
   btnSub.disabled = !tipoSelecionado;
   msgEl.textContent="";
 }
 
-// Submeter registro
+// Enviar ao Supabase
 async function enviarAoSupabase(dados) {
   const response = await fetch(`${SUPABASE_URL}/rest/v1/BPO_registosNSS`, {
     method:'POST',
@@ -338,32 +303,63 @@ function formatarDataHoraLocal(date){
   return `${ano}-${mes}-${dia}T${hora}:${min}:${seg}`;
 }
 
+// Submeter registro
 async function submeter(){
-  if(!tipoSelecionado){ mostrarMensagem("Selecione um tipo de registo.",false); return; }
+  if(!tipoSelecionado){ mostrarMensagem("Selecione um tipo de registo.", false); return; }
   inicioDataHora = new Date();
+
   if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
     horaIni.textContent = `✔️ Registado`;
     horaIni.style.display='inline-block';
-    const dados = { data:formatarDataHoraLocal(inicioDataHora).split('T')[0], user,nome,tipo:tipoSelecionado, inicio:formatarDataHoraLocal(inicioDataHora), fim:null, duracao:null };
-    try{ await enviarAoSupabase(dados); mostrarMensagem("✔️ Registo enviado com sucesso!"); btnSub.disabled=true; } catch(err){ mostrarMensagem("❌ Erro ao enviar: "+err.message,false);}
+    const dados = {
+      data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+      user, nome,
+      tipo: tipoSelecionado,
+      inicio: formatarDataHoraLocal(inicioDataHora),
+      fim: null,
+      duracao: null
+    };
+    try{
+      await enviarAoSupabase(dados);
+      mostrarMensagem("✔️ Registo enviado com sucesso!");
+      btnSub.disabled=true;
+    }catch(err){
+      mostrarMensagem("❌ Erro ao enviar: "+err.message, false);
+    }
   } else {
     horaIni.textContent = `🕒 Início: ${inicioDataHora.toLocaleTimeString('pt-BR')}`;
     horaIni.style.display='inline-block';
     iniciarCronometro();
     btnSub.style.display='none';
     btnTerm.style.display='inline-block';
-    mostrarMensagem("");
   }
 }
 
+// Terminar registro (pausas, refeição, formação)
 async function terminar(){
   pararCronometro();
   fimDataHora = new Date();
   horaFim.textContent = `🕔 Fim: ${fimDataHora.toLocaleTimeString('pt-BR')}`;
   horaFim.style.display='inline-block';
+
   const duracaoHoras = segundos / 3600;
-  const dados = { data:formatarDataHoraLocal(inicioDataHora).split('T')[0], user,nome,tipo:tipoSelecionado, inicio:formatarDataHoraLocal(inicioDataHora), fim:formatarDataHoraLocal(fimDataHora), duracao:parseFloat(duracaoHoras.toFixed(3)) };
-  try{ await enviarAoSupabase(dados); mostrarMensagem("✔️ Registo enviado com sucesso!",true);} catch(err){ mostrarMensagem("❌ Erro ao enviar: "+err.message,false);}
+  const dados = {
+    data: formatarDataHoraLocal(inicioDataHora).split('T')[0],
+    user, nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: formatarDataHoraLocal(fimDataHora),
+    duracao: parseFloat(duracaoHoras.toFixed(3))
+  };
+
+  try{
+    await enviarAoSupabase(dados);
+    mostrarMensagem("✔️ Registo enviado com sucesso!", true);
+  }catch(err){
+    mostrarMensagem("❌ Erro ao enviar: "+err.message,false);
+  }
+
+  // Reset
   btnTerm.style.display='none';
   btnSub.style.display='inline-block';
   btnSub.disabled=true;
@@ -371,7 +367,7 @@ async function terminar(){
   tipoBtns.forEach(b=>b.classList.remove('active'));
 }
 
-// Scripts GAMa (igual ao original)
+// Scripts GAMa
 let startTime,endTime,timerInterval;
 const startButton=document.getElementById('startButton');
 const endButton=document.getElementById('endButton');
@@ -403,7 +399,7 @@ endButton.addEventListener('click',function(){
   const startFormatted=formatDate(startTime);
   const endFormatted=formatDate(endTime);
 
-  fetch('https://bijndfsxrzjviwrdvwms.supabase.co/rest/v1/BPO_dadosprodução',{
+  fetch(`${SUPABASE_URL}/rest/v1/BPO_dadosprodução`,{
     method:'POST',
     headers:{ 'Content-Type':'application/json','apikey': SUPABASE_API_KEY,'Authorization':`Bearer ${SUPABASE_API_KEY}`,'Prefer':'return=representation'},
     body:JSON.stringify({ inicio:startFormatted, fim:endFormatted, colaborador, processoGama, Documentos:Number(documentos), tarefaFinalizada, tempo })
@@ -414,16 +410,6 @@ endButton.addEventListener('click',function(){
 });
 
 function showMessage(message,type){ responseMessage.textContent=message; responseMessage.className='message '+type; responseMessage.style.display='block'; setTimeout(()=>{ responseMessage.style.display='none'; },5000);}
-
-function showTab(tabId){
-  const tabs=document.querySelectorAll('.tab-content');
-  tabs.forEach(tab=>tab.classList.remove('active'));
-  const buttons=document.querySelectorAll('.tab-btn');
-  buttons.forEach(btn=>btn.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
-  const button=Array.from(buttons).find(b=>b.getAttribute('onclick').includes(tabId));
-  if(button) button.classList.add('active');
-}
 </script>
 
 </body>
