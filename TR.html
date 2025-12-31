@@ -42,34 +42,68 @@ body {
   max-width: 400px;
   margin: 20px auto; /* já centraliza horizontalmente */
 }
-/* Botões tipo registro horizontais */
-#tipoButtons {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
-}
-
+/* Botões tipo registro */
 .tipo-btn {
-  padding: 5px 10px;
+  padding: 10px 20px;       
   border: none;
-  border-radius: 4px;
-  background-color: #ccc;
+  border-radius: 6px;
+  color: white;
   cursor: pointer;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  transition: background 0.2s;
 }
 
-.tipo-btn.active {
-  background-color: #28a745;
-  color: white;
+/* Cores por tipo */
+.tipo-btn[data-tipo="login"],
+.tipo-btn[data-tipo="logout"] {
+  background-color: #dc3545; /* vermelho */
 }
 
-.tipo-btn:hover {
-  background-color: #20c14a;
-  color: white;
+.tipo-btn[data-tipo="pausa1"],
+.tipo-btn[data-tipo="pausa2"] {
+  background-color: #ffc107; /* amarelo */
+  color: black; /* melhor contraste */
 }
+
+.tipo-btn[data-tipo="refeicao"] {
+  background-color: #fd7e14; /* laranja */
+}
+
+.tipo-btn[data-tipo="formacao"] {
+  background-color: #0d6efd; /* azul escuro */
+}
+
+/* Hover */
+.tipo-btn[data-tipo="login"]:hover,
+.tipo-btn[data-tipo="logout"]:hover { background-color: #c82333; }
+.tipo-btn[data-tipo="pausa1"]:hover,
+.tipo-btn[data-tipo="pausa2"]:hover { background-color: #e0a800; color: black; }
+.tipo-btn[data-tipo="refeicao"]:hover { background-color: #e36a0c; }
+.tipo-btn[data-tipo="formacao"]:hover { background-color: #084298; }
+
+/* Ativo */
+.tipo-btn.active { filter: brightness(85%); }
+
+/* Botões Submeter e Terminar ficam verdes */
+#btnSubmeter, #btnTerminar {
+  padding: 10px 20px;       
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 16px;
+  background-color: #28a745; 
+  color: white;
+  transition: background 0.2s;
+}
+
+#btnSubmeter:hover, #btnTerminar:hover {
+  background-color: #218838;
+}
+
+
+
 
 /* Status e mensagens */
 #statusContainer {
@@ -414,3 +448,4 @@ function showMessage(message,type){ responseMessage.textContent=message; respons
 
 </body>
 </html>
+
