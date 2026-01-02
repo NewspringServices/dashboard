@@ -23,9 +23,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background:
-    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
-    url('TESTE1.jpg') no-repeat center/cover fixed;
+
+  /* FUNDO SEM IMAGEM */
+  background: linear-gradient(135deg, #1e293b, #0f172a);
 }
 
 /* CONTAINER */
@@ -52,9 +52,9 @@ body {
 .logo img {
   max-width: 110px;
   margin-bottom: 20px;
-  filter: drop-shadow(0 8px 12px rgba(0,0,0,.4));
 }
 
+/* TÍTULO */
 h2 {
   font-weight: 600;
   margin-bottom: 5px;
@@ -78,6 +78,7 @@ input {
   border: none;
   background: rgba(255,255,255,.15);
   color: #fff;
+  outline: none;
 }
 
 input::placeholder {
@@ -151,6 +152,7 @@ form button {
     <input type="password" id="password" placeholder="Senha" required />
     <button type="submit">Entrar</button>
   </form>
+
   <p id="error-message" class="error-message"></p>
   <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
 </div>
@@ -168,6 +170,7 @@ form button {
     <input type="password" id="adminPass" placeholder="Senha" required />
     <button type="submit">Entrar</button>
   </form>
+
   <p id="admin-error-message" class="error-message"></p>
   <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
 </div>
