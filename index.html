@@ -1,265 +1,282 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Newspring Services</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Newspring Services</title>
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #333;
-      background: url('TESTE1.jpg') no-repeat center center fixed;
-      background-size: cover;
-    }
+<style>
+:root {
+  --primary: #6366f1;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --glass: rgba(255, 255, 255, 0.15);
+  --border: rgba(255, 255, 255, 0.25);
+}
 
-    .container {
-      background-color: #ffffff;
-      padding: 40px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      position: relative;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    .logo {
-      margin-bottom: 20px;
-    }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background:
+    linear-gradient(rgba(0,0,0,.45), rgba(0,0,0,.45)),
+    url('TESTE1.jpg') no-repeat center/cover fixed;
+}
 
-    .logo img {
-      max-width: 120px;
-      height: auto;
-      display: inline-block;
-    }
+/* CONTAINER 3D */
+.container {
+  background: var(--glass);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border);
+  padding: 40px;
+  border-radius: 22px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  color: #fff;
 
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 14px;
-    }
+  box-shadow:
+    0 25px 45px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.2);
 
-    button {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      font-size: 14px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
+  animation: fadeUp .7s ease;
+}
 
-    .btn-colaborador {
-      background-color: #28a745;
-      color: white;
-    }
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
-    .btn-colaborador:hover {
-      background-color: #218838;
-    }
+/* LOGO */
+.logo img {
+  max-width: 110px;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.4));
+}
 
-    .btn-administrador {
-      background-color: #007bff;
-      color: white;
-    }
+h2 {
+  margin-bottom: 20px;
+  font-weight: 600;
+  letter-spacing: .5px;
+}
 
-    .btn-administrador:hover {
-      background-color: #0056b3;
-    }
+/* INPUTS */
+input {
+  width: 100%;
+  padding: 12px 14px;
+  margin: 10px 0;
+  border-radius: 12px;
+  border: none;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+  transition: all .3s ease;
+}
 
-    form button[type="submit"] {
-      background-color: #28a745;
-      color: white;
-    }
+input::placeholder {
+  color: rgba(255,255,255,.75);
+}
 
-    form button[type="submit"]:hover {
-      background-color: #218838;
-    }
+input:focus {
+  background: rgba(255,255,255,.25);
+  transform: translateY(-1px);
+}
 
-    .btn-voltar {
-      background-color: #dc3545;
-      color: white;
-      margin-top: 20px;
-    }
+/* BOTÕES */
+button {
+  width: 100%;
+  padding: 13px;
+  margin-top: 12px;
+  border-radius: 14px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
 
-    .btn-voltar:hover {
-      background-color: #b02a37;
-    }
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.35),
+    inset 0 -3px 0 rgba(0,0,0,.2);
 
-    .error-message {
-      color: #e74c3c;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-  </style>
+  transition: all .25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 15px 30px rgba(0,0,0,.45),
+    inset 0 -3px 0 rgba(0,0,0,.25);
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* CORES */
+.btn-colaborador {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.btn-administrador {
+  background: linear-gradient(135deg, #6366f1, #4338ca);
+}
+
+form button {
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.btn-voltar {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+}
+
+/* ERRO */
+.error-message {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #fecaca;
+}
+</style>
 </head>
+
 <body>
 
-  <div id="menu" class="container">
-    <div class="logo">
-      <img src="logo.png" alt="Logo FYBDO" />
-    </div>
-    <h2>Newspring Services</h2>
-    <button class="btn-colaborador" onclick="mostrarLoginColaborador()">Área Colaborador</button>
-    <button class="btn-administrador" onclick="mostrarLoginAdministrador()">Área Administrador</button>
+<div id="menu" class="container">
+  <div class="logo">
+    <img src="logo.png" alt="Logo FYBDO" />
   </div>
+  <h2>Newspring Services</h2>
+  <button class="btn-colaborador" onclick="mostrarLoginColaborador()">Área Colaborador</button>
+  <button class="btn-administrador" onclick="mostrarLoginAdministrador()">Área Administrador</button>
+</div>
 
-  <div id="loginColaborador" class="container" style="display:none;">
-    <div class="logo">
-      <img src="logo.png" alt="Logo FYBDO" />
-    </div>
-    <h2>ÁREA DE COLABORADOR</h2>
-    <form id="loginForm" onsubmit="return validarLogin(event)">
-      <input type="text" id="username" placeholder="Usuário" required />
-      <input type="password" id="password" placeholder="Senha" required />
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="error-message" class="error-message"></p>
-    <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
+<div id="loginColaborador" class="container" style="display:none;">
+  <div class="logo">
+    <img src="logo.png" alt="Logo FYBDO" />
   </div>
+  <h2>ÁREA DE COLABORADOR</h2>
+  <form id="loginForm" onsubmit="return validarLogin(event)">
+    <input type="text" id="username" placeholder="Usuário" required />
+    <input type="password" id="password" placeholder="Senha" required />
+    <button type="submit">Entrar</button>
+  </form>
+  <p id="error-message" class="error-message"></p>
+  <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
+</div>
 
-  <div id="loginAdministrador" class="container" style="display:none;">
-    <div class="logo">
-      <img src="logo.png" alt="Logo FYBDO" />
-    </div>
-    <h2>ÁREA DE ADMINISTRADOR</h2>
-    <form id="adminForm" onsubmit="return validarAdmin(event)">
-      <input type="text" id="adminUser" placeholder="Usuário" required />
-      <input type="password" id="adminPass" placeholder="Senha" required />
-      <button type="submit">Entrar</button>
-    </form>
-    <p id="admin-error-message" class="error-message"></p>
-    <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
+<div id="loginAdministrador" class="container" style="display:none;">
+  <div class="logo">
+    <img src="logo.png" alt="Logo FYBDO" />
   </div>
+  <h2>ÁREA DE ADMINISTRADOR</h2>
+  <form id="adminForm" onsubmit="return validarAdmin(event)">
+    <input type="text" id="adminUser" placeholder="Usuário" required />
+    <input type="password" id="adminPass" placeholder="Senha" required />
+    <button type="submit">Entrar</button>
+  </form>
+  <p id="admin-error-message" class="error-message"></p>
+  <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
+</div>
 
-  <script>
+<script>
+function mostrarLoginColaborador() {
+  menu.style.display = "none";
+  loginColaborador.style.display = "block";
+}
 
-    function mostrarLoginColaborador() {
-      document.getElementById('menu').style.display = 'none';
-      document.getElementById('loginColaborador').style.display = 'block';
-    }
+function mostrarLoginAdministrador() {
+  menu.style.display = "none";
+  loginAdministrador.style.display = "block";
+}
 
-    function mostrarLoginAdministrador() {
-      document.getElementById('menu').style.display = 'none';
-      document.getElementById('loginAdministrador').style.display = 'block';
-    }
+function voltarMenu() {
+  loginColaborador.style.display = "none";
+  loginAdministrador.style.display = "none";
+  menu.style.display = "block";
 
-    function voltarMenu() {
-      document.getElementById('loginColaborador').style.display = 'none';
-      document.getElementById('loginAdministrador').style.display = 'none';
-      document.getElementById('menu').style.display = 'block';
+  document.getElementById("error-message").textContent = "";
+  document.getElementById("admin-error-message").textContent = "";
 
-      document.getElementById('error-message').textContent = '';
-      document.getElementById('admin-error-message').textContent = '';
+  loginForm.reset();
+  adminForm.reset();
+}
 
-      document.getElementById('loginForm').reset();
-      document.getElementById('adminForm').reset();
-    }
+const usuarios = [
+  { usuario: "EX04904", senha: "Telma*1993", pagina: "TR.html" },
+  { usuario: "TR", senha: "TR", pagina: "trr.html" },
+  { usuario: "EX10359", senha: "JOEL*NSS02", pagina: "JoelMundjanga.html" },
+  { usuario: "EX10362", senha: "ORLANDA*NSS03", pagina: "OrlandaFrancisco.html" },
+  { usuario: "EX10418", senha: "JOANA*NSS05", pagina: "JoanaFigueiras.html" },
+  { usuario: "EX10613", senha: "CARLA*NSS08", pagina: "CarlaTrindade.html" },
+  { usuario: "EX10622", senha: "NADIA*NSS09", pagina: "NádiaOliveira.html" },
+  { usuario: "EX10867", senha: "GILDA*NSS10", pagina: "GildaAnjos.html" },
+  { usuario: "EX11321", senha: "NSS*KARINA", pagina: "KarinaMartins.html" },
+  { usuario: "EX10677", senha: "NSS*ANDREIA", pagina: "AndreiaGrilo.html" },
+  { usuario: "EX10105", senha: "NSS*MONICA", pagina: "MonicaValente.html" },
+  { usuario: "EX04620", senha: "NSS*CARINA", pagina: "CarinaLavado.html" },
+  { usuario: "EX11405", senha: "NSS*MGOIS", pagina: "MadalenaGois.html" },
+  { usuario: "EX11397", senha: "NSS*CPADEIRO", pagina: "CarolinaPadeiro.html" },
+  { usuario: "EX11398", senha: "NSS*ANABARAO", pagina: "AnaBarão.html" },
+  { usuario: "EX11399", senha: "NSS*MPENGO", pagina: "DélciaMpengo.html" },
+  { usuario: "EX11400", senha: "NSS*DCRUZ", pagina: "DélioCruz.html" },
+  { usuario: "EX11401", senha: "NSS*JSOUSA", pagina: "JoanaSousa.html" },
+  { usuario: "EX11402", senha: "NSS*LMATOS", pagina: "LeandroMatos.html" },
+  { usuario: "EX11403", senha: "NSS*MARTAF", pagina: "MartaFernandes.html" },
+  { usuario: "GANJOS", senha: "NSS*GANJOS", pagina: "GildaAnjos.auto.html" },
+  { usuario: "EX11561", senha: "NSS*VERAF", pagina: "VeraFreitas.html" },
+  { usuario: "EX11530", senha: "NSS*COSTA", pagina: "CláudioCosta.html" },
+  { usuario: "EX11531", senha: "NSS*FABIO", pagina: "FábioAbreu.html" },
+  { usuario: "EX10884", senha: "NSS*RACHEL", pagina: "RachelCoelho.html" },
+  { usuario: "EX10886", senha: "NSS*SUSANA", pagina: "SusanaBordalo.html" },
+  { usuario: "EX10888", senha: "NSS*SOFIA", pagina: "SofiaFerreira.html" },
+  { usuario: "EX10889", senha: "NSS*MARCOS", pagina: "MarcosMoura.html" },
+  { usuario: "EX10891", senha: "NSS*SARA", pagina: "SaraChotumiã.html" },
+  { usuario: "EX04695", senha: "NSS*EX04695", pagina: "SandraFacao.html" },
+  { usuario: "EX10579", senha: "NSS*EX10579", pagina: "CarlaReis.html" },
+  { usuario: "EX08554", senha: "NSS*EX08554", pagina: "PatriciaAndre.html" }
+];
 
-    const usuarios = [
-      { usuario: "EX04904", senha: "Telma*1993", pagina: "TR.html" },
-            { usuario: "TR", senha: "TR", pagina: "trr.html" },
+function validarLogin(event) {
+  event.preventDefault();
+  const usuario = username.value.trim();
+  const senha = password.value.trim();
+  const erro = document.getElementById("error-message");
 
-      { usuario: "EX10359", senha: "JOEL*NSS02", pagina: "JoelMundjanga.html" },
-      { usuario: "EX10362", senha: "ORLANDA*NSS03", pagina: "OrlandaFrancisco.html" },
-      { usuario: "EX10418", senha: "JOANA*NSS05", pagina: "JoanaFigueiras.html" },
-      { usuario: "EX10613", senha: "CARLA*NSS08", pagina: "CarlaTrindade.html" },
-      { usuario: "EX10622", senha: "NADIA*NSS09", pagina: "NádiaOliveira.html" },
-      { usuario: "EX10867", senha: "GILDA*NSS10", pagina: "GildaAnjos.html" },
-      { usuario: "EX11321", senha: "NSS*KARINA", pagina: "KarinaMartins.html" },
-      { usuario: "EX10677", senha: "NSS*ANDREIA", pagina: "AndreiaGrilo.html" },
-      { usuario: "EX10105", senha: "NSS*MONICA", pagina: "MonicaValente.html" },
-      { usuario: "EX04620", senha: "NSS*CARINA", pagina: "CarinaLavado.html" },
-      { usuario: "EX11405", senha: "NSS*MGOIS", pagina: "MadalenaGois.html" },
-      { usuario: "EX11397", senha: "NSS*CPADEIRO", pagina: "CarolinaPadeiro.html" },
-      { usuario: "EX11398", senha: "NSS*ANABARAO", pagina: "AnaBarão.html" },
-      { usuario: "EX11399", senha: "NSS*MPENGO", pagina: "DélciaMpengo.html" },
-      { usuario: "EX11400", senha: "NSS*DCRUZ", pagina: "DélioCruz.html" },
-      { usuario: "EX11401", senha: "NSS*JSOUSA", pagina: "JoanaSousa.html" },
-      { usuario: "EX11402", senha: "NSS*LMATOS", pagina: "LeandroMatos.html" },
-      { usuario: "EX11403", senha: "NSS*MARTAF", pagina: "MartaFernandes.html" },
-      { usuario: "GANJOS", senha: "NSS*GANJOS", pagina: "GildaAnjos.auto.html" },
-      { usuario: "EX11561", senha: "NSS*VERAF", pagina: "VeraFreitas.html" },
-      { usuario: "EX11530", senha: "NSS*COSTA", pagina: "CláudioCosta.html" },
-      { usuario: "EX11531", senha: "NSS*FABIO", pagina: "FábioAbreu.html" },
-      { usuario: "EX10884", senha: "NSS*RACHEL", pagina: "RachelCoelho.html" },
-      { usuario: "EX10886", senha: "NSS*SUSANA", pagina: "SusanaBordalo.html" },
-      { usuario: "EX10888", senha: "NSS*SOFIA", pagina: "SofiaFerreira.html" },
-      { usuario: "EX10889", senha: "NSS*MARCOS", pagina: "MarcosMoura.html" },
-      { usuario: "EX10891", senha: "NSS*SARA", pagina: "SaraChotumiã.html" },
-      { usuario: "EX04695", senha: "NSS*EX04695", pagina: "SandraFacao.html" },
-      { usuario: "EX10579", senha: "NSS*EX10579", pagina: "CarlaReis.html" },
-      { usuario: "EX08554", senha: "NSS*EX08554", pagina: "PatriciaAndre.html" }
-    ];
+  const valido = usuarios.find(u => u.usuario === usuario && u.senha === senha);
+  valido ? window.location.href = valido.pagina : erro.textContent = "Usuário ou senha incorretos.";
+}
 
-    function validarLogin(event) {
-      event.preventDefault();
-      const usuario = document.getElementById("username").value.trim();
-      const senha = document.getElementById("password").value.trim();
-      const errorMessage = document.getElementById("error-message");
-      errorMessage.textContent = "";
+const adminUsuarios = [
+  { usuario: "BPO", senha: "NSS*BPOTR", pagina: "BPO.html" },
+  { usuario: "EX04904", senha: "Telma", pagina: "https://script.google.com/macros/s/AKfycbxxayKo6UagQQfXhltAnDOH8xqKYtEcZZH5miH2MYuzb4ryzSQfumNlXDN9OxskPmn5aw/exec" },
+  { usuario: "EX10622", senha: "NSS*NADIA", pagina: "https://script.google.com/macros/s/AKfycbxxayKo6UagQQfXhltAnDOH8xqKYtEcZZH5miH2MYuzb4ryzSQfumNlXDN9OxskPmn5aw/exec" },
+  { usuario: "Worten", senha: "NSS*Worten_Admin", pagina: "WORTEN.html" }
+];
 
-      const usuarioValido = usuarios.find(u => u.usuario === usuario && u.senha === senha);
+function validarAdmin(event) {
+  event.preventDefault();
+  const usuario = adminUser.value.trim();
+  const senha = adminPass.value.trim();
+  const erro = document.getElementById("admin-error-message");
 
-      if (usuarioValido) {
-        window.location.href = usuarioValido.pagina;  /* 👉 ABRE MESMA PÁGINA */
-      } else {
-        errorMessage.textContent = "Usuário ou senha incorretos.";
-      }
-    }
-
-    const adminUsuarios = [
-      { usuario: "BPO", senha: "NSS*BPOTR", pagina: "BPO.html" },
-      { usuario: "EX04904", senha: "Telma", pagina: "https://script.google.com/macros/s/AKfycbxxayKo6UagQQfXhltAnDOH8xqKYtEcZZH5miH2MYuzb4ryzSQfumNlXDN9OxskPmn5aw/exec" },
-      { usuario: "EX10622", senha: "NSS*NADIA", pagina: "https://script.google.com/macros/s/AKfycbxxayKo6UagQQfXhltAnDOH8xqKYtEcZZH5miH2MYuzb4ryzSQfumNlXDN9OxskPmn5aw/exec" },
-      { usuario: "Worten", senha: "NSS*Worten_Admin", pagina: "WORTEN.html" }
-    ];
-
-    function validarAdmin(event) {
-      event.preventDefault();
-      const usuario = document.getElementById("adminUser").value.trim();
-      const senha = document.getElementById("adminPass").value.trim();
-      const errorMessage = document.getElementById("admin-error-message");
-      errorMessage.textContent = "";
-
-      const adminValido = adminUsuarios.find(a => a.usuario === usuario && a.senha === senha);
-
-      if (adminValido) {
-        window.location.href = adminValido.pagina;  /* 👉 ABRE MESMA PÁGINA */
-      } else {
-        errorMessage.textContent = "Usuário ou senha incorretos.";
-      }
-    }
-
-  </script>
+  const valido = adminUsuarios.find(a => a.usuario === usuario && a.senha === senha);
+  valido ? window.location.href = valido.pagina : erro.textContent = "Usuário ou senha incorretos.";
+}
+</script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
