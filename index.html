@@ -7,9 +7,6 @@
 
 <style>
 :root {
-  --primary: #6366f1;
-  --success: #22c55e;
-  --danger: #ef4444;
   --glass: rgba(255, 255, 255, 0.15);
   --border: rgba(255, 255, 255, 0.25);
 }
@@ -31,34 +28,24 @@ body {
     url('TESTE1.jpg') no-repeat center/cover fixed;
 }
 
-/* CONTAINER 3D */
+/* CONTAINER */
 .container {
   background: var(--glass);
   backdrop-filter: blur(15px);
   border: 1px solid var(--border);
   padding: 40px;
   border-radius: 22px;
-  width: 100%;
   max-width: 420px;
+  width: 100%;
   text-align: center;
   color: #fff;
-
-  box-shadow:
-    0 25px 45px rgba(0,0,0,.4),
-    inset 0 1px 0 rgba(255,255,255,.2);
-
+  box-shadow: 0 25px 45px rgba(0,0,0,.4);
   animation: fadeUp .7s ease;
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 /* LOGO */
@@ -69,32 +56,32 @@ body {
 }
 
 h2 {
-  margin-bottom: 20px;
   font-weight: 600;
-  letter-spacing: .5px;
+  margin-bottom: 5px;
+}
+
+/* SUBTÍTULO */
+.subtitulo {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.75);
+  margin-bottom: 25px;
 }
 
 /* INPUTS */
 input {
   width: 100%;
-  padding: 12px 14px;
+  padding: 12px;
   margin: 10px 0;
   border-radius: 12px;
   border: none;
   background: rgba(255,255,255,.15);
   color: #fff;
-  font-size: 14px;
-  outline: none;
-  transition: all .3s ease;
 }
 
 input::placeholder {
   color: rgba(255,255,255,.75);
-}
-
-input:focus {
-  background: rgba(255,255,255,.25);
-  transform: translateY(-1px);
 }
 
 /* BOTÕES */
@@ -104,30 +91,16 @@ button {
   margin-top: 12px;
   border-radius: 14px;
   border: none;
-  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   color: #fff;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,.35),
-    inset 0 -3px 0 rgba(0,0,0,.2);
-
-  transition: all .25s ease;
+  transition: .25s;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow:
-    0 15px 30px rgba(0,0,0,.45),
-    inset 0 -3px 0 rgba(0,0,0,.25);
 }
 
-button:active {
-  transform: translateY(1px);
-}
-
-/* CORES */
 .btn-colaborador {
   background: linear-gradient(135deg, #22c55e, #16a34a);
 }
@@ -144,7 +117,6 @@ form button {
   background: linear-gradient(135deg, #ef4444, #b91c1c);
 }
 
-/* ERRO */
 .error-message {
   margin-top: 12px;
   font-size: 14px;
@@ -155,20 +127,25 @@ form button {
 
 <body>
 
+<!-- MENU -->
 <div id="menu" class="container">
   <div class="logo">
-    <img src="logo.png" alt="Logo FYBDO" />
+    <img src="logo.png" alt="Logo" />
   </div>
   <h2>Newspring Services</h2>
+  <p class="subtitulo">BPO • BACK OFFICE • CONTACT CENTER</p>
   <button class="btn-colaborador" onclick="mostrarLoginColaborador()">Área Colaborador</button>
   <button class="btn-administrador" onclick="mostrarLoginAdministrador()">Área Administrador</button>
 </div>
 
+<!-- COLABORADOR -->
 <div id="loginColaborador" class="container" style="display:none;">
   <div class="logo">
-    <img src="logo.png" alt="Logo FYBDO" />
+    <img src="logo.png" alt="Logo" />
   </div>
-  <h2>ÁREA DE COLABORADOR</h2>
+  <h2>Newspring Services</h2>
+  <p class="subtitulo">BPO • BACK OFFICE • CONTACT CENTER</p>
+
   <form id="loginForm" onsubmit="return validarLogin(event)">
     <input type="text" id="username" placeholder="Usuário" required />
     <input type="password" id="password" placeholder="Senha" required />
@@ -178,11 +155,14 @@ form button {
   <button class="btn-voltar" onclick="voltarMenu()">Voltar</button>
 </div>
 
+<!-- ADMIN -->
 <div id="loginAdministrador" class="container" style="display:none;">
   <div class="logo">
-    <img src="logo.png" alt="Logo FYBDO" />
+    <img src="logo.png" alt="Logo" />
   </div>
-  <h2>ÁREA DE ADMINISTRADOR</h2>
+  <h2>Newspring Services</h2>
+  <p class="subtitulo">BPO • BACK OFFICE • CONTACT CENTER</p>
+
   <form id="adminForm" onsubmit="return validarAdmin(event)">
     <input type="text" id="adminUser" placeholder="Usuário" required />
     <input type="password" id="adminPass" placeholder="Senha" required />
@@ -207,12 +187,10 @@ function voltarMenu() {
   loginColaborador.style.display = "none";
   loginAdministrador.style.display = "none";
   menu.style.display = "block";
-
-  document.getElementById("error-message").textContent = "";
-  document.getElementById("admin-error-message").textContent = "";
-
   loginForm.reset();
   adminForm.reset();
+  document.getElementById("error-message").textContent = "";
+  document.getElementById("admin-error-message").textContent = "";
 }
 
 const usuarios = [
@@ -250,14 +228,13 @@ const usuarios = [
   { usuario: "EX08554", senha: "NSS*EX08554", pagina: "PatriciaAndre.html" }
 ];
 
-function validarLogin(event) {
-  event.preventDefault();
-  const usuario = username.value.trim();
-  const senha = password.value.trim();
+function validarLogin(e) {
+  e.preventDefault();
+  const u = username.value.trim();
+  const s = password.value.trim();
   const erro = document.getElementById("error-message");
-
-  const valido = usuarios.find(u => u.usuario === usuario && u.senha === senha);
-  valido ? window.location.href = valido.pagina : erro.textContent = "Usuário ou senha incorretos.";
+  const ok = usuarios.find(x => x.usuario === u && x.senha === s);
+  ok ? window.location.href = ok.pagina : erro.textContent = "Usuário ou senha incorretos.";
 }
 
 const adminUsuarios = [
@@ -267,14 +244,13 @@ const adminUsuarios = [
   { usuario: "Worten", senha: "NSS*Worten_Admin", pagina: "WORTEN.html" }
 ];
 
-function validarAdmin(event) {
-  event.preventDefault();
-  const usuario = adminUser.value.trim();
-  const senha = adminPass.value.trim();
+function validarAdmin(e) {
+  e.preventDefault();
+  const u = adminUser.value.trim();
+  const s = adminPass.value.trim();
   const erro = document.getElementById("admin-error-message");
-
-  const valido = adminUsuarios.find(a => a.usuario === usuario && a.senha === senha);
-  valido ? window.location.href = valido.pagina : erro.textContent = "Usuário ou senha incorretos.";
+  const ok = adminUsuarios.find(x => x.usuario === u && x.senha === s);
+  ok ? window.location.href = ok.pagina : erro.textContent = "Usuário ou senha incorretos.";
 }
 </script>
 
