@@ -6,6 +6,8 @@
 <title>Dashboard Newspring</title>
 
 <style>
+
+  /* ================= BODY / APP ================= */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -22,7 +24,7 @@ body {
   padding: 15px;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 .header {
   text-align: center;
   margin-bottom: 10px;
@@ -37,7 +39,7 @@ body {
   font-weight: bold;
 }
 
-/* STATUS */
+/* ================= STATUS ================= */
 .status-card {
   background: #b71c1c;
   color: white;
@@ -52,7 +54,7 @@ body {
   font-weight: bold;
 }
 
-/* HORAS */
+/* ================= HORAS ================= */
 #horas {
   text-align: center;
   font-weight: bold;
@@ -63,7 +65,7 @@ body {
   display: none;
 }
 
-/* BOTÕES ESTADO */
+/* ================= BOTÕES ESTADO ================= */
 #tipoButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -78,6 +80,13 @@ body {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.tipo-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.15);
 }
 
 [data-tipo="login"] { background:#2e7d32; }
@@ -87,7 +96,7 @@ body {
 [data-tipo="formacao"] { background:#0b1f5e; }
 [data-tipo="logout"] { background:#d50000; }
 
-/* AÇÕES */
+/* ================= AÇÕES ================= */
 .actions {
   text-align: center;
   margin-top: 10px;
@@ -99,48 +108,142 @@ body {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-#btnSubmeter { background:#28a745; color:white; }
-#btnTerminar { background:#d50000; color:white; display:none; }
+#btnSubmeter { 
+  background:#28a745; 
+  color:white; 
+  box-shadow: 0 4px 10px rgba(40,167,69,0.3);
+}
+
+#btnSubmeter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(40,167,69,0.4);
+}
+
+#btnTerminar { 
+  background:#d50000; 
+  color:white; 
+  display:none; 
+  box-shadow: 0 4px 10px rgba(213,0,0,0.3);
+}
+
+#btnTerminar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(213,0,0,0.4);
+}
 
 #mensagem {
   margin-top: 8px;
   font-weight: bold;
 }
 
-/* PRODUÇÃO */
+/* ================= PRODUÇÃO MODERNA ================= */
 .form-container {
-  background: white;
-  padding: 20px;
-  border-radius: 14px;
-  margin-top: 20px;
-  box-shadow: 0 4px 8px rgba(0,0,0,.1);
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  margin-top: 25px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.form-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
 }
 
 .titulo-gama {
   text-align: center;
+  font-size: 22px;
+  font-weight: 700;
   color: #28a745;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .form-group {
-  margin-bottom: 12px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
 }
 
 input, select {
   width: 100%;
-  padding: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 5px rgba(40,167,69,0.3);
+  outline: none;
 }
 
 .button-container {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
 }
 
 .button-container button {
   width: 48%;
+  padding: 12px 0;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
 }
+
+#startButton {
+  background: #28a745;
+  color: white;
+  box-shadow: 0 4px 10px rgba(40,167,69,0.3);
+}
+
+#startButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(40,167,69,0.4);
+}
+
+#endButton {
+  background: #d50000;
+  color: white;
+  box-shadow: 0 4px 10px rgba(213,0,0,0.3);
+}
+
+#endButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(213,0,0,0.4);
+}
+
+#tempoTarefa {
+  text-align: center;
+  font-weight: 600;
+  font-size: 16px;
+  background: #f0f0f0;
+  border-radius: 12px;
+}
+
+#responseMessage {
+  text-align: center;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #155724;
+}
+
 </style>
 </head>
 
@@ -280,29 +383,64 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
   };
 });
 
-btnSub.onclick=async()=>{
-  if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
-    await enviarAoSupabase({data:formatarDataHoraLocal(inicioDataHora).split("T")[0],user,nome,tipo:tipoSelecionado,inicio:formatarDataHoraLocal(inicioDataHora),fim:null,duracao:null});
-    msgEl.textContent="✔️ Registo enviado";
-    btnSub.disabled=true;
+btnSub.onclick = async () => {
+  if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+    await enviarAoSupabase({
+      data: formatarDataHoraLocal(inicioDataHora).split("T")[0],
+      user,
+      nome,
+      tipo: tipoSelecionado,
+      inicio: formatarDataHoraLocal(inicioDataHora),
+      fim: null,
+      duracao: null
+    });
+    msgEl.textContent = "✔️ Registo enviado";
+    btnSub.disabled = true;
   } else {
-    btnSub.style.display="none";
-    btnTerm.style.display="inline-block";
+    btnSub.style.display = "none";
+    btnTerm.style.display = "inline-block";
+    
+    // Aqui, quando terminar (após submeter o final) vamos limpar
+    // Adiciona um listener temporário no botão Terminar
+    const terminarHandler = async () => {
+      const fimDataHora = new Date();
+      const duracaoHoras = (fimDataHora - inicioDataHora) / 3600000;
+
+      horaFimEl.textContent = "🕔 Fim: " + fimDataHora.toLocaleTimeString("pt-BR");
+      horaFimEl.style.display = "block";
+
+      await enviarAoSupabase({
+        data: formatarDataHoraLocal(inicioDataHora).split("T")[0],
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: formatarDataHoraLocal(fimDataHora),
+        duracao: parseFloat(duracaoHoras.toFixed(3))
+      });
+
+      msgEl.textContent = "✔️ Registo enviado";
+
+      // Limpar horas e voltar online após 5 segundos
+      setTimeout(() => {
+        horaInicioEl.style.display = "none";
+        horaFimEl.style.display = "none";
+        estadoLabel.textContent = "🟢 ONLINE";
+        msgEl.textContent = "";
+        tipoSelecionado = "";
+        btnTerm.style.display = "none";
+        btnSub.style.display = "inline-block";
+        btnSub.disabled = true;
+      }, 5000);
+
+      // Remove o listener para não duplicar
+      btnTerm.removeEventListener("click", terminarHandler);
+    };
+
+    btnTerm.addEventListener("click", terminarHandler);
   }
 };
 
-btnTerm.onclick=async()=>{
-  const fim=new Date();
-  const dur=(fim-inicioDataHora)/3600000;
-  horaFimEl.textContent="🕔 Fim: "+fim.toLocaleTimeString("pt-BR");
-  horaFimEl.style.display="block";
-
-  await enviarAoSupabase({data:formatarDataHoraLocal(inicioDataHora).split("T")[0],user,nome,tipo:tipoSelecionado,inicio:formatarDataHoraLocal(inicioDataHora),fim:formatarDataHoraLocal(fim),duracao:Number(dur.toFixed(3))});
-  msgEl.textContent="✔️ Registo enviado";
-  btnTerm.style.display="none";
-  btnSub.style.display="inline-block";
-  btnSub.disabled=true;
-};
 
 /* ================= PRODUÇÃO (IGUAL AO TEU) ================= */
 let startTime,endTime,timerInterval;
@@ -324,6 +462,9 @@ function formatDate(d){
 }
 
 startButton.onclick=()=>{
+  // Limpar mensagem anterior
+  responseMessage.textContent = "";
+  
   startTime=new Date();
   startButton.disabled=true;
   endButton.disabled=false;
