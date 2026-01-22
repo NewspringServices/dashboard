@@ -148,6 +148,9 @@ body {
   box-shadow: 0 8px 20px rgba(0,0,0,0.12);
   margin-top: 25px;
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centraliza todos os inputs e botões */
 }
 
 .form-container:hover {
@@ -175,13 +178,17 @@ body {
   color: #333;
 }
 
-input, select {
+.form-group input,
+.form-group select {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box; /* garante que padding/border não ultrapassem o container */
   padding: 12px 14px;
   border-radius: 12px;
   border: 1px solid #ddd;
   font-size: 15px;
   transition: border 0.2s, box-shadow 0.2s;
+  text-align: center; /* centraliza o texto dentro do input */
 }
 
 input:focus, select:focus {
@@ -192,17 +199,19 @@ input:focus, select:focus {
 
 .button-container {
   display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
+  justify-content: center; /* centraliza os botões */
+  gap: 12px; /* espaço entre eles */
+  width: 100%;
 }
 
 .button-container button {
-  width: 48%;
-  padding: 12px 0;
-  border: none;
-  border-radius: 14px;
-  font-size: 16px;
+  flex: 1; /* cada botão ocupa a mesma proporção do container */
+  max-width: 140px; /* largura máxima para não ficar grande demais */
+  padding: 10px 0; /* altura do botão */
+  font-size: 15px;
   font-weight: 600;
+  border-radius: 12px;
+  border: none;
   cursor: pointer;
   transition: transform 0.1s, box-shadow 0.1s;
 }
@@ -228,6 +237,7 @@ input:focus, select:focus {
   transform: translateY(-2px);
   box-shadow: 0 6px 14px rgba(213,0,0,0.4);
 }
+
 
 #tempoTarefa {
   text-align: center;
@@ -503,3 +513,4 @@ endButton.onclick=()=>{
 </script>
 </body>
 </html>
+
