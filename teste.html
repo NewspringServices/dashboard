@@ -6,58 +6,73 @@
 <title>Dashboard Newspring</title>
 
 <style>
+/* ================= TEMA CORPORATE ================= */
+:root {
+  --primary: #0b5ed7;
+  --success: #198754;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --text: #212529;
+  --border: #dee2e6;
+}
 
-  /* ================= BODY / APP ================= */
+/* ================= BODY ================= */
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
   margin: 0;
-  background: #f7f7f7;
+  background: var(--bg);
   display: flex;
   justify-content: center;
-  align-items: center;
   min-height: 100vh;
 }
 
 .app {
   width: 100%;
-  max-width: 420px;
-  padding: 15px;
+  max-width: 480px;
+  padding: 20px;
 }
 
 /* ================= HEADER ================= */
 .header {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .header img {
-  max-width: 130px;
-  margin-bottom: 10px;
+  max-width: 110px;
+  margin-bottom: 8px;
 }
 
 .info {
-  font-weight: bold;
+  font-size: 14px;
+  color: #495057;
 }
 
 /* ================= STATUS ================= */
 .status-card {
-  background: #b71c1c;
-  color: white;
-  padding: 15px;
-  border-radius: 14px;
-  text-align: center;
-  margin-bottom: 10px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 6px solid var(--danger);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
 }
 
 #estadoLabel {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 /* ================= HORAS ================= */
 #horas {
-  text-align: center;
-  font-weight: bold;
+  font-size: 13px;
+  color: #495057;
   margin-bottom: 10px;
 }
 
@@ -69,32 +84,30 @@ body {
 #tipoButtons {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .tipo-btn {
-  padding: 18px;
-  border: none;
-  border-radius: 14px;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,.12);
-  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 .tipo-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0,0,0,.15);
+  background: #e9ecef;
 }
 
-[data-tipo="login"] { background:#2e7d32; }
-[data-tipo="pausa1"],
-[data-tipo="pausa2"],
-[data-tipo="refeicao"] { background:#8bc34a; }
-[data-tipo="formacao"] { background:#0b1f5e; }
-[data-tipo="logout"] { background:#d50000; }
+[data-tipo="login"] { border-left: 4px solid var(--success); }
+[data-tipo="logout"] { border-left: 4px solid var(--danger); }
+[data-tipo^="pausa"],
+[data-tipo="refeicao"] { border-left: 4px solid var(--warning); }
+[data-tipo="formacao"] { border-left: 4px solid var(--primary); }
 
 /* ================= AÇÕES ================= */
 .actions {
@@ -103,147 +116,108 @@ body {
 }
 
 .actions button {
-  padding: 12px 25px;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
   border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
 }
 
-#btnSubmeter { 
-  background:#28a745; 
-  color:white; 
-  box-shadow: 0 4px 10px rgba(40,167,69,0.3);
+#btnSubmeter {
+  background: var(--primary);
+  color: white;
 }
 
-#btnSubmeter:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(40,167,69,0.4);
-}
-
-#btnTerminar { 
-  background:#d50000; 
-  color:white; 
-  display:none; 
-  box-shadow: 0 4px 10px rgba(213,0,0,0.3);
-}
-
-#btnTerminar:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(213,0,0,0.4);
+#btnTerminar {
+  background: var(--danger);
+  color: white;
+  display: none;
 }
 
 #mensagem {
   margin-top: 8px;
-  font-weight: bold;
+  font-weight: 600;
 }
 
-/* ================= PRODUÇÃO MODERNA ================= */
+/* ================= PRODUÇÃO ================= */
 .form-container {
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-  margin-top: 25px;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.form-container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.18);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
 }
 
 .titulo-gama {
   text-align: center;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  color: #28a745;
-  margin-bottom: 20px;
+  color: var(--primary);
+  margin-bottom: 16px;
 }
 
 .form-group {
-  margin-bottom: 18px;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 14px;
 }
 
 .form-group label {
-  margin-bottom: 6px;
+  font-size: 13px;
   font-weight: 600;
-  color: #333;
+  color: #495057;
+  margin-bottom: 4px;
 }
 
 input, select {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-  font-size: 15px;
-  transition: border 0.2s, box-shadow 0.2s;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  font-size: 14px;
 }
 
 input:focus, select:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 5px rgba(40,167,69,0.3);
+  border-color: var(--primary);
   outline: none;
 }
 
 .button-container {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  margin-top: 14px;
 }
 
 .button-container button {
   width: 48%;
-  padding: 12px 0;
+  padding: 10px 0;
+  border-radius: 6px;
   border: none;
-  border-radius: 14px;
-  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.1s, box-shadow 0.1s;
 }
 
 #startButton {
-  background: #28a745;
+  background: var(--success);
   color: white;
-  box-shadow: 0 4px 10px rgba(40,167,69,0.3);
-}
-
-#startButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(40,167,69,0.4);
 }
 
 #endButton {
-  background: #d50000;
+  background: var(--danger);
   color: white;
-  box-shadow: 0 4px 10px rgba(213,0,0,0.3);
-}
-
-#endButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(213,0,0,0.4);
 }
 
 #tempoTarefa {
+  background: #f1f3f5;
   text-align: center;
   font-weight: 600;
-  font-size: 16px;
-  background: #f0f0f0;
-  border-radius: 12px;
 }
 
 #responseMessage {
   text-align: center;
-  margin-top: 15px;
+  margin-top: 12px;
   font-weight: 600;
-  color: #155724;
+  color: var(--success);
 }
-
 </style>
 </head>
 
@@ -290,17 +264,17 @@ input:focus, select:focus {
   <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
   <form id="gamaForm">
     <div class="form-group">
-      <label>Processo:</label>
+      <label>Processo</label>
       <input type="text" id="processoGama" required />
     </div>
 
     <div class="form-group">
-      <label>Documentos Tratados:</label>
+      <label>Documentos Tratados</label>
       <input type="number" id="documentos" required />
     </div>
 
     <div class="form-group">
-      <label>Tarefa Finalizada:</label>
+      <label>Tarefa Finalizada</label>
       <select id="tarefaFinalizada">
         <option>Reembolsos Multicare</option>
         <option>Formação/Meetings</option>
@@ -308,13 +282,13 @@ input:focus, select:focus {
     </div>
 
     <div class="form-group">
-      <label>Tempo da Tarefa:</label>
+      <label>Tempo da Tarefa</label>
       <input type="text" id="tempoTarefa" readonly />
     </div>
 
     <div class="button-container">
-      <button type="button" id="startButton">Iniciar Tarefa</button>
-      <button type="button" id="endButton" disabled>Finalizar Tarefa</button>
+      <button type="button" id="startButton">Iniciar</button>
+      <button type="button" id="endButton" disabled>Finalizar</button>
     </div>
 
     <div id="responseMessage"></div>
@@ -373,8 +347,16 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
     horaFimEl.style.display="none";
     msgEl.textContent="";
 
-    if(tipoSelecionado==="login"){ estadoLabel.textContent="🟢 ONLINE"; horaInicioEl.style.display="none"; }
-    else if(tipoSelecionado==="logout"){ estadoLabel.textContent="🔴 OFFLINE"; horaInicioEl.style.display="none"; }
+    if(tipoSelecionado==="login"){ 
+      estadoLabel.textContent="🟢 ONLINE"; 
+      horaInicioEl.style.display="none"; 
+      document.querySelector(".status-card").style.borderLeftColor="var(--success)";
+    }
+    else if(tipoSelecionado==="logout"){ 
+      estadoLabel.textContent="🔴 OFFLINE"; 
+      horaInicioEl.style.display="none"; 
+      document.querySelector(".status-card").style.borderLeftColor="var(--danger)";
+    }
     else {
       estadoLabel.textContent="⏸ "+btn.textContent;
       horaInicioEl.textContent="🕒 Início: "+inicioDataHora.toLocaleTimeString("pt-BR");
@@ -400,8 +382,6 @@ btnSub.onclick = async () => {
     btnSub.style.display = "none";
     btnTerm.style.display = "inline-block";
     
-    // Aqui, quando terminar (após submeter o final) vamos limpar
-    // Adiciona um listener temporário no botão Terminar
     const terminarHandler = async () => {
       const fimDataHora = new Date();
       const duracaoHoras = (fimDataHora - inicioDataHora) / 3600000;
@@ -421,7 +401,6 @@ btnSub.onclick = async () => {
 
       msgEl.textContent = "✔️ Registo enviado";
 
-      // Limpar horas e voltar online após 5 segundos
       setTimeout(() => {
         horaInicioEl.style.display = "none";
         horaFimEl.style.display = "none";
@@ -431,9 +410,9 @@ btnSub.onclick = async () => {
         btnTerm.style.display = "none";
         btnSub.style.display = "inline-block";
         btnSub.disabled = true;
+        document.querySelector(".status-card").style.borderLeftColor="var(--success)";
       }, 5000);
 
-      // Remove o listener para não duplicar
       btnTerm.removeEventListener("click", terminarHandler);
     };
 
@@ -441,8 +420,7 @@ btnSub.onclick = async () => {
   }
 };
 
-
-/* ================= PRODUÇÃO (IGUAL AO TEU) ================= */
+/* ================= PRODUÇÃO ================= */
 let startTime,endTime,timerInterval;
 const startButton=document.getElementById('startButton');
 const endButton=document.getElementById('endButton');
@@ -462,7 +440,6 @@ function formatDate(d){
 }
 
 startButton.onclick=()=>{
-  // Limpar mensagem anterior
   responseMessage.textContent = "";
   
   startTime=new Date();
@@ -501,5 +478,6 @@ endButton.onclick=()=>{
   startButton.disabled=false;
 };
 </script>
+
 </body>
 </html>
