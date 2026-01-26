@@ -300,7 +300,7 @@ async function enviarAoSupabase(dados, table){
     }
     // ✅ ALERTA DE SUCESSO
 
-    msgEl.textContent = `✅ Registro de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
+    msgEl.textContent = `✅ Registo de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
     return await res.json();
   } catch(err){
     console.error(err);
@@ -413,5 +413,6 @@ endButton.onclick=async ()=>{
 </script>
 </body>
 </html>
+
 
 
