@@ -42,8 +42,8 @@ body {
 
 .sidebar-top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
 }
 
@@ -60,11 +60,11 @@ body {
   font-size: 24px;
   margin-right: 10px;
 }
+
 .nome { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
 .data { font-size: 14px; color: #555; }
-#logoSidebar { width: 120px; height: 120px; object-fit: contain; }
 
-#historicoContainer { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 180px); }
+#historicoContainer { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 150px); }
 #historicoContainer h3 { font-size: 14px; margin-bottom: 8px; }
 .historico-item { font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .historico-login { color: var(--success); }
@@ -74,19 +74,13 @@ body {
 .historico-formacao { color: var(--primary); }
 
 /* ================= MAIN ================= */
-.main-wrapper {
-  margin-left: 780px; /* espaço da sidebar */
-  flex-grow: 1;
-  display: flex;
-  justify-content: center; /* centraliza a plataforma */
-  padding: 20px;
-}
-
 .main {
+  flex-grow: 1;
   max-width: 480px;
-  width: 100%;
+  margin-left: 780px; /* mesmo valor da sidebar */
   display: flex;
   flex-direction: column;
+  padding: 20px;
 }
 /* STATUS */
 .status-card {
@@ -144,7 +138,7 @@ input:focus, select:focus { border-color: var(--primary); outline:none; }
         <div class="data" id="dataHoje"></div>
       </div>
     </div>
-    <img id="logoSidebar" src="logo.png" alt="Logo">
+    <img src="logo.png" alt="Logo" style="width:60px; height:60px; object-fit:contain;">
   </div>
 
   <div id="historicoContainer">
@@ -153,61 +147,229 @@ input:focus, select:focus { border-color: var(--primary); outline:none; }
   </div>
 </div>
 
-<div class="main-wrapper">
-  <div class="main">
-    <div class="status-card">
-      <div id="estadoLabel">🔴 OFFLINE</div>
-    </div>
+<div class="main">
+  <div class="status-card">
+    <div id="estadoLabel">🔴 OFFLINE</div>
+  </div>
 
-    <div id="tipoButtons">
-      <button class="tipo-btn" data-tipo="login">Login</button>
-      <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
-      <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
-      <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
-      <button class="tipo-btn" data-tipo="formacao">Formação</button>
-      <button class="tipo-btn" data-tipo="logout">Logout</button>
-    </div>
+  <div id="tipoButtons">
+    <button class="tipo-btn" data-tipo="login">Login</button>
+    <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
+    <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
+    <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
+    <button class="tipo-btn" data-tipo="formacao">Formação</button>
+    <button class="tipo-btn" data-tipo="logout">Logout</button>
+  </div>
 
-    <div class="actions">
-      <button id="btnSubmeter" disabled>Submeter</button>
-      <button id="btnTerminar">Finalizar</button>
-      <div id="mensagem"></div>
-    </div>
+  <div class="actions">
+    <button id="btnSubmeter" disabled>Submeter</button>
+    <button id="btnTerminar">Finalizar</button>
+    <div id="mensagem"></div>
+  </div>
 
-    <div class="form-container">
-      <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
-      <form id="gamaForm">
-        <div class="form-group">
-          <label>Processo</label>
-          <input type="text" id="processoGama" required />
-        </div>
-        <div class="form-group">
-          <label>Documentos Tratados</label>
-          <input type="number" id="documentos" required />
-        </div>
-        <div class="form-group">
-          <label>Tarefa Finalizada</label>
-          <select id="tarefaFinalizada">
-            <option>Reembolsos Multicare</option>
-            <option>Formação/Meetings</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Tempo da Tarefa</label>
-          <input type="text" id="tempoTarefa" readonly />
-        </div>
-        <div class="button-container">
-          <button type="button" id="startButton">Iniciar</button>
-          <button type="button" id="endButton" disabled>Finalizar</button>
-        </div>
-        <div id="responseMessage"></div>
-      </form>
-    </div>
+  <div class="form-container">
+    <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
+    <form id="gamaForm">
+      <div class="form-group">
+        <label>Processo</label>
+        <input type="text" id="processoGama" required />
+      </div>
+      <div class="form-group">
+        <label>Documentos Tratados</label>
+        <input type="number" id="documentos" required />
+      </div>
+      <div class="form-group">
+        <label>Tarefa Finalizada</label>
+        <select id="tarefaFinalizada">
+          <option>Reembolsos Multicare</option>
+          <option>Formação/Meetings</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tempo da Tarefa</label>
+        <input type="text" id="tempoTarefa" readonly />
+      </div>
+      <div class="button-container">
+        <button type="button" id="startButton">Iniciar</button>
+        <button type="button" id="endButton" disabled>Finalizar</button>
+      </div>
+      <div id="responseMessage"></div>
+    </form>
   </div>
 </div>
 
 <script>
-// seu código JS de Supabase e funcionalidades continua o mesmo...
+const user="EX04904";
+const nome="Telma Sofia Pereira Rosa";
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+document.getElementById("nomeUser").textContent = nome;
+document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
+document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
+
+let tipoSelecionado="";
+let inicioDataHora;
+let fimDataHora;
+let registroAtualId = null; // id do registro no histórico
+const estadoLabel = document.getElementById("estadoLabel");
+const btnSub=document.getElementById("btnSubmeter");
+const btnTerm=document.getElementById("btnTerminar");
+const msgEl=document.getElementById("mensagem");
+const historicoList=document.getElementById("historicoList");
+
+function formatarDataHoraLocal(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
+         String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
+}
+
+// Historico com atualização na mesma linha
+let historicoContador = 0;
+function registrarHistorico(tipo, inicio, fim=null){
+  if(!fim){
+    // criar novo registro e salvar ID
+    registroAtualId = 'hist-' + historicoContador++;
+    const div=document.createElement('div');
+    div.className='historico-item historico-'+tipo;
+    div.id = registroAtualId;
+    div.textContent = tipo.charAt(0).toUpperCase()+tipo.slice(1)+' - Início: '+inicio.toLocaleTimeString('pt-BR', {hour12:false});
+    historicoList.prepend(div);
+    return registroAtualId;
+  } else {
+    // atualizar registro existente
+    const divAtual = document.getElementById(registroAtualId);
+    const duracao=((fim-inicio)/1000/60).toFixed(1);
+    divAtual.textContent += ' | Fim: '+fim.toLocaleTimeString('pt-BR', {hour12:false})+' | Duração: '+duracao+' min';
+  }
+}
+
+async function enviarAoSupabase(dados, table){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_API_KEY,
+        "Authorization":`Bearer ${SUPABASE_API_KEY}`,
+        "Prefer":"return=representation"
+      },
+      body: JSON.stringify(dados)
+    });
+    if(!res.ok){
+      const errData = await res.json().catch(()=>({message:res.statusText}));
+      throw new Error(errData.message||res.statusText);
+    }
+    return await res.json();
+  } catch(err){
+    console.error(err);
+    msgEl.textContent="❌ Erro ao enviar: "+err.message;
+  }
+}
+
+// Botões de estado
+document.querySelectorAll(".tipo-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    tipoSelecionado=btn.dataset.tipo;
+    inicioDataHora=new Date();
+    fimDataHora=null;
+    btnSub.disabled=false;
+    btnSub.style.display="inline-block";
+    btnTerm.style.display="none";
+    msgEl.textContent="";
+    let cor="";
+    if(tipoSelecionado==="login"){ 
+      estadoLabel.textContent="🟢 ONLINE"; cor="--success";
+    } else if(tipoSelecionado==="logout"){ 
+      estadoLabel.textContent="🔴 OFFLINE"; cor="--danger";
+    } else { 
+      estadoLabel.textContent="⏸ "+btn.textContent; cor="--warning"; 
+    }
+    document.querySelector(".status-card").style.borderLeftColor=getComputedStyle(document.documentElement).getPropertyValue(cor);
+
+    // registrar inicio no histórico
+    registrarHistorico(tipoSelecionado,inicioDataHora);
+  }
+});
+
+// Submeter / Finalizar
+btnSub.onclick=()=>{
+  const dataHoje=formatarDataHoraLocal(inicioDataHora).split("T")[0];
+  if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
+    enviarAoSupabase({
+      data:dataHoje,
+      user,
+      nome,
+      tipo:tipoSelecionado,
+      inicio:formatarDataHoraLocal(inicioDataHora),
+      fim:null,
+      duracao:null
+    },"BPO_registosNSS");
+    btnSub.disabled=true;
+  } else {
+    btnSub.style.display="none";
+    btnTerm.style.display="inline-block";
+    btnTerm.onclick=async ()=>{
+      fimDataHora=new Date();
+      registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
+      await enviarAoSupabase({
+        data:dataHoje,
+        user,
+        nome,
+        tipo:tipoSelecionado,
+        inicio:formatarDataHoraLocal(inicioDataHora),
+        fim:formatarDataHoraLocal(fimDataHora),
+        duracao:parseFloat(((fimDataHora-inicioDataHora)/3600000).toFixed(3))
+      },"BPO_registosNSS");
+      btnTerm.style.display="none";
+      btnSub.style.display="inline-block";
+      btnSub.disabled=true;
+      estadoLabel.textContent="🟢 ONLINE";
+      document.querySelector(".status-card").style.borderLeftColor="var(--success)";
+    };
+  }
+};
+
+// Produção
+let startTime,endTime,timerInterval;
+const startButton=document.getElementById('startButton');
+const endButton=document.getElementById('endButton');
+const tempoTarefa=document.getElementById('tempoTarefa');
+const responseMessage=document.getElementById('responseMessage');
+
+function formatTime(seconds){
+  const h=Math.floor(seconds/3600);
+  const m=Math.floor((seconds%3600)/60);
+  const s=seconds%60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+startButton.onclick=()=>{
+  responseMessage.textContent="";
+  startTime=new Date();
+  startButton.disabled=true;
+  endButton.disabled=false;
+  timerInterval=setInterval(()=>{
+    tempoTarefa.value=formatTime(Math.floor((new Date()-startTime)/1000));
+  },1000);
+};
+
+endButton.onclick=async ()=>{
+  clearInterval(timerInterval);
+  endTime=new Date();
+  endButton.disabled=true;
+  await enviarAoSupabase({
+    inicio:startTime.toISOString(),
+    fim:endTime.toISOString(),
+    colaborador:nome,
+    processoGama:document.getElementById('processoGama').value,
+    Documentos:Number(document.getElementById('documentos').value),
+    tarefaFinalizada:document.getElementById('tarefaFinalizada').value,
+    tempo:tempoTarefa.value
+  },"BPO_dadosprodução");
+  responseMessage.textContent="✔️ Produção enviada";
+  document.getElementById('gamaForm').reset();
+  startButton.disabled=false;
+};
 </script>
 </body>
 </html>
