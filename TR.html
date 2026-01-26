@@ -107,12 +107,22 @@ body {
 #btnTerminar { background: var(--danger); color:white; display:none; }
 #mensagem { margin-top:8px; font-weight:bold; text-align:center; }
 /* PRODUÇÃO */
-.form-container {
+  .form-container {
   background: var(--card);
-  border:1px solid var(--border);
-  border-radius:10px;
-  padding:20px;
-  margin-top:20px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  width: 100%;       /* ocupa todo o espaço da main */
+  box-sizing: border-box; /* garante que padding não aumenta a largura */
+  max-width: 480px;  /* opcional, para limitar */
+  margin: 0 auto;    /* centraliza dentro da main */
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  box-sizing: border-box; /* garante que não passa da borda do form */
+
 }
 .titulo-gama { text-align:center; font-weight:bold; font-size:18px; color: var(--primary); margin-bottom:16px; }
 .form-group { margin-bottom:14px; }
@@ -373,6 +383,7 @@ endButton.onclick=async ()=>{
 </script>
 </body>
 </html>
+
 
 
 
