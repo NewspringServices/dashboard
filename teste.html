@@ -4,477 +4,303 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dashboard Newspring</title>
-
 <style>
 :root {
-  --primary: #0b5ed7;
-  --success: #198754;
+  --primary: #0b1f5e;
+  --success: #2e7d32;
   --warning: #ffc107;
-  --danger: #dc3545;
-  --bg: #f4f6f9;
+  --danger: #d50000;
+  --bg: #f7f7f7;
   --card: #ffffff;
   --text: #212529;
-  --border: #dee2e6;
+  --border: #ddd;
 }
 
-/* ================= BODY ================= */
 body {
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   background: var(--bg);
   display: flex;
-  justify-content: center;
   min-height: 100vh;
 }
 
-.app {
-  width: 100%;
-  max-width: 480px;
-  padding: 20px;
-}
-
-/* ================= HEADER ================= */
-.header {
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 260px;
   background: var(--card);
+  border-radius: 10px;
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  text-align: center;
-  margin-bottom: 12px;
-}
-
-.header img {
-  max-width: 110px;
-  margin-bottom: 8px;
-}
-
-.info {
-  font-size: 14px;
-  color: #495057;
-}
-
-/* ================= STATUS ================= */
-.status-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-left: 6px solid var(--danger);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 12px;
-}
-
-#estadoLabel {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-/* ================= HORAS ================= */
-#horas {
-  font-size: 13px;
-  color: #495057;
-  margin-bottom: 10px;
-}
-
-#horaInicio, #horaFim {
-  display: none;
-}
-
-/* ================= BOTÕES ESTADO ================= */
-#tipoButtons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.tipo-btn {
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.tipo-btn:hover {
-  background: #e9ecef;
-}
-
-[data-tipo="login"] { border-left: 4px solid var(--success); }
-[data-tipo="logout"] { border-left: 4px solid var(--danger); }
-[data-tipo^="pausa"],
-[data-tipo="refeicao"] { border-left: 4px solid var(--warning); }
-[data-tipo="formacao"] { border-left: 4px solid var(--primary); }
-
-/* ================= HISTÓRICO ================= */
-#historicoContainer {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 12px;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-#historicoContainer h3 {
-  font-size: 14px;
-  color: #495057;
-  margin-bottom: 8px;
-}
-
-.historico-item {
   display: flex;
-  justify-content: space-between;
-  padding: 4px 0;
-  font-size: 13px;
-  border-bottom: 1px solid #eee;
+  flex-direction: column;
+  padding: 20px;
+  height: 100vh; /* ocupa toda altura */
+  box-sizing: border-box;
+  position: fixed;
+  left: 0;
+  top: 0;
 }
-
-.historico-item:last-child {
-  border-bottom: none;
+.avatar {
+  width: 60px;
+  height: 60px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  margin-bottom: 10px;
 }
-
+.nome { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.data { font-size: 14px; color: #555; margin-bottom: 14px; }
+#historicoContainer { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 150px); }
+#historicoContainer h3 { font-size: 14px; margin-bottom: 8px; }
+.historico-item { font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .historico-login { color: var(--success); }
 .historico-logout { color: var(--danger); }
 .historico-pausa { color: var(--warning); }
 .historico-refeicao { color: var(--warning); }
 .historico-formacao { color: var(--primary); }
 
-/* ================= AÇÕES ================= */
-.actions {
-  text-align: center;
-  margin-top: 10px;
+/* ================= MAIN ================= */
+.main {
+  flex-grow: 1;
+  max-width: 480px;
+  margin-left: 280px; /* espaço para a sidebar */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
 }
-
-.actions button {
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-}
-
-#btnSubmeter {
-  background: var(--primary);
-  color: white;
-}
-
-#btnTerminar {
-  background: var(--danger);
-  color: white;
-  display: none;
-}
-
-#mensagem {
-  margin-top: 8px;
-  font-weight: 600;
-}
-
-/* ================= PRODUÇÃO ================= */
-.form-container {
+/* STATUS */
+.status-card {
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 20px;
-  margin-top: 20px;
-}
-
-.titulo-gama {
+  border-left: 6px solid var(--danger);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 12px;
   text-align: center;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--primary);
-  margin-bottom: 16px;
 }
-
-.form-group {
-  margin-bottom: 14px;
+#estadoLabel { font-weight: bold; }
+/* BOTÕES ESTADO */
+#tipoButtons { display: grid; grid-template-columns: repeat(2,1fr); gap:8px; margin-bottom:12px; }
+.tipo-btn { padding:12px; border-radius:6px; border:1px solid var(--border); background: var(--card); font-weight:bold; cursor:pointer; }
+[data-tipo="login"] { border-left:4px solid var(--success); }
+[data-tipo="logout"] { border-left:4px solid var(--danger); }
+[data-tipo^="pausa"], [data-tipo="refeicao"] { border-left:4px solid var(--warning); }
+[data-tipo="formacao"] { border-left:4px solid var(--primary); }
+/* AÇÕES */
+.actions { text-align:center; margin-bottom:20px; }
+.actions button { padding:10px 18px; border-radius:6px; font-weight:bold; border:none; cursor:pointer; margin-right:6px; }
+#btnSubmeter { background: var(--primary); color:white; }
+#btnTerminar { background: var(--danger); color:white; display:none; }
+#mensagem { margin-top:8px; font-weight:bold; text-align:center; }
+/* PRODUÇÃO */
+.form-container {
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px;
+  margin-top:20px;
 }
-
-.form-group label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #495057;
-  margin-bottom: 4px;
-}
-
-input, select {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  font-size: 14px;
-}
-
-input:focus, select:focus {
-  border-color: var(--primary);
-  outline: none;
-}
-
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 14px;
-}
-
-.button-container button {
-  width: 48%;
-  padding: 10px 0;
-  border-radius: 6px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-#startButton {
-  background: var(--success);
-  color: white;
-}
-
-#endButton {
-  background: var(--danger);
-  color: white;
-}
-
-#tempoTarefa {
-  background: #f1f3f5;
-  text-align: center;
-  font-weight: 600;
-}
-
-#responseMessage {
-  text-align: center;
-  margin-top: 12px;
-  font-weight: 600;
-  color: var(--success);
-}
+.titulo-gama { text-align:center; font-weight:bold; font-size:18px; color: var(--primary); margin-bottom:16px; }
+.form-group { margin-bottom:14px; }
+.form-group label { font-weight:bold; margin-bottom:4px; display:block; }
+input, select { width:100%; padding:10px; border-radius:6px; border:1px solid var(--border); font-size:14px; }
+input:focus, select:focus { border-color: var(--primary); outline:none; }
+.button-container { display:flex; justify-content:space-between; margin-top:14px; }
+.button-container button { width:48%; padding:10px 0; font-weight:bold; border:none; border-radius:6px; cursor:pointer; }
+#startButton { background: var(--success); color:white; }
+#endButton { background: var(--danger); color:white; }
+#tempoTarefa { text-align:center; font-weight:bold; background:#f0f0f0; border-radius:6px; }
+#responseMessage { text-align:center; margin-top:12px; font-weight:bold; color: var(--success);}
 </style>
 </head>
-
 <body>
-<div class="app">
 
-<!-- HEADER -->
-<div class="header">
-  <img src="logo.png" />
-  <div class="info" id="infoData"></div>
-  <div class="info" id="infoNome"></div>
+<div class="sidebar">
+  <div class="avatar" id="avatar">T</div>
+  <div class="nome" id="nomeUser"></div>
+  <div class="data" id="dataHoje"></div>
+  <div id="historicoContainer">
+    <h3>Histórico de Ações</h3>
+    <div id="historicoList"></div>
+  </div>
 </div>
 
-<!-- STATUS -->
-<div class="status-card">
-  <div id="estadoLabel">🔴 OFFLINE</div>
-</div>
+<div class="main">
+  <div class="status-card">
+    <div id="estadoLabel">🔴 OFFLINE</div>
+  </div>
 
-<!-- HORAS -->
-<div id="horas">
-  <div id="horaInicio"></div>
-  <div id="horaFim"></div>
-</div>
+  <div id="tipoButtons">
+    <button class="tipo-btn" data-tipo="login">Login</button>
+    <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
+    <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
+    <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
+    <button class="tipo-btn" data-tipo="formacao">Formação</button>
+    <button class="tipo-btn" data-tipo="logout">Logout</button>
+  </div>
 
-<!-- BOTÕES -->
-<div id="tipoButtons">
-  <button class="tipo-btn" data-tipo="login">Login</button>
-  <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
-  <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
-  <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
-  <button class="tipo-btn" data-tipo="formacao">Formação</button>
-  <button class="tipo-btn" data-tipo="logout">Logout</button>
-</div>
+  <div class="actions">
+    <button id="btnSubmeter" disabled>Submeter</button>
+    <button id="btnTerminar">Finalizar</button>
+    <div id="mensagem"></div>
+  </div>
 
-<!-- HISTÓRICO -->
-<div id="historicoContainer">
-  <h3>Histórico de Ações</h3>
-  <div id="historicoList"></div>
-</div>
-
-<!-- AÇÕES -->
-<div class="actions">
-  <button id="btnSubmeter" disabled>Submeter</button>
-  <button id="btnTerminar">Finalizar</button>
-  <div id="mensagem"></div>
-</div>
-
-<!-- PRODUÇÃO -->
-<div class="form-container">
-  <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
-  <form id="gamaForm">
-    <div class="form-group">
-      <label>Processo</label>
-      <input type="text" id="processoGama" required />
-    </div>
-
-    <div class="form-group">
-      <label>Documentos Tratados</label>
-      <input type="number" id="documentos" required />
-    </div>
-
-    <div class="form-group">
-      <label>Tarefa Finalizada</label>
-      <select id="tarefaFinalizada">
-        <option>Reembolsos Multicare</option>
-        <option>Formação/Meetings</option>
-      </select>
-    </div>
-
-    <div class="form-group">
-      <label>Tempo da Tarefa</label>
-      <input type="text" id="tempoTarefa" readonly />
-    </div>
-
-    <div class="button-container">
-      <button type="button" id="startButton">Iniciar</button>
-      <button type="button" id="endButton" disabled>Finalizar</button>
-    </div>
-
-    <div id="responseMessage"></div>
-  </form>
-</div>
-
+  <div class="form-container">
+    <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
+    <form id="gamaForm">
+      <div class="form-group">
+        <label>Processo</label>
+        <input type="text" id="processoGama" required />
+      </div>
+      <div class="form-group">
+        <label>Documentos Tratados</label>
+        <input type="number" id="documentos" required />
+      </div>
+      <div class="form-group">
+        <label>Tarefa Finalizada</label>
+        <select id="tarefaFinalizada">
+          <option>Reembolsos Multicare</option>
+          <option>Formação/Meetings</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Tempo da Tarefa</label>
+        <input type="text" id="tempoTarefa" readonly />
+      </div>
+      <div class="button-container">
+        <button type="button" id="startButton">Iniciar</button>
+        <button type="button" id="endButton" disabled>Finalizar</button>
+      </div>
+      <div id="responseMessage"></div>
+    </form>
+  </div>
 </div>
 
 <script>
-/* ================= DADOS ================= */
-const user = "EX04904";
-const nome = "Telma Sofia Pereira Rosa";
-
+const user="EX04904";
+const nome="Telma Sofia Pereira Rosa";
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
-/* ================= ESTADOS ================= */
-let tipoSelecionado = "";
+document.getElementById("nomeUser").textContent = nome;
+document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
+document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
+
+let tipoSelecionado="";
 let inicioDataHora;
-
+let fimDataHora;
 const estadoLabel = document.getElementById("estadoLabel");
-const btnSub = document.getElementById("btnSubmeter");
-const btnTerm = document.getElementById("btnTerminar");
-const msgEl = document.getElementById("mensagem");
-const horaInicioEl = document.getElementById("horaInicio");
-const horaFimEl = document.getElementById("horaFim");
-const historicoList = document.getElementById("historicoList");
-
-document.getElementById("infoNome").textContent = "👤 " + nome;
-document.getElementById("infoData").textContent =
-  "📅 " + new Date().toLocaleDateString("pt-BR");
+const btnSub=document.getElementById("btnSubmeter");
+const btnTerm=document.getElementById("btnTerminar");
+const msgEl=document.getElementById("mensagem");
+const historicoList=document.getElementById("historicoList");
 
 function formatarDataHoraLocal(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
          String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
 }
 
-function registrarHistorico(tipo, hora){
-  const div = document.createElement('div');
-  div.className = 'historico-item historico-' + tipo;
-  div.textContent = hora + ' - ' + tipo.charAt(0).toUpperCase() + tipo.slice(1);
+function registrarHistorico(tipo,inicio,fim=null){
+  const div=document.createElement('div');
+  div.className='historico-item historico-'+tipo;
+  let text=tipo.charAt(0).toUpperCase()+tipo.slice(1)+' - Início: '+inicio;
+  if(fim){
+    const duracao=((fim.getTime()-inicio.getTime())/1000/60).toFixed(1);
+    text+=' | Fim: '+fim.toLocaleTimeString()+' | Duração: '+duracao+' min';
+  }
+  div.textContent=text;
   historicoList.prepend(div);
 }
 
-async function enviarAoSupabase(dados){
-  await fetch(`${SUPABASE_URL}/rest/v1/BPO_registosNSS`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "apikey":SUPABASE_API_KEY,
-      "Authorization":`Bearer ${SUPABASE_API_KEY}`
-    },
-    body:JSON.stringify(dados)
-  });
+async function enviarAoSupabase(dados, table){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_API_KEY,
+        "Authorization":`Bearer ${SUPABASE_API_KEY}`,
+        "Prefer":"return=representation"
+      },
+      body: JSON.stringify(dados)
+    });
+    if(!res.ok){
+      const errData = await res.json().catch(()=>({message:res.statusText}));
+      throw new Error(errData.message||res.statusText);
+    }
+    return await res.json();
+  } catch(err){
+    console.error(err);
+    msgEl.textContent="❌ Erro ao enviar: "+err.message;
+  }
 }
 
+// Botões de estado
 document.querySelectorAll(".tipo-btn").forEach(btn=>{
   btn.onclick=()=>{
     tipoSelecionado=btn.dataset.tipo;
     inicioDataHora=new Date();
+    fimDataHora=null;
     btnSub.disabled=false;
     btnSub.style.display="inline-block";
     btnTerm.style.display="none";
-    horaFimEl.style.display="none";
     msgEl.textContent="";
-
+    let cor="";
     if(tipoSelecionado==="login"){ 
-      estadoLabel.textContent="🟢 ONLINE"; 
-      horaInicioEl.style.display="none"; 
-      document.querySelector(".status-card").style.borderLeftColor="var(--success)";
-      registrarHistorico("login", inicioDataHora.toLocaleTimeString("pt-BR"));
+      estadoLabel.textContent="🟢 ONLINE"; cor="--success";
+    } else if(tipoSelecionado==="logout"){ 
+      estadoLabel.textContent="🔴 OFFLINE"; cor="--danger";
+    } else { 
+      estadoLabel.textContent="⏸ "+btn.textContent; cor="--warning"; 
     }
-    else if(tipoSelecionado==="logout"){ 
-      estadoLabel.textContent="🔴 OFFLINE"; 
-      horaInicioEl.style.display="none"; 
-      document.querySelector(".status-card").style.borderLeftColor="var(--danger)";
-      registrarHistorico("logout", inicioDataHora.toLocaleTimeString("pt-BR"));
-    }
-    else {
-      estadoLabel.textContent="⏸ "+btn.textContent;
-      horaInicioEl.textContent="🕒 Início: "+inicioDataHora.toLocaleTimeString("pt-BR");
-      horaInicioEl.style.display="block";
-      let tipoHist = tipoSelecionado;
-      if(tipoSelecionado.startsWith("pausa")) tipoHist = "pausa";
-      registrarHistorico(tipoHist, inicioDataHora.toLocaleTimeString("pt-BR"));
-    }
-  };
+    document.querySelector(".status-card").style.borderLeftColor=getComputedStyle(document.documentElement).getPropertyValue(cor);
+  }
 });
 
-/* ================= SUBMETER E FINALIZAR ================= */
-btnSub.onclick = async () => {
-  if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
-    await enviarAoSupabase({
-      data: formatarDataHoraLocal(inicioDataHora).split("T")[0],
+// Submeter / Finalizar
+btnSub.onclick=()=>{
+  const dataHoje=formatarDataHoraLocal(inicioDataHora).split("T")[0];
+  if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
+    registrarHistorico(tipoSelecionado,inicioDataHora);
+    enviarAoSupabase({
+      data:dataHoje,
       user,
       nome,
-      tipo: tipoSelecionado,
-      inicio: formatarDataHoraLocal(inicioDataHora),
-      fim: null,
-      duracao: null
-    });
-    msgEl.textContent = "✔️ Registo enviado";
-    btnSub.disabled = true;
+      tipo:tipoSelecionado,
+      inicio:formatarDataHoraLocal(inicioDataHora),
+      fim:null,
+      duracao:null
+    },"BPO_registosNSS");
+    btnSub.disabled=true;
   } else {
-    btnSub.style.display = "none";
-    btnTerm.style.display = "inline-block";
-    
-    const terminarHandler = async () => {
-      const fimDataHora = new Date();
-      const duracaoHoras = (fimDataHora - inicioDataHora) / 3600000;
-
-      horaFimEl.textContent = "🕔 Fim: " + fimDataHora.toLocaleTimeString("pt-BR");
-      horaFimEl.style.display = "block";
-
+    btnSub.style.display="none";
+    btnTerm.style.display="inline-block";
+    btnTerm.onclick=async ()=>{
+      fimDataHora=new Date();
+      registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
       await enviarAoSupabase({
-        data: formatarDataHoraLocal(inicioDataHora).split("T")[0],
+        data:dataHoje,
         user,
         nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: formatarDataHoraLocal(fimDataHora),
-        duracao: parseFloat(duracaoHoras.toFixed(3))
-      });
-
-      msgEl.textContent = "✔️ Registo enviado";
-
-      setTimeout(() => {
-        horaInicioEl.style.display = "none";
-        horaFimEl.style.display = "none";
-        estadoLabel.textContent = "🟢 ONLINE";
-        msgEl.textContent = "";
-        tipoSelecionado = "";
-        btnTerm.style.display = "none";
-        btnSub.style.display = "inline-block";
-        btnSub.disabled = true;
-        document.querySelector(".status-card").style.borderLeftColor="var(--success)";
-      }, 5000);
-
-      btnTerm.removeEventListener("click", terminarHandler);
+        tipo:tipoSelecionado,
+        inicio:formatarDataHoraLocal(inicioDataHora),
+        fim:formatarDataHoraLocal(fimDataHora),
+        duracao:parseFloat(((fimDataHora-inicioDataHora)/3600000).toFixed(3))
+      },"BPO_registosNSS");
+      btnTerm.style.display="none";
+      btnSub.style.display="inline-block";
+      btnSub.disabled=true;
+      estadoLabel.textContent="🟢 ONLINE";
+      document.querySelector(".status-card").style.borderLeftColor="var(--success)";
     };
-
-    btnTerm.addEventListener("click", terminarHandler);
   }
 };
 
-/* ================= PRODUÇÃO ================= */
+// Produção
 let startTime,endTime,timerInterval;
 const startButton=document.getElementById('startButton');
 const endButton=document.getElementById('endButton');
@@ -488,14 +314,8 @@ function formatTime(seconds){
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-function formatDate(d){
-  return d.getDate().toString().padStart(2,'0')+"/"+(d.getMonth()+1).toString().padStart(2,'0')+"/"+d.getFullYear()+" "+
-         d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0')+":"+d.getSeconds().toString().padStart(2,'0');
-}
-
 startButton.onclick=()=>{
-  responseMessage.textContent = "";
-  
+  responseMessage.textContent="";
   startTime=new Date();
   startButton.disabled=true;
   endButton.disabled=false;
@@ -504,34 +324,23 @@ startButton.onclick=()=>{
   },1000);
 };
 
-endButton.onclick=()=>{
+endButton.onclick=async ()=>{
   clearInterval(timerInterval);
   endTime=new Date();
   endButton.disabled=true;
-
-  fetch(`${SUPABASE_URL}/rest/v1/BPO_dadosprodução`,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json",
-      "apikey":SUPABASE_API_KEY,
-      "Authorization":`Bearer ${SUPABASE_API_KEY}`
-    },
-    body:JSON.stringify({
-      inicio:formatDate(startTime),
-      fim:formatDate(endTime),
-      colaborador:nome,
-      processoGama:document.getElementById('processoGama').value,
-      Documentos:Number(document.getElementById('documentos').value),
-      tarefaFinalizada:document.getElementById('tarefaFinalizada').value,
-      tempo:tempoTarefa.value
-    })
-  });
-
+  await enviarAoSupabase({
+    inicio:startTime.toISOString(),
+    fim:endTime.toISOString(),
+    colaborador:nome,
+    processoGama:document.getElementById('processoGama').value,
+    Documentos:Number(document.getElementById('documentos').value),
+    tarefaFinalizada:document.getElementById('tarefaFinalizada').value,
+    tempo:tempoTarefa.value
+  },"BPO_dadosprodução");
   responseMessage.textContent="✔️ Produção enviada";
   document.getElementById('gamaForm').reset();
   startButton.disabled=false;
 };
 </script>
-
 </body>
 </html>
