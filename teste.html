@@ -26,19 +26,20 @@ body {
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  width: 260px;
+  width: 780px; /* maior para mostrar toda a info */
   background: var(--card);
   border-radius: 10px;
   border: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   padding: 20px;
-  height: 100vh; /* ocupa toda altura */
+  height: 100vh;
   box-sizing: border-box;
   position: fixed;
   left: 0;
   top: 0;
 }
+
 .avatar {
   width: 60px;
   height: 60px;
@@ -67,7 +68,7 @@ body {
 .main {
   flex-grow: 1;
   max-width: 480px;
-  margin-left: 280px; /* espaço para a sidebar */
+  margin-left: 780px; /* mesmo valor da sidebar */
   display: flex;
   flex-direction: column;
   padding: 20px;
