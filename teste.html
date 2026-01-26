@@ -6,7 +6,6 @@
 <title>Dashboard Newspring</title>
 
 <style>
-/* ================= TEMA CORPORATE ================= */
 :root {
   --primary: #0b5ed7;
   --success: #198754;
@@ -108,6 +107,41 @@ body {
 [data-tipo^="pausa"],
 [data-tipo="refeicao"] { border-left: 4px solid var(--warning); }
 [data-tipo="formacao"] { border-left: 4px solid var(--primary); }
+
+/* ================= HISTÓRICO ================= */
+#historicoContainer {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+#historicoContainer h3 {
+  font-size: 14px;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.historico-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #eee;
+}
+
+.historico-item:last-child {
+  border-bottom: none;
+}
+
+.historico-login { color: var(--success); }
+.historico-logout { color: var(--danger); }
+.historico-pausa { color: var(--warning); }
+.historico-refeicao { color: var(--warning); }
+.historico-formacao { color: var(--primary); }
 
 /* ================= AÇÕES ================= */
 .actions {
@@ -252,6 +286,12 @@ input:focus, select:focus {
   <button class="tipo-btn" data-tipo="logout">Logout</button>
 </div>
 
+<!-- HISTÓRICO -->
+<div id="historicoContainer">
+  <h3>Histórico de Ações</h3>
+  <div id="historicoList"></div>
+</div>
+
 <!-- AÇÕES -->
 <div class="actions">
   <button id="btnSubmeter" disabled>Submeter</button>
@@ -315,6 +355,7 @@ const btnTerm = document.getElementById("btnTerminar");
 const msgEl = document.getElementById("mensagem");
 const horaInicioEl = document.getElementById("horaInicio");
 const horaFimEl = document.getElementById("horaFim");
+const historicoList = document.getElementById("historicoList");
 
 document.getElementById("infoNome").textContent = "👤 " + nome;
 document.getElementById("infoData").textContent =
@@ -323,6 +364,13 @@ document.getElementById("infoData").textContent =
 function formatarDataHoraLocal(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
          String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
+}
+
+function registrarHistorico(tipo, hora){
+  const div = document.createElement('div');
+  div.className = 'historico-item historico-' + tipo;
+  div.textContent = hora + ' - ' + tipo.charAt(0).toUpperCase() + tipo.slice(1);
+  historicoList.prepend(div);
 }
 
 async function enviarAoSupabase(dados){
@@ -351,20 +399,26 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
       estadoLabel.textContent="🟢 ONLINE"; 
       horaInicioEl.style.display="none"; 
       document.querySelector(".status-card").style.borderLeftColor="var(--success)";
+      registrarHistorico("login", inicioDataHora.toLocaleTimeString("pt-BR"));
     }
     else if(tipoSelecionado==="logout"){ 
       estadoLabel.textContent="🔴 OFFLINE"; 
       horaInicioEl.style.display="none"; 
       document.querySelector(".status-card").style.borderLeftColor="var(--danger)";
+      registrarHistorico("logout", inicioDataHora.toLocaleTimeString("pt-BR"));
     }
     else {
       estadoLabel.textContent="⏸ "+btn.textContent;
       horaInicioEl.textContent="🕒 Início: "+inicioDataHora.toLocaleTimeString("pt-BR");
       horaInicioEl.style.display="block";
+      let tipoHist = tipoSelecionado;
+      if(tipoSelecionado.startsWith("pausa")) tipoHist = "pausa";
+      registrarHistorico(tipoHist, inicioDataHora.toLocaleTimeString("pt-BR"));
     }
   };
 });
 
+/* ================= SUBMETER E FINALIZAR ================= */
 btnSub.onclick = async () => {
   if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
     await enviarAoSupabase({
