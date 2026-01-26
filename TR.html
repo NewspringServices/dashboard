@@ -26,7 +26,7 @@ body {
 
 /* ================= SIDEBAR ================= */
 .sidebar {
-  width: 780px; /* maior para mostrar toda a info */
+  width: 780px;
   background: var(--card);
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -79,18 +79,9 @@ body {
   padding-top: 10px;
   border-top: 1px solid var(--border);
 }
-#linksUteis h3 {
-  font-size: 14px;
-  margin-bottom: 8px;
-}
-.links-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.links-list li {
-  margin-bottom: 6px;
-}
+#linksUteis h3 { font-size: 14px; margin-bottom: 8px; }
+.links-list { list-style: none; padding: 0; margin: 0; }
+.links-list li { margin-bottom: 6px; }
 .links-list li a {
   text-decoration: none;
   color: var(--primary);
@@ -100,15 +91,13 @@ body {
   border-radius: 6px;
   transition: background 0.2s;
 }
-.links-list li a:hover {
-  background: #e0e0e0;
-}
+.links-list li a:hover { background: #e0e0e0; }
 
 /* ================= MAIN ================= */
 .main {
   flex-grow: 1;
   max-width: 480px;
-  margin-left: 1000px; /* mesmo valor da sidebar */
+  margin-left: 1000px;
   display: flex;
   flex-direction: column;
   padding: 20px;
@@ -139,7 +128,7 @@ body {
 .actions button { padding:10px 18px; border-radius:6px; font-weight:bold; border:none; cursor:pointer; margin-right:6px; }
 #btnSubmeter { background: var(--primary); color:white; }
 #btnTerminar { background: var(--danger); color:white; display:none; }
-#mensagem { margin-top:8px; font-weight:bold; text-align:center; }
+#mensagem { margin-top:8px; font-weight:bold; text-align:center; color: var(--success); }
 
 /* PRODUÇÃO */
 .form-container {
@@ -147,16 +136,13 @@ body {
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 20px;
-  width: 100%;       /* ocupa todo o espaço da main */
-  box-sizing: border-box; /* garante que padding não aumenta a largura */
-  max-width: 480px;  /* opcional, para limitar */
-  margin: 0 auto;    /* centraliza dentro da main */
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 480px;
+  margin: 0 auto;
 }
 .form-group input,
-.form-group select {
-  width: 100%;
-  box-sizing: border-box; /* garante que não passa da borda do form */
-}
+.form-group select { width: 100%; box-sizing: border-box; }
 .titulo-gama { text-align:center; font-weight:bold; font-size:18px; color: var(--primary); margin-bottom:16px; }
 .form-group { margin-bottom:14px; }
 .form-group label { font-weight:bold; margin-bottom:4px; display:block; }
@@ -258,6 +244,7 @@ const nome="Telma Sofia Pereira Rosa";
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
+
 document.getElementById("nomeUser").textContent = nome;
 document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
@@ -311,10 +298,14 @@ async function enviarAoSupabase(dados, table){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
+    // ✅ ALERTA DE SUCESSO
+    alert(`✅ Registro de "${dados.tipo || dados.tarefaFinalizada}" enviado com sucesso!`);
+    msgEl.textContent = `✅ Registro de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
     return await res.json();
   } catch(err){
     console.error(err);
     msgEl.textContent="❌ Erro ao enviar: "+err.message;
+    alert(`❌ Erro ao enviar: ${err.message}`);
   }
 }
 
@@ -341,10 +332,10 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
   }
 });
 
-btnSub.onclick=()=>{
+btnSub.onclick=async ()=>{
   const dataHoje=formatarDataHoraLocal(inicioDataHora).split("T")[0];
   if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
-    enviarAoSupabase({
+    await enviarAoSupabase({
       data:dataHoje,
       user,
       nome,
@@ -422,3 +413,4 @@ endButton.onclick=async ()=>{
 </script>
 </body>
 </html>
+
