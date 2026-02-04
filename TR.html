@@ -322,6 +322,7 @@ async function enviarAoSupabase(dados, table){
   }catch(err){
     console.error(err);
     msgEl.textContent="❌ Erro ao enviar: "+err.message;
+    throw err;
   }
 }
 
@@ -336,14 +337,12 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
     btnTerm.style.display = "none";
     msgEl.textContent = "";
 
-    if(tipoSelecionado === "login") {
+    if(tipoSelecionado === "login"){
       estadoLabel.textContent = "🟢 ONLINE";
-    } else if(tipoSelecionado === "logout") {
+    } else if(tipoSelecionado === "logout"){
       estadoLabel.textContent = "🔴 OFFLINE";
     } else {
-      estadoLabel.textContent = "⏸ " + btn.textContent;
-      // Mantém histórico imediato para pausas, refeições e formações
-      registrarHistorico(tipoSelecionado, inicioDataHora);
+      estadoLabel.textContent = "⏸ "+btn.textContent;
     }
   };
 });
@@ -353,18 +352,18 @@ btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
 
   try {
-    // 🔒 Bloquear duplicados para login, logout, pausas e refeições (formação permitido múltiplas vezes)
-    if (tipoSelecionado !== "formacao") {
+    // Bloquear duplicados para todos exceto formacao
+    if(tipoSelecionado !== "formacao"){
       const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
-      if (jaExiste) {
+      if(jaExiste){
         msgEl.textContent = "⚠️ Este registo já foi submetido hoje.";
         btnSub.disabled = true;
         return;
       }
     }
 
-    // ✅ Envio normal
-    if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
+    // Para login/logout/pausa/almoço/formacao
+    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       await enviarAoSupabase({
         data: dataHoje,
         user,
@@ -375,17 +374,30 @@ btnSub.onclick = async () => {
         duracao: null
       }, "BPO_registosNSS");
 
-      // Só adiciona histórico após envio bem-sucedido
       registrarHistorico(tipoSelecionado, inicioDataHora);
-
       btnSub.disabled = true;
     } else {
+      // Pausa/almoço/formação (tem fim)
       btnSub.style.display = "none";
       btnTerm.style.display = "inline-block";
 
+      // Submeter o início agora
+      await enviarAoSupabase({
+        data: dataHoje,
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: null,
+        duracao: null
+      }, "BPO_registosNSS");
+
+      // Registrar histórico apenas o início
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+
       btnTerm.onclick = async () => {
         fimDataHora = new Date();
-
+        // Atualizar fim no Supabase
         await enviarAoSupabase({
           data: dataHoje,
           user,
@@ -396,7 +408,7 @@ btnSub.onclick = async () => {
           duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
         }, "BPO_registosNSS");
 
-        // Só adiciona histórico após envio bem-sucedido
+        // Atualizar histórico com o fim
         registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
 
         btnTerm.style.display = "none";
@@ -407,7 +419,7 @@ btnSub.onclick = async () => {
       };
     }
 
-  } catch(err) {
+  } catch(err){
     console.error(err);
     msgEl.textContent = "❌ Erro ao validar registo";
   }
@@ -460,6 +472,7 @@ endButton.onclick=async ()=>{
 
 </body>
 </html>
+
 
 
 
