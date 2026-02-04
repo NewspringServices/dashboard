@@ -244,7 +244,6 @@ const nome="Telma Sofia Pereira Rosa";
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
-
 document.getElementById("nomeUser").textContent = nome;
 document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
@@ -265,6 +264,25 @@ function formatarDataHoraLocal(d){
          String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
 }
 
+// ================== 🔒 VERIFICA REGISTO DUPLICADO ==================
+async function existeRegistoHoje(user, tipo, data) {
+  const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?user=eq.${user}&tipo=eq.${tipo}&data=eq.${data}&select=id`;
+
+  const res = await fetch(url, {
+    headers:{
+      "apikey": SUPABASE_API_KEY,
+      "Authorization": `Bearer ${SUPABASE_API_KEY}`
+    }
+  });
+
+  if(!res.ok){
+    throw new Error("Erro ao verificar registos existentes");
+  }
+
+  const dados = await res.json();
+  return dados.length > 0;
+}
+
 let historicoContador = 0;
 function registrarHistorico(tipo, inicio, fim=null){
   if(!fim){
@@ -272,13 +290,12 @@ function registrarHistorico(tipo, inicio, fim=null){
     const div=document.createElement('div');
     div.className='historico-item historico-'+tipo;
     div.id = registroAtualId;
-    div.textContent = tipo.charAt(0).toUpperCase()+tipo.slice(1)+' - Início: '+inicio.toLocaleTimeString('pt-BR', {hour12:false});
+    div.textContent = tipo.charAt(0).toUpperCase()+tipo.slice(1)+' - Início: '+inicio.toLocaleTimeString('pt-BR',{hour12:false});
     historicoList.prepend(div);
-    return registroAtualId;
   } else {
     const divAtual = document.getElementById(registroAtualId);
     const duracao=((fim-inicio)/1000/60).toFixed(1);
-    divAtual.textContent += ' | Fim: '+fim.toLocaleTimeString('pt-BR', {hour12:false})+' | Duração: '+duracao+' min';
+    divAtual.textContent += ' | Fim: '+fim.toLocaleTimeString('pt-BR',{hour12:false})+' | Duração: '+duracao+' min';
   }
 }
 
@@ -294,18 +311,17 @@ async function enviarAoSupabase(dados, table){
       },
       body: JSON.stringify(dados)
     });
+
     if(!res.ok){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
-    // ✅ ALERTA DE SUCESSO
 
     msgEl.textContent = `✅ Registo de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
     return await res.json();
-  } catch(err){
+  }catch(err){
     console.error(err);
     msgEl.textContent="❌ Erro ao enviar: "+err.message;
-    alert(`❌ Erro ao enviar: ${err.message}`);
   }
 }
 
@@ -314,62 +330,78 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
   btn.onclick=()=>{
     tipoSelecionado=btn.dataset.tipo;
     inicioDataHora=new Date();
-    fimDataHora=null;
     btnSub.disabled=false;
     btnSub.style.display="inline-block";
     btnTerm.style.display="none";
     msgEl.textContent="";
-    let cor="";
-    if(tipoSelecionado==="login"){ 
-      estadoLabel.textContent="🟢 ONLINE"; cor="--success";
-    } else if(tipoSelecionado==="logout"){ 
-      estadoLabel.textContent="🔴 OFFLINE"; cor="--danger";
-    } else { 
-      estadoLabel.textContent="⏸ "+btn.textContent; cor="--warning"; 
+
+    if(tipoSelecionado==="login"){
+      estadoLabel.textContent="🟢 ONLINE";
+    } else if(tipoSelecionado==="logout"){
+      estadoLabel.textContent="🔴 OFFLINE";
+    } else {
+      estadoLabel.textContent="⏸ "+btn.textContent;
     }
-    document.querySelector(".status-card").style.borderLeftColor=getComputedStyle(document.documentElement).getPropertyValue(cor);
+
     registrarHistorico(tipoSelecionado,inicioDataHora);
-  }
+  };
 });
 
 btnSub.onclick=async ()=>{
-  const dataHoje=formatarDataHoraLocal(inicioDataHora).split("T")[0];
-  if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
-    await enviarAoSupabase({
-      data:dataHoje,
-      user,
-      nome,
-      tipo:tipoSelecionado,
-      inicio:formatarDataHoraLocal(inicioDataHora),
-      fim:null,
-      duracao:null
-    },"BPO_registosNSS");
-    btnSub.disabled=true;
-  } else {
-    btnSub.style.display="none";
-    btnTerm.style.display="inline-block";
-    btnTerm.onclick=async ()=>{
-      fimDataHora=new Date();
-      registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
+  const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
+
+  try{
+    const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
+
+    if(jaExiste){
+      msgEl.textContent="⚠️ Este registo já foi submetido hoje.";
+      btnSub.disabled=true;
+      return;
+    }
+
+    if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
       await enviarAoSupabase({
         data:dataHoje,
         user,
         nome,
         tipo:tipoSelecionado,
         inicio:formatarDataHoraLocal(inicioDataHora),
-        fim:formatarDataHoraLocal(fimDataHora),
-        duracao:parseFloat(((fimDataHora-inicioDataHora)/3600000).toFixed(3))
+        fim:null,
+        duracao:null
       },"BPO_registosNSS");
-      btnTerm.style.display="none";
-      btnSub.style.display="inline-block";
+
       btnSub.disabled=true;
-      estadoLabel.textContent="🟢 ONLINE";
-      document.querySelector(".status-card").style.borderLeftColor="var(--success)";
-    };
+    } else {
+      btnSub.style.display="none";
+      btnTerm.style.display="inline-block";
+
+      btnTerm.onclick=async ()=>{
+        fimDataHora=new Date();
+        registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
+
+        await enviarAoSupabase({
+          data:dataHoje,
+          user,
+          nome,
+          tipo:tipoSelecionado,
+          inicio:formatarDataHoraLocal(inicioDataHora),
+          fim:formatarDataHoraLocal(fimDataHora),
+          duracao:parseFloat(((fimDataHora-inicioDataHora)/3600000).toFixed(3))
+        },"BPO_registosNSS");
+
+        btnTerm.style.display="none";
+        btnSub.style.display="inline-block";
+        btnSub.disabled=true;
+        estadoLabel.textContent="🟢 ONLINE";
+      };
+    }
+  }catch(err){
+    console.error(err);
+    msgEl.textContent="❌ Erro ao validar registo";
   }
 };
 
-// ================== Produção ==================
+// ================== Produção (INALTERADO) ==================
 let startTime,endTime,timerInterval;
 const startButton=document.getElementById('startButton');
 const endButton=document.getElementById('endButton');
@@ -397,6 +429,7 @@ endButton.onclick=async ()=>{
   clearInterval(timerInterval);
   endTime=new Date();
   endButton.disabled=true;
+
   await enviarAoSupabase({
     inicio:startTime.toISOString(),
     fim:endTime.toISOString(),
@@ -406,13 +439,16 @@ endButton.onclick=async ()=>{
     tarefaFinalizada:document.getElementById('tarefaFinalizada').value,
     tempo:tempoTarefa.value
   },"BPO_dadosprodução");
+
   responseMessage.textContent="✔️ Produção enviada";
   document.getElementById('gamaForm').reset();
   startButton.disabled=false;
 };
 </script>
+
 </body>
 </html>
+
 
 
 
