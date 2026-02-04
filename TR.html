@@ -249,46 +249,40 @@ document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
 
 // ================== Histórico ==================
-let tipoSelecionado="";
+let tipoSelecionado = "";
 let inicioDataHora;
 let fimDataHora;
 let registroAtualId = null;
 const estadoLabel = document.getElementById("estadoLabel");
-const btnSub=document.getElementById("btnSubmeter");
-const btnTerm=document.getElementById("btnTerminar");
-const msgEl=document.getElementById("mensagem");
-const historicoList=document.getElementById("historicoList");
+const btnSub = document.getElementById("btnSubmeter");
+const btnTerm = document.getElementById("btnTerminar");
+const msgEl = document.getElementById("mensagem");
+const historicoList = document.getElementById("historicoList");
+let historicoContador = 0;
 
 function formatarDataHoraLocal(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
          String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
 }
 
-// ================== 🔒 VERIFICA REGISTO DUPLICADO ==================
 async function existeRegistoHoje(user, tipo, data) {
   const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?user=eq.${user}&tipo=eq.${tipo}&data=eq.${data}&select=id`;
-
   const res = await fetch(url, {
     headers:{
       "apikey": SUPABASE_API_KEY,
       "Authorization": `Bearer ${SUPABASE_API_KEY}`
     }
   });
-
-  if(!res.ok){
-    throw new Error("Erro ao verificar registos existentes");
-  }
-
+  if(!res.ok) throw new Error("Erro ao verificar registos existentes");
   const dados = await res.json();
   return dados.length > 0;
 }
 
-let historicoContador = 0;
 function registrarHistorico(tipo, inicio, fim=null){
   if(!fim){
     registroAtualId = 'hist-' + historicoContador++;
-    const div=document.createElement('div');
-    div.className='historico-item historico-'+tipo;
+    const div = document.createElement('div');
+    div.className = 'historico-item historico-'+tipo;
     div.id = registroAtualId;
     div.textContent = tipo.charAt(0).toUpperCase()+tipo.slice(1)+' - Início: '+inicio.toLocaleTimeString('pt-BR',{hour12:false});
     historicoList.prepend(div);
@@ -311,12 +305,10 @@ async function enviarAoSupabase(dados, table){
       },
       body: JSON.stringify(dados)
     });
-
     if(!res.ok){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
-
     msgEl.textContent = `✅ Registo de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
     return await res.json();
   }catch(err){
@@ -347,22 +339,20 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
   };
 });
 
-// ================== Botão Submeter ==================
 btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
 
   try {
-    // Bloquear duplicados para todos exceto formacao
     if(tipoSelecionado !== "formacao"){
       const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
-      if(jaExiste){
+      if(jaExiste && (tipoSelecionado === "login" || tipoSelecionado === "logout")){
         msgEl.textContent = "⚠️ Este registo já foi submetido hoje.";
         btnSub.disabled = true;
         return;
       }
     }
 
-    // Para login/logout/pausa/almoço/formacao
+    // LOGIN/LOGOUT → envia imediatamente
     if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       await enviarAoSupabase({
         data: dataHoje,
@@ -373,31 +363,17 @@ btnSub.onclick = async () => {
         fim: null,
         duracao: null
       }, "BPO_registosNSS");
-
       registrarHistorico(tipoSelecionado, inicioDataHora);
       btnSub.disabled = true;
+
     } else {
-      // Pausa/almoço/formação (tem fim)
+      // Pausa, Refeição, Formação → envia somente ao finalizar
+      registrarHistorico(tipoSelecionado, inicioDataHora);
       btnSub.style.display = "none";
       btnTerm.style.display = "inline-block";
 
-      // Submeter o início agora
-      await enviarAoSupabase({
-        data: dataHoje,
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: null,
-        duracao: null
-      }, "BPO_registosNSS");
-
-      // Registrar histórico apenas o início
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-
       btnTerm.onclick = async () => {
         fimDataHora = new Date();
-        // Atualizar fim no Supabase
         await enviarAoSupabase({
           data: dataHoje,
           user,
@@ -408,9 +384,7 @@ btnSub.onclick = async () => {
           duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
         }, "BPO_registosNSS");
 
-        // Atualizar histórico com o fim
         registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
-
         btnTerm.style.display = "none";
         btnSub.style.display = "inline-block";
         btnSub.disabled = true;
@@ -472,10 +446,3 @@ endButton.onclick=async ()=>{
 
 </body>
 </html>
-
-
-
-
-
-
-
