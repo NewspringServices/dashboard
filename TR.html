@@ -347,19 +347,24 @@ document.querySelectorAll(".tipo-btn").forEach(btn=>{
   };
 });
 
-btnSub.onclick=async ()=>{
+// ================== Botão Submeter ==================
+btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
 
-  try{
-    const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
+  try {
+    // 🔒 Bloquear duplicados para login, logout, pausas e refeições
+    if (tipoSelecionado !== "formacao") {
+      const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
 
-    if(jaExiste){
-      msgEl.textContent="⚠️ Este registo já foi submetido hoje.";
-      btnSub.disabled=true;
-      return;
+      if (jaExiste) {
+        msgEl.textContent = "⚠️ Este registo já foi submetido hoje.";
+        btnSub.disabled = true;
+        return;
+      }
     }
 
-    if(tipoSelecionado==="login"||tipoSelecionado==="logout"){
+    // ✅ Envio normal
+    if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
       await enviarAoSupabase({
         data:dataHoje,
         user,
@@ -375,8 +380,8 @@ btnSub.onclick=async ()=>{
       btnSub.style.display="none";
       btnTerm.style.display="inline-block";
 
-      btnTerm.onclick=async ()=>{
-        fimDataHora=new Date();
+      btnTerm.onclick = async () => {
+        fimDataHora = new Date();
         registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
 
         await enviarAoSupabase({
@@ -393,15 +398,17 @@ btnSub.onclick=async ()=>{
         btnSub.style.display="inline-block";
         btnSub.disabled=true;
         estadoLabel.textContent="🟢 ONLINE";
+        document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
       };
     }
-  }catch(err){
+
+  } catch(err) {
     console.error(err);
     msgEl.textContent="❌ Erro ao validar registo";
   }
 };
 
-// ================== Produção (INALTERADO) ==================
+// ================== Produção ==================
 let startTime,endTime,timerInterval;
 const startButton=document.getElementById('startButton');
 const endButton=document.getElementById('endButton');
@@ -446,8 +453,10 @@ endButton.onclick=async ()=>{
 };
 </script>
 
+
 </body>
 </html>
+
 
 
 
