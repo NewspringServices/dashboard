@@ -305,7 +305,7 @@ async function enviarAoSupabase(dados, table){
       method:"POST",
       headers:{
         "Content-Type":"application/json",
-        "apikey":SUPABASE_API_KEY,
+        "apikey": SUPABASE_API_KEY,
         "Authorization":`Bearer ${SUPABASE_API_KEY}`,
         "Prefer":"return=representation"
       },
@@ -326,24 +326,25 @@ async function enviarAoSupabase(dados, table){
 }
 
 // ================== Botões de Estado ==================
-document.querySelectorAll(".tipo-btn").forEach(btn=>{
-  btn.onclick=()=>{
-    tipoSelecionado=btn.dataset.tipo;
-    inicioDataHora=new Date();
-    btnSub.disabled=false;
-    btnSub.style.display="inline-block";
-    btnTerm.style.display="none";
-    msgEl.textContent="";
+document.querySelectorAll(".tipo-btn").forEach(btn => {
+  btn.onclick = () => {
+    tipoSelecionado = btn.dataset.tipo;
+    inicioDataHora = new Date();
+    fimDataHora = null;
+    btnSub.disabled = false;
+    btnSub.style.display = "inline-block";
+    btnTerm.style.display = "none";
+    msgEl.textContent = "";
 
-    if(tipoSelecionado==="login"){
-      estadoLabel.textContent="🟢 ONLINE";
-    } else if(tipoSelecionado==="logout"){
-      estadoLabel.textContent="🔴 OFFLINE";
+    if(tipoSelecionado === "login") {
+      estadoLabel.textContent = "🟢 ONLINE";
+    } else if(tipoSelecionado === "logout") {
+      estadoLabel.textContent = "🔴 OFFLINE";
     } else {
-      estadoLabel.textContent="⏸ "+btn.textContent;
+      estadoLabel.textContent = "⏸ " + btn.textContent;
+      // Mantém histórico imediato para pausas, refeições e formações
+      registrarHistorico(tipoSelecionado, inicioDataHora);
     }
-
-    registrarHistorico(tipoSelecionado,inicioDataHora);
   };
 });
 
@@ -352,10 +353,9 @@ btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
 
   try {
-    // 🔒 Bloquear duplicados para login, logout, pausas e refeições
+    // 🔒 Bloquear duplicados para login, logout, pausas e refeições (formação permitido múltiplas vezes)
     if (tipoSelecionado !== "formacao") {
       const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
-
       if (jaExiste) {
         msgEl.textContent = "⚠️ Este registo já foi submetido hoje.";
         btnSub.disabled = true;
@@ -366,45 +366,50 @@ btnSub.onclick = async () => {
     // ✅ Envio normal
     if (tipoSelecionado === "login" || tipoSelecionado === "logout") {
       await enviarAoSupabase({
-        data:dataHoje,
+        data: dataHoje,
         user,
         nome,
-        tipo:tipoSelecionado,
-        inicio:formatarDataHoraLocal(inicioDataHora),
-        fim:null,
-        duracao:null
-      },"BPO_registosNSS");
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: null,
+        duracao: null
+      }, "BPO_registosNSS");
 
-      btnSub.disabled=true;
+      // Só adiciona histórico após envio bem-sucedido
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+
+      btnSub.disabled = true;
     } else {
-      btnSub.style.display="none";
-      btnTerm.style.display="inline-block";
+      btnSub.style.display = "none";
+      btnTerm.style.display = "inline-block";
 
       btnTerm.onclick = async () => {
         fimDataHora = new Date();
-        registrarHistorico(tipoSelecionado,inicioDataHora,fimDataHora);
 
         await enviarAoSupabase({
-          data:dataHoje,
+          data: dataHoje,
           user,
           nome,
-          tipo:tipoSelecionado,
-          inicio:formatarDataHoraLocal(inicioDataHora),
-          fim:formatarDataHoraLocal(fimDataHora),
-          duracao:parseFloat(((fimDataHora-inicioDataHora)/3600000).toFixed(3))
-        },"BPO_registosNSS");
+          tipo: tipoSelecionado,
+          inicio: formatarDataHoraLocal(inicioDataHora),
+          fim: formatarDataHoraLocal(fimDataHora),
+          duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+        }, "BPO_registosNSS");
 
-        btnTerm.style.display="none";
-        btnSub.style.display="inline-block";
-        btnSub.disabled=true;
-        estadoLabel.textContent="🟢 ONLINE";
+        // Só adiciona histórico após envio bem-sucedido
+        registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+
+        btnTerm.style.display = "none";
+        btnSub.style.display = "inline-block";
+        btnSub.disabled = true;
+        estadoLabel.textContent = "🟢 ONLINE";
         document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
       };
     }
 
   } catch(err) {
     console.error(err);
-    msgEl.textContent="❌ Erro ao validar registo";
+    msgEl.textContent = "❌ Erro ao validar registo";
   }
 };
 
@@ -438,14 +443,14 @@ endButton.onclick=async ()=>{
   endButton.disabled=true;
 
   await enviarAoSupabase({
-    inicio:startTime.toISOString(),
-    fim:endTime.toISOString(),
-    colaborador:nome,
-    processoGama:document.getElementById('processoGama').value,
-    Documentos:Number(document.getElementById('documentos').value),
-    tarefaFinalizada:document.getElementById('tarefaFinalizada').value,
-    tempo:tempoTarefa.value
-  },"BPO_dadosprodução");
+    inicio: startTime.toISOString(),
+    fim: endTime.toISOString(),
+    colaborador: nome,
+    processoGama: document.getElementById('processoGama').value,
+    Documentos: Number(document.getElementById('documentos').value),
+    tarefaFinalizada: document.getElementById('tarefaFinalizada').value,
+    tempo: tempoTarefa.value
+  }, "BPO_dadosprodução");
 
   responseMessage.textContent="✔️ Produção enviada";
   document.getElementById('gamaForm').reset();
@@ -453,9 +458,9 @@ endButton.onclick=async ()=>{
 };
 </script>
 
-
 </body>
 </html>
+
 
 
 
