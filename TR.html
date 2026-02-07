@@ -413,36 +413,61 @@ function formatTime(seconds){
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 }
 
-startButton.onclick=()=>{
-  responseMessage.textContent="";
-  startTime=new Date();
-  startButton.disabled=true;
-  endButton.disabled=false;
-  timerInterval=setInterval(()=>{
-    tempoTarefa.value=formatTime(Math.floor((new Date()-startTime)/1000));
-  },1000);
+btnSub.onclick = async () => {
+  const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
+
+  try {
+    // LOGIN/LOGOUT → envia imediatamente
+    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
+      await enviarAoSupabase({
+        data: dataHoje,
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: null,
+        duracao: null
+      }, "BPO_registosNSS");
+
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+      btnSub.disabled = true;
+
+    } else {
+      // Pausa, Refeição, Formação → envia somente ao finalizar
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+      btnSub.style.display = "none";
+      btnTerm.style.display = "inline-block";
+
+      btnTerm.onclick = async () => {
+        fimDataHora = new Date();
+
+        await enviarAoSupabase({
+          data: dataHoje,
+          user,
+          nome,
+          tipo: tipoSelecionado,
+          inicio: formatarDataHoraLocal(inicioDataHora),
+          fim: formatarDataHoraLocal(fimDataHora),
+          duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+        }, "BPO_registosNSS");
+
+        registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+        btnTerm.style.display = "none";
+        btnSub.style.display = "inline-block";
+        btnSub.disabled = true;
+        estadoLabel.textContent = "🟢 ONLINE";
+        document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+      };
+    }
+
+  } catch(err){
+    console.error(err);
+    msgEl.textContent = "❌ Erro ao validar registo";
+  }
 };
 
-endButton.onclick=async ()=>{
-  clearInterval(timerInterval);
-  endTime=new Date();
-  endButton.disabled=true;
-
-  await enviarAoSupabase({
-    inicio: startTime.toISOString(),
-    fim: endTime.toISOString(),
-    colaborador: nome,
-    processoGama: document.getElementById('processoGama').value,
-    Documentos: Number(document.getElementById('documentos').value),
-    tarefaFinalizada: document.getElementById('tarefaFinalizada').value,
-    tempo: tempoTarefa.value
-  }, "BPO_dadosprodução");
-
-  responseMessage.textContent="✔️ Produção enviada";
-  document.getElementById('gamaForm').reset();
-  startButton.disabled=false;
-};
 </script>
 
 </body>
 </html>
+
