@@ -265,15 +265,21 @@ function formatarDataHoraLocal(d){
          String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
 }
 
-async function existeRegistoHoje(user, tipo, data) {
-  const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?user=eq.${user}&tipo=eq.${tipo}&data=eq.${data}&select=id`;
+async function existeRegistoUltimos15Min(user, tipo) {
+  const agora = new Date();
+  const menos15 = new Date(agora.getTime() - (15 * 60 * 1000));
+  const inicioISO = formatarDataHoraLocal(menos15);
+  const fimISO = formatarDataHoraLocal(agora);
+
+  const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?user=eq.${user}&tipo=eq.${tipo}&inicio=gte.${inicioISO}&inicio=lte.${fimISO}&select=id,inicio`;
+
   const res = await fetch(url, {
     headers:{
       "apikey": SUPABASE_API_KEY,
       "Authorization": `Bearer ${SUPABASE_API_KEY}`
     }
   });
-  if(!res.ok) throw new Error("Erro ao verificar registos existentes");
+  if(!res.ok) throw new Error("Erro ao verificar últimos 15 min");
   const dados = await res.json();
   return dados.length > 0;
 }
@@ -343,17 +349,14 @@ btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
 
   try {
-    if(tipoSelecionado !== "formacao"){
-      const jaExiste = await existeRegistoHoje(user, tipoSelecionado, dataHoje);
-      if(jaExiste && (tipoSelecionado === "login" || tipoSelecionado === "logout")){
-        msgEl.textContent = "⚠️ Este registo já foi submetido hoje.";
+    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
+      const bloqueado = await existeRegistoUltimos15Min(user, tipoSelecionado);
+      if(bloqueado){
+        msgEl.textContent = "⚠️ Registo já enviado";
         btnSub.disabled = true;
         return;
       }
-    }
 
-    // LOGIN/LOGOUT → envia imediatamente
-    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       await enviarAoSupabase({
         data: dataHoje,
         user,
@@ -363,72 +366,6 @@ btnSub.onclick = async () => {
         fim: null,
         duracao: null
       }, "BPO_registosNSS");
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-      btnSub.disabled = true;
-
-    } else {
-      // Pausa, Refeição, Formação → envia somente ao finalizar
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-      btnSub.style.display = "none";
-      btnTerm.style.display = "inline-block";
-
-      btnTerm.onclick = async () => {
-        fimDataHora = new Date();
-        await enviarAoSupabase({
-          data: dataHoje,
-          user,
-          nome,
-          tipo: tipoSelecionado,
-          inicio: formatarDataHoraLocal(inicioDataHora),
-          fim: formatarDataHoraLocal(fimDataHora),
-          duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
-        }, "BPO_registosNSS");
-
-        registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
-        btnTerm.style.display = "none";
-        btnSub.style.display = "inline-block";
-        btnSub.disabled = true;
-        estadoLabel.textContent = "🟢 ONLINE";
-        document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
-      };
-    }
-
-  } catch(err){
-    console.error(err);
-    msgEl.textContent = "❌ Erro ao validar registo";
-  }
-};
-
-// ================== Produção ==================
-let startTime,endTime,timerInterval;
-const startButton=document.getElementById('startButton');
-const endButton=document.getElementById('endButton');
-const tempoTarefa=document.getElementById('tempoTarefa');
-const responseMessage=document.getElementById('responseMessage');
-
-function formatTime(seconds){
-  const h=Math.floor(seconds/3600);
-  const m=Math.floor((seconds%3600)/60);
-  const s=seconds%60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-}
-
-btnSub.onclick = async () => {
-  const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
-
-  try {
-    // LOGIN/LOGOUT → envia imediatamente
-    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
-      await enviarAoSupabase({
-        data: dataHoje,
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: null,
-        duracao: null
-      }, "BPO_registosNSS");
-
       registrarHistorico(tipoSelecionado, inicioDataHora);
       btnSub.disabled = true;
 
@@ -465,9 +402,7 @@ btnSub.onclick = async () => {
     msgEl.textContent = "❌ Erro ao validar registo";
   }
 };
-
 </script>
 
 </body>
 </html>
-
