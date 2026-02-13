@@ -315,7 +315,7 @@ async function enviarAoSupabase(dados, table){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
-    msgEl.textContent = `✅ Registo de "${dados.tipo || dados.tarefaFinalizada}" enviado!`;
+    msgEl.textContent = `✅ Registo enviado!`;
     return await res.json();
   }catch(err){
     console.error(err);
@@ -406,3 +406,4 @@ btnSub.onclick = async () => {
 
 </body>
 </html>
+
