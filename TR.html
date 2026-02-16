@@ -204,8 +204,7 @@ function registrarHistorico(tipo, inicio, fim=null){
     divAtual.textContent += ' | Fim: '+fim.toLocaleTimeString('pt-BR',{hour12:false})+' | Duração: '+duracao+' min';
   }
 }
-
-async function enviarAoSupabase(dados, table){
+async function enviarAoSupabase(dados, table, feedbackEl){
   try{
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
       method:"POST",
@@ -221,14 +220,25 @@ async function enviarAoSupabase(dados, table){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
-    msgEl.textContent = `✅ Registo enviado!`;
-    setTimeout(() => { msgEl.textContent = ""; }, 5000);
-  }catch(err){
+
+    // Mostra a mensagem de sucesso apenas se passou feedbackEl
+    if(feedbackEl){
+      if(table === "BPO_registosNSS"){
+        feedbackEl.textContent = "✅ Registo enviado!";
+      } else if(table === "BPO_dadosprodução"){
+        feedbackEl.textContent = "✅ Tarefa finalizada e enviada!";
+      }
+      setTimeout(()=>{ feedbackEl.textContent = ""; }, 5000);
+    }
+
+  } catch(err){
     console.error(err);
-    msgEl.textContent="❌ Erro ao enviar: "+err.message;
+    if(feedbackEl) feedbackEl.textContent="❌ Erro ao enviar: "+err.message;
     throw err;
   }
 }
+
+ 
 
 // ================== Botões de Estado ==================
 document.querySelectorAll(".tipo-btn").forEach(btn => {
@@ -248,8 +258,33 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
     } else {
       estadoLabel.textContent = "⏸ "+btn.textContent;
     }
+
+    btnTerm.onclick = async () => {
+  fimDataHora = new Date();
+
+  await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: formatarDataHoraLocal(fimDataHora),
+    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+
+  registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+  btnTerm.style.display = "none";
+  btnSub.style.display = "inline-block";
+  btnSub.disabled = true;
+  estadoLabel.textContent = "🟢 ONLINE";
+  document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+};
+
   };
 });
+
+
+  
 
 btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
@@ -365,3 +400,4 @@ endBtn.onclick = async ()=>{
 </script>
 </body>
 </html>
+
