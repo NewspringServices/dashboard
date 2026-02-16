@@ -412,11 +412,51 @@ btnSub.onclick = async () => {
     console.error(err);
     msgEl.textContent = "❌ Erro ao validar registo";
   }
+  // ================== PRODUÇÃO ==================
+let inicioTarefa = null;
+const startBtn = document.getElementById("startButton");
+const endBtn = document.getElementById("endButton");
+const tempoTarefa = document.getElementById("tempoTarefa");
+const responseMessage = document.getElementById("responseMessage");
+
+startBtn.onclick = () => {
+
+  // valida campos primeiro
+  const processo = document.getElementById("processoGama").value;
+  const docs = document.getElementById("documentos").value;
+
+  if (!processo || !docs) {
+    responseMessage.textContent = "⚠️ Preenche Processo e Documentos primeiro!";
+    return;
+  }
+
+  inicioTarefa = new Date();
+  startBtn.disabled = true;
+  endBtn.disabled = false;
+  tempoTarefa.value = "Em execução...";
+  responseMessage.textContent = "";
 };
+
+endBtn.onclick = () => {
+  if (!inicioTarefa) return;
+
+  const fim = new Date();
+  const minutos = ((fim - inicioTarefa) / 60000).toFixed(1);
+
+  tempoTarefa.value = minutos + " min";
+  responseMessage.textContent = "✅ Tarefa finalizada!";
+
+  startBtn.disabled = false;
+  endBtn.disabled = true;
+  inicioTarefa = null;
+};
+
+
 </script>
 
 </body>
 </html>
+
 
 
 
