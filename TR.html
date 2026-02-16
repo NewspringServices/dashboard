@@ -117,11 +117,11 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
     <form id="gamaForm">
       <div class="form-group">
         <label>Processo</label>
-        <input type="text" id="processoGama" required />
+        <input type="text" id="processoGama" />
       </div>
       <div class="form-group">
         <label>Documentos Tratados</label>
-        <input type="number" id="documentos" required />
+        <input type="number" id="documentos" />
       </div>
       <div class="form-group">
         <label>Tarefa Finalizada</label>
@@ -326,9 +326,6 @@ function formatHHMMSS(ms){
 }
 
 startBtn.onclick = ()=>{
-  const processo = document.getElementById("processoGama").value;
-  const docs = document.getElementById("documentos").value;
-  if(!processo || !docs){ responseMessage.textContent="⚠️ Preenche Processo e Documentos primeiro!"; return; }
   inicioTarefa = new Date();
   startBtn.disabled=true; endBtn.disabled=false; tempoTarefa.value="Em execução...";
   intervalTarefa=setInterval(()=>{ tempoTarefa.value=formatHHMMSS(new Date()-inicioTarefa); },1000);
@@ -352,8 +349,8 @@ endBtn.onclick = async ()=>{
       inicio: formatarDataHoraLocal(inicioTarefa),
       fim: formatarDataHoraLocal(fim),
       colaborador: nome,
-      "processoGama": processo,
-      Documentos: parseInt(docs),
+      processoGama: processo || "",
+      Documentos: parseInt(docs)||0,
       tarefaFinalizada: tarefaFinalizada,
       tempo: formatHHMMSS(duracaoMS)
     }, "BPO_dadosprodução");
@@ -363,9 +360,8 @@ endBtn.onclick = async ()=>{
   }
 
   startBtn.disabled=false; endBtn.disabled=true;
-  inicioTarefa=null; tempoTarefa.value=formatHHMMSS(duracaoMS);
+  inicioTarefa=null; tempoTarefa.value="00:00:00";
 };
 </script>
 </body>
 </html>
-
