@@ -357,11 +357,16 @@ btnSub.onclick = async () => {
   try {
     if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       const bloqueado = await existeRegistoUltimos15Min(user, tipoSelecionado);
-      if(bloqueado){
-        msgEl.textContent = "⚠️ Registo já enviado";
-        btnSub.disabled = true;
-        return;
-      }
+ if(bloqueado){
+  msgEl.textContent = "⚠️ Registo já enviado";
+  btnSub.disabled = true;
+
+  setTimeout(() => {
+    msgEl.textContent = "";
+  }, 5000);
+
+  return;
+}
 
       await enviarAoSupabase({
         data: dataHoje,
@@ -412,5 +417,6 @@ btnSub.onclick = async () => {
 
 </body>
 </html>
+
 
 
