@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- saved from url=(0053)https://newspringservices.github.io/dashboard/TR.html -->
-<html lang="pt-br"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard Newspring</title>
 <style>
@@ -20,8 +20,8 @@ body {
   margin:0; 
   background:var(--bg); 
   display:flex; 
-  flex-direction:column; /* alinhar verticalmente */
-  align-items:center;    /* centraliza horizontalmente */
+  flex-direction:column;
+  align-items:center;
   min-height:100vh; 
   padding:20px;
   box-sizing:border-box;
@@ -29,7 +29,7 @@ body {
 
 .sidebar { 
   width:100%;       
-  max-width:780px;  /* opcional: mantém limite de largura */
+  max-width:780px; 
   background:var(--card); 
   border-radius:10px; 
   border:1px solid var(--border); 
@@ -37,9 +37,21 @@ body {
   flex-direction:column; 
   padding:20px; 
   box-sizing:border-box; 
-  position:static;   /* remove o fixo */
-  margin-bottom:20px; /* separa da main */
+  margin-bottom:20px;
 }
+
+.sidebar-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.avatar { width:60px; height:60px; background:var(--primary); border-radius:50%; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:24px; margin-right:10px; }
+.nome { font-weight:700; font-size:16px; margin-bottom:4px; }
+.data { font-size:14px; color:#555; }
+#historicoContainer { flex-grow:1; overflow-y:auto; max-height:calc(100vh - 250px); display:flex; flex-direction:column; align-items:center; }
+#historicoContainer h3 { font-size:14px; margin:8px 0; }
+#historicoContainer img { width:400px; height:150px; object-fit:contain; margin-bottom:12px; }
+.historico-item { font-size:13px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.historico-login { color:var(--success); }
+.historico-logout { color:var(--danger); }
+.historico-pausa, .historico-refeicao { color:var(--warning); }
+.historico-formacao { color:var(--primary); }
 
 .main { 
   width:100%; 
@@ -50,24 +62,6 @@ body {
   box-sizing:border-box; 
 }
 
-/* ================== RESTANTE DO SEU CSS ================== */
-.sidebar-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
-.avatar { width:60px; height:60px; background:var(--primary); border-radius:50%; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:24px; margin-right:10px; }
-.nome { font-weight:700; font-size:16px; margin-bottom:4px; }
-.data { font-size:14px; color:#555; }
-#historicoContainer { flex-grow:1; overflow-y:auto; max-height:calc(100vh - 250px); }
-#historicoContainer h3 { font-size:14px; margin-bottom:8px; }
-.historico-item { font-size:13px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.historico-login { color:var(--success); }
-.historico-logout { color:var(--danger); }
-.historico-pausa, .historico-refeicao { color:var(--warning); }
-.historico-formacao { color:var(--primary); }
-#linksUteis { margin-top:20px; padding-top:10px; border-top:1px solid var(--border); }
-#linksUteis h3 { font-size:14px; margin-bottom:8px; }
-.links-list { list-style:none; padding:0; margin:0; }
-.links-list li { margin-bottom:6px; }
-.links-list li a { text-decoration:none; color:var(--primary); font-weight:bold; padding:6px 8px; display:block; border-radius:6px; transition:background 0.2s; }
-.links-list li a:hover { background:#e0e0e0; }
 .status-card { background:var(--card); border:1px solid var(--border); border-left:6px solid var(--danger); border-radius:10px; padding:14px; margin-bottom:12px; text-align:center; }
 #estadoLabel { font-weight:bold; }
 #tipoButtons { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
@@ -106,14 +100,14 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
         <div class="data" id="dataHoje">17/02/2026</div>
       </div>
     </div>
-    <img src="./Dashboard Newspring_files/logo.png" alt="Logo" style="width:400px; height:150px; object-fit:contain;">
   </div>
 
   <div id="historicoContainer">
+    <img src="logo.png" alt="Logo">
     <h3>Histórico de Ações</h3>
     <div id="historicoList"></div>
   </div>
-
+</div>
 
 <div class="main">
   <div class="status-card">
@@ -130,7 +124,7 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
   </div>
 
   <div class="actions">
-    <button id="btnSubmeter" disabled="">Submeter</button>
+    <button id="btnSubmeter" disabled>Submeter</button>
     <button id="btnTerminar">Finalizar</button>
     <div id="mensagem"></div>
   </div>
@@ -155,11 +149,11 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
       </div>
       <div class="form-group">
         <label>Tempo da Tarefa</label>
-        <input type="text" id="tempoTarefa" readonly="">
+        <input type="text" id="tempoTarefa" readonly>
       </div>
       <div class="button-container">
         <button type="button" id="startButton">Iniciar</button>
-        <button type="button" id="endButton" disabled="">Finalizar</button>
+        <button type="button" id="endButton" disabled>Finalizar</button>
       </div>
       <div id="responseMessage"></div>
     </form>
@@ -441,3 +435,4 @@ intervalTarefa = null;
 
 
 </div></body></html>
+
