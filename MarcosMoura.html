@@ -493,7 +493,22 @@ endBtn.onclick = async ()=>{
 
   startBtn.disabled=false; endBtn.disabled=true;
   inicioTarefa=null; tempoTarefa.value="00:00:00";
+
+  startBtn.disabled = false;
+endBtn.disabled = true;
+
+// RESET CAMPOS
+document.getElementById("processoGama").value = "";
+document.getElementById("documentos").value = "";
+document.getElementById("tarefaFinalizada").value = "";
+
+inicioTarefa = null;
+tempoTarefa.value = "00:00:00";
+clearInterval(intervalTarefa);
+intervalTarefa = null;
+
 };
 </script>
 </body>
 </html>
+
