@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Dashboard Newspring</title>
 <style>
 :root {
@@ -15,145 +15,78 @@
   --text: #212529;
   --border: #ddd;
 }
-
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: var(--bg);
-  display: flex;
-  min-height: 100vh;
+body { 
+  font-family: Arial, sans-serif; 
+  margin:0; 
+  background:var(--bg); 
+  display:flex; 
+  flex-direction:column;
+  align-items:center;
+  min-height:100vh; 
+  padding:20px;
+  box-sizing:border-box;
 }
 
-/* ================= SIDEBAR ================= */
-.sidebar {
-  width: 780px;
-  background: var(--card);
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  height: 100vh;
-  box-sizing: border-box;
-  position: fixed;
-  left: 0;
-  top: 0;
+.sidebar { 
+  width:100%;       
+  max-width:780px; 
+  background:var(--card); 
+  border-radius:10px; 
+  border:1px solid var(--border); 
+  display:flex; 
+  flex-direction:column; 
+  padding:20px; 
+  box-sizing:border-box; 
+  margin-bottom:20px;
 }
 
-.sidebar-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+.sidebar-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.avatar { width:60px; height:60px; background:var(--primary); border-radius:50%; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; font-size:24px; margin-right:10px; }
+.nome { font-weight:700; font-size:16px; margin-bottom:4px; }
+.data { font-size:14px; color:#555; }
+#historicoContainer { flex-grow:1; overflow-y:auto; max-height:calc(100vh - 250px); display:flex; flex-direction:column; align-items:center; }
+#historicoContainer h3 { font-size:14px; margin:8px 0; }
+#historicoContainer img { width:400px; height:150px; object-fit:contain; margin-bottom:12px; }
+.historico-item { font-size:13px; margin-bottom:6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.historico-login { color:var(--success); }
+.historico-logout { color:var(--danger); }
+.historico-pausa, .historico-refeicao { color:var(--warning); }
+.historico-formacao { color:var(--primary); }
+
+.main { 
+  width:100%; 
+  max-width:480px; 
+  display:flex; 
+  flex-direction:column; 
+  padding:20px; 
+  box-sizing:border-box; 
 }
 
-.avatar {
-  width: 60px;
-  height: 60px;
-  background: var(--primary);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: bold;
-  font-size: 24px;
-  margin-right: 10px;
-}
-
-.nome { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
-.data { font-size: 14px; color: #555; }
-
-#historicoContainer { flex-grow: 1; overflow-y: auto; max-height: calc(100vh - 250px); }
-#historicoContainer h3 { font-size: 14px; margin-bottom: 8px; }
-.historico-item { font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.historico-login { color: var(--success); }
-.historico-logout { color: var(--danger); }
-.historico-pausa { color: var(--warning); }
-.historico-refeicao { color: var(--warning); }
-.historico-formacao { color: var(--primary); }
-
-/* Links Úteis */
-#linksUteis {
-  margin-top: 20px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-#linksUteis h3 { font-size: 14px; margin-bottom: 8px; }
-.links-list { list-style: none; padding: 0; margin: 0; }
-.links-list li { margin-bottom: 6px; }
-.links-list li a {
-  text-decoration: none;
-  color: var(--primary);
-  font-weight: bold;
-  padding: 6px 8px;
-  display: block;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-.links-list li a:hover { background: #e0e0e0; }
-
-/* ================= MAIN ================= */
-.main {
-  flex-grow: 1;
-  max-width: 480px;
-  margin-left: 1000px;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-}
-
-/* STATUS */
-.status-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-left: 6px solid var(--danger);
-  border-radius: 10px;
-  padding: 14px;
-  margin-bottom: 12px;
-  text-align: center;
-}
-#estadoLabel { font-weight: bold; }
-
-/* BOTÕES ESTADO */
-#tipoButtons { display: grid; grid-template-columns: repeat(2,1fr); gap:8px; margin-bottom:12px; }
-.tipo-btn { padding:12px; border-radius:6px; border:1px solid var(--border); background: var(--card); font-weight:bold; cursor:pointer; }
+.status-card { background:var(--card); border:1px solid var(--border); border-left:6px solid var(--danger); border-radius:10px; padding:14px; margin-bottom:12px; text-align:center; }
+#estadoLabel { font-weight:bold; }
+#tipoButtons { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:12px; }
+.tipo-btn { padding:12px; border-radius:6px; border:1px solid var(--border); background:var(--card); font-weight:bold; cursor:pointer; }
 [data-tipo="login"] { border-left:4px solid var(--success); }
 [data-tipo="logout"] { border-left:4px solid var(--danger); }
 [data-tipo^="pausa"], [data-tipo="refeicao"] { border-left:4px solid var(--warning); }
 [data-tipo="formacao"] { border-left:4px solid var(--primary); }
-
-/* AÇÕES */
 .actions { text-align:center; margin-bottom:20px; }
 .actions button { padding:10px 18px; border-radius:6px; font-weight:bold; border:none; cursor:pointer; margin-right:6px; }
-#btnSubmeter { background: var(--primary); color:white; }
-#btnTerminar { background: var(--danger); color:white; display:none; }
-#mensagem { margin-top:8px; font-weight:bold; text-align:center; color: var(--success); }
-
-/* PRODUÇÃO */
-.form-container {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 20px;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 480px;
-  margin: 0 auto;
-}
-.form-group input,
-.form-group select { width: 100%; box-sizing: border-box; }
-.titulo-gama { text-align:center; font-weight:bold; font-size:18px; color: var(--primary); margin-bottom:16px; }
+#btnSubmeter { background:var(--primary); color:white; }
+#btnTerminar { background:var(--danger); color:white; display:none; }
+#mensagem { margin-top:8px; font-weight:bold; text-align:center; color:var(--success); }
+.form-container { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; width:100%; box-sizing:border-box; max-width:480px; margin:0 auto; }
+.titulo-gama { text-align:center; font-weight:bold; font-size:18px; color:var(--primary); margin-bottom:16px; }
 .form-group { margin-bottom:14px; }
 .form-group label { font-weight:bold; margin-bottom:4px; display:block; }
 input, select { width:100%; padding:10px; border-radius:6px; border:1px solid var(--border); font-size:14px; }
-input:focus, select:focus { border-color: var(--primary); outline:none; }
+input:focus, select:focus { border-color:var(--primary); outline:none; }
 .button-container { display:flex; justify-content:space-between; margin-top:14px; }
 .button-container button { width:48%; padding:10px 0; font-weight:bold; border:none; border-radius:6px; cursor:pointer; }
-#startButton { background: var(--success); color:white; }
-#endButton { background: var(--danger); color:white; }
+#startButton { background:var(--success); color:white; }
+#endButton { background:var(--danger); color:white; }
 #tempoTarefa { text-align:center; font-weight:bold; background:#f0f0f0; border-radius:6px; }
-#responseMessage { text-align:center; margin-top:12px; font-weight:bold; color: var(--success);}
+#responseMessage { text-align:center; margin-top:12px; font-weight:bold; color:var(--success);}
 </style>
 </head>
 <body>
@@ -167,22 +100,12 @@ input:focus, select:focus { border-color: var(--primary); outline:none; }
         <div class="data" id="dataHoje"></div>
       </div>
     </div>
-    <img src="logo.png" alt="Logo" style="width:400px; height:150px; object-fit:contain;">
   </div>
 
   <div id="historicoContainer">
+    <img src="logo.png" alt="Logo">
     <h3>Histórico de Ações</h3>
     <div id="historicoList"></div>
-  </div>
-
-  <!-- Links Úteis -->
-  <div id="linksUteis">
-    <h3>Links Úteis</h3>
-    <ul class="links-list">
-      <li><a href="https://www.newspring.pt/" target="_blank">Site Oficial - Newspring</a></li>
-      <li><a href="http://cisn/IPortal/Sidebar.aspx" target="_blank">CISN</a></li>
-      <li><a href="https://ferias2026.github.io/FID_2026/" target="_blank">Plataforma Férias 2026</a></li>
-    </ul>
   </div>
 </div>
 
@@ -211,22 +134,22 @@ input:focus, select:focus { border-color: var(--primary); outline:none; }
     <form id="gamaForm">
       <div class="form-group">
         <label>Processo</label>
-        <input type="text" id="processoGama" required />
+        <input type="text" id="processoGama">
       </div>
       <div class="form-group">
         <label>Documentos Tratados</label>
-        <input type="number" id="documentos" required />
+        <input type="number" id="documentos">
       </div>
       <div class="form-group">
         <label>Tarefa Finalizada</label>
         <select id="tarefaFinalizada">
-          <option>Reembolsos Multicare</option>
-          <option>DNP</option>
+      <option>Reembolsos Multicare</option>
+                    <option>DNP</option>
         </select>
       </div>
       <div class="form-group">
         <label>Tempo da Tarefa</label>
-        <input type="text" id="tempoTarefa" readonly />
+        <input type="text" id="tempoTarefa" readonly>
       </div>
       <div class="button-container">
         <button type="button" id="startButton">Iniciar</button>
@@ -507,6 +430,10 @@ intervalTarefa = null;
 
 };
 </script>
-</body>
-</html>
+
+
+
+
+
+</div></body></html>
 
