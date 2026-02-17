@@ -297,8 +297,7 @@ function registrarHistorico(tipo, inicio, fim=null){
     divAtual.textContent += ' | Fim: '+fim.toLocaleTimeString('pt-BR',{hour12:false})+' | Duração: '+duracao+' min';
   }
 }
-
-async function enviarAoSupabase(dados, table){
+async function enviarAoSupabase(dados, table, feedbackEl){
   try{
     const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`,{
       method:"POST",
@@ -314,20 +313,25 @@ async function enviarAoSupabase(dados, table){
       const errData = await res.json().catch(()=>({message:res.statusText}));
       throw new Error(errData.message||res.statusText);
     }
-   msgEl.textContent = `✅ Registo enviado!`;
 
-// Apaga a mensagem após 5 segundos
-setTimeout(() => {
-  msgEl.textContent = "";
-}, 5000);
-  }catch(err){
+    // Mostra a mensagem de sucesso apenas se passou feedbackEl
+    if(feedbackEl){
+      if(table === "BPO_registosNSS"){
+        feedbackEl.textContent = "✅ Registo enviado!";
+      } else if(table === "BPO_dadosprodução"){
+        feedbackEl.textContent = "✅ Tarefa finalizada e enviada!";
+      }
+      setTimeout(()=>{ feedbackEl.textContent = ""; }, 5000);
+    }
+
+  } catch(err){
     console.error(err);
-    msgEl.textContent="❌ Erro ao enviar: "+err.message;
+    if(feedbackEl) feedbackEl.textContent="❌ Erro ao enviar: "+err.message;
     throw err;
   }
 }
 
-
+ 
 
 // ================== Botões de Estado ==================
 document.querySelectorAll(".tipo-btn").forEach(btn => {
@@ -347,8 +351,33 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
     } else {
       estadoLabel.textContent = "⏸ "+btn.textContent;
     }
+
+    btnTerm.onclick = async () => {
+  fimDataHora = new Date();
+
+  await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: formatarDataHoraLocal(fimDataHora),
+    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+
+  registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+  btnTerm.style.display = "none";
+  btnSub.style.display = "inline-block";
+  btnSub.disabled = true;
+  estadoLabel.textContent = "🟢 ONLINE";
+  document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+};
+
   };
 });
+
+
+  
 
 btnSub.onclick = async () => {
   const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
@@ -356,16 +385,12 @@ btnSub.onclick = async () => {
   try {
     if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       const bloqueado = await existeRegistoUltimos15Min(user, tipoSelecionado);
- if(bloqueado){
-  msgEl.textContent = "⚠️ Registo já enviado";
-  btnSub.disabled = true;
-
-  setTimeout(() => {
-    msgEl.textContent = "";
-  }, 5000);
-
-  return;
-}
+      if(bloqueado){
+        msgEl.textContent = "⚠️ Registo já enviado";
+        btnSub.disabled = true;
+        setTimeout(() => { msgEl.textContent = ""; }, 5000);
+        return;
+      }
 
       await enviarAoSupabase({
         data: dataHoje,
@@ -380,7 +405,6 @@ btnSub.onclick = async () => {
       btnSub.disabled = true;
 
     } else {
-      // Pausa, Refeição, Formação → envia somente ao finalizar
       registrarHistorico(tipoSelecionado, inicioDataHora);
       btnSub.style.display = "none";
       btnTerm.style.display = "inline-block";
@@ -412,7 +436,60 @@ btnSub.onclick = async () => {
     msgEl.textContent = "❌ Erro ao validar registo";
   }
 };
-</script>
 
+// ================== Produção ==================
+let inicioTarefa = null;
+let intervalTarefa = null;
+const startBtn = document.getElementById("startButton");
+const endBtn = document.getElementById("endButton");
+const tempoTarefa = document.getElementById("tempoTarefa");
+const responseMessage = document.getElementById("responseMessage");
+
+function formatHHMMSS(ms){
+  const totalSec = Math.floor(ms/1000);
+  const h = String(Math.floor(totalSec/3600)).padStart(2,"0");
+  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
+  const s = String(totalSec%60).padStart(2,"0");
+  return `${h}:${m}:${s}`;
+}
+
+startBtn.onclick = ()=>{
+  inicioTarefa = new Date();
+  startBtn.disabled=true; endBtn.disabled=false; tempoTarefa.value="Em execução...";
+  intervalTarefa=setInterval(()=>{ tempoTarefa.value=formatHHMMSS(new Date()-inicioTarefa); },1000);
+  responseMessage.textContent="";
+};
+
+endBtn.onclick = async ()=>{
+  if(!inicioTarefa) return;
+  clearInterval(intervalTarefa);
+  const fim = new Date();
+  const duracaoMS = fim-inicioTarefa;
+  tempoTarefa.value=formatHHMMSS(duracaoMS);
+
+  const processo = document.getElementById("processoGama").value;
+  const docs = document.getElementById("documentos").value;
+  const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
+
+  try{
+    await enviarAoSupabase({
+      tipologiaPuxada:"",
+      inicio: formatarDataHoraLocal(inicioTarefa),
+      fim: formatarDataHoraLocal(fim),
+      colaborador: nome,
+      processoGama: processo || "",
+      Documentos: parseInt(docs)||0,
+      tarefaFinalizada: tarefaFinalizada,
+      tempo: formatHHMMSS(duracaoMS)
+    }, "BPO_dadosprodução");
+    responseMessage.textContent="✅ Tarefa finalizada e enviada!";
+  }catch(err){
+    responseMessage.textContent="❌ Erro ao enviar: "+err.message;
+  }
+
+  startBtn.disabled=false; endBtn.disabled=true;
+  inicioTarefa=null; tempoTarefa.value="00:00:00";
+};
+</script>
 </body>
 </html>
