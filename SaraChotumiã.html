@@ -246,7 +246,8 @@ input:focus, select:focus { border-color: var(--primary); outline:none; }
 // ================== Dados do Usuário ==================
    const user = "EX10891";
     const nome = "Sara Banú Chotumiã"; 
-const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+
+ const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
 document.getElementById("nomeUser").textContent = nome;
@@ -495,7 +496,22 @@ endBtn.onclick = async ()=>{
 
   startBtn.disabled=false; endBtn.disabled=true;
   inicioTarefa=null; tempoTarefa.value="00:00:00";
+
+  startBtn.disabled = false;
+endBtn.disabled = true;
+
+// RESET CAMPOS
+document.getElementById("processoGama").value = "";
+document.getElementById("documentos").value = "";
+document.getElementById("tarefaFinalizada").value = "";
+
+inicioTarefa = null;
+tempoTarefa.value = "00:00:00";
+clearInterval(intervalTarefa);
+intervalTarefa = null;
+
 };
 </script>
 </body>
 </html>
+
