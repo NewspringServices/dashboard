@@ -96,8 +96,8 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
     <div style="display:flex; align-items:center;">
       <div class="avatar" id="avatar">T</div>
       <div>
-        <div class="nome" id="nomeUser">Telma Sofia Pereira Rosa</div>
-        <div class="data" id="dataHoje">17/02/2026</div>
+        <div class="nome" id="nomeUser"></div>
+        <div class="data" id="dataHoje"></div>
       </div>
     </div>
   </div>
@@ -143,11 +143,11 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
       <div class="form-group">
         <label>Tarefa Finalizada</label>
         <select id="tarefaFinalizada">
-  <option>Auto-Aberturas</option>
+   <option>Auto-Aberturas</option>
         <option>Auto-Indexações</option>
         <option>Auto-Devolução de E-mail</option>
         <option>Erros/SPAMS</option>
-                  <option>DNP</option>
+   <option>DNP</option>
 
         </select>
       </div>
@@ -166,7 +166,7 @@ input:focus, select:focus { border-color:var(--primary); outline:none; }
 
 <script>
 // ================== Dados do Usuário ==================
-   const user = "EX10677";
+     const user = "EX10677";
     const nome = "Andreia Sofia Figueiredo Grilo";
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
@@ -283,3 +283,161 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
 
     btnTerm.onclick = async () => {
   fimDataHora = new Date();
+
+  await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: formatarDataHoraLocal(fimDataHora),
+    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+
+  registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+  btnTerm.style.display = "none";
+  btnSub.style.display = "inline-block";
+  btnSub.disabled = true;
+  estadoLabel.textContent = "🟢 ONLINE";
+  document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+};
+
+  };
+});
+
+
+  
+
+btnSub.onclick = async () => {
+  const dataHoje = formatarDataHoraLocal(inicioDataHora).split("T")[0];
+
+  try {
+    if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
+      const bloqueado = await existeRegistoUltimos15Min(user, tipoSelecionado);
+      if(bloqueado){
+        msgEl.textContent = "⚠️ Registo já enviado";
+        btnSub.disabled = true;
+        setTimeout(() => { msgEl.textContent = ""; }, 5000);
+        return;
+      }
+
+      await enviarAoSupabase({
+        data: dataHoje,
+        user,
+        nome,
+        tipo: tipoSelecionado,
+        inicio: formatarDataHoraLocal(inicioDataHora),
+        fim: null,
+        duracao: null
+      }, "BPO_registosNSS");
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+      btnSub.disabled = true;
+
+    } else {
+      registrarHistorico(tipoSelecionado, inicioDataHora);
+      btnSub.style.display = "none";
+      btnTerm.style.display = "inline-block";
+
+      btnTerm.onclick = async () => {
+        fimDataHora = new Date();
+
+        await enviarAoSupabase({
+          data: dataHoje,
+          user,
+          nome,
+          tipo: tipoSelecionado,
+          inicio: formatarDataHoraLocal(inicioDataHora),
+          fim: formatarDataHoraLocal(fimDataHora),
+          duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
+        }, "BPO_registosNSS");
+
+        registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
+        btnTerm.style.display = "none";
+        btnSub.style.display = "inline-block";
+        btnSub.disabled = true;
+        estadoLabel.textContent = "🟢 ONLINE";
+        document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+      };
+    }
+
+  } catch(err){
+    console.error(err);
+    msgEl.textContent = "❌ Erro ao validar registo";
+  }
+};
+
+// ================== Produção ==================
+let inicioTarefa = null;
+let intervalTarefa = null;
+const startBtn = document.getElementById("startButton");
+const endBtn = document.getElementById("endButton");
+const tempoTarefa = document.getElementById("tempoTarefa");
+const responseMessage = document.getElementById("responseMessage");
+
+function formatHHMMSS(ms){
+  const totalSec = Math.floor(ms/1000);
+  const h = String(Math.floor(totalSec/3600)).padStart(2,"0");
+  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
+  const s = String(totalSec%60).padStart(2,"0");
+  return `${h}:${m}:${s}`;
+}
+
+startBtn.onclick = ()=>{
+  inicioTarefa = new Date();
+  startBtn.disabled=true; endBtn.disabled=false; tempoTarefa.value="Em execução...";
+  intervalTarefa=setInterval(()=>{ tempoTarefa.value=formatHHMMSS(new Date()-inicioTarefa); },1000);
+  responseMessage.textContent="";
+};
+
+endBtn.onclick = async ()=>{
+  if(!inicioTarefa) return;
+  clearInterval(intervalTarefa);
+  const fim = new Date();
+  const duracaoMS = fim-inicioTarefa;
+  tempoTarefa.value=formatHHMMSS(duracaoMS);
+
+  const processo = document.getElementById("processoGama").value;
+  const docs = document.getElementById("documentos").value;
+  const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
+
+  try{
+    await enviarAoSupabase({
+      tipologiaPuxada:"",
+      inicio: formatarDataHoraLocal(inicioTarefa),
+      fim: formatarDataHoraLocal(fim),
+      colaborador: nome,
+      processoGama: processo || "",
+      Documentos: parseInt(docs)||0,
+      tarefaFinalizada: tarefaFinalizada,
+      tempo: formatHHMMSS(duracaoMS)
+    }, "BPO_dadosprodução");
+    responseMessage.textContent="✅ Tarefa finalizada e enviada!";
+  }catch(err){
+    responseMessage.textContent="❌ Erro ao enviar: "+err.message;
+  }
+
+  startBtn.disabled=false; endBtn.disabled=true;
+  inicioTarefa=null; tempoTarefa.value="00:00:00";
+
+  startBtn.disabled = false;
+endBtn.disabled = true;
+
+// RESET CAMPOS
+document.getElementById("processoGama").value = "";
+document.getElementById("documentos").value = "";
+document.getElementById("tarefaFinalizada").value = "";
+
+inicioTarefa = null;
+tempoTarefa.value = "00:00:00";
+clearInterval(intervalTarefa);
+intervalTarefa = null;
+
+};
+</script>
+
+
+
+
+
+</div></body></html>
+
