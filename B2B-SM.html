@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Produção - B2B Medições</title>
+<style>
+:root {
+  --primary: #0b1f5e;
+  --success: #2e7d32;
+  --danger: #d50000;
+  --bg: #f7f7f7;
+  --card: #ffffff;
+  --border: #ddd;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin:0;
+  background:var(--bg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  min-height:100vh;
+  padding-top:60px;
+}
+
+header {
+  width:100%;
+  max-width:420px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:20px;
+  margin-bottom:20px;
+  box-sizing:border-box;
+}
+
+header img {
+  width:150px; 
+  height:150px;
+  object-fit:contain;
+  margin-bottom:10px;
+}
+
+header .info {
+  text-align:center;
+}
+
+header .info .nome {
+  font-weight:bold;
+  font-size:18px;
+  color:var(--primary);
+  margin-bottom:4px;
+}
+
+header .info .data {
+  font-size:16px;
+  color:#555;
+}
+
+.form-container {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:20px;
+  width:100%;
+  max-width:420px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.titulo {
+  text-align:center;
+  font-weight:bold;
+  font-size:18px;
+  color:var(--primary);
+  margin-bottom:16px;
+}
+
+.form-group {
+  margin-bottom:14px;
+  width:100%;
+}
+
+.form-group label {
+  font-weight:bold;
+  display:block;
+  margin-bottom:4px;
+}
+
+input, select {
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  box-sizing:border-box;
+  background:#fff; /* fundo branco */
+}
+
+#tempoTarefa {
+  text-align:center;
+  font-weight:bold;
+  background:#f0f0f0;
+  margin-top:6px;
+  width:100%;
+}
+
+.button-container {
+  display:flex;
+  justify-content:space-between;
+  margin-top:14px;
+  width:100%;
+}
+
+button {
+  width:48%;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#startButton { background:var(--success); color:white; }
+#endButton { background:var(--danger); color:white; }
+
+#responseMessage {
+  text-align:center;
+  margin-top:12px;
+  font-weight:bold;
+  color:var(--success);
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <img src="logo.png" alt="Logo">
+  <div class="info">
+    <div class="nome" id="nomeUser"></div>
+    <div class="data" id="dataHoje"></div>
+  </div>
+</header>
+
+<div class="form-container">
+  <div class="titulo">Produção - B2B Medições</div>
+
+  <div class="form-group">
+    <label>Número de Caso</label>
+    <input type="number" id="numeroCaso">
+  </div>
+
+  <div class="form-group">
+    <label>Estado do Processo</label>
+    <select id="estadoProcesso" required>
+      <option value="" disabled selected>-- Selecione --</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Tratado">Tratado</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Tempo da Tarefa</label>
+    <input type="text" id="tempoTarefa" readonly value="00:00:00">
+  </div>
+
+  <div class="button-container">
+    <button type="button" id="startButton">Iniciar</button>
+    <button type="button" id="endButton" disabled>Finalizar</button>
+  </div>
+
+  <div id="responseMessage"></div>
+</div>
+
+<script>
+// ================== Dados do colaborador ==================
+const nome = "Sheila Sandra Mapoissa";
+const user = "Sheila Mapoissa";
+
+// Cabeçalho
+document.getElementById("nomeUser").textContent = nome;
+document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
+
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+// ================== Funções auxiliares ==================
+function formatarDataHoraLocal(d){
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
+         String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0");
+}
+
+function formatHHMMSS(ms){
+  const totalSec = Math.floor(ms/1000);
+  const h = String(Math.floor(totalSec/3600)).padStart(2,"0");
+  const m = String(Math.floor((totalSec%3600)/60)).padStart(2,"0");
+  const s = String(totalSec%60).padStart(2,"0");
+  return `${h}:${m}:${s}`;
+}
+
+async function enviarAoSupabase(dados){
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/B2B_medições`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "apikey": SUPABASE_API_KEY,
+      "Authorization":`Bearer ${SUPABASE_API_KEY}`,
+      "Prefer":"return=representation"
+    },
+    body: JSON.stringify(dados)
+  });
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error(err);
+  }
+}
+
+// ================== Lógica Iniciar / Finalizar ==================
+let inicioTarefa = null;
+let intervalTarefa = null;
+
+const startBtn = document.getElementById("startButton");
+const endBtn = document.getElementById("endButton");
+const tempoTarefa = document.getElementById("tempoTarefa");
+const responseMessage = document.getElementById("responseMessage");
+
+startBtn.onclick = () => {
+  inicioTarefa = new Date();
+  startBtn.disabled = true;
+  endBtn.disabled = false;
+  tempoTarefa.value = "00:00:00";
+
+  intervalTarefa = setInterval(()=>{
+    tempoTarefa.value = formatHHMMSS(new Date()-inicioTarefa);
+  },1000);
+
+  responseMessage.textContent = "";
+};
+
+endBtn.onclick = async () => {
+  if(!inicioTarefa) return;
+
+  clearInterval(intervalTarefa);
+
+  const fim = new Date();
+  const duracaoMS = fim - inicioTarefa;
+
+  const numeroCaso = parseInt(document.getElementById("numeroCaso").value);
+  const estadoProcesso = document.getElementById("estadoProcesso").value;
+  const dataHoje = new Date().toISOString().split("T")[0];
+
+  if(isNaN(numeroCaso)){
+    responseMessage.textContent = "❌ Por favor preencha o número de caso.";
+    return;
+  }
+
+  if(!estadoProcesso){
+    responseMessage.textContent = "❌ Por favor selecione o estado do processo.";
+    return;
+  }
+
+  const registo = {
+    data: dataHoje,
+    inicio: formatarDataHoraLocal(inicioTarefa),
+    fim: formatarDataHoraLocal(fim),
+    colaborador: nome,
+    user: user,
+    numero_caso: numeroCaso,
+    estado_processo: estadoProcesso
+  };
+
+  try{
+    await enviarAoSupabase(registo);
+    responseMessage.textContent="✅ Tarefa finalizada e enviada!";
+  } catch(err){
+    responseMessage.textContent="❌ Erro ao enviar: "+err.message;
+  }
+
+  // RESET
+  startBtn.disabled = false;
+  endBtn.disabled = true;
+  inicioTarefa = null;
+  tempoTarefa.value = "00:00:00";
+  document.getElementById("numeroCaso").value = "";
+  document.getElementById("estadoProcesso").value = "";
+};
+</script>
+</body>
+</html>
