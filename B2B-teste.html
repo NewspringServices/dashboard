@@ -21,9 +21,9 @@ body {
   display:flex;
   flex-direction:column;
   align-items:center;
+  justify-content:flex-start;
   min-height:100vh;
-  justify-content:flex-start; /* permite controlar o espaço superior */
-  padding-top:60px; /* empurra cabeçalho e formulário para baixo */
+  padding-top:60px;
 }
 
 header {
@@ -33,28 +33,29 @@ header {
   border:1px solid var(--border);
   border-radius:10px;
   display:flex;
+  flex-direction:column;
   align-items:center;
-  padding:10px 16px;
+  padding:20px;
   margin-bottom:20px;
   box-sizing:border-box;
 }
 
 header img {
-  width:50px;
-  height:50px;
+  width:100px; /* logo maior */
+  height:100px;
   object-fit:contain;
-  margin-right:12px;
+  margin-bottom:10px;
 }
 
 header .info {
-  display:flex;
-  flex-direction:column;
+  text-align:center;
 }
 
 header .info .nome {
   font-weight:bold;
   font-size:16px;
   color:var(--primary);
+  margin-bottom:4px;
 }
 
 header .info .data {
@@ -99,6 +100,15 @@ input, select {
   padding:10px;
   border-radius:6px;
   border:1px solid var(--border);
+  box-sizing:border-box;
+}
+
+#tempoTarefa {
+  text-align:center;
+  font-weight:bold;
+  background:#f0f0f0;
+  margin-top:6px;
+  width:100%;
 }
 
 .button-container {
@@ -119,13 +129,6 @@ button {
 
 #startButton { background:var(--success); color:white; }
 #endButton { background:var(--danger); color:white; }
-
-#tempoTarefa {
-  text-align:center;
-  font-weight:bold;
-  background:#f0f0f0;
-  margin-top:6px;
-}
 
 #responseMessage {
   text-align:center;
