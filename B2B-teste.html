@@ -41,7 +41,7 @@ header {
 }
 
 header img {
-  width:150px; /* logo maior */
+  width:150px; 
   height:150px;
   object-fit:contain;
   margin-bottom:10px;
@@ -101,6 +101,7 @@ input, select {
   border-radius:6px;
   border:1px solid var(--border);
   box-sizing:border-box;
+  background:#fff; /* fundo branco */
 }
 
 #tempoTarefa {
@@ -159,9 +160,10 @@ button {
 
   <div class="form-group">
     <label>Estado do Processo</label>
-    <select id="estadoProcesso">
-      <option>Pendente</option>
-      <option>Tratado</option>
+    <select id="estadoProcesso" required>
+      <option value="" disabled selected>-- Selecione --</option>
+      <option value="Pendente">Pendente</option>
+      <option value="Tratado">Tratado</option>
     </select>
   </div>
 
@@ -234,6 +236,7 @@ startBtn.onclick = () => {
   inicioTarefa = new Date();
   startBtn.disabled = true;
   endBtn.disabled = false;
+  tempoTarefa.value = "00:00:00";
 
   intervalTarefa = setInterval(()=>{
     tempoTarefa.value = formatHHMMSS(new Date()-inicioTarefa);
@@ -256,6 +259,11 @@ endBtn.onclick = async () => {
 
   if(isNaN(numeroCaso)){
     responseMessage.textContent = "❌ Por favor preencha o número de caso.";
+    return;
+  }
+
+  if(!estadoProcesso){
+    responseMessage.textContent = "❌ Por favor selecione o estado do processo.";
     return;
   }
 
@@ -282,7 +290,7 @@ endBtn.onclick = async () => {
   inicioTarefa = null;
   tempoTarefa.value = "00:00:00";
   document.getElementById("numeroCaso").value = "";
-  document.getElementById("estadoProcesso").value = "Pendente";
+  document.getElementById("estadoProcesso").value = "";
 };
 </script>
 </body>
