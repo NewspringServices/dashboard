@@ -101,7 +101,7 @@ input, select {
   border-radius:6px;
   border:1px solid var(--border);
   box-sizing:border-box;
-  background:#fff; /* fundo branco */
+  background:#fff;
 }
 
 #tempoTarefa {
@@ -167,6 +167,16 @@ button {
     </select>
   </div>
 
+  <!-- CAMPO Auditado -->
+  <div class="form-group">
+    <label>Auditado</label>
+    <select id="auditado" required>
+      <option value="" disabled selected>-- Selecione --</option>
+      <option value="Sim">Sim</option>
+      <option value="Não">Não</option>
+    </select>
+  </div>
+
   <div class="form-group">
     <label>Tempo da Tarefa</label>
     <input type="text" id="tempoTarefa" readonly value="00:00:00">
@@ -182,13 +192,14 @@ button {
 
 <script>
 // ================== Dados do colaborador ==================
-const nome = "Telma Sofia Pereira Rosa";
-const user = "EX04904";
+const nome = "Catarina Lisandra Fernandes Gonçalves";
+const user = "Catarina Goncalves";
 
 // Cabeçalho
 document.getElementById("nomeUser").textContent = nome;
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
 
+// ================== Config Supabase ==================
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
@@ -252,11 +263,15 @@ endBtn.onclick = async () => {
 
   const fim = new Date();
   const duracaoMS = fim - inicioTarefa;
+  const duracaoHHMMSS = formatHHMMSS(duracaoMS);
 
   const numeroCaso = parseInt(document.getElementById("numeroCaso").value);
   const estadoProcesso = document.getElementById("estadoProcesso").value;
+  const auditadoStr = document.getElementById("auditado").value;
+  const auditado = auditadoStr === "Sim"; // TRUE/FALSE
   const dataHoje = new Date().toISOString().split("T")[0];
 
+  // Validações
   if(isNaN(numeroCaso)){
     responseMessage.textContent = "❌ Por favor preencha o número de caso.";
     return;
@@ -267,6 +282,11 @@ endBtn.onclick = async () => {
     return;
   }
 
+  if(!auditadoStr){
+    responseMessage.textContent = "❌ Por favor selecione se foi auditado.";
+    return;
+  }
+
   const registo = {
     data: dataHoje,
     inicio: formatarDataHoraLocal(inicioTarefa),
@@ -274,7 +294,9 @@ endBtn.onclick = async () => {
     colaborador: nome,
     user: user,
     numero_caso: numeroCaso,
-    estado_processo: estadoProcesso
+    estado_processo: estadoProcesso,
+    tempo: duracaoHHMMSS,
+    auditado: auditado
   };
 
   try{
@@ -291,6 +313,7 @@ endBtn.onclick = async () => {
   tempoTarefa.value = "00:00:00";
   document.getElementById("numeroCaso").value = "";
   document.getElementById("estadoProcesso").value = "";
+  document.getElementById("auditado").value = "";
 };
 </script>
 </body>
