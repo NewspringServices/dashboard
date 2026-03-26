@@ -1,23 +1,125 @@
 
+```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
   <title>Exportar Excel</title>
 
+  <!-- Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #1e293b;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 300px;
+    }
+
+    img {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 15px;
+      background: #334155;
+      color: white;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .error {
+      color: #f87171;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
+
 <body>
 
-<button onclick="exportar()">Exportar Excel</button>
+<div class="container">
+
+  <!-- LOGO -->
+  <img src="logo.png" alt="Logo">
+
+  <h2>Área Protegida</h2>
+
+  <!-- LOGIN -->
+  <div id="login">
+    <input type="password" id="password" placeholder="Introduz a senha">
+    <div id="erro" class="error"></div>
+    <button onclick="login()">Entrar</button>
+  </div>
+
+  <!-- BOTÃO EXPORT -->
+  <div id="app" class="hidden">
+    <h2>Exportar Dados</h2>
+    <button onclick="exportar()">Exportar Excel</button>
+  </div>
+
+</div>
 
 <script>
+const SENHA = "Newspring*2026"; // 🔒 MUDA ISTO
+
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+const SUPABASE_API_KEY = 'A_TUA_KEY_AQUI';
+
+function login() {
+  const input = document.getElementById("password").value;
+
+  if (input === SENHA) {
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+  } else {
+    document.getElementById("erro").innerText = "Senha incorreta";
+  }
+}
 
 async function exportar() {
   try {
-    // ⚠️ importante para nomes com acentos
     const tabela = encodeURIComponent("B2B_medições");
 
     const res = await fetch(
@@ -31,24 +133,19 @@ async function exportar() {
       }
     );
 
-    console.log("STATUS:", res.status);
-
     if (!res.ok) {
       const erro = await res.text();
-      console.error("ERRO:", erro);
       alert("Erro: " + erro);
       return;
     }
 
     const dados = await res.json();
-    console.log("DADOS:", dados);
 
     if (!dados || dados.length === 0) {
-      alert("Sem dados na tabela");
+      alert("Sem dados");
       return;
     }
 
-    // Converter para Excel
     const ws = XLSX.utils.json_to_sheet(dados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dados");
@@ -57,11 +154,11 @@ async function exportar() {
 
   } catch (err) {
     console.error(err);
-    alert("Erro geral");
+    alert("Erro ao exportar");
   }
 }
 </script>
 
 </body>
 </html>
-
+```
