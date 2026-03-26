@@ -1,89 +1,67 @@
-```html
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Exportar Supabase para Excel</title>
+  <title>Exportar Excel</title>
 
-  <!-- Biblioteca Excel (SheetJS) -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      margin-top: 50px;
-    }
-
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #218838;
-    }
-  </style>
 </head>
 <body>
 
-  <h2>Exportar tabela Supabase para Excel</h2>
-  <button onclick="exportarExcel()">Exportar Excel</button>
+<button onclick="exportar()">Exportar Excel</button>
 
-  <script>
-    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+<script>
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
-    // ⚠️ Usa apenas a ANON KEY (não uses service_role no frontend)
-    const SUPABASE_API_KEY = 'COLOCA_AQUI_A_TUA_ANON_KEY';
+async function exportar() {
+  try {
+    // ⚠️ importante para nomes com acentos
+    const tabela = encodeURIComponent("B2B_medições");
 
-    async function exportarExcel() {
-      try {
-        const tabela = encodeURIComponent("B2B_medições");
-
-        const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
-          {
-            method: "GET",
-            headers: {
-              "apikey": SUPABASE_API_KEY,
-              "Authorization": `Bearer ${SUPABASE_API_KEY}`
-            }
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Erro na API: " + response.status);
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
+      {
+        method: "GET",
+        headers: {
+          "apikey": SUPABASE_API_KEY,
+          "Authorization": `Bearer ${SUPABASE_API_KEY}`
         }
-
-        const dados = await response.json();
-        console.log("Dados recebidos:", dados);
-
-        if (!dados || dados.length === 0) {
-          alert("Não há dados na tabela!");
-          return;
-        }
-
-        // Converter JSON -> Excel
-        const worksheet = XLSX.utils.json_to_sheet(dados);
-        const workbook = XLSX.utils.book_new();
-
-        XLSX.utils.book_append_sheet(workbook, worksheet, "Dados");
-
-        // Download do ficheiro
-        XLSX.writeFile(workbook, "dados_supabase.xlsx");
-
-      } catch (error) {
-        console.error("Erro:", error);
-        alert("Erro ao exportar. Vê o console (F12).");
       }
+    );
+
+    console.log("STATUS:", res.status);
+
+    if (!res.ok) {
+      const erro = await res.text();
+      console.error("ERRO:", erro);
+      alert("Erro: " + erro);
+      return;
     }
-  </script>
+
+    const dados = await res.json();
+    console.log("DADOS:", dados);
+
+    if (!dados || dados.length === 0) {
+      alert("Sem dados na tabela");
+      return;
+    }
+
+    // Converter para Excel
+    const ws = XLSX.utils.json_to_sheet(dados);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Dados");
+
+    XLSX.writeFile(wb, "dados.xlsx");
+
+  } catch (err) {
+    console.error(err);
+    alert("Erro geral");
+  }
+}
+</script>
 
 </body>
 </html>
-```
+
