@@ -39,23 +39,21 @@
       color: #111;
     }
 
-  
-
     input {
-  width: 100%;
-  padding: 14px;         /* igual ao botão */
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 15px;
-  background: #f9f9f9;
-  color: #111;
-  font-size: 16px;
-  box-sizing: border-box; /* importante para largura total */
-}
+      width: 100%;
+      padding: 14px;         /* igual ao botão */
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      background: #f9f9f9;
+      color: #111;
+      font-size: 16px;
+      box-sizing: border-box; /* importante para largura total */
+    }
 
     button {
       width: 100%;
-      padding: 14px;         /* mesmo tamanho para login e export */
+      padding: 14px;         
       border-radius: 8px;
       border: none;
       background: #10b981;   /* verde */
@@ -123,8 +121,9 @@ async function exportar() {
   try {
     const tabela = encodeURIComponent("B2B_medições");
 
+    // Selecionar todas as colunas exceto "id"
     const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
+      `${SUPABASE_URL}/rest/v1/${tabela}?select=data,inicio,fim,colaborador,"user",numero_caso,estado_processo,tempo,auditado`,
       {
         method: "GET",
         headers: {
