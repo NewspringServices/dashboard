@@ -168,6 +168,15 @@ button {
   </div>
 
   <div class="form-group">
+    <label>Auditado</label>
+    <select id="auditado" required>
+      <option value="" disabled selected>-- Selecione --</option>
+      <option value="Sim">Sim</option>
+      <option value="Não">Não</option>
+    </select>
+  </div>
+
+  <div class="form-group">
     <label>Tempo da Tarefa</label>
     <input type="text" id="tempoTarefa" readonly value="00:00:00">
   </div>
@@ -185,7 +194,6 @@ button {
 const nome = "Karine Garcia Teixeira";
 const user = "Karine Teixeira";
 
-// Cabeçalho
 document.getElementById("nomeUser").textContent = nome;
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
 
@@ -257,15 +265,20 @@ endBtn.onclick = async () => {
 
   const numeroCaso = parseInt(document.getElementById("numeroCaso").value);
   const estadoProcesso = document.getElementById("estadoProcesso").value;
+  const auditado = document.getElementById("auditado").value; // "Sim" ou "Não"
   const dataHoje = new Date().toISOString().split("T")[0];
 
+  // Validações
   if(isNaN(numeroCaso)){
     responseMessage.textContent = "❌ Por favor preencha o número de caso.";
     return;
   }
-
   if(!estadoProcesso){
     responseMessage.textContent = "❌ Por favor selecione o estado do processo.";
+    return;
+  }
+  if(!auditado){
+    responseMessage.textContent = "❌ Por favor selecione se foi auditado.";
     return;
   }
 
@@ -277,7 +290,8 @@ endBtn.onclick = async () => {
     user: user,
     numero_caso: numeroCaso,
     estado_processo: estadoProcesso,
-    tempo: duracaoHHMMSS // <-- adicionada a coluna tempo
+    tempo: duracaoHHMMSS,
+    auditado: auditado
   };
 
   try{
@@ -294,6 +308,7 @@ endBtn.onclick = async () => {
   tempoTarefa.value = "00:00:00";
   document.getElementById("numeroCaso").value = "";
   document.getElementById("estadoProcesso").value = "";
+  document.getElementById("auditado").value = "";
 };
 </script>
 </body>
