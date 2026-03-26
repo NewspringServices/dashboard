@@ -1,0 +1,89 @@
+```html
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Exportar Supabase para Excel</title>
+
+  <!-- Biblioteca Excel (SheetJS) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Exportar tabela Supabase para Excel</h2>
+  <button onclick="exportarExcel()">Exportar Excel</button>
+
+  <script>
+    const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+
+    // ⚠️ Usa apenas a ANON KEY (não uses service_role no frontend)
+    const SUPABASE_API_KEY = 'COLOCA_AQUI_A_TUA_ANON_KEY';
+
+    async function exportarExcel() {
+      try {
+        const tabela = encodeURIComponent("B2B_medições");
+
+        const response = await fetch(
+          `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
+          {
+            method: "GET",
+            headers: {
+              "apikey": SUPABASE_API_KEY,
+              "Authorization": `Bearer ${SUPABASE_API_KEY}`
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Erro na API: " + response.status);
+        }
+
+        const dados = await response.json();
+        console.log("Dados recebidos:", dados);
+
+        if (!dados || dados.length === 0) {
+          alert("Não há dados na tabela!");
+          return;
+        }
+
+        // Converter JSON -> Excel
+        const worksheet = XLSX.utils.json_to_sheet(dados);
+        const workbook = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Dados");
+
+        // Download do ficheiro
+        XLSX.writeFile(workbook, "dados_supabase.xlsx");
+
+      } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao exportar. Vê o console (F12).");
+      }
+    }
+  </script>
+
+</body>
+</html>
+```
