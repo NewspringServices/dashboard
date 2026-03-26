@@ -1,5 +1,4 @@
 
-```html
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -13,8 +12,8 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
+      background: #064e3b; /* fundo verde escuro */
+      color: #111;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -22,39 +21,41 @@
     }
 
     .container {
-      background: #1e293b;
-      padding: 40px;
+      background: #ffffff; /* quadrado branco */
+      padding: 50px 40px;
       border-radius: 16px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      box-shadow: 0 0 30px rgba(0,0,0,0.3);
       text-align: center;
-      width: 300px;
+      width: 350px;
     }
 
     img {
-      width: 120px;
-      margin-bottom: 20px;
+      width: 180px; /* maior */
+      height: auto; /* manter proporção */
+      margin-bottom: 30px;
     }
 
     h2 {
       margin-bottom: 20px;
+      color: #111;
     }
 
     input {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border-radius: 8px;
-      border: none;
+      border: 1px solid #ccc;
       margin-bottom: 15px;
-      background: #334155;
-      color: white;
+      background: #f9f9f9;
+      color: #111;
     }
 
     button {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       border: none;
-      background: #3b82f6;
+      background: #10b981; /* verde do botão */
       color: white;
       font-size: 16px;
       cursor: pointer;
@@ -62,7 +63,7 @@
     }
 
     button:hover {
-      background: #2563eb;
+      background: #059669; /* verde mais escuro ao passar o mouse */
     }
 
     .hidden {
@@ -102,14 +103,12 @@
 </div>
 
 <script>
-const SENHA = "Newspring*2026"; // 🔒 MUDA ISTO
-
+const SENHA = "1234"; // muda para a tua senha
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-const SUPABASE_API_KEY = 'A_TUA_KEY_AQUI';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
 function login() {
   const input = document.getElementById("password").value;
-
   if (input === SENHA) {
     document.getElementById("login").classList.add("hidden");
     document.getElementById("app").classList.remove("hidden");
@@ -121,7 +120,6 @@ function login() {
 async function exportar() {
   try {
     const tabela = encodeURIComponent("B2B_medições");
-
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
       {
@@ -142,14 +140,13 @@ async function exportar() {
     const dados = await res.json();
 
     if (!dados || dados.length === 0) {
-      alert("Sem dados");
+      alert("Sem dados na tabela");
       return;
     }
 
     const ws = XLSX.utils.json_to_sheet(dados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dados");
-
     XLSX.writeFile(wb, "dados.xlsx");
 
   } catch (err) {
@@ -161,4 +158,3 @@ async function exportar() {
 
 </body>
 </html>
-```
