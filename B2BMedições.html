@@ -3,7 +3,8 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <!-- Excel -->
+
+  <!-- Biblioteca Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
   <style>
@@ -28,8 +29,8 @@
     }
 
     img {
-      width: 180px; /* maior */
-      height: auto; /* manter proporção */
+      width: 180px; /* logo maior */
+      height: auto;
       margin-bottom: 30px;
     }
 
@@ -46,14 +47,15 @@
       margin-bottom: 15px;
       background: #f9f9f9;
       color: #111;
+      font-size: 16px;
     }
 
     button {
       width: 100%;
-      padding: 14px;
+      padding: 14px;         /* mesmo tamanho para login e export */
       border-radius: 8px;
       border: none;
-      background: #10b981; /* verde do botão */
+      background: #10b981;   /* verde */
       color: white;
       font-size: 16px;
       cursor: pointer;
@@ -61,7 +63,7 @@
     }
 
     button:hover {
-      background: #059669; /* verde mais escuro ao passar o mouse */
+      background: #059669;   /* verde mais escuro ao passar o mouse */
     }
 
     .hidden {
@@ -118,6 +120,7 @@ function login() {
 async function exportar() {
   try {
     const tabela = encodeURIComponent("B2B_medições");
+
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/${tabela}?select=*`,
       {
@@ -145,7 +148,7 @@ async function exportar() {
     const ws = XLSX.utils.json_to_sheet(dados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dados");
-    XLSX.writeFile(wb, "Newspring_MediçõesB2B.xlsx");
+    XLSX.writeFile(wb, "Newspring_Dados_MediçõesB2B.xlsx");
 
   } catch (err) {
     console.error(err);
