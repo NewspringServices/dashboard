@@ -13,7 +13,7 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: #064e3b; /* fundo verde escuro */
+      background: #064e3b;
       color: #111;
       display: flex;
       justify-content: center;
@@ -22,7 +22,7 @@
     }
 
     .container {
-      background: #ffffff; /* quadrado branco */
+      background: #ffffff;
       padding: 50px 40px;
       border-radius: 16px;
       box-shadow: 0 0 30px rgba(0,0,0,0.3);
@@ -31,7 +31,7 @@
     }
 
     img {
-      width: 180px; /* logo maior */
+      width: 180px;
       height: auto;
       margin-bottom: 30px;
     }
@@ -58,7 +58,7 @@
       padding: 14px;
       border-radius: 8px;
       border: none;
-      background: #10b981;   /* verde */
+      background: #10b981;
       color: white;
       font-size: 16px;
       cursor: pointer;
@@ -66,7 +66,7 @@
     }
 
     button:hover {
-      background: #059669;   /* verde mais escuro */
+      background: #059669;
     }
 
     .hidden {
@@ -105,7 +105,7 @@
 </div>
 
 <script>
-const SENHA = "NSS*2026"; // tua senha
+const SENHA = "NSS*2026";
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
@@ -120,47 +120,62 @@ function login() {
   }
 }
 
-// EXPORTAÇÃO
+// EXPORTAÇÃO (CORRIGIDA)
 async function exportar() {
   try {
     const tabela = encodeURIComponent("B2B_medições");
 
-    // Seleciona colunas, sem "id"
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/${tabela}?select=data,inicio,fim,colaborador,"user",numero_caso,estado_processo,tempo,auditado`,
-      {
-        method: "GET",
-        headers: {
-          "apikey": SUPABASE_API_KEY,
-          "Authorization": `Bearer ${SUPABASE_API_KEY}`
-        }
-      }
-    );
+    let todosDados = [];
+    let from = 0;
+    const step = 1000;
 
-    if (!res.ok) {
-      const erro = await res.text();
-      alert("Erro: " + erro);
-      return;
+    while (true) {
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/${tabela}?select=data,inicio,fim,colaborador,"user",numero_caso,estado_processo,tempo,auditado`,
+        {
+          method: "GET",
+          headers: {
+            "apikey": SUPABASE_API_KEY,
+            "Authorization": `Bearer ${SUPABASE_API_KEY}`,
+            "Range": `${from}-${from + step - 1}`
+          }
+        }
+      );
+
+      if (!res.ok) {
+        const erro = await res.text();
+        alert("Erro: " + erro);
+        return;
+      }
+
+      const dados = await res.json();
+
+      if (dados.length === 0) break;
+
+      todosDados = todosDados.concat(dados);
+
+      if (dados.length < step) break;
+
+      from += step;
     }
 
-    let dados = await res.json();
-
-    if (!dados || dados.length === 0) {
+    if (!todosDados || todosDados.length === 0) {
       alert("Sem dados na tabela");
       return;
     }
 
-    // Formatar inicio/fim para "YYYY-MM-DD HH:MM:SS" sem +00
-    dados = dados.map(d => ({
+    // Formatar datas
+    const dadosFormatados = todosDados.map(d => ({
       ...d,
       inicio: d.inicio ? d.inicio.replace('T', ' ').split('+')[0] : '',
       fim: d.fim ? d.fim.replace('T', ' ').split('+')[0] : ''
     }));
 
     // Criar Excel
-    const ws = XLSX.utils.json_to_sheet(dados);
+    const ws = XLSX.utils.json_to_sheet(dadosFormatados);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Dados");
+
     XLSX.writeFile(wb, "Newspring_Dados_MediçõesB2B.xlsx");
 
   } catch (err) {
