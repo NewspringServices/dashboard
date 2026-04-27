@@ -2,197 +2,161 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>Painel Controlo NSS</title>
+<title>Área Protegida - BPO</title>
 
 <style>
-body {
+
+body{
   margin:0;
   font-family:Arial;
-  background:#f4f6f8;
-}
-
-/* ================= LOGIN ================= */
-#login {
-  height:100vh;
+  background: linear-gradient(135deg,#0f3d2e,#19a463);
   display:flex;
   justify-content:center;
   align-items:center;
-  background:linear-gradient(135deg,#0f6b3c,#19a463);
+  height:100vh;
 }
 
-.box {
+/* ================= BOX ================= */
+.box{
   background:white;
   padding:30px;
-  border-radius:10px;
-  width:300px;
+  border-radius:12px;
+  width:340px;
   text-align:center;
-}
-
-.box input {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-}
-
-.box button {
-  width:100%;
-  padding:10px;
-  margin-top:10px;
-  background:#19a463;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-
-/* ================= APP ================= */
-#app {
-  display:none;
-}
-
-/* HEADER */
-.header {
-  background:linear-gradient(90deg,#0f6b3c,#19a463);
-  color:white;
-  padding:12px 20px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.menu button {
-  margin-left:10px;
-  padding:8px 12px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-.btn-blue {
-  background:#2c3e50;
-  color:white;
-}
-
-.btn-red {
-  background:#c1121f;
-  color:white;
-}
-
-/* CONTENT */
-.content {
-  padding:20px;
-}
-
-/* ÁREA DINÂMICA */
-#view {
-  margin-top:20px;
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  min-height:300px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.2);
 }
 
 /* LOGO */
-.logo {
-  width:120px;
+.logo{
+  width:110px;
+  margin-bottom:15px;
+}
+
+/* títulos */
+h2{
+  color:#0f6b3c;
   margin-bottom:10px;
 }
+
+/* aviso */
+.warning{
+  color:#c1121f;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+/* input */
+input{
+  width:100%;
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  margin-bottom:15px;
+  text-align:center;
+  font-size:16px;
+}
+
+input:focus{
+  outline:none;
+  border-color:#19a463;
+  box-shadow:0 0 0 2px rgba(25,164,99,0.2);
+}
+
+/* botão base */
+button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:6px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+  margin-top:10px;
+}
+
+/* cores */
+.green{ background:#19a463; }
+.green:hover{ background:#148a52; }
+
+.blue{ background:#2c3e50; }
+.blue:hover{ background:#1f2a36; }
+
+.red{ background:#c1121f; }
+.red:hover{ background:#8b0f18; }
+
+/* menu escondido */
+.menu{
+  display:none;
+}
+
 </style>
 </head>
 
 <body>
 
 <!-- LOGIN -->
-<div id="login">
-  <div class="box">
-    <h3>🔐 Área Protegida</h3>
-    <input type="password" id="pass" placeholder="Senha">
-    <button onclick="login()">Entrar</button>
-  </div>
+<div class="box" id="loginBox">
+
+  <img src="logo.png" class="logo">
+
+  <h2>🔒 Área Protegida</h2>
+
+  <div class="warning">⚠️ Acesso restrito à equipa autorizada</div>
+
+  <input type="password" id="pass" placeholder="Introduzir password">
+
+  <button class="green" onclick="check()">Entrar</button>
+
 </div>
 
-<!-- APP -->
-<div id="app">
+<!-- MENU -->
+<div class="box menu" id="menuBox">
 
-  <div class="header">
-    <div>📊 Painel Controlo - NSS _Serviços Administrativos Fidelidade</div>
+  <img src="logo.png" class="logo">
 
-    <div class="menu">
-      <button class="btn-blue" onclick="loadView('GestãoEquipa.html')">
-        Gestão de Equipa
-      </button>
+  <h2>📊 Painel BPO</h2>
 
-      <button class="btn-blue" onclick="loadView('producao')">
-        Gestão de Produções
-      </button>
+  <button class="blue" onclick="openEquipa()">
+    👥 Gestão de Equipa
+  </button>
 
-      <button class="btn-red" onclick="logout()">
-        Sair
-      </button>
-    </div>
-  </div>
+  <button class="green" onclick="openProducao()">
+    📦 Gestão de Produções
+  </button>
 
-  <div class="content">
+  <button class="red" onclick="logout()">
+    🚪 Sair
+  </button>
 
-    <!-- área onde muda tudo -->
-    <div id="view">
-
-      <img src="logo.png" class="logo">
-
-      <h2>Bem-vindo ao sistema</h2>
-      <p>Escolhe uma opção no menu acima.</p>
-
-    </div>
-
-  </div>
 </div>
 
 <script>
 
-function login(){
+function check(){
   const pass = document.getElementById("pass").value;
 
   if(pass === "12345"){
-    document.getElementById("login").style.display = "none";
-    document.getElementById("app").style.display = "block";
+    document.getElementById("loginBox").style.display="none";
+    document.getElementById("menuBox").style.display="block";
   } else {
-    alert("Senha incorreta");
+    alert("❌ Password incorreta");
   }
 }
 
 function logout(){
-  document.getElementById("login").style.display = "flex";
-  document.getElementById("app").style.display = "none";
-  document.getElementById("pass").value = "";
-  document.getElementById("view").innerHTML = "";
+  document.getElementById("menuBox").style.display="none";
+  document.getElementById("loginBox").style.display="block";
+  document.getElementById("pass").value="";
 }
 
-/* ================= CARREGAR VIEWS ================= */
-function loadView(page){
-
-  const view = document.getElementById("view");
-
-  let file = "";
-
-  if(page === "equipa"){
-    file = "GestãoEquipa.html";
-  }
-
-  if(page === "producao"){
-    file = "GestaoProducoesBPO.html";
-  }
-
-  fetch(file)
-    .then(res => res.text())
-    .then(html => {
-      view.innerHTML = html;
-    })
-    .catch(err => {
-      view.innerHTML = "<p>Erro ao carregar página</p>";
-      console.error(err);
-    });
+function openEquipa(){
+  window.location.href = "GestãoEquipaBPO.html";
 }
-    
+
+function openProducao(){
+  window.location.href = "GestãoProduçõesBPO.html";
+}
 
 </script>
 
