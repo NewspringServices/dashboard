@@ -25,7 +25,6 @@ body {
   align-items:center;
 }
 
-/* botões header */
 .header-actions {
   display:flex;
   gap:10px;
@@ -41,7 +40,6 @@ button {
   transition:0.2s;
 }
 
-/* verde */
 .btn-green {
   background:#19a463;
   color:white;
@@ -50,7 +48,6 @@ button {
   background:#148a52;
 }
 
-/* azul */
 .btn-blue {
   background:#2c3e50;
   color:white;
@@ -59,7 +56,6 @@ button {
   background:#1f2a36;
 }
 
-/* vermelho */
 .btn-red {
   background:#c1121f;
   color:white;
@@ -119,7 +115,9 @@ th {
   <div>📁 Tarefas Submetidas - Plataforma Newspring</div>
 
   <div class="header-actions">
-    <button class="btn-blue" onclick="goMenu()">🏠 Menu Principal</button>
+    <!-- 🔥 ALTERADO AQUI -->
+    <button class="btn-blue" onclick="goMenu()">👥 Gestão Logins e Retirados</button>
+
     <button class="btn-red" onclick="logout()">🚪 Logout</button>
   </div>
 </div>
@@ -193,12 +191,10 @@ th {
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
 let allData = [];
 
-/* ================= LOAD ================= */
 async function load(){
   const { data } = await client
     .from('BPO_dadosprodução')
@@ -210,7 +206,6 @@ async function load(){
   renderTaskSummary();
 }
 
-/* ================= NAV ================= */
 function showTab(i){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.querySelectorAll('.tab')[i].classList.add('active');
@@ -219,15 +214,15 @@ function showTab(i){
   document.getElementById('tab'+i).classList.add('active');
 }
 
+/* 🔥 botão Gestão */
 function goMenu(){
-  window.location.href = "teste.html";
+  window.location.href = "GestãoEquipaBPO.html"; // ou o teu painel principal
 }
 
 function logout(){
-  window.location.href = "2teste.html";
+  window.location.href = "PainelControloNSS.html";
 }
 
-/* ================= TEMPO ================= */
 function calcTempo(inicio, fim){
   if(!inicio || !fim) return '';
   const diff = (new Date(fim) - new Date(inicio)) / 60000;
@@ -236,7 +231,6 @@ function calcTempo(inicio, fim){
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
-/* ================= TABLE ================= */
 function render(){
 
   const fCol = document.getElementById('filterColaborador').value?.toLowerCase()||'';
@@ -276,7 +270,6 @@ function render(){
   });
 }
 
-/* ================= SUMMARY ================= */
 function renderTaskSummary(){
 
   const fUser = document.getElementById('taskUserFilter')?.value?.toLowerCase()||'';
