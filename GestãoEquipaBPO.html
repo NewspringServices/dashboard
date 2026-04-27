@@ -363,19 +363,36 @@ function isMeal(t){ return (t||'').toLowerCase().includes('refeicao') || (t||'')
 function isLogout(t){ return (t||'').toLowerCase().includes('logout'); }
 
 async function load(){
-  const { data } = await client
-    .from('BPO_registosNSS')
-    .select('*')
-    .order('created_at',{ascending:true});
 
-  allData=data||[];
+  let from = 0;
+  let to = 999;
+  let all = [];
+
+  while(true){
+
+    const { data } = await client
+      .from('BPO_registosNSS')
+      .select('*')
+      .order('created_at',{ascending:true})
+      .range(from, to);
+
+    if(!data || data.length === 0) break;
+
+    all = all.concat(data);
+
+    if(data.length < 1000) break;
+
+    from += 1000;
+    to += 1000;
+  }
+
+  allData = all;
 
   renderDashboard();
   renderTable();
   renderAlerts();
   renderSummary();
 }
-
 function renderDashboard(){
 
   const logins = allData.filter(r=>{
@@ -628,30 +645,24 @@ function logout(){
 
 function exportSummary(){
 
-  const rows = [];
+  const rows = allData.map(r => ({
 
-  document.querySelectorAll("#summaryTable tr").forEach(tr=>{
-    const tds = [...tr.querySelectorAll("td")].map(td=>td.innerText);
-
-    rows.push({
-      Data:tds[0],
-      User:tds[1],
-      Nome:tds[2],
-      Login:tds[3],
-      Logout:tds[4],
-      Pausa1:tds[5],
-      Pausa2:tds[6],
-      Refeicao:tds[7],
-      TempoLogado:tds[8],
-      TempoTrabalhado:tds[9]
-    });
-  });
+    Data: r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : ''),
+    User: r.user,
+    Nome: r.nome,
+    Tipo: r.tipo,
+    Inicio: r.inicio ? timeOnly(r.inicio) : '',
+    Fim: r.fim ? timeOnly(r.fim) : '',
+    Duracao: hhmmss(r.inicio, r.fim)
+  }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "ResumoDia");
-  XLSX.writeFile(wb, "resumo_dia.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "Resumo");
+  XLSX.writeFile(wb, "export_completo.xlsx");
 }
+  
+  
 
 </script>
 
