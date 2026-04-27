@@ -172,22 +172,27 @@ function loadView(page){
 
   const view = document.getElementById("view");
 
+  let file = "";
+
   if(page === "equipa"){
-    view.innerHTML = `
-      <img src="logo.png" class="logo">
-      <h2>Gestão de Equipa</h2>
-      <p>Aqui vai entrar o teu HTML da equipa.</p>
-    `;
+    file = "GestãoEquipa.html";
   }
 
   if(page === "producao"){
-    view.innerHTML = `
-      <img src="logo.png" class="logo">
-      <h2>Gestão de Produções</h2>
-      <p>Aqui vai entrar o teu HTML de produções.</p>
-    `;
+    file = "GestaoProducoesBPO.html";
   }
+
+  fetch(file)
+    .then(res => res.text())
+    .then(html => {
+      view.innerHTML = html;
+    })
+    .catch(err => {
+      view.innerHTML = "<p>Erro ao carregar página</p>";
+      console.error(err);
+    });
 }
+    
 
 </script>
 
