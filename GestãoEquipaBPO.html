@@ -466,7 +466,8 @@ function renderAlerts(){
 
     if(isPause(tipo)) ok=diff>16;
     if(isMeal(tipo)) ok=diff>65;
-    if(isLogout(tipo)) ok=true;
+// ❌ remover logouts da aba 3
+if(isLogout(tipo)) return;
 
     if(!ok) return;
 
