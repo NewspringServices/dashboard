@@ -15,7 +15,7 @@ body {
   margin:0;
 }
 
-/* ================= HEADER ================= */
+/* HEADER */
 .header {
   background: linear-gradient(90deg,#0f6b3c,#19a463);
   color:white;
@@ -25,12 +25,9 @@ body {
   align-items:center;
 }
 
-.header-actions {
-  display:flex;
-  gap:10px;
-}
+.header-actions { display:flex; gap:10px; }
 
-/* ================= BOTÕES ================= */
+/* BUTTONS */
 button {
   padding:8px 14px;
   border:none;
@@ -40,52 +37,25 @@ button {
   transition:0.2s;
 }
 
-.btn-green {
-  background:#19a463;
-  color:white;
-}
-.btn-green:hover {
-  background:#148a52;
-}
+.btn-green { background:#19a463; color:white; }
+.btn-green:hover { background:#148a52; }
 
-.btn-blue {
-  background:#2c3e50;
-  color:white;
-}
-.btn-blue:hover {
-  background:#1f2a36;
-}
+.btn-blue { background:#2c3e50; color:white; }
+.btn-blue:hover { background:#1f2a36; }
 
-.btn-red {
-  background:#c1121f;
-  color:white;
-}
-.btn-red:hover {
-  background:#8b0f18;
-}
+.btn-red { background:#c1121f; color:white; }
+.btn-red:hover { background:#8b0f18; }
 
-/* ================= TABS ================= */
-.tabs {
-  display:flex;
-  background:white;
-  border-bottom:1px solid #ddd;
-}
+/* TABS */
+.tabs { display:flex; background:white; border-bottom:1px solid #ddd; }
+.tab { padding:12px 18px; cursor:pointer; }
+.tab.active { border-bottom:3px solid #19a463; font-weight:bold; }
 
-.tab {
-  padding:12px 18px;
-  cursor:pointer;
-}
-
-.tab.active {
-  border-bottom:3px solid #19a463;
-  font-weight:bold;
-}
-
-/* ================= VIEWS ================= */
+/* VIEWS */
 .view { display:none; padding:20px; }
 .view.active { display:block; }
 
-/* ================= TABLE ================= */
+/* TABLE */
 table {
   width:100%;
   background:white;
@@ -110,25 +80,21 @@ th {
 
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div>📁 Tarefas Submetidas - Plataforma Newspring</div>
 
   <div class="header-actions">
-    <!-- 🔥 ALTERADO AQUI -->
     <button class="btn-blue" onclick="goMenu()">👥 Gestão Logins e Retirados</button>
-
     <button class="btn-red" onclick="logout()">🚪 Logout</button>
   </div>
 </div>
 
-<!-- TABS -->
 <div class="tabs">
   <div class="tab active" onclick="showTab(0)">📋 Dados</div>
   <div class="tab" onclick="showTab(1)">📊 Resumo tarefas</div>
 </div>
 
-<!-- TAB 1 -->
+<!-- ABA 1 -->
 <div class="view active" id="tab0">
 
 <div style="padding:20px;">
@@ -162,7 +128,7 @@ th {
 </div>
 </div>
 
-<!-- TAB 2 -->
+<!-- ABA 2 -->
 <div class="view" id="tab1">
 
 <div style="padding:20px;">
@@ -172,6 +138,8 @@ th {
 <input id="taskUserFilter" placeholder="Filtrar colaborador..." onkeyup="renderTaskSummary()">
 <input type="date" id="taskStart" onchange="renderTaskSummary()">
 <input type="date" id="taskEnd" onchange="renderTaskSummary()">
+
+<button class="btn-green" onclick="exportTaskSummary()">📤 Export Excel</button>
 
 <table>
 <thead>
@@ -214,9 +182,8 @@ function showTab(i){
   document.getElementById('tab'+i).classList.add('active');
 }
 
-/* 🔥 botão Gestão */
 function goMenu(){
-  window.location.href = "GestãoEquipaBPO.html"; // ou o teu painel principal
+  window.location.href = "GestãoEquipaBPO.html";
 }
 
 function logout(){
@@ -231,29 +198,13 @@ function calcTempo(inicio, fim){
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
+/* ================= ABA 1 ================= */
 function render(){
-
-  const fCol = document.getElementById('filterColaborador').value?.toLowerCase()||'';
-  const fTar = document.getElementById('filterTarefa').value?.toLowerCase()||'';
-
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
 
   const tbody = document.getElementById('table');
   tbody.innerHTML='';
 
-  const filtered = allData.filter(r=>{
-    if(fCol && !(r.colaborador||'').toLowerCase().includes(fCol)) return false;
-    if(fTar && !(r.tarefaFinalizada||'').toLowerCase().includes(fTar)) return false;
-
-    const d = new Date(r.inicio);
-    if(start && d < new Date(start)) return false;
-    if(end && d > new Date(end+"T23:59:59")) return false;
-
-    return true;
-  });
-
-  filtered.forEach(r=>{
+  allData.forEach(r=>{
     tbody.innerHTML+=`
 <tr>
 <td>${r.id}</td>
@@ -270,30 +221,19 @@ function render(){
   });
 }
 
+/* ================= ABA 2 ================= */
 function renderTaskSummary(){
-
-  const fUser = document.getElementById('taskUserFilter')?.value?.toLowerCase()||'';
-  const start = document.getElementById('taskStart')?.value;
-  const end = document.getElementById('taskEnd')?.value;
 
   const map={};
 
   allData.forEach(r=>{
-
-    const d = new Date(r.inicio);
-    if(start && d < new Date(start)) return;
-    if(end && d > new Date(end+"T23:59:59")) return;
-
     const user = r.colaborador||'';
     const task = r.tarefaFinalizada||'';
     const docs = Number(r.Documentos||0);
 
-    if(fUser && !user.toLowerCase().includes(fUser)) return;
-
     const key = user+'|'+task;
 
     if(!map[key]) map[key]={user,task,docs:0};
-
     map[key].docs += docs;
   });
 
@@ -308,6 +248,55 @@ function renderTaskSummary(){
 <td>${r.docs}</td>
 </tr>`;
   });
+}
+
+/* ================= EXPORT ABA 1 ================= */
+function exportExcel(){
+
+  const rows = [];
+
+  document.querySelectorAll("#table tr").forEach(tr=>{
+    const tds = [...tr.querySelectorAll("td")].map(td=>td.innerText);
+
+    rows.push({
+      ID: tds[0],
+      Data: tds[1],
+      Colaborador: tds[2],
+      Tipologia: tds[3],
+      ProcessoGama: tds[4],
+      Documentos: tds[5],
+      TarefaFinalizada: tds[6],
+      Inicio: tds[7],
+      Fim: tds[8],
+      Tempo: tds[9]
+    });
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Dados");
+  XLSX.writeFile(wb, "tarefas_submetidas.xlsx");
+}
+
+/* ================= EXPORT ABA 2 ================= */
+function exportTaskSummary(){
+
+  const rows = [];
+
+  document.querySelectorAll("#taskTable tr").forEach(tr=>{
+    const tds = [...tr.querySelectorAll("td")].map(td=>td.innerText);
+
+    rows.push({
+      Colaborador: tds[0],
+      Tarefa: tds[1],
+      TotalDocumentos: tds[2]
+    });
+  });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "ResumoTarefas");
+  XLSX.writeFile(wb, "resumo_tarefas.xlsx");
 }
 
 load();
