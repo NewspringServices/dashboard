@@ -6,10 +6,11 @@
 
 <style>
 
+/* ================= BASE ================= */
 body{
   margin:0;
-  font-family:Arial;
-  background: linear-gradient(135deg,#0f3d2e,#19a463);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: linear-gradient(135deg,#eef7f2,#dff3ea);
   display:flex;
   justify-content:center;
   align-items:center;
@@ -19,11 +20,33 @@ body{
 /* ================= BOX ================= */
 .box{
   background:white;
-  padding:30px;
-  border-radius:12px;
-  width:340px;
+  padding:35px;
+  border-radius:14px;
+  width:360px;
   text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.2);
+  box-shadow:0 10px 25px rgba(0,0,0,0.12);
+  transition:0.4s;
+}
+
+/* animações */
+.slide-out{
+  transform: translateX(-50px);
+  opacity:0;
+}
+
+.slide-in{
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn{
+  from{
+    transform: translateX(50px);
+    opacity:0;
+  }
+  to{
+    transform: translateX(0);
+    opacity:1;
+  }
 }
 
 /* LOGO */
@@ -41,41 +64,39 @@ h2{
 /* aviso */
 .warning{
   color:#c1121f;
-  font-weight:bold;
+  font-weight:600;
   margin-bottom:15px;
 }
 
-/* input */
+/* ================= INPUT ================= */
 input{
   width:100%;
-  padding:10px;
-  border-radius:6px;
+  padding:12px;
+  border-radius:8px;
   border:1px solid #ccc;
   margin-bottom:15px;
   text-align:center;
-  font-size:16px;
 }
 
 input:focus{
   outline:none;
   border-color:#19a463;
-  box-shadow:0 0 0 2px rgba(25,164,99,0.2);
+  box-shadow:0 0 0 3px rgba(25,164,99,0.15);
 }
 
-/* botão base */
+/* ================= BOTÕES ================= */
 button{
   width:100%;
-  padding:10px;
+  padding:12px;
   border:none;
-  border-radius:6px;
+  border-radius:8px;
   color:white;
   font-weight:bold;
   cursor:pointer;
-  transition:0.2s;
   margin-top:10px;
+  transition:0.2s;
 }
 
-/* cores */
 .green{ background:#19a463; }
 .green:hover{ background:#148a52; }
 
@@ -85,9 +106,26 @@ button{
 .red{ background:#c1121f; }
 .red:hover{ background:#8b0f18; }
 
-/* menu escondido */
+/* ================= MENU ================= */
 .menu{
   display:none;
+}
+
+/* ================= LOADING ================= */
+.loader{
+  display:none;
+  width:40px;
+  height:40px;
+  border:4px solid #dff3ea;
+  border-top:4px solid #19a463;
+  border-radius:50%;
+  margin:20px auto;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin{
+  0%{ transform: rotate(0deg); }
+  100%{ transform: rotate(360deg); }
 }
 
 </style>
@@ -101,12 +139,14 @@ button{
   <img src="logo.png" class="logo">
 
   <h2>🔒 Área Protegida</h2>
-
-  <div class="warning">⚠️ Acesso restrito à equipa autorizada</div>
+  <div class="warning">⚠️ Acesso restrito</div>
 
   <input type="password" id="pass" placeholder="Introduzir password">
 
   <button class="green" onclick="check()">Entrar</button>
+
+  <!-- loader -->
+  <div class="loader" id="loader"></div>
 
 </div>
 
@@ -133,23 +173,57 @@ button{
 
 <script>
 
+/* LOGIN COM LOADING + ANIMAÇÃO */
 function check(){
   const pass = document.getElementById("pass").value;
+  const loader = document.getElementById("loader");
 
   if(pass === "12345"){
-    document.getElementById("loginBox").style.display="none";
-    document.getElementById("menuBox").style.display="block";
+
+    loader.style.display = "block";
+
+    setTimeout(() => {
+
+      const loginBox = document.getElementById("loginBox");
+      loginBox.classList.add("slide-out");
+
+      setTimeout(()=>{
+        loginBox.style.display="none";
+
+        const menu = document.getElementById("menuBox");
+        menu.style.display="block";
+        menu.classList.add("slide-in");
+
+      },300);
+
+    },800);
+
   } else {
     alert("❌ Password incorreta");
   }
 }
 
+/* LOGOUT */
 function logout(){
-  document.getElementById("menuBox").style.display="none";
-  document.getElementById("loginBox").style.display="block";
-  document.getElementById("pass").value="";
+
+  const menu = document.getElementById("menuBox");
+
+  menu.classList.add("slide-out");
+
+  setTimeout(()=>{
+    menu.style.display="none";
+
+    const login = document.getElementById("loginBox");
+    login.style.display="block";
+    login.classList.add("slide-in");
+
+    document.getElementById("pass").value="";
+    document.getElementById("loader").style.display="none";
+
+  },300);
 }
 
+/* LINKS */
 function openEquipa(){
   window.location.href = "GestãoEquipaBPO.html";
 }
