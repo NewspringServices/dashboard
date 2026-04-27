@@ -495,20 +495,35 @@ function renderSummary(){
 
   const groups = {};
 
+  // 🔹 AGRUPAR POR USER + DIA
   allData.forEach(r=>{
     const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
     const key = r.user + '_' + date;
 
     if(!groups[key]){
-      groups[key] = {user:r.user,nome:r.nome,data:date,login:'',logout:'',pausas:[],refeicao:''};
+      groups[key] = {
+        user:r.user,
+        nome:r.nome,
+        data:date,
+        eventos:[],
+        pausas:[],
+        refeicoes:[]
+      };
     }
 
     const tipo=(r.tipo||'').toLowerCase();
 
-    if(isLogin(tipo)) groups[key].login=r.inicio;
-    if(isLogout(tipo)) groups[key].logout=r.fim || r.inicio;
-    if(isPause(tipo)) groups[key].pausas.push(r);
-    if(isMeal(tipo)) groups[key].refeicao=r;
+    if(isLogin(tipo) || isLogout(tipo)){
+      groups[key].eventos.push(r);
+    }
+
+    if(isPause(tipo)){
+      groups[key].pausas.push(r);
+    }
+
+    if(isMeal(tipo)){
+      groups[key].refeicoes.push(r);
+    }
   });
 
   const tbody=document.getElementById('summaryTable');
@@ -516,57 +531,66 @@ function renderSummary(){
 
   Object.values(groups).forEach(g=>{
 
-    // 🔎 FILTRO USER/NOME
     if(f && !((g.user||'').toLowerCase().includes(f)||(g.nome||'').toLowerCase().includes(f))) return;
-
-    // 📅 FILTRO DATA
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
-    const p1=g.pausas[0]?hhmmss(g.pausas[0].inicio,g.pausas[0].fim):'';
-    const p2=g.pausas[1]?hhmmss(g.pausas[1].inicio,g.pausas[1].fim):'';
-    const ref=g.refeicao?hhmmss(g.refeicao.inicio,g.refeicao.fim):'';
+    // 🔥 ORDENAR EVENTOS
+    g.eventos.sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
 
-    let tempoLogado = '';
-    let tempoTrabalhado = '';
+    let totalMin = 0;
+    let loginAtual = null;
 
-    if (g.login && g.logout) {
+    let primeiroLogin = '';
+    let ultimoLogout = '';
 
-      const total =
-        (new Date(g.logout) - new Date(g.login)) / 60000;
+    // 🔥 CALCULAR TODOS OS CICLOS LOGIN → LOGOUT
+    g.eventos.forEach(e=>{
+      const tipo=(e.tipo||'').toLowerCase();
 
-      const pausas =
-        g.pausas.reduce((a,p)=>a + duration(p.inicio,p.fim), 0);
+      if(isLogin(tipo)){
+        loginAtual = e.inicio;
+        if(!primeiroLogin) primeiroLogin = e.inicio;
+      }
 
-      const almoco =
-        g.refeicao ? duration(g.refeicao.inicio, g.refeicao.fim) : 0;
+      if(isLogout(tipo) && loginAtual){
+        const fim = e.fim || e.inicio;
+        totalMin += (new Date(fim) - new Date(loginAtual)) / 60000;
+        ultimoLogout = fim;
+        loginAtual = null;
+      }
+    });
 
-      const net = total - pausas - almoco;
+    // 🔥 SOMAR PAUSAS + REFEIÇÕES
+    const pausaMin = g.pausas.reduce((a,p)=>a + duration(p.inicio,p.fim),0);
+    const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
 
-      const format = (mins) => {
-        const sec = Math.max(0, Math.floor(mins * 60));
-        const h = Math.floor(sec / 3600);
-        const m = Math.floor((sec % 3600) / 60);
-        const s = sec % 60;
-        return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-      };
+    const netMin = totalMin - pausaMin - refeicaoMin;
 
-      tempoLogado = format(total);
-      tempoTrabalhado = format(net);
-    }
+    const format = (mins) => {
+      const sec = Math.max(0, Math.floor(mins * 60));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
+
+    const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
+    const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
+    const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
 
     tbody.innerHTML+=`
 <tr>
 <td>${g.data}</td>
 <td>${g.user}</td>
 <td>${g.nome}</td>
-<td>${timeOnly(g.login)}</td>
-<td>${timeOnly(g.logout)}</td>
+<td>${timeOnly(primeiroLogin)}</td>
+<td>${timeOnly(ultimoLogout)}</td>
 <td>${p1}</td>
 <td>${p2}</td>
 <td>${ref}</td>
-<td>${tempoLogado}</td>
-<td>${tempoTrabalhado}</td>
+<td>${format(totalMin)}</td>
+<td>${format(netMin)}</td>
 </tr>
     `;
   });
