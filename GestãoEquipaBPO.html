@@ -377,6 +377,7 @@ async function load(){
 }
 
 function renderDashboard(){
+
   const logins = allData.filter(r=>{
     if(!isLogin(r.tipo)) return false;
     const d=new Date(r.inicio);
@@ -387,28 +388,35 @@ function renderDashboard(){
   const meals = allData.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>65);
   const logouts = allData.filter(r=>isLogout(r.tipo));
 
-  const card = (title,color,list) => `
+  // 🔥 CARD EDITADO COM REGRA NOVA
+  const card = (title,color,list,type) => `
 <div style="background:white;padding:15px;margin-bottom:12px;border-left:6px solid ${color};border-radius:6px;">
 <b>${title} (${list.length})</b>
 <div style="margin-top:8px;font-size:13px;line-height:1.5;">
-${list.length ? list.map(r =>
-`• ${r.user} - ${r.nome} - ${timeOnly(r.inicio)}`
-).join('<br>') : 'Sem registos'}
+${list.length ? list.map(r => {
+
+  // 🔥 REGRA: pausas e refeições mostram duração
+  const value = (type === 'pause' || type === 'meal')
+    ? hhmmss(r.inicio,r.fim)
+    : timeOnly(r.inicio);
+
+  return `• ${r.user} - ${r.nome} - ${value}`;
+}).join('<br>') : 'Sem registos'}
 </div>
 </div>
   `;
 
   document.getElementById('dash-login').innerHTML =
-    card("🔴 Logins tardios","#e74c3c",logins);
+    card("🔴 Logins tardios","#e74c3c",logins,'login');
 
   document.getElementById('dash-pausa').innerHTML =
-    card("🟠 Pausas excedidas","#f39c12",pausas);
+    card("🟠 Pausas excedidas","#f39c12",pausas,'pause');
 
   document.getElementById('dash-refeicao').innerHTML =
-    card("🟡 Refeições excedidas","#f1c40f",meals);
+    card("🟡 Refeições excedidas","#f1c40f",meals,'meal');
 
   document.getElementById('dash-logout').innerHTML =
-    card("⚫ Logouts","#2c3e50",logouts);
+    card("⚫ Logouts","#2c3e50",logouts,'logout');
 }
 
 function renderTable(){
