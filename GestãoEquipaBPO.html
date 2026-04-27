@@ -383,8 +383,8 @@ function renderDashboard(){
     return (d.getHours()*60+d.getMinutes())>=541;
   });
 
-  const pausas = allData.filter(r=>isPause(r.tipo)&&duration(r.inicio,r.fim)>15);
-  const meals = allData.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>60);
+  const pausas = allData.filter(r=>isPause(r.tipo)&&duration(r.inicio,r.fim)>16);
+  const meals = allData.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>65);
   const logouts = allData.filter(r=>isLogout(r.tipo));
 
   const card = (title,color,list) => `
@@ -464,8 +464,8 @@ function renderAlerts(){
       ok=(d.getHours()*60+d.getMinutes())>=541;
     }
 
-    if(isPause(tipo)) ok=diff>15;
-    if(isMeal(tipo)) ok=diff>60;
+    if(isPause(tipo)) ok=diff>16;
+    if(isMeal(tipo)) ok=diff>65;
     if(isLogout(tipo)) ok=true;
 
     if(!ok) return;
