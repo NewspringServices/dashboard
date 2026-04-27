@@ -10,7 +10,11 @@
 body{
   margin:0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg,#eef7f2,#dff3ea);
+
+  /* 🎯 FUNDO PROFISSIONAL (equilibrado) */
+  background:
+    linear-gradient(120deg, #e9f0ec 0%, #f7f9f8 40%, #eef3f1 100%);
+
   display:flex;
   justify-content:center;
   align-items:center;
@@ -24,29 +28,17 @@ body{
   border-radius:14px;
   width:360px;
   text-align:center;
-  box-shadow:0 10px 25px rgba(0,0,0,0.12);
-  transition:0.4s;
+
+  /* sombra premium suave */
+  box-shadow:
+    0 12px 30px rgba(0,0,0,0.12);
+
+  transition:0.3s;
 }
 
-/* animações */
-.slide-out{
-  transform: translateX(-50px);
-  opacity:0;
-}
-
-.slide-in{
-  animation: slideIn 0.4s ease;
-}
-
-@keyframes slideIn{
-  from{
-    transform: translateX(50px);
-    opacity:0;
-  }
-  to{
-    transform: translateX(0);
-    opacity:1;
-  }
+.box:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.15);
 }
 
 /* LOGO */
@@ -59,6 +51,7 @@ body{
 h2{
   color:#0f6b3c;
   margin-bottom:10px;
+  font-weight:600;
 }
 
 /* aviso */
@@ -73,15 +66,17 @@ input{
   width:100%;
   padding:12px;
   border-radius:8px;
-  border:1px solid #ccc;
+  border:1px solid #d0d5d3;
   margin-bottom:15px;
   text-align:center;
+  font-size:15px;
+  transition:0.2s;
 }
 
 input:focus{
   outline:none;
-  border-color:#19a463;
-  box-shadow:0 0 0 3px rgba(25,164,99,0.15);
+  border-color:#0f6b3c;
+  box-shadow:0 0 0 3px rgba(15,107,60,0.12);
 }
 
 /* ================= BOTÕES ================= */
@@ -97,27 +92,48 @@ button{
   transition:0.2s;
 }
 
-.green{ background:#19a463; }
-.green:hover{ background:#148a52; }
+/* verde elegante */
+.green{
+  background:#0f6b3c;
+}
+.green:hover{
+  background:#0c5a32;
+}
 
-.blue{ background:#2c3e50; }
-.blue:hover{ background:#1f2a36; }
+/* azul */
+.blue{
+  background:#2c3e50;
+}
+.blue:hover{
+  background:#1f2a36;
+}
 
-.red{ background:#c1121f; }
-.red:hover{ background:#8b0f18; }
+/* vermelho */
+.red{
+  background:#c1121f;
+}
+.red:hover{
+  background:#8b0f18;
+}
 
 /* ================= MENU ================= */
 .menu{
   display:none;
+  animation: fadeIn 0.3s ease;
 }
 
-/* ================= LOADING ================= */
+@keyframes fadeIn{
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform: translateY(0); }
+}
+
+/* ================= LOADER ================= */
 .loader{
   display:none;
   width:40px;
   height:40px;
-  border:4px solid #dff3ea;
-  border-top:4px solid #19a463;
+  border:4px solid #e0e6e3;
+  border-top:4px solid #0f6b3c;
   border-radius:50%;
   margin:20px auto;
   animation: spin 1s linear infinite;
@@ -139,13 +155,13 @@ button{
   <img src="logo.png" class="logo">
 
   <h2>🔒 Área Protegida</h2>
+
   <div class="warning">⚠️ Acesso restrito</div>
 
   <input type="password" id="pass" placeholder="Introduzir password">
 
   <button class="green" onclick="check()">Entrar</button>
 
-  <!-- loader -->
   <div class="loader" id="loader"></div>
 
 </div>
@@ -155,14 +171,14 @@ button{
 
   <img src="logo.png" class="logo">
 
-  <h2>📊 Painel BPO</h2>
+  <h2>📊 Painel Controlo BPO</h2>
 
   <button class="blue" onclick="openEquipa()">
     👥 Gestão de Equipa
   </button>
 
   <button class="green" onclick="openProducao()">
-    📦 Gestão de Produções
+    📁 Gestão de Produções
   </button>
 
   <button class="red" onclick="logout()">
@@ -173,57 +189,31 @@ button{
 
 <script>
 
-/* LOGIN COM LOADING + ANIMAÇÃO */
 function check(){
   const pass = document.getElementById("pass").value;
   const loader = document.getElementById("loader");
 
   if(pass === "12345"){
 
-    loader.style.display = "block";
+    loader.style.display="block";
 
-    setTimeout(() => {
-
-      const loginBox = document.getElementById("loginBox");
-      loginBox.classList.add("slide-out");
-
-      setTimeout(()=>{
-        loginBox.style.display="none";
-
-        const menu = document.getElementById("menuBox");
-        menu.style.display="block";
-        menu.classList.add("slide-in");
-
-      },300);
-
-    },800);
+    setTimeout(()=>{
+      document.getElementById("loginBox").style.display="none";
+      document.getElementById("menuBox").style.display="block";
+    },700);
 
   } else {
     alert("❌ Password incorreta");
   }
 }
 
-/* LOGOUT */
 function logout(){
-
-  const menu = document.getElementById("menuBox");
-
-  menu.classList.add("slide-out");
-
-  setTimeout(()=>{
-    menu.style.display="none";
-
-    const login = document.getElementById("loginBox");
-    login.style.display="block";
-    login.classList.add("slide-in");
-
-    document.getElementById("pass").value="";
-    document.getElementById("loader").style.display="none";
-
-  },300);
+  document.getElementById("menuBox").style.display="none";
+  document.getElementById("loginBox").style.display="block";
+  document.getElementById("pass").value="";
+  document.getElementById("loader").style.display="none";
 }
 
-/* LINKS */
 function openEquipa(){
   window.location.href = "GestãoEquipaBPO.html";
 }
