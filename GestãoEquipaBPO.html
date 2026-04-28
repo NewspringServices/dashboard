@@ -395,16 +395,24 @@ async function load(){
 }
 function renderDashboard(){
 
-  const logins = allData.filter(r=>{
+  const hoje = new Date().toISOString().split('T')[0];
+
+  const dadosHoje = allData.filter(r => {
+    const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+    return data === hoje;
+  });
+
+  const logins = dadosHoje.filter(r=>{
     if(!isLogin(r.tipo)) return false;
     const d=new Date(r.inicio);
     return (d.getHours()*60+d.getMinutes())>=541;
   });
 
-  const pausas = allData.filter(r=>isPause(r.tipo)&&duration(r.inicio,r.fim)>16);
-  const meals = allData.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>65);
-  const logouts = allData.filter(r=>isLogout(r.tipo));
+  const pausas = dadosHoje.filter(r=>isPause(r.tipo)&&duration(r.inicio,r.fim)>16);
+  const meals = dadosHoje.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>65);
+  const logouts = dadosHoje.filter(r=>isLogout(r.tipo));
 
+ 
   // 🔥 CARD EDITADO COM REGRA NOVA
   const card = (title,color,list,type) => `
 <div style="background:white;padding:15px;margin-bottom:12px;border-left:6px solid ${color};border-radius:6px;">
