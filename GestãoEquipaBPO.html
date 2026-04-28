@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>BPO Dashboard</title>
+<title>Painel Controlo Newspring_Serviços Administrativos Fidelidade</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -195,6 +196,17 @@ button {
   gap:10px;
   align-items:center;
 }
+.estado-ferias {
+  color: #19a463;
+}
+
+.estado-licenca {
+  color: #e74c3c;
+}
+
+.estado-normal {
+  color: #000;
+}
 </style>
 </head>
 
@@ -202,7 +214,7 @@ button {
 
 
 <div class="header">
-  <div>📊 BPO Dashboard</div>
+  <div>📊Painel Controlo Newspring_Serviços Administrativos Fidelidade</div>
 
   <div class="header-actions">
     <button class="btn-blue" onclick="goMenu()"> 📁 Gestão de Produções</button>
@@ -211,15 +223,16 @@ button {
 </div>
 
 <div class="tabs">
-  <div class="tab active" onclick="showTab(0)">Dashboard</div>
-  <div class="tab" onclick="showTab(1)">Logins</div>
-  <div class="tab" onclick="showTab(2)">Alertas & Observações</div>
-  <div class="tab" onclick="showTab(3)">Resumo dia</div>
+<div class="tab active" onclick="showTab(0)">📊 Alertas Gerais</div>
+<div class="tab" onclick="showTab(1)">👤 Logins e Inatividade</div>
+<div class="tab" onclick="showTab(2)">🚨 Alertas & Observações</div>
+<div class="tab" onclick="showTab(3)">🧾 Resumo Dia</div>
+<div class="tab" onclick="showTab(4)">📆 Planeamento</div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="view active" id="tab0">
-<h3>📊 Alertas gerais</h3>
+<h3></h3>
 
 <div id="dash-login"></div>
 <div id="dash-pausa"></div>
@@ -229,7 +242,7 @@ button {
 
 <!-- LOGINS -->
 <div class="view" id="tab1">
-<h3>🔐 Logins e Retiradas</h3>
+<h3></h3>
 
 <div style="display:flex; gap:10px; margin-bottom:10px;">
 <input type="date" id="dateStart" onchange="renderTable()">
@@ -258,7 +271,7 @@ button {
 
 <!-- ALERTAS -->
 <div class="view" id="tab2">
-<h3>⚠️ Alertas & Observações</h3>
+<h3></h3>
 
 <div style="display:flex; gap:10px; margin-bottom:10px;">
 <input id="alertFilter" placeholder="Filtrar user/nome..." onkeyup="renderAlerts()">
@@ -286,7 +299,7 @@ button {
 
 <!-- RESUMO DIA -->
 <div class="view" id="tab3">
-<h3>📅 Resumo dia</h3>
+<h3></h3>
 
 <div style="display:flex; gap:10px; margin-bottom:10px;">
 <input type="date" id="sumStart" onchange="renderSummary()">
@@ -295,6 +308,7 @@ button {
 </div>
 
 <button onclick="exportSummary()">📤 Export Excel</button>
+
 
 
 <table>
@@ -316,6 +330,29 @@ button {
 </table>
 </div>
 
+
+<!-- PLANEAMENTO -->
+<div class="view" id="tab4">
+  <h3>📅 Planeamento Mês</h3>
+
+<div style="display:flex; gap:10px; margin-bottom:10px;">
+  <input type="date" id="planStart" onchange="renderPlaneamento()">
+  <input type="date" id="planEnd" onchange="renderPlaneamento()">
+  <input id="planFilter" placeholder="Filtrar user ou nome..." onkeyup="renderPlaneamento()">
+</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>User</th>
+        <th>Nome</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="planeamentoTable"></tbody>
+  </table>
+</div>
 <script>
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
@@ -334,6 +371,7 @@ function showTab(i){
   document.getElementById('tab'+i).classList.add('active');
 
   if(i===3) renderSummary();
+  if(i===4) loadPlaneamento();
 }
 
 function timeOnly(dt){
@@ -393,6 +431,101 @@ async function load(){
   renderAlerts();
   renderSummary();
 }
+
+let planeamentoData = [];
+
+
+function excelDateToJS(excelDate){
+  if(!excelDate) return '';
+
+  // se já for texto tipo "01-05-2026"
+  if(isNaN(excelDate)) return excelDate;
+
+  const date = new Date((excelDate - 25569) * 86400 * 1000);
+
+  const d = String(date.getDate()).padStart(2,'0');
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const y = date.getFullYear();
+
+  return `${d}-${m}-${y}`;
+}
+
+async function loadPlaneamento(){
+
+  const { data, error } = await client
+    .from('planeamento')
+    .select('*')
+    .order('data', { ascending: true });
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  planeamentoData = data;
+
+  renderPlaneamento();
+}
+
+function renderPlaneamento(){
+
+  const tbody = document.getElementById('planeamentoTable');
+  tbody.innerHTML = '';
+
+  const f = document.getElementById('planFilter')?.value?.toLowerCase() || '';
+  const start = document.getElementById('planStart')?.value;
+  const end = document.getElementById('planEnd')?.value;
+
+  planeamentoData.forEach(r => {
+
+    // 🔍 TEXTO
+    const matchText =
+      (r.user || '').toLowerCase().includes(f) ||
+      (r.nome || '').toLowerCase().includes(f);
+
+    if(!matchText) return;
+
+    // 🔥 DATA FIX
+const dataObj = parseDateSafe(r.data);
+if(start && dataObj < new Date(start)) return;
+if(end && dataObj > new Date(end + "T23:59:59")) return;
+    // 🎨 CORES
+    let cor = '';
+    if(r.estado === 'Férias') cor = '#19a463';
+    if(r.estado === 'Trabalha') cor = '#000000';
+    if(r.estado === 'Dispensa') cor = '#000000';
+    if(r.estado === 'Licença') cor = '#e74c3c';
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.data || ''}</td>
+        <td>${r.user || ''}</td>
+        <td>${r.nome || ''}</td>
+        <td style="font-weight:bold;color:${cor}">
+          ${r.estado || ''}
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function parseDateSafe(dateStr){
+  if(!dateStr) return null;
+
+  // formato DD/MM/YYYY
+  if(dateStr.includes('/')){
+    const [d,m,y] = dateStr.split('/');
+    return new Date(`${y}-${m}-${d}`);
+  }
+
+  // formato ISO (YYYY-MM-DD ou com T)
+  if(dateStr.includes('T') || dateStr.match(/^\d{4}-\d{2}-\d{2}/)){
+    return new Date(dateStr);
+  }
+
+  return new Date(dateStr);
+}
+
 function renderDashboard(){
 
   const hoje = new Date().toISOString().split('T')[0];
@@ -641,6 +774,7 @@ function exportAlerts(){}
 
 
 load();
+loadPlaneamento();
 
 function goMenu(){
   window.location.href = "GestãoProduçõesBPO.html"; // ou o teu painel principal
@@ -676,3 +810,4 @@ function exportSummary(){
 
 </body>
 </html>
+
