@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -161,17 +162,9 @@ table {
 }
 
 
-
-
-th, td {
-  padding:10px;
-  border-bottom:1px solid #ddd;
-  vertical-align:top;
-}
-
-th {
-  background:#111;
-  color:white;
+table th {
+  background: linear-gradient(90deg,#0f6b3c,#19a463) !important;
+  color: white !important;
 }
 
 input, textarea {
@@ -855,8 +848,22 @@ function save(id){
 
 function exportExcel(){}
 
-function exportAlerts(){}
+function exportExcel(){
+  const rows = allData.map(r => ({
+    Data: r.data,
+    User: r.user,
+    Nome: r.nome,
+    Tipo: r.tipo,
+    Inicio: timeOnly(r.inicio),
+    Fim: timeOnly(r.fim),
+    Duracao: hhmmss(r.inicio, r.fim)
+  }));
 
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Logins");
+  XLSX.writeFile(wb, "logins.xlsx");
+}
 
 load();
 loadPlaneamento();
