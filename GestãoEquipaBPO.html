@@ -349,6 +349,7 @@ button {
 <th>Nome</th>
 <th>Login</th>
 <th>Logout</th>
+<th>Planeamento</th>
 <th>Pausa 1</th>
 <th>Pausa 2</th>
 <th>Refeição</th>
@@ -740,23 +741,42 @@ function renderSummary(){
 
   const groups = {};
 
-  // 🔹 AGRUPAR POR USER + DIA
-  allData.forEach(r=>{
+  // 🔥 1. BASE = PLANEAMENTO (NÃO LOGINS)
+  planeamentoData.forEach(p => {
+
+    const key = (p.user || '') + '_' + (p.data || '');
+
+    groups[key] = {
+      user: p.user,
+      nome: p.nome,
+      data: p.data,
+      estado: p.estado,
+      eventos: [],
+      pausas: [],
+      refeicoes: []
+    };
+  });
+
+  // 🔥 2. ENCAIXAR LOGS POR USER + DATA
+  allData.forEach(r => {
+
     const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
     const key = r.user + '_' + date;
 
     if(!groups[key]){
+      // caso não exista no planeamento, cria fallback
       groups[key] = {
-        user:r.user,
-        nome:r.nome,
-        data:date,
-        eventos:[],
-        pausas:[],
-        refeicoes:[]
+        user: r.user,
+        nome: r.nome,
+        data: date,
+        estado: '',
+        eventos: [],
+        pausas: [],
+        refeicoes: []
       };
     }
 
-    const tipo=(r.tipo||'').toLowerCase();
+    const tipo = (r.tipo || '').toLowerCase();
 
     if(isLogin(tipo) || isLogout(tipo)){
       groups[key].eventos.push(r);
@@ -771,16 +791,15 @@ function renderSummary(){
     }
   });
 
-  const tbody=document.getElementById('summaryTable');
-  tbody.innerHTML='';
+  const tbody = document.getElementById('summaryTable');
+  tbody.innerHTML = '';
 
-  Object.values(groups).forEach(g=>{
+  Object.values(groups).forEach(g => {
 
-    if(f && !((g.user||'').toLowerCase().includes(f)||(g.nome||'').toLowerCase().includes(f))) return;
+    if(f && !((g.user||'').toLowerCase().includes(f) || (g.nome||'').toLowerCase().includes(f))) return;
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
-    // 🔥 ORDENAR EVENTOS
     g.eventos.sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
 
     let totalMin = 0;
@@ -789,9 +808,8 @@ function renderSummary(){
     let primeiroLogin = '';
     let ultimoLogout = '';
 
-    // 🔥 CALCULAR TODOS OS CICLOS LOGIN → LOGOUT
     g.eventos.forEach(e=>{
-      const tipo=(e.tipo||'').toLowerCase();
+      const tipo = (e.tipo||'').toLowerCase();
 
       if(isLogin(tipo)){
         loginAtual = e.inicio;
@@ -806,10 +824,8 @@ function renderSummary(){
       }
     });
 
-    // 🔥 SOMAR PAUSAS + REFEIÇÕES
     const pausaMin = g.pausas.reduce((a,p)=>a + duration(p.inicio,p.fim),0);
     const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
-
     const netMin = totalMin - pausaMin - refeicaoMin;
 
     const format = (mins) => {
@@ -824,18 +840,29 @@ function renderSummary(){
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
     const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
 
-    tbody.innerHTML+=`
+    tbody.innerHTML += `
 <tr>
+
 <td>${g.data}</td>
 <td>${g.user}</td>
 <td>${g.nome}</td>
+
+<!-- LOGIN -->
 <td>${timeOnly(primeiroLogin)}</td>
+
+<!-- LOGOUT -->
 <td>${timeOnly(ultimoLogout)}</td>
+
+<!-- PLANEAMENTO (AGORA VEM DO SUPABASE PLANEAMENTO) -->
+<td>${g.estado || ''}</td>
+
 <td>${p1}</td>
 <td>${p2}</td>
 <td>${ref}</td>
+
 <td>${format(totalMin)}</td>
 <td>${format(netMin)}</td>
+
 </tr>
     `;
   });
