@@ -355,6 +355,7 @@ button {
 <th>Refeição</th>
 <th>Tempo logado</th>
 <th>Tempo trabalhado</th>
+<th>Alerta</th>
 </tr>
 </thead>
 <tbody id="summaryTable"></tbody>
@@ -413,6 +414,20 @@ function timeOnly(dt){
   if(!dt) return '';
   const d=new Date(dt);
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+}
+
+
+function getAlertaStyle(alerta){
+
+  if(alerta === 'Ausência Total'){
+    return 'color:#e74c3c;';
+  }
+
+  if(alerta === 'Ausência Parcial'){
+    return 'color:#f39c12;';
+  }
+
+  return 'color:#19a463;';
 }
 
 function showToast(msg){
@@ -862,19 +877,84 @@ function renderSummary(){
 
 <td>${format(totalMin)}</td>
 <td>${format(netMin)}</td>
-
+<td style="${getAlertaStyle(getAlerta(g))}">${getAlerta(g)}</td>
 </tr>
     `;
   });
 }
 
-function save(id){
-  notes[id]=document.getElementById('n-'+id).value;
-  document.getElementById('n-'+id).disabled=true;
+
+function getAlerta(g){
+
+  if((g.estado || '').toLowerCase() !== 'trabalha'){
+    return "Sem anomalias de registos";
+  }
+
+  let loginAtual = null;
+  let total = 0;
+
+  g.eventos.sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
+
+  g.eventos.forEach(e => {
+    const tipo = (e.tipo || '').toLowerCase();
+
+    if(isLogin(tipo)){
+      loginAtual = e.inicio;
+    }
+
+    if(isLogout(tipo) && loginAtual){
+      total += (new Date(e.fim || e.inicio) - new Date(loginAtual)) / 60000;
+      loginAtual = null;
+    }
+  });
+
+  if(!total || total === 0){
+    return "Ausência Total";
+  }
+
+  if(total < 450){
+    return "Ausência Parcial";
+  }
+
+  return "Sem anomalias de registos";
 }
 
-function exportExcel(){}
+function exportAlerts(){
 
+  const rows = allData
+    .filter(r => {
+
+      const tipo = (r.tipo || '').toLowerCase();
+      const diff = duration(r.inicio, r.fim);
+
+      let ok = false;
+
+      if(isLogin(tipo)){
+        const d = new Date(r.inicio);
+        ok = (d.getHours()*60 + d.getMinutes()) >= 541;
+      }
+
+      if(isPause(tipo)) ok = diff > 16;
+      if(isMeal(tipo)) ok = diff > 65;
+
+      if(isLogout(tipo)) return false;
+
+      return ok;
+    })
+    .map(r => ({
+      User: r.user,
+      Nome: r.nome,
+      Tipo: r.tipo,
+      Hora: timeOnly(r.inicio),
+      Duracao: hhmmss(r.inicio, r.fim),
+      Nota: notes[r.id] || ''
+    }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Alertas");
+  XLSX.writeFile(wb, "alertas.xlsx");
+}
 function exportExcel(){
   const rows = allData.map(r => ({
     Data: r.data,
