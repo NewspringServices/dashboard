@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Planeamento BPO + Gestão</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+
+body{
+  font-family: Arial;
+  background:#f4f6f8;
+  margin:0;
+}
+
+.header{
+  background: linear-gradient(90deg,#0f6b3c,#19a463);
+  color:white;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-actions{
+  display:flex;
+  gap:10px;
+}
+
+.tabs{
+  display:flex;
+  background:white;
+  border-bottom:1px solid #ddd;
+}
+
+.tab{
+  padding:12px 18px;
+  cursor:pointer;
+}
+
+.tab.active{
+  border-bottom:3px solid #19a463;
+  font-weight:bold;
+  color:#0f6b3c;
+}
+
+.view{ display:none; padding:20px; }
+.view.active{ display:block; }
+
+button{
+  padding:8px 14px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+  background:#19a463;
+  color:white;
+}
+
+button:hover{ background:#148a52; }
+
+.btn-blue{ background:#2c3e50; }
+.btn-blue:hover{ background:#1f2a36; }
+
+.btn-red{ background:#c1121f; }
+.btn-red:hover{ background:#8b0f18; }
+
+input{
+  padding:8px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  margin-right:8px;
+  margin-bottom:10px;
+}
+
+table{
+  width:100%;
+  margin-top:15px;
+  border-collapse:collapse;
+  background:white;
+  border-radius:8px;
+  overflow:hidden;
+}
+
+th, td{
+  padding:10px;
+  border-bottom:1px solid #ddd;
+}
+
+th{
+  background:#0f6b3c;
+  color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <img src="logo2.png" style="height:42px;">
+    <div>Painel Controlo Newspring_Serviços Administrativos Fidelidade</div>
+  </div>
+
+  <div class="header-actions">
+    <button class="btn-blue" onclick="goMenu()">🏠 Menu</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab(0)">📅 Planeamento</div>
+  <div class="tab" onclick="showTab(1)">📋 Gestão de Registos</div>
+</div>
+
+<!-- ================= PLANEAMENTO ================= -->
+<div class="view active" id="view0">
+
+  <h3>📅 Planeamento</h3>
+
+  <input type="file" id="filePlaneamento" onchange="loadExcel(event)">
+
+  <button onclick="loadPlaneamento()">🔄 Atualizar Planeamento</button>
+  <button onclick="saveToSupabase()">💾 Guardar no Supabase</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>User</th>
+        <th>Nome</th>
+        <th>Estado</th>
+      </tr>
+    </thead>
+    <tbody id="planeamentoTable"></tbody>
+  </table>
+
+</div>
+
+<!-- ================= GESTÃO DADOS ================= -->
+<div class="view" id="view1">
+
+  <h3>📋Gestão de Registos Supabase</h3>
+
+  <input id="filtroTexto" placeholder="Filtrar user ou nome..." onkeyup="renderRegistos()">
+  <input type="date" id="filtroData" onchange="renderRegistos()">
+
+  <button onclick="loadRegistos()">🔄 Atualizar Registos</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Data</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+
+    <tbody id="registosTable"></tbody>
+  </table>
+
+</div>
+
+<script>
+
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+/* ================= TABS ================= */
+function showTab(i){
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  document.querySelectorAll(".tab")[i].classList.add("active");
+
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  document.getElementById("view" + i).classList.add("active");
+}
+
+function excelDateToJSDate(serial){
+  // 🔥 cria data diretamente sem UTC shift
+  const date = new Date(Math.round((serial - 25569) * 86400 * 1000));
+
+  const day = String(date.getDate()).padStart(2,'0');
+  const month = String(date.getMonth() + 1).padStart(2,'0');
+  const year = date.getFullYear();
+
+  return `${year}-${month}-${day}`;
+}
+/* ================= PLANEAMENTO ================= */
+let planeamentoData = [];
+
+async function loadPlaneamento(){
+  const { data } = await client.from("planeamento").select("*").order("created_at",{ascending:false});
+  planeamentoData = data;
+  renderPlaneamento();
+}
+
+
+async function saveToSupabase(){
+
+  if(!planeamentoData || planeamentoData.length === 0){
+    alert("Não há dados para guardar");
+    return;
+  }
+
+  const payload = planeamentoData.map(r => ({
+    data: r.data,
+    user: r.user,
+    nome: r.nome,
+    estado: r.estado
+  }));
+
+  const { error } = await client
+    .from("planeamento")
+    .insert(payload);
+
+  if(error){
+    console.error(error);
+    alert("Erro ao guardar no Supabase ❌");
+  } else {
+    alert("Guardado com sucesso no Supabase ✅");
+    loadPlaneamento();
+  }
+}
+
+/* ================= EXCEL ================= */
+function loadExcel(event){
+  const file = event.target.files[0];
+
+  if(!file){
+    alert("Escolhe um ficheiro Excel");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function(e){
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: "array" });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
+
+    console.log("Excel carregado:", json);
+
+    planeamentoData = json.map(r => {
+
+      const rawDate = r.data ?? r.Data;
+
+      return {
+        data: typeof rawDate === "number"
+          ? excelDateToJSDate(rawDate)
+          : rawDate || "",
+
+        user: r.user || r.User || "",
+        nome: r.nome || r.Nome || "",
+        estado: r.estado || r.Estado || ""
+      };
+
+    });
+
+    renderPlaneamento();
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+/* ================= RENDER ================= */
+function renderPlaneamento(){
+  const tbody = document.getElementById("planeamentoTable");
+  tbody.innerHTML = "";
+
+  planeamentoData.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.data}</td>
+        <td>${r.user}</td>
+        <td>${r.nome}</td>
+        <td>${r.estado}</td>
+      </tr>
+    `;
+  });
+}
+
+/* ================= REGISTOS ================= */
+let registosData = [];
+
+async function loadRegistos(){
+  const { data } = await client
+    .from("BPO_registosNSS")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  registosData = data;
+  renderRegistos();
+}
+
+function renderRegistos(){
+
+  const txt = document.getElementById("filtroTexto")?.value?.toLowerCase() || "";
+  const dt = document.getElementById("filtroData")?.value || "";
+
+  const tbody = document.getElementById("registosTable");
+  tbody.innerHTML = "";
+
+  registosData
+    .filter(r=>{
+      const okText =
+        (r.user||"").toLowerCase().includes(txt) ||
+        (r.nome||"").toLowerCase().includes(txt);
+
+      const okDate = dt ? String(r.data||"").slice(0,10) === dt : true;
+
+      return okText && okDate;
+    })
+    .forEach(r=>{
+      tbody.innerHTML += `
+        <tr>
+          <td>${r.user}</td>
+          <td>${r.nome}</td>
+          <td>${r.tipo}</td>
+          <td>${r.data||''}</td>
+          <td>
+            <button onclick="deleteRow('${r.id}')">✖️ Apagar</button>
+          </td>
+        </tr>
+      `;
+    });
+}
+
+/* DELETE */
+async function deleteRow(id){
+  if(!confirm("Apagar?")) return;
+
+  await client.from("BPO_registosNSS").delete().eq("id",id);
+  loadRegistos();
+}
+
+/* NAV */
+function goMenu(){
+  window.location.href = "PainelControloNSS.html";
+}
+
+</script>
+
+</body>
+</html>
