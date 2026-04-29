@@ -161,13 +161,14 @@ th{
 
   <table>
     <thead>
-      <tr>
-        <th>User</th>
-        <th>Nome</th>
-        <th>Tipo</th>
-        <th>Data</th>
-        <th>Ação</th>
-      </tr>
+   <tr>
+  <th>User</th>
+  <th>Nome</th>
+  <th>Tipo</th>
+  <th>Data</th>
+  <th>Hora</th>
+  <th>Ação</th>
+</tr>
     </thead>
 
     <tbody id="registosTable"></tbody>
@@ -203,11 +204,22 @@ function excelDateToJSDate(serial){
 let planeamentoData = [];
 
 async function loadPlaneamento(){
-  const { data } = await client.from("planeamento").select("*").order("created_at",{ascending:false});
-  planeamentoData = data;
+
+  const { data, error } = await client
+    .from("planeamento")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.log("Erro Supabase:", error);
+    return;
+  }
+
+  console.log("Planeamento carregado:", data);
+
+  planeamentoData = data || [];
   renderPlaneamento();
 }
-
 
 async function saveToSupabase(){
 
@@ -235,8 +247,24 @@ async function saveToSupabase(){
     loadPlaneamento();
   }
 }
+async function deleteRow(id){
 
+  console.log("A apagar ID:", id);
 
+  const { error } = await client
+    .from("BPO_registosNSS")
+    .delete()
+    .eq("id", id);
+
+  if(error){
+    console.log(error);
+    alert("Erro ao apagar no Supabase ❌");
+    return;
+  }
+
+  alert("Apagado com sucesso ✅");
+  loadRegistos();
+}
 function goGestaoEquipa(){
   window.location.href = "GestãoEquipaBPO.html";
 }
@@ -326,7 +354,8 @@ function renderRegistos(){
   tbody.innerHTML = "";
 
   registosData
-    .filter(r=>{
+    .filter(r => {
+
       const okText =
         (r.user||"").toLowerCase().includes(txt) ||
         (r.nome||"").toLowerCase().includes(txt);
@@ -335,18 +364,27 @@ function renderRegistos(){
 
       return okText && okDate;
     })
-    .forEach(r=>{
-      tbody.innerHTML += `
-        <tr>
-          <td>${r.user}</td>
-          <td>${r.nome}</td>
-          <td>${r.tipo}</td>
-          <td>${r.data||''}</td>
-          <td>
-            <button onclick="deleteRow('${r.id}')">✖️ Apagar</button>
-          </td>
-        </tr>
-      `;
+    .forEach(r => {
+
+      const hora = r.created_at
+        ? new Date(r.created_at).toLocaleTimeString('pt-PT', {
+            hour: '2-digit',
+            minute: '2-digit'
+          })
+        : '';
+
+   tbody.innerHTML += `
+  <tr>
+    <td>${r.user}</td>
+    <td>${r.nome}</td>
+    <td>${r.tipo}</td>
+    <td>${r.data||''}</td>
+    <td>${hora}</td>
+    <td>
+      <button onclick="deleteRow('${r.id}')">✖️ Apagar</button>
+    </td>
+  </tr>
+`;
     });
 }
 
