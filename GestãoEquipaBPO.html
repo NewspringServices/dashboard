@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -200,6 +198,21 @@ button {
 .estado-normal {
   color: #000;
 }
+.filter-absence {
+  padding:8px 12px;
+  border-radius:6px;
+  border:1px solid #ccc;
+  background:white;
+  color:#e74c3c;   /* vermelho mas NÃO bold */
+  font-weight:normal;
+  width:220px;
+}
+
+.filter-absence:focus {
+  outline:none;
+  border-color:#e74c3c;
+  box-shadow:0 0 0 2px rgba(231,76,60,0.15);
+}
 
 </style>
 </head>
@@ -233,17 +246,18 @@ button {
 </div>
 
 <div class="tabs">
-<div class="tab active" onclick="showTab(0)">📊 Alertas Gerais</div>
-<div class="tab" onclick="showTab(1)">👤 Logins e Inatividade</div>
-<div class="tab" onclick="showTab(2)">🚨 Alertas & Observações</div>
-<div class="tab" onclick="showTab(3)">🧾 Resumo Dia</div>
-<div class="tab" onclick="showTab(4)">📆 Planeamento</div>
+  <div class="tab active" onclick="showTab(0)">🚨 Alertas Gerais</div>
+  <div class="tab" onclick="showTab(1)">👤 Logins e Inatividade</div>
+  <div class="tab" onclick="showTab(2)">🧾 Resumo Dia</div>
+  <div class="tab" onclick="showTab(3)">📆 Planeamento</div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="view active" id="tab0">
 <h3></h3>
 
+<div id="kpis-dashboard" style="display:flex; gap:15px; margin-bottom:15px;"></div>
+<div id="sem-login-list" style="margin-top:10px;"></div>
 <div class="header-actions" style="margin-bottom:10px;">
   <button onclick="refreshDashboard()">🔄 Atualizar</button>
 </div>
@@ -254,15 +268,51 @@ button {
 <div id="dash-logout"></div>
 </div>
 
+<!-- ALERTAS -->
+<div class="view" id="tab-alertas">
+  <h3>🚨 Alertas</h3>
 
+  <div style="display:flex; gap:10px; margin-bottom:10px;">
+    <input id="alertFilter" placeholder="Filtrar user ou nome..." onkeyup="renderAlerts()">
+
+    <input type="date" id="alertStart" onchange="renderAlerts()">
+    <input type="date" id="alertEnd" onchange="renderAlerts()">
+
+    <button onclick="refreshAlerts()">🔄 Atualizar</button>
+    <button onclick="exportAlerts()">📤 Export Excel</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Nome</th>
+        <th>Tipo</th>
+        <th>Hora</th>
+        <th>Duração</th>
+        <th>Nota</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody id="alertsTable"></tbody>
+  </table>
+</div>
 
 <!-- LOGINS -->
 <div class="view" id="tab1">
 <h3></h3>
 
 <div style="display:flex; gap:10px; margin-bottom:10px;">
-<input type="date" id="dateStart" onchange="renderTable()">
-<input type="date" id="dateEnd" onchange="renderTable()">
+  <input type="date" id="dateStart" onchange="renderTable()">
+  <input type="date" id="dateEnd" onchange="renderTable()">
+
+  <select id="tipoFilter" onchange="renderTable()">
+    <option value="">Todos os Tipos</option>
+    <option value="login">Login</option>
+    <option value="pausa">Pausa</option>
+    <option value="refeicao">Refeição</option>
+    <option value="logout">Logout</option>
+  </select>
 </div>
 
 <input id="filter" placeholder="Filtrar user ou nome..." onkeyup="renderTable()">
@@ -290,47 +340,29 @@ button {
 </div>
 
 <!-- ALERTAS -->
-<div class="view" id="tab2">
-<h3></h3>
 
-
-<div style="display:flex; gap:10px; margin-bottom:10px;">
-<input id="alertFilter" placeholder="Filtrar user/nome..." onkeyup="renderAlerts()">
-<input type="date" id="alertStart" onchange="renderAlerts()">
-<input type="date" id="alertEnd" onchange="renderAlerts()">
-</div>
-
-
-<div style="margin-bottom:10px;">
-  <button onclick="refreshAlerts()">🔄 Atualizar</button>
-</div>
-
-<button onclick="exportAlerts()">📤 Export Excel</button>
-
-<table>
-<thead>
-<tr>
-<th>User</th>
-<th>Nome</th>
-<th>Tipo</th>
-<th>Hora</th>
-<th>Duração</th>
-<th>Nota</th>
-<th>Ação</th>
-</tr>
-</thead>
-<tbody id="alertsTable"></tbody>
-</table>
-</div>
 
 <!-- RESUMO DIA -->
-<div class="view" id="tab3">
-<h3></h3>
+<div class="view" id="tab2">
+  <h3></h3>
 
 <div style="display:flex; gap:10px; margin-bottom:10px;">
 <input type="date" id="sumStart" onchange="renderSummary()">
 <input type="date" id="sumEnd" onchange="renderSummary()">
 <input id="sumFilter" placeholder="Filtrar user ou nome..." onkeyup="renderSummary()">
+</div>
+
+<div style="margin:12px 0 6px 0;">
+  <label style="font-size:12px; color:#555; display:block; margin-bottom:4px;">
+    Filtrar ausência
+  </label>
+
+  <select id="sumAlertaFilter" onchange="renderSummary()" class="filter-absence">
+    <option value="">Todos os Alertas</option>
+    <option value="Ausência Total">Ausência Total</option>
+    <option value="Ausência Parcial">Ausência Parcial</option>
+    <option value="Sem anomalias de registos">Sem anomalias</option>
+  </select>
 </div>
 
 <div style="margin-bottom:10px;">
@@ -347,14 +379,14 @@ button {
 <th>Data</th>
 <th>User</th>
 <th>Nome</th>
+<th>Planeamento</th>
 <th>Login</th>
 <th>Logout</th>
-<th>Planeamento</th>
 <th>Pausa 1</th>
 <th>Pausa 2</th>
 <th>Refeição</th>
-<th>Tempo logado</th>
 <th>Tempo trabalhado</th>
+<th>Alerta Excedidos</th>
 <th>Alerta</th>
 </tr>
 </thead>
@@ -364,13 +396,26 @@ button {
 
 
 <!-- PLANEAMENTO -->
-<div class="view" id="tab4">
-  <h3></h3>
+<div class="view" id="tab3">
+    <h3></h3>
 
 <div style="margin-bottom:10px;">
   <button onclick="refreshPlaneamento()">🔄 Atualizar</button>
 </div>
 
+<div style="margin:12px 0 6px 0;">
+  <label style="font-size:12px; color:#555; display:block; margin-bottom:4px;">
+    Filtrar estado
+  </label>
+
+  <select id="planEstado" onchange="renderPlaneamento()" class="filter-absence">
+    <option value="">Todos os estados</option>
+    <option value="Trabalha">Trabalha</option>
+    <option value="Férias">Férias</option>
+    <option value="Licença">Licença</option>
+    <option value="Dispensa">Dispensa</option>
+  </select>
+</div>
 <div style="display:flex; gap:10px; margin-bottom:10px;">
   <input type="date" id="planStart" onchange="renderPlaneamento()">
   <input type="date" id="planEnd" onchange="renderPlaneamento()">
@@ -406,8 +451,11 @@ function showTab(i){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('tab'+i).classList.add('active');
 
-  if(i===3) renderSummary();
-  if(i===4) loadPlaneamento();
+  if(i===0) renderDashboard();
+  if(i===1) renderTable();
+  if(i===2) renderSummary();
+  if(i===3) loadPlaneamento();
+  
 }
 
 function timeOnly(dt){
@@ -416,6 +464,199 @@ function timeOnly(dt){
   return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
 }
 
+
+function getHoje(){
+  return new Date().toISOString().split('T')[0];
+}
+function getPlaneadosHoje(){
+  const hoje = getHoje();
+
+  return planeamentoData.filter(p =>
+    (p.data || '') === hoje &&
+    (p.estado || '').toLowerCase() === 'trabalha'
+  ).length;
+}
+
+function getFeriasCount(){
+  const hoje = getHoje();
+
+  return planeamentoData.filter(p =>
+    (p.data === hoje) &&
+    (p.estado || '').toLowerCase() === 'férias'
+  ).length;
+}
+
+function getLoginsHoje(){
+  const hoje = getHoje();
+
+  return allData.filter(r => {
+    const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+    return data === hoje && isLogin(r.tipo);
+  }).length;
+}
+
+function renderKPIs(){
+
+  const el = document.getElementById('kpis-dashboard');
+  if(!el) return;
+
+  const hoje = getHoje();
+
+  const planeados = planeamentoData.filter(p =>
+    (p.data || '') === hoje &&
+    (p.estado || '').toLowerCase() === 'trabalha'
+  );
+
+  const logins = allData.filter(r => {
+    const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+    return data === hoje && isLogin(r.tipo);
+  });
+
+  const semLogin = getPlaneadosSemLoginHoje();
+
+  el.innerHTML = `
+
+
+    <div class="card" style="flex:1;border-left:5px solid #2c3e50;">
+      👥 Presenças Planeadas<br>
+      <b>${planeados.length}</b><br><br>
+      <button onclick="toggleKPI('planeados')">Ver lista</button>
+    </div>
+
+    <div class="card" style="flex:1;border-left:5px solid #19a463;">
+      🟢 Logins Submetidos<br>
+      <b>${logins.length}</b><br><br>
+      <button onclick="toggleKPI('logins')">Ver lista</button>
+    </div>
+
+    <div class="card" style="flex:1;border-left:5px solid #e74c3c;">
+      ❌ Sem Registo de Login<br>
+      <b>${semLogin.length}</b><br><br>
+      <button onclick="toggleKPI('semLogin')">Ver lista</button>
+    </div>
+    <div class="card" style="flex:1;border-left:5px solid #3498db;">
+  🏖️ Férias<br>
+  <b>${getFeriasCount()}</b><br><br>
+  <button onclick="toggleKPI('ferias')">Ver lista</button>
+</div>
+<div class="card" style="flex:1;border-left:5px solid #e67e22;">
+  🏥 Baixas & Licenças<br>
+  <b>${getBaixasLicencasHoje().length}</b><br><br>
+  <button onclick="toggleKPI('baixas')">Ver lista</button>
+</div>
+  `;
+  
+
+  renderKPILists(planeados, logins, semLogin);
+}
+
+function renderKPILists(planeados, logins, semLogin){
+
+  const el = document.getElementById('sem-login-list');
+  if(!el) return;
+
+  let html = '';
+
+  // 👥 planeados
+  if(kpiOpen.planeados){
+    html += `
+      <div class="card">
+        <b>👥 Planeados hoje</b><br><br>
+        ${planeados.map(p => `• ${p.user} - ${p.nome}`).join('<br>')}
+      </div>
+    `;
+  }
+
+  // 🟢 logins
+  if(kpiOpen.logins){
+    html += `
+      <div class="card" style="border-left:5px solid #19a463;">
+        <b>🟢 Logins efetuados hoje</b><br><br>
+        ${logins.map(r => `• ${r.user} - ${r.nome} - ${timeOnly(r.inicio)}`).join('<br>')}
+      </div>
+    `;
+  }
+
+  // ❌ sem login
+  if(kpiOpen.semLogin){
+    html += `
+      <div class="card" style="border-left:5px solid #e74c3c;">
+        <b>❌ Sem login hoje</b><br><br>
+        ${semLogin.length
+          ? semLogin.map(p => `• ${p.user} - ${p.nome}`).join('<br>')
+          : 'Ninguém 🎉'}
+      </div>
+    `;
+  }
+
+  // 🏖️ férias (SEPARADO E CORRETO)
+  if(kpiOpen.ferias){
+    html += `
+      <div class="card" style="border-left:5px solid #3498db;">
+        <b>🏖️ Colaboradores de férias</b><br><br>
+        ${
+          planeamentoData
+.filter(p =>
+  (p.data === getHoje()) &&
+  (p.estado || '').toLowerCase() === 'férias'
+)
+            .map(p => `• ${p.user} - ${p.nome}`)
+            .join('<br>') || 'Nenhum colaborador em férias'
+        }
+      </div>
+    `;
+  }
+
+// 🏥 baixas + licenças
+if(kpiOpen.baixas){
+  html += `
+    <div class="card" style="border-left:5px solid #e67e22;">
+      <b>🏥 Baixas + Licenças</b><br><br>
+      ${
+        getBaixasLicencasHoje().length
+          ? getBaixasLicencasHoje()
+              .map(p => `• ${p.user} - ${p.nome} - ${p.estado}`)
+              .join('<br>')
+          : 'Nenhum colaborador em baixa/licença'
+      }
+    </div>
+  `;
+}
+
+  el.innerHTML = html;
+}
+ 
+
+let semLoginOpen = false;
+
+function renderSemLoginList(){
+
+  const el = document.getElementById('sem-login-list');
+  if(!el) return;
+
+  const lista = getPlaneadosSemLoginHoje();
+
+  if(!semLoginOpen){
+    el.innerHTML = '';
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card" style="border-left:5px solid #e74c3c;">
+      <b>❌ Colaboradores sem login hoje (${lista.length})</b>
+      <div style="margin-top:10px; font-size:13px; line-height:1.6;">
+        ${lista.length ? lista.map(p =>
+          `• ${p.user} - ${p.nome}`
+        ).join('<br>') : 'Ninguém 🎉'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleSemLogin(){
+  semLoginOpen = !semLoginOpen;
+  renderSemLoginList();
+}
 
 function getAlertaStyle(alerta){
 
@@ -428,6 +669,58 @@ function getAlertaStyle(alerta){
   }
 
   return 'color:#19a463;';
+}
+
+function getExcedidos(g){
+
+  let alerta = [];
+
+  // 🔸 Pausa 1 e 2
+  g.pausas.forEach((p, i) => {
+    const dur = duration(p.inicio, p.fim);
+
+    if(dur > 16){
+      alerta.push(`Pausa ${i+1} (${hhmmss(p.inicio,p.fim)})`);
+    }
+  });
+
+  // 🔸 Refeição
+  g.refeicoes.forEach((r, i) => {
+    const dur = duration(r.inicio, r.fim);
+
+    if(dur > 65){
+      alerta.push(`Refeição (${hhmmss(r.inicio,r.fim)})`);
+    }
+  });
+
+  // ❌ nada excedido → vazio (sem OK)
+  if(alerta.length === 0){
+    return "";
+  }
+
+  return alerta.join(" | ");
+}
+
+function getFeriasHoje(){
+  const hoje = getHoje();
+
+  return planeamentoData.filter(p =>
+    (p.data || '') === hoje &&
+    (p.estado || '').toLowerCase() === 'férias'
+  );
+}
+
+function getBaixasLicencasHoje(){
+  const hoje = getHoje();
+
+  return planeamentoData.filter(p => {
+    const estado = (p.estado || '').toLowerCase();
+
+    return (
+      p.data === hoje &&
+      (estado === 'baixa' || estado === 'licença')
+    );
+  });
 }
 
 function showToast(msg){
@@ -472,6 +765,7 @@ function refreshSummary(){
 
 function refreshPlaneamento(){
   loadPlaneamento();
+  renderKPIs();
   showToast("📅 Planeamento atualizado");
 }
 function duration(a,b){
@@ -524,6 +818,7 @@ async function load(){
   renderTable();
   renderAlerts();
   renderSummary();
+  renderKPIs();
 }
 
 let planeamentoData = [];
@@ -556,9 +851,34 @@ async function loadPlaneamento(){
     return;
   }
 
-  planeamentoData = data;
+planeamentoData = data;
+renderPlaneamento();
+renderKPIs(); // 🔥 isto é o que falta
+}
 
-  renderPlaneamento();
+function getPlaneadosSemLoginHoje(){
+
+  const hoje = getHoje();
+
+  // users planeados a trabalhar hoje
+  const planeados = planeamentoData.filter(p =>
+    (p.data || '') === hoje &&
+    (p.estado || '').toLowerCase() === 'trabalha'
+  );
+
+  return planeados.filter(p => {
+
+    const temLogin = allData.some(r => {
+      const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+      return (
+        data === hoje &&
+        r.user === p.user &&
+        isLogin(r.tipo)
+      );
+    });
+
+    return !temLogin;
+  });
 }
 
 function renderPlaneamento(){
@@ -570,25 +890,28 @@ function renderPlaneamento(){
   const start = document.getElementById('planStart')?.value;
   const end = document.getElementById('planEnd')?.value;
 
+  const estadoFiltro = document.getElementById('planEstado')?.value || '';
+
   planeamentoData.forEach(r => {
 
-    // 🔍 TEXTO
     const matchText =
       (r.user || '').toLowerCase().includes(f) ||
       (r.nome || '').toLowerCase().includes(f);
 
     if(!matchText) return;
 
-    // 🔥 DATA FIX
-const dataObj = parseDateSafe(r.data);
-if(start && dataObj < new Date(start)) return;
-if(end && dataObj > new Date(end + "T23:59:59")) return;
-    // 🎨 CORES
+    // 🔥 FILTRO ESTADO (NOVO)
+    if(estadoFiltro && r.estado !== estadoFiltro) return;
+
+    const dataObj = parseDateSafe(r.data);
+    if(start && dataObj < new Date(start)) return;
+    if(end && dataObj > new Date(end + "T23:59:59")) return;
+
     let cor = '';
-    if(r.estado === 'Férias') cor = '#19a463';
-    if(r.estado === 'Trabalha') cor = '#000000';
-    if(r.estado === 'Dispensa') cor = '#000000';
-    if(r.estado === 'Licença') cor = '#e74c3c';
+    if(r.estado === 'Férias') cor = '#000';
+    if(r.estado === 'Trabalha') cor = '#000';
+    if(r.estado === 'Dispensa') cor = '#000';
+    if(r.estado === 'Licença') cor = '#000';
 
     tbody.innerHTML += `
       <tr>
@@ -672,23 +995,40 @@ ${list.length ? list.map(r => {
 }
 
 function renderTable(){
-  const f=document.getElementById('filter').value?.toLowerCase()||'';
-  const start=document.getElementById('dateStart').value;
-  const end=document.getElementById('dateEnd').value;
+  const f = document.getElementById('filter').value?.toLowerCase() || '';
+  const start = document.getElementById('dateStart').value;
+  const end = document.getElementById('dateEnd').value;
+  const tipoFiltro = document.getElementById('tipoFilter').value;
 
-  const filtered=allData.filter(r=>{
-    const ok=(r.user||'').toLowerCase().includes(f)||(r.nome||'').toLowerCase().includes(f);
-    if(!ok) return false;
+  const filtered = allData.filter(r => {
 
-    const d=new Date(r.inicio);
-    if(start && d<new Date(start)) return false;
-    if(end && d>new Date(end+"T23:59:59")) return false;
+    // 🔎 filtro texto
+    const okText =
+      (r.user||'').toLowerCase().includes(f) ||
+      (r.nome||'').toLowerCase().includes(f);
+
+    if(!okText) return false;
+
+    // 📅 filtro datas
+    const d = new Date(r.inicio);
+    if(start && d < new Date(start)) return false;
+    if(end && d > new Date(end+"T23:59:59")) return false;
+
+    // 🧠 filtro tipo
+    const tipo = (r.tipo || '').toLowerCase();
+
+    if(tipoFiltro){
+      if(tipoFiltro === 'login' && !isLogin(tipo)) return false;
+      if(tipoFiltro === 'pausa' && !isPause(tipo)) return false;
+      if(tipoFiltro === 'refeicao' && !isMeal(tipo)) return false;
+      if(tipoFiltro === 'logout' && !isLogout(tipo)) return false;
+    }
 
     return true;
   });
 
-  const tbody=document.getElementById('table');
-  tbody.innerHTML='';
+  const tbody = document.getElementById('table');
+  tbody.innerHTML = '';
 
   filtered.forEach(r=>{
     tbody.innerHTML+=`
@@ -741,15 +1081,27 @@ if(isLogout(tipo)) return;
 <td>${timeOnly(r.inicio)}</td>
 <td>${hhmmss(r.inicio,r.fim)}</td>
 <td><textarea id="n-${r.id}">${notes[r.id]||''}</textarea></td>
-<td><button onclick="save('${r.id}')">Guardar</button></td>
 </tr>
     `;
   });
 }
 
 
-function renderSummary(){
+let kpiOpen = {
+  planeados: false,
+  logins: false,
+  semLogin: false,
+  ferias: false,
+  baixas: false
+};
 
+function toggleKPI(tipo){
+  kpiOpen[tipo] = !kpiOpen[tipo];
+  renderKPIs();
+}
+
+function renderSummary(){
+const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
   const f = document.getElementById('sumFilter')?.value?.toLowerCase() || '';
   const start = document.getElementById('sumStart')?.value;
   const end = document.getElementById('sumEnd')?.value;
@@ -854,32 +1206,38 @@ function renderSummary(){
     const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
     const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
+const alerta = getAlerta(g);
 
-    tbody.innerHTML += `
+if(alertaFiltro && alerta !== alertaFiltro) return;
+
+tbody.innerHTML += `
 <tr>
 
 <td>${g.data}</td>
 <td>${g.user}</td>
 <td>${g.nome}</td>
 
-<!-- LOGIN -->
-<td>${timeOnly(primeiroLogin)}</td>
-
-<!-- LOGOUT -->
-<td>${timeOnly(ultimoLogout)}</td>
-
-<!-- PLANEAMENTO (AGORA VEM DO SUPABASE PLANEAMENTO) -->
 <td>${g.estado || ''}</td>
+
+<td>${timeOnly(primeiroLogin)}</td>
+<td>${timeOnly(ultimoLogout)}</td>
 
 <td>${p1}</td>
 <td>${p2}</td>
 <td>${ref}</td>
 
-<td>${format(totalMin)}</td>
 <td>${format(netMin)}</td>
-<td style="${getAlertaStyle(getAlerta(g))}">${getAlerta(g)}</td>
+
+<td class="alert-excedidos" style="color:${getExcedidos(g) ? '#e74c3c' : '#999'};">
+  ${getExcedidos(g)}
+</td>
+
+<td style="${getAlertaStyle(getAlerta(g))}">
+  ${getAlerta(g)}
+</td>
+
 </tr>
-    `;
+`;
   });
 }
 
@@ -887,7 +1245,7 @@ function renderSummary(){
 function getAlerta(g){
 
   if((g.estado || '').toLowerCase() !== 'trabalha'){
-    return "Sem anomalias de registos";
+    return ""; // não mostra nada se não for "trabalha"
   }
 
   let loginAtual = null;
@@ -916,7 +1274,7 @@ function getAlerta(g){
     return "Ausência Parcial";
   }
 
-  return "Sem anomalias de registos";
+  return ""; // 🔥 antes era "Sem anomalias", agora fica vazio
 }
 
 function exportAlerts(){
@@ -972,8 +1330,13 @@ function exportExcel(){
   XLSX.writeFile(wb, "logins.xlsx");
 }
 
-load();
-loadPlaneamento();
+async function init(){
+  await load();
+  await loadPlaneamento();
+  renderKPIs();
+}
+
+init();
 
 function goMenu(){
   window.location.href = "GestãoProduçõesBPO.html"; // ou o teu painel principal
@@ -983,24 +1346,119 @@ function logout(){
   window.location.href = "PainelControloNSS.html";
 }
 
-
 function exportSummary(){
 
-  const rows = allData.map(r => ({
+  const groups = {};
 
-    Data: r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : ''),
-    User: r.user,
-    Nome: r.nome,
-    Tipo: r.tipo,
-    Inicio: r.inicio ? timeOnly(r.inicio) : '',
-    Fim: r.fim ? timeOnly(r.fim) : '',
-    Duracao: hhmmss(r.inicio, r.fim)
-  }));
+  // 1. BASE = PLANEAMENTO
+  planeamentoData.forEach(p => {
+    const key = (p.user || '') + '_' + (p.data || '');
+
+    groups[key] = {
+      user: p.user,
+      nome: p.nome,
+      data: p.data,
+      estado: p.estado,
+      eventos: [],
+      pausas: [],
+      refeicoes: []
+    };
+  });
+
+  // 2. ENCAIXAR LOGS
+  allData.forEach(r => {
+
+    const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+    const key = r.user + '_' + date;
+
+    if(!groups[key]){
+      groups[key] = {
+        user: r.user,
+        nome: r.nome,
+        data: date,
+        estado: '',
+        eventos: [],
+        pausas: [],
+        refeicoes: []
+      };
+    }
+
+    const tipo = (r.tipo || '').toLowerCase();
+
+    if(isLogin(tipo) || isLogout(tipo)){
+      groups[key].eventos.push(r);
+    }
+
+    if(isPause(tipo)){
+      groups[key].pausas.push(r);
+    }
+
+    if(isMeal(tipo)){
+      groups[key].refeicoes.push(r);
+    }
+  });
+
+  const rows = [];
+
+  Object.values(groups).forEach(g => {
+
+    g.eventos.sort((a,b)=> new Date(a.inicio) - new Date(b.inicio));
+
+    let totalMin = 0;
+    let loginAtual = null;
+
+    let primeiroLogin = '';
+    let ultimoLogout = '';
+
+    g.eventos.forEach(e => {
+
+      const tipo = (e.tipo || '').toLowerCase();
+
+      if(isLogin(tipo)){
+        loginAtual = e.inicio;
+        if(!primeiroLogin) primeiroLogin = e.inicio;
+      }
+
+      if(isLogout(tipo) && loginAtual){
+        const fim = e.fim || e.inicio;
+        totalMin += (new Date(fim) - new Date(loginAtual)) / 60000;
+        ultimoLogout = fim;
+        loginAtual = null;
+      }
+    });
+
+    const pausaMin = g.pausas.reduce((a,p)=>a + duration(p.inicio,p.fim),0);
+    const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
+    const netMin = totalMin - pausaMin - refeicaoMin;
+
+    const format = (mins) => {
+      const sec = Math.max(0, Math.floor(mins * 60));
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
+
+    rows.push({
+      Data: g.data,
+      User: g.user,
+      Nome: g.nome,
+      Planeamento: g.estado || '',
+      Login: timeOnly(primeiroLogin),
+      Logout: timeOnly(ultimoLogout),
+      Pausa1: g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '',
+      Pausa2: g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '',
+      Refeicao: g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '',
+      TempoTrabalhado: format(netMin),
+      AlertasExcedidos: getExcedidos(g),
+      Alerta: getAlerta(g)
+    });
+  });
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Resumo");
-  XLSX.writeFile(wb, "export_completo.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, "ResumoDia");
+  XLSX.writeFile(wb, "BPO_Resumo_Dia.xlsx");
 }
   
   
@@ -1010,3 +1468,4 @@ function exportSummary(){
 </body>
 
 </html>
+
