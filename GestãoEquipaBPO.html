@@ -766,18 +766,19 @@ function showToast(msg){
   }, 2000);
 }
 
-function refreshDashboard(){
+async function refreshDashboard(){
+  await load(); // 🔥 volta a ir ao Supabase
   renderDashboard();
-  showToast("📊 Alertas Gerais atualizado");
+  showToast("📊 Atualizado");
 }
 
-function refreshLogins(){
-  renderTable();
+async function refreshLogins(){
+  await load();
   showToast("👤 Dados de Login e Inatividade atualizados");
 }
 
-function refreshAlerts(){
-  renderAlerts();
+async function refreshAlerts(){
+  await load();
   showToast("🚨 Alertas atualizados");
 }
 
@@ -786,6 +787,26 @@ function refreshSummary(){
   showToast("🧾 Dados de Resumo atualizado");
 }
 
+async function refreshPlaneamento(){
+  await loadPlaneamento();
+  showToast("📅 Planeamento atualizado");
+}
+
+async function loadPlaneamento(){
+  const { data, error } = await client
+    .from('planeamento')
+    .select('*')
+    .order('data', { ascending: true });
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  planeamentoData = data || [];
+  renderPlaneamento();
+  renderKPIs();
+}
 function refreshPlaneamento(){
   loadPlaneamento();
   renderKPIs();
@@ -862,22 +883,7 @@ function excelDateToJS(excelDate){
   return `${d}-${m}-${y}`;
 }
 
-async function loadPlaneamento(){
 
-  const { data, error } = await client
-    .from('planeamento')
-    .select('*')
-    .order('data', { ascending: true });
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-planeamentoData = data;
-renderPlaneamento();
-renderKPIs(); // 🔥 isto é o que falta
-}
 
 function getPlaneadosSemLoginHoje(){
 
@@ -1370,12 +1376,21 @@ function exportExcel(){
 }
 
 async function init(){
-  await load();
-  await loadPlaneamento();
+  await Promise.all([
+    load(),
+    loadPlaneamento()
+  ]);
+
   renderKPIs();
 }
-
 init();
+
+async function reloadAll(){
+  await Promise.all([
+    load(),
+    loadPlaneamento()
+  ]);
+}
 
 function goMenu(){
   window.location.href = "GestãoProduçõesBPO.html"; // ou o teu painel principal
@@ -1507,6 +1522,4 @@ function exportSummary(){
 </body>
 
 </html>
-
-
 
