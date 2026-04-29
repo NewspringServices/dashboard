@@ -686,6 +686,11 @@ function getAlertaStyle(alerta){
     return 'color:#f39c12;';
   }
 
+  // 🔥 preto NORMAL (sem bold)
+  if(alerta === 'Validar presença (sem logout)'){
+    return 'color:#000;';
+  }
+
   return 'color:#19a463;';
 }
 
@@ -1259,13 +1264,33 @@ tbody.innerHTML += `
   });
 }
 
-
 function getAlerta(g){
 
   if((g.estado || '').toLowerCase() !== 'trabalha'){
-    return ""; // não mostra nada se não for "trabalha"
+    return "";
   }
 
+  let temLogin = false;
+  let temLogout = false;
+
+  g.eventos.forEach(e => {
+    const tipo = (e.tipo || '').toLowerCase();
+
+    if(isLogin(tipo)) temLogin = true;
+    if(isLogout(tipo)) temLogout = true;
+  });
+
+  // ❌ não fez login
+  if(!temLogin){
+    return "Ausência Total";
+  }
+
+  // ⚠️ fez login mas não fez logout
+  if(temLogin && !temLogout){
+    return "Validar presença (sem logout)";
+  }
+
+  // 🔢 cálculo normal
   let loginAtual = null;
   let total = 0;
 
@@ -1284,15 +1309,11 @@ function getAlerta(g){
     }
   });
 
-  if(!total || total === 0){
-    return "Ausência Total";
-  }
-
   if(total < 450){
     return "Ausência Parcial";
   }
 
-  return ""; // 🔥 antes era "Sem anomalias", agora fica vazio
+  return "";
 }
 
 function exportAlerts(){
