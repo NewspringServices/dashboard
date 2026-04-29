@@ -112,6 +112,7 @@ button:hover {
   transform:scale(1.03);
 }
 
+
 /* ================= TABELAS (VERDE LIMPO) ================= */
 table {
   width:100%;
@@ -279,8 +280,7 @@ button {
     <input type="date" id="alertEnd" onchange="renderAlerts()">
 
     <button onclick="refreshAlerts()">🔄 Atualizar</button>
-    <button onclick="exportAlerts()">📤 Export Excel</button>
-  </div>
+<button class="btn-blue" onclick="exportAlerts()">📤 Export Excel</button>  </div>
 
   <table>
     <thead>
@@ -317,8 +317,7 @@ button {
 
 <input id="filter" placeholder="Filtrar user ou nome..." onkeyup="renderTable()">
 
-<button onclick="exportExcel()">📤 Export Excel</button>
-
+<button class="btn-blue" onclick="exportExcel()">📤 Export Excel</button>
 <div style="margin-bottom:10px;">
   <button onclick="refreshLogins()">🔄 Atualizar</button>
 </div>
@@ -369,8 +368,7 @@ button {
   <button onclick="refreshSummary()">🔄 Atualizar</button>
 </div>
 
-<button onclick="exportSummary()">📤 Export Excel</button>
-
+<button class="btn-blue" onclick="exportSummary()">📤 Export Excel</button>
 
 
 <table>
@@ -421,6 +419,10 @@ button {
   <input type="date" id="planEnd" onchange="renderPlaneamento()">
   <input id="planFilter" placeholder="Filtrar user ou nome..." onkeyup="renderPlaneamento()">
 </div>
+
+<button class="btn-blue" onclick="exportPlaneamento()">
+  📤 Export Excel
+</button>
 
   <table>
     <thead>
@@ -493,6 +495,22 @@ function getLoginsHoje(){
     const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
     return data === hoje && isLogin(r.tipo);
   }).length;
+}
+
+function exportPlaneamento(){
+
+  const rows = planeamentoData.map(p => ({
+    Data: p.data,
+    User: p.user,
+    Nome: p.nome,
+    Estado: p.estado
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Planeamento");
+
+  XLSX.writeFile(wb, "BPO_Planeamento.xlsx");
 }
 
 function renderKPIs(){
@@ -1327,7 +1345,7 @@ function exportExcel(){
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Logins");
-  XLSX.writeFile(wb, "logins.xlsx");
+  XLSX.writeFile(wb, "Relatório_BPO_Dados de Logins e Inatividade.xlsx");
 }
 
 async function init(){
@@ -1458,7 +1476,7 @@ function exportSummary(){
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "ResumoDia");
-  XLSX.writeFile(wb, "BPO_Resumo_Dia.xlsx");
+  XLSX.writeFile(wb, "Relatório_BPO_Resumo_Dia.xlsx");
 }
   
   
@@ -1468,4 +1486,5 @@ function exportSummary(){
 </body>
 
 </html>
+
 
