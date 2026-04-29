@@ -106,9 +106,17 @@ th{
     <div>Painel Controlo Newspring_Serviços Administrativos Fidelidade</div>
   </div>
 
-  <div class="header-actions">
-    <button class="btn-blue" onclick="goMenu()">🏠 Menu</button>
-  </div>
+<div class="header-actions">
+  <button class="btn-blue" onclick="goMenu()">🏠 Menu</button>
+
+  <button onclick="goGestaoEquipa()">
+    👥 Gestão Logins & Retirados
+  </button>
+
+  <button onclick="goGestaoProducoes()">
+    📊 Gestão Produções
+  </button>
+</div>
 </div>
 
 <!-- TABS -->
@@ -226,6 +234,15 @@ async function saveToSupabase(){
     alert("Guardado com sucesso no Supabase ✅");
     loadPlaneamento();
   }
+}
+
+
+function goGestaoEquipa(){
+  window.location.href = "GestãoEquipaBPO.html";
+}
+
+function goGestaoProducoes(){
+  window.location.href = "GestãoProduçõesBPO.html";
 }
 
 /* ================= EXCEL ================= */
