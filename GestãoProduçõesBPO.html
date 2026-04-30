@@ -306,7 +306,7 @@ else {
   color = "#27ae60"; // verde
 }
 
-    tbody.innerHTML += `
+tbody.innerHTML += `
 <tr>
   <td>${r.data}</td>
   <td>${r.colaborador}</td>
@@ -315,29 +315,48 @@ else {
   <td style="color:${color}; font-weight:bold;">
     ${percent.toFixed(1)}%
   </td>
-  <td>${r.observacoes ?? ""}</td>
+  <td>
+<input 
+  value="${r.observacoes ?? ""}" 
+  readonly
+  data-id="${r.id}"
+  onclick="enableEdit(this)"
+  onblur="disableEdit(this)"
+  style="width:95%; padding:6px; border-radius:6px; border:1px solid #ccc; background:#eee; cursor:pointer;"
+/>
+  </td>
 </tr>`;
   });
 }
 
-function exportOcc(){
-
-  const rows = ocupacao.map(r => ({
-    Data: r.data,
-    Colaborador: r.colaborador,
-    Tempo_Total: r.tempo_total,
-    Tempo_Estimado: "07:00:00",
-    Taxa_Ocupacao: r.taxa_ocupacao + "%"
-  }));
-
-  const ws = XLSX.utils.json_to_sheet(rows);
-  const wb = XLSX.utils.book_new();
-
-  XLSX.utils.book_append_sheet(wb, ws, "Ocupacao");
-
-  XLSX.writeFile(wb, "taxa_ocupacao.xlsx");
+function enableEdit(input){
+  input.readOnly = false;
+  input.style.background = "white";
+  input.focus();
 }
 
+function disableEdit(input){
+  input.readOnly = true;
+  input.style.background = "#eee";
+
+  const id = input.dataset.id;
+  const value = input.value;
+
+  saveObs(id, value);
+}
+
+async function saveObs(id, value){
+
+  const { error } = await client
+    .from('resumo_ocupacao')
+    .update({ observacoes: value })
+    .eq('id', id);
+
+  if(error){
+    console.log(error);
+    alert("Erro ao guardar observação");
+  }
+}
 
 function render(){
 
@@ -432,9 +451,9 @@ async function load(){
 
   data = res || [];
 
-  const { data: occ } = await client
-    .from('resumo_ocupacao')
-    .select('*')
+ const { data: occ } = await client
+  .from('resumo_ocupacao')
+  .select('id, data, colaborador, tempo_total, taxa_ocupacao, observacoes')
     .order('data', { ascending: false });
 
   ocupacao = occ || [];
