@@ -218,11 +218,14 @@ tr:hover td {
 <table>
 <thead>
 <tr>
+
 <th>Data</th>
 <th>Colaborador</th>
 <th>Tempo Total</th>
 <th>Tempo Estimado</th>
 <th>% Ocupação</th>
+<th>Observações</th>
+
 </tr>
 </thead>
 
@@ -242,16 +245,7 @@ const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
 let data = [];
 
-async function load(){
 
-  const { data: res } = await client
-    .from('resumo_producao_diaria')
-    .select('*')
-    .order('data', { ascending: false });
-
-  data = res || [];
-  render();
-}
 
 function showTab(i){
 
@@ -291,47 +285,50 @@ function renderOcc(){
 
   const ESTIMADO = 7 * 3600;
 
-  data.forEach(r => {
+  ocupacao.forEach(r => {
 
-    if(f && !r.colaborador.toLowerCase().includes(f)) return;
+    if(f && !r.colaborador?.toLowerCase().includes(f)) return;
     if(start && r.data < start) return;
     if(end && r.data > end) return;
 
     const totalSec = toSeconds(r.tempo_total);
     const percent = (totalSec / ESTIMADO) * 100;
 
-const color = getOccColor(percent);
+ let color;
 
-tbody.innerHTML += `
+if (percent <= 70) {
+  color = "#e74c3c"; // vermelho
+} 
+else if (percent <= 88) {
+  color = "#f39c12"; // laranja
+} 
+else {
+  color = "#27ae60"; // verde
+}
+
+    tbody.innerHTML += `
 <tr>
-<td>${r.data}</td>
-<td>${r.colaborador}</td>
-<td>${r.tempo_total}</td>
-<td>07:00:00</td>
-<td style="color:${color}; font-weight:bold;">
-  ${percent.toFixed(1)}%
-</td>
+  <td>${r.data}</td>
+  <td>${r.colaborador}</td>
+  <td>${r.tempo_total}</td>
+  <td>07:00:00</td>
+  <td style="color:${color}; font-weight:bold;">
+    ${percent.toFixed(1)}%
+  </td>
+  <td>${r.observacoes ?? ""}</td>
 </tr>`;
   });
 }
 
 function exportOcc(){
 
-  const ESTIMADO = 7 * 3600;
-
-  const rows = data.map(r => {
-
-    const totalSec = toSeconds(r.tempo_total);
-    const percent = (totalSec / ESTIMADO) * 100;
-
-    return {
-      Data: r.data,
-      Colaborador: r.colaborador,
-      Tempo_Total: r.tempo_total,
-      Tempo_Estimado: "07:00:00",
-      Taxa_Ocupacao: percent.toFixed(1) + "%"
-    };
-  });
+  const rows = ocupacao.map(r => ({
+    Data: r.data,
+    Colaborador: r.colaborador,
+    Tempo_Total: r.tempo_total,
+    Tempo_Estimado: "07:00:00",
+    Taxa_Ocupacao: r.taxa_ocupacao + "%"
+  }));
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -423,6 +420,28 @@ function logout(){
 }
 
 load();
+
+let ocupacao = [];
+
+async function load(){
+
+  const { data: res } = await client
+    .from('resumo_producao_diaria')
+    .select('*')
+    .order('data', { ascending: false });
+
+  data = res || [];
+
+  const { data: occ } = await client
+    .from('resumo_ocupacao')
+    .select('*')
+    .order('data', { ascending: false });
+
+  ocupacao = occ || [];
+
+  render();
+}
+
 
 </script>
 
