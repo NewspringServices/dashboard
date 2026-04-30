@@ -144,6 +144,7 @@ tr:hover td {
 
 </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 
 <body>
@@ -265,6 +266,46 @@ function toSeconds(hms){
   return (h*3600)+(m*60)+s;
 }
 
+
+function exportOcc(){
+
+  const f = document.getElementById('occFilter').value?.toLowerCase() || '';
+  const start = document.getElementById('occStart').value;
+  const end = document.getElementById('occEnd').value;
+
+  const ESTIMADO = 7 * 3600;
+
+  const rows = ocupacao
+    .filter(r => {
+
+      if(f && !r.colaborador?.toLowerCase().includes(f)) return false;
+      if(start && r.data < start) return false;
+      if(end && r.data > end) return false;
+
+      return true;
+    })
+    .map(r => {
+
+      const totalSec = toSeconds(r.tempo_total);
+      const percent = (totalSec / ESTIMADO) * 100;
+
+      return {
+        Data: r.data,
+        Colaborador: r.colaborador,
+        Tempo_Total: r.tempo_total,
+        Tempo_Estimado: "07:00:00",
+        Ocupacao: percent.toFixed(1) + "%",
+        Observacoes: r.observacoes || ""
+      };
+    });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Taxa Ocupação");
+
+  XLSX.writeFile(wb, "Relatório_Taxa Ocupação_BPO.xlsx");
+}
 
 function getOccColor(p){
 
@@ -427,7 +468,7 @@ function exportExcel(){
 
   XLSX.utils.book_append_sheet(wb, ws, "Resumo Produção");
 
-  XLSX.writeFile(wb, "resumo_producao_diaria.xlsx");
+  XLSX.writeFile(wb, "Relatório_Tempos de Produção_BPO.xlsx");
 }
 
 function goMenu(){
