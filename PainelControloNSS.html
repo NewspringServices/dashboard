@@ -8,7 +8,7 @@
 
 body{
   margin:0;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-family: 'Inter', Arial;
 
   background: url("fundo.png") no-repeat center center fixed;
   background-size: cover;
@@ -18,40 +18,20 @@ body{
   align-items:center;
   height:100vh;
 }
+
 /* CARD */
 .box{
   background: rgba(255,255,255,0.9);
   padding:40px;
   border-radius:18px;
-  width:360px;
+  width:320px;
   text-align:center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
 .logo{
-  width:100%;
-  max-width:260px;
-  height:150px;
-  object-fit:contain;
-  margin-bottom:18px;
-  filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1));
-}
-
-/* TEXTO */
-.warning{
-  color:#c1121f;
-  font-weight:600;
+  width:140px;
   margin-bottom:15px;
-}
-
-/* INPUT */
-input{
-  width:100%;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  margin-bottom:10px;
-  text-align:center;
 }
 
 /* BOTÃO */
@@ -66,31 +46,50 @@ button{
   cursor:pointer;
 }
 
-/* LOADER */
-.loader{
-  display:none;
-  width:40px;
-  height:40px;
-  border:4px solid #eee;
-  border-top:4px solid #19a463;
-  border-radius:50%;
-  margin:15px auto;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin{
-  100%{ transform: rotate(360deg); }
-}
-
-/* TOAST */
-#toast{
+/* MODAL */
+.modal{
   position:fixed;
-  top:20px;
-  right:20px;
-  padding:10px 15px;
-  border-radius:8px;
-  color:white;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
   display:none;
+  justify-content:center;
+  align-items:center;
+
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+}
+
+/* CAIXA MODAL */
+.modal-box{
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  width:280px;
+  text-align:center;
+}
+
+.modal-box input{
+  width:200px;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  text-align:center;
+  display:block;
+  margin:10px auto;
+}
+
+/* ERRO INLINE */
+.error{
+  color:#c1121f;
+  font-size:14px;
+  margin-top:8px;
+  height:18px;
+}.titulo{
+  color:#0f6b3c;
+  margin-bottom:20px;
+  font-weight:700;
 }
 
 </style>
@@ -98,53 +97,63 @@ button{
 
 <body>
 
-<div id="toast"></div>
-
+<!-- CARD INICIAL -->
 <div class="box">
-
   <img src="logo.png" class="logo">
 
-  <div class="warning">⚠️ Acesso restrito</div>
+  <h2 class="titulo">Dashboard Gestão BPO</h2>
 
-  <input type="password" id="pass" placeholder="Introduzir password">
+  <button onclick="openModal()">Entrar</button>
+</div>
 
-  <button onclick="check()">Entrar</button>
+<!-- MODAL PASSWORD -->
+<div class="modal" id="modal">
 
-  <div class="loader" id="loader"></div>
+  <div class="modal-box">
+
+    <h3>🔐 Acesso</h3>
+
+    <input type="password" id="pass" placeholder="Introduzir password">
+
+    <div id="errorMsg" class="error"></div>
+
+    <button onclick="check()">Entrar</button>
+
+    <button onclick="closeModal()" style="margin-top:8px; background:#c1121f;">
+      Cancelar
+    </button>
+
+  </div>
 
 </div>
 
 <script>
 
-/* TOAST */
-function showToast(msg){
-  const t = document.getElementById("toast");
-  t.innerText = msg;
-  t.style.background = "#c1121f";
-  t.style.display = "block";
-
-  setTimeout(()=> t.style.display="none", 2500);
+/* ABRIR MODAL */
+function openModal(){
+  document.getElementById("modal").style.display="flex";
 }
 
-/* LOGIN DIRETO */
+/* FECHAR MODAL */
+function closeModal(){
+  document.getElementById("modal").style.display="none";
+  document.getElementById("pass").value="";
+  document.getElementById("errorMsg").innerText="";
+}
+
+/* LOGIN */
 function check(){
   const pass = document.getElementById("pass").value;
-  const loader = document.getElementById("loader");
+  const error = document.getElementById("errorMsg");
 
   if(pass === "12345"){
-
-    loader.style.display="block";
-
-    setTimeout(()=>{
-      window.location.href = "GestãoEquipaBPO.html";
-    },500);
-
+    window.location.href = "GestãoEquipaBPO.html";
   } else {
-    showToast("❌ Password incorreta");
+    error.innerText = "❌ Password incorreta";
   }
 }
 
-/* ENTER = LOGIN */
+/* ENTER */
 document.getElementById("pass").addEventListener("keypress", function(e){
   if(e.key === "Enter"){
     check();
