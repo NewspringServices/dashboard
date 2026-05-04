@@ -1023,10 +1023,14 @@ async function refreshPlaneamento(){
 }
 
 async function loadPlaneamento(){
+
+  const hoje = getHoje();
+
   const { data, error } = await client
     .from('planeamento')
     .select('*')
-    .order('data', { ascending: true });
+    .eq('data', hoje)   // 👈 ISTO É O IMPORTANTE
+    .order('user', { ascending: true });
 
   if(error){
     console.error(error);
@@ -1360,6 +1364,8 @@ function toggleKPI(tipo){
 }
 
 function renderSummary(){
+  const hoje = getHoje();
+const diaSelecionado = document.getElementById('sumStart')?.value || hoje;
 const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
   const f = document.getElementById('sumFilter')?.value?.toLowerCase() || '';
   const start = document.getElementById('sumStart')?.value;
@@ -1368,9 +1374,11 @@ const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
   const groups = {};
 
   // 🔥 1. BASE = PLANEAMENTO (NÃO LOGINS)
-  planeamentoData.forEach(p => {
+planeamentoData.forEach(p => {
 
-    const key = (p.user || '') + '_' + (p.data || '');
+  if ((p.data || '') !== diaSelecionado) return;
+
+  const key = (p.user || '') + '_' + (p.data || '');
 
     groups[key] = {
       user: p.user,
@@ -1752,3 +1760,4 @@ function exportSummary(){
 </body>
 
 </html>
+
