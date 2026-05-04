@@ -313,6 +313,7 @@ button {
 
 <div id="kpis-dashboard" style="display:flex; gap:15px; margin-bottom:15px;"></div>
 <div id="sem-login-list" style="margin-top:10px;"></div>
+
 <div class="header-actions" style="margin-bottom:10px;">
   <button onclick="refreshDashboard()">🔄 Atualizar</button>
 </div>
@@ -321,6 +322,10 @@ button {
 <div id="dash-pausa"></div>
 <div id="dash-refeicao"></div>
 <div id="dash-logout"></div>
+
+<!-- 🔥 AQUI É ONDE ENTRA -->
+<div id="dash-multilogin"></div>
+
 </div>
 
 <!-- ALERTAS -->
@@ -859,7 +864,7 @@ function renderKPILists(planeados, logins, semLogin){
 if(kpiOpen.baixas){
   html += `
     <div class="card" style="border-left:5px solid #e67e22;">
-      <b>🏥 Baixas + Licenças</b><br><br>
+      <b>🏥 Baixas & Licenças</b><br><br>
       ${
         getBaixasLicencasHoje().length
           ? getBaixasLicencasHoje()
@@ -1215,28 +1220,43 @@ function renderDashboard(){
     return data === hoje;
   });
 
-  const logins = dadosHoje.filter(r=>{
+  const logins = dadosHoje.filter(r => {
     if(!isLogin(r.tipo)) return false;
-    const d=new Date(r.inicio);
-    return (d.getHours()*60+d.getMinutes())>=541;
+    const d = new Date(r.inicio);
+    return (d.getHours()*60 + d.getMinutes()) >= 541;
   });
 
-  const pausas = dadosHoje.filter(r=>isPause(r.tipo)&&duration(r.inicio,r.fim)>16);
-  const meals = dadosHoje.filter(r=>isMeal(r.tipo)&&duration(r.inicio,r.fim)>65);
-  const logouts = dadosHoje.filter(r=>isLogout(r.tipo));
+  const pausas = dadosHoje.filter(r => isPause(r.tipo) && duration(r.inicio,r.fim) > 16);
+  const meals = dadosHoje.filter(r => isMeal(r.tipo) && duration(r.inicio,r.fim) > 65);
+  const logouts = dadosHoje.filter(r => isLogout(r.tipo));
 
- 
-  // 🔥 CARD EDITADO COM REGRA NOVA
+  // 🔥 NOVO: LOGINS POR USER
+  const loginsHoje = dadosHoje.filter(r => isLogin(r.tipo));
+
+  const loginCountByUser = {};
+
+  loginsHoje.forEach(r => {
+    loginCountByUser[r.user] = (loginCountByUser[r.user] || 0) + 1;
+  });
+
+  const maisDeUmLogin = Object.entries(loginCountByUser)
+    .filter(([user, count]) => count > 1)
+    .map(([user, count]) => {
+      const nome = dadosHoje.find(r => r.user === user)?.nome || '';
+      return { user, nome, count };
+    });
+
+  // 🔥 CARD BASE
   const card = (title,color,list,type) => `
 <div style="background:white;padding:15px;margin-bottom:12px;border-left:6px solid ${color};border-radius:6px;">
 <b>${title} (${list.length})</b>
 <div style="margin-top:8px;font-size:13px;line-height:1.5;">
 ${list.length ? list.map(r => {
 
-  // 🔥 REGRA: pausas e refeições mostram duração
-  const value = (type === 'pause' || type === 'meal')
-    ? hhmmss(r.inicio,r.fim)
-    : timeOnly(r.inicio);
+  const value =
+    (type === 'pause' || type === 'meal')
+      ? hhmmss(r.inicio,r.fim)
+      : (r.inicio ? timeOnly(r.inicio) : `x${r.count || ''}`);
 
   return `• ${r.user} - ${r.nome} - ${value}`;
 }).join('<br>') : 'Sem registos'}
@@ -1244,70 +1264,34 @@ ${list.length ? list.map(r => {
 </div>
   `;
 
+  // 🔴 LOGINS TARDIOS
   document.getElementById('dash-login').innerHTML =
     card("🔴 Logins tardios","#e74c3c",logins,'login');
 
+  // 🟠 PAUSAS
   document.getElementById('dash-pausa').innerHTML =
     card("🟠 Pausas excedidas","#f39c12",pausas,'pause');
 
+  // 🟡 REFEIÇÕES
   document.getElementById('dash-refeicao').innerHTML =
     card("🟡 Refeições excedidas","#f1c40f",meals,'meal');
 
+  // ⚫ LOGOUTS
   document.getElementById('dash-logout').innerHTML =
     card("⚫ Logouts","#2c3e50",logouts,'logout');
+
+  // 🟣 NOVO CARD: MAIS DE 1 LOGIN
+  document.getElementById('dash-multilogin').innerHTML = `
+<div style="background:white;padding:15px;margin-bottom:12px;border-left:6px solid #8e44ad;border-radius:6px;">
+<b>🔁 Mais que 1 Login Dia (${maisDeUmLogin.length})</b>
+<div style="margin-top:8px;font-size:13px;line-height:1.5;">
+${maisDeUmLogin.length
+  ? maisDeUmLogin.map(r => `• ${r.user} - ${r.nome} - ${r.count} logins`).join('<br>')
+  : 'Sem duplicações 🎉'}
+</div>
+</div>
+  `;
 }
-
-function renderTable(){
-  const f = document.getElementById('filter').value?.toLowerCase() || '';
-  const start = document.getElementById('dateStart').value;
-  const end = document.getElementById('dateEnd').value;
-  const tipoFiltro = document.getElementById('tipoFilter').value;
-
-  const filtered = allData.filter(r => {
-
-    // 🔎 filtro texto
-    const okText =
-      (r.user||'').toLowerCase().includes(f) ||
-      (r.nome||'').toLowerCase().includes(f);
-
-    if(!okText) return false;
-
-    // 📅 filtro datas
-    const d = new Date(r.inicio);
-    if(start && d < new Date(start)) return false;
-    if(end && d > new Date(end+"T23:59:59")) return false;
-
-    // 🧠 filtro tipo
-    const tipo = (r.tipo || '').toLowerCase();
-
-    if(tipoFiltro){
-      if(tipoFiltro === 'login' && !isLogin(tipo)) return false;
-      if(tipoFiltro === 'pausa' && !isPause(tipo)) return false;
-      if(tipoFiltro === 'refeicao' && !isMeal(tipo)) return false;
-      if(tipoFiltro === 'logout' && !isLogout(tipo)) return false;
-    }
-
-    return true;
-  });
-
-  const tbody = document.getElementById('table');
-  tbody.innerHTML = '';
-
-  filtered.forEach(r=>{
-    tbody.innerHTML+=`
-<tr>
-<td>${r.data||''}</td>
-<td>${r.user||''}</td>
-<td>${r.nome||''}</td>
-<td>${r.tipo||''}</td>
-<td>${timeOnly(r.inicio)}</td>
-<td>${timeOnly(r.fim)}</td>
-<td>${hhmmss(r.inicio,r.fim)}</td>
-</tr>
-    `;
-  });
-}
-
 function renderAlerts(){
   const tbody=document.getElementById('alertsTable');
   tbody.innerHTML='';
@@ -1760,4 +1744,3 @@ function exportSummary(){
 </body>
 
 </html>
-
