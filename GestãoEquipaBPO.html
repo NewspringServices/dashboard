@@ -304,6 +304,7 @@ button {
   <div class="tab" onclick="showTab(1)">👤 Logins e Inatividade</div>
   <div class="tab" onclick="showTab(2)">🧾 Resumo Dia</div>
   <div class="tab" onclick="showTab(3)">📆 Planeamento</div>
+  <div class="tab" onclick="showTab(4)">⚙️ Forçar Login/Logout</div>
 </div>
 
 <!-- DASHBOARD -->
@@ -488,6 +489,78 @@ button {
     <tbody id="planeamentoTable"></tbody>
   </table>
 </div>
+
+<div class="view" id="tab4">
+  <h3>⚙️ Forçar Registo - Login / Logout</h3>
+
+  <div class="card" style="max-width:400px;">
+
+    <h3 style="text-align:center;">Forçar Registo</h3>
+
+    <select id="nomeSelect">
+   <option value="">-- Selecionar nome --</option>
+
+<option>Ana Catarina Oliveira Mendonça Barão</option>
+<option>Ana Karina Spencer Martins</option>
+<option>Andreia Sofia Figueiredo Grilo</option>
+
+<option>Carina Ourives Lavado</option>
+<option>Carla Alexandra Duarte Reis</option>
+<option>Carla Mariza Dias Trindade</option>
+<option>Carolina Adelaide Viegas Gomes Padeiro</option>
+<option>Cintia Maisa Gomes Carlos</option>
+
+<option>Delson da Silva Carvalho</option>
+<option>Délcia Filomena Emílio Mpengo</option>
+
+<option>Eunice Rosalina Moiane Machatine Chiau</option>
+
+<option>Fábio Rúben de Abreu Assunção</option>
+
+<option>Gilda Maria Infante Anjos</option>
+<option>Gisela Cristina Cidade Cabeca Ingles</option>
+
+<option>Joana de Almeida Figueiras</option>
+<option>Joana Emanuela Lenho da Costa Sousa</option>
+<option>Joel Quissama Mundjanga</option>
+<option>Jessica Silva Nogueira Manacas</option>
+
+<option>Madalena Farinha de Carvalho e Sousa Góis</option>
+<option>Marcos Felipe Bastos Moura</option>
+<option>Marta Sofia da Conceição Fernandes</option>
+<option>Mónica Sofia Pereira Valente</option>
+
+<option>Nádia Filipa Contins Cunha Oliveira</option>
+
+<option>Orlanda Leizi Gomes Francisco</option>
+
+<option>Patrícia Alexandra Viegas André</option>
+
+<option>Rachel Alvarez dos Santos Coelho</option>
+
+<option>Sandra Isabel Domingues Facão</option>
+<option>Sandra Maria Moreira Bento</option>
+<option>Sara Banú Chotumiã</option>
+<option>Sofia Isabel Martins Cruz Mendes Ferreira</option>
+<option>Susana Carina Marques Bordalo</option>
+
+<option>Telma Sofia Pereira Rosa</option>
+
+<option>Vera Lúcia Centeio dos Santos Freitas</option>
+
+    </select>
+
+    <div style="display:flex; gap:10px; margin-top:10px;">
+      <button onclick="enviarForcado('login')" style="background:green;">Login</button>
+      <button onclick="enviarForcado('logout')" class="btn-red">Logout</button>
+    </div>
+
+    <div id="msgForce" style="margin-top:10px; text-align:center; font-weight:bold;"></div>
+
+  </div>
+</div>
+</div>
+
 <script>
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
@@ -520,6 +593,82 @@ function closeAdminModal(){
   document.getElementById("adminModal").style.display = "none";
   document.getElementById("adminPass").value = "";
   document.getElementById("adminMsg").innerText = "";
+}
+
+
+const utilizadores = {
+  "Joel Quissama Mundjanga": "EX10359",
+  "Orlanda Leizi Gomes Francisco": "EX10362",
+  "Joana de Almeida Figueiras": "EX10418",
+  "Carla Mariza Dias Trindade": "EX10613",
+  "Nádia Filipa Contins Cunha Oliveira": "EX10622",
+  "Gilda Maria Infante Anjos": "EX10867",
+  "Marcos Felipe Bastos Moura": "EX10889",
+  "Susana Carina Marques Bordalo": "EX10886",
+  "Sara Banú Chotumiã": "EX10891",
+  "Sofia Isabel Martins Cruz Mendes Ferreira": "EX10888",
+  "Rachel Alvarez dos Santos Coelho": "EX10884",
+  "Carla Alexandra Duarte Reis": "EX10579",
+  "Patrícia Alexandra Viegas André": "EX08554",
+  "Sandra Isabel Domingues Facão": "EX04695",
+  "Ana Karina Spencer Martins": "EX11321",
+  "Andreia Sofia Figueiredo Grilo": "EX10677",
+  "Mónica Sofia Pereira Valente": "EX10105",
+  "Carina Ourives Lavado": "EX04620",
+  "Madalena Farinha de Carvalho e Sousa Góis": "EX11405",
+  "Carolina Adelaide Viegas Gomes Padeiro": "EX11397",
+  "Ana Catarina Oliveira Mendonça Barão": "EX11398",
+  "Délcia Filomena Emílio Mpengo": "EX11399",
+  "Joana Emanuela Lenho da Costa Sousa": "EX11401",
+  "Marta Sofia da Conceição Fernandes": "EX11403",
+  "Fábio Rúben de Abreu Assunção": "EX11531",
+  "Vera Lúcia Centeio dos Santos Freitas": "EX11561",
+  "Telma Sofia Pereira Rosa": "EX04904",
+  "Cintia Maisa Gomes Carlos": "EX12700",
+  "Delson da Silva Carvalho": "EX12701",
+  "Eunice Rosalina Moiane Machatine Chiau": "EX12702",
+  "Jessica Silva Nogueira Manacas": "EX12703",
+  "Sandra Maria Moreira Bento": "EX12704",
+  "Gisela Maria Cabeca Ingles": "EX00281"
+};
+
+
+async function enviarForcado(tipo){
+
+  const nome = document.getElementById("nomeSelect").value;
+  const msg = document.getElementById("msgForce");
+
+  if(!nome){
+    msg.style.color = "red";
+    msg.innerText = "Seleciona um nome";
+    return;
+  }
+
+  const user = utilizadores[nome];
+
+  const payload = {
+    data: new Date().toISOString().slice(0,10),
+    user,
+    nome,
+    tipo,
+    inicio: new Date().toISOString().slice(0,19)
+  };
+
+  const { error } = await client
+    .from('BPO_registosNSS')
+    .insert([payload]);
+
+  if(error){
+    msg.style.color = "red";
+    msg.innerText = "Erro ao registar";
+    console.error(error);
+    return;
+  }
+
+  msg.style.color = "green";
+  msg.innerText = "✔ Registo criado com sucesso";
+
+  load(); // atualiza dashboard
 }
 
 function checkAdmin(){
