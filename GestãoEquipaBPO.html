@@ -1367,6 +1367,10 @@ function toggleKPI(tipo){
   renderKPIs();
 }
 
+
+
+
+
 function renderSummary(){
 
   const TARGET_MIN = 450; // 7h30
@@ -1478,20 +1482,17 @@ function renderSummary(){
     const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
     const netMin = totalMin - pausaMin - refeicaoMin;
 
-    // 🔥 NOVO: falta e extra
     const faltaMin = Math.max(0, TARGET_MIN - netMin);
     const extraMin = Math.max(0, netMin - TARGET_MIN);
 
- const format = (mins) => {
-  if (!mins || mins <= 0) return "";
-
-  const sec = Math.floor(mins * 60);
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = sec % 60;
-
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-};
+    const format = (mins) => {
+      if (!mins || mins <= 0) return "";
+      const sec = Math.floor(mins * 60);
+      const h = Math.floor(sec / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = sec % 60;
+      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    };
 
     const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
@@ -1515,8 +1516,9 @@ function renderSummary(){
 
 <td>${format(netMin)}</td>
 
-<td>${format(faltaMin)}</td>
-<td>${format(extraMin)}</td>
+<!-- 🔥 SÓ TRABALHA -->
+<td>${g.estado === 'Trabalha' ? format(faltaMin) : ''}</td>
+<td>${g.estado === 'Trabalha' ? format(extraMin) : ''}</td>
 
 <td class="alert-excedidos" style="color:${getExcedidos(g) ? '#e74c3c' : '#999'};">
   ${getExcedidos(g)}
@@ -1529,6 +1531,8 @@ function renderSummary(){
 `;
   });
 }
+
+
 function getAlerta(g){
 
   if((g.estado || '').toLowerCase() !== 'trabalha'){
@@ -1659,6 +1663,9 @@ function logout(){
   window.location.href = "PainelControloNSS.html";
 }
 
+
+
+
 function exportSummary(){
 
   const TARGET_MIN = 450;
@@ -1672,7 +1679,6 @@ function exportSummary(){
 
   const groups = {};
 
-  // 1. BASE = PLANEAMENTO
   planeamentoData
     .filter(p => p.data && p.data <= hoje)
     .forEach(p => {
@@ -1690,7 +1696,6 @@ function exportSummary(){
       };
     });
 
-  // 2. LOGS
   allData
     .filter(r => {
       const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
@@ -1732,13 +1737,11 @@ function exportSummary(){
 
   Object.values(groups).forEach(g => {
 
-    // 🔎 FILTRO TEXTO
     if(f && !(
       (g.user || '').toLowerCase().includes(f) ||
       (g.nome || '').toLowerCase().includes(f)
     )) return;
 
-    // 📅 FILTRO DATAS
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
@@ -1784,7 +1787,6 @@ function exportSummary(){
 
     const alerta = getAlerta(g);
 
-    // 🚨 filtro de alerta (igual ao renderSummary)
     if(alertaFiltro && alerta !== alertaFiltro) return;
 
     rows.push({
@@ -1795,8 +1797,11 @@ function exportSummary(){
       Login: timeOnly(primeiroLogin),
       Logout: timeOnly(ultimoLogout),
       TempoTrabalhado: format(netMin),
-      TempoFalta: format(faltaMin),
-      TempoExtra: format(extraMin),
+
+      // 🔥 SÓ TRABALHA
+      TempoFalta: g.estado === 'Trabalha' ? format(faltaMin) : '',
+      TempoExtra: g.estado === 'Trabalha' ? format(extraMin) : '',
+
       Alerta: alerta,
       Excedidos: getExcedidos(g)
     });
@@ -1808,7 +1813,8 @@ function exportSummary(){
 
   XLSX.writeFile(wb, "Relatório_BPO_Resumo_Dia.xlsx");
 }
-  
+
+
 
 </script>
 
