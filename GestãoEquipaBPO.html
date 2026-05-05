@@ -585,6 +585,10 @@ function showTab(i){
   
 }
 
+function getHojeISO(){
+  return new Date().toISOString().split('T')[0];
+}
+
 function openAdminModal(){
   document.getElementById("adminModal").style.display = "flex";
 }
@@ -1368,56 +1372,66 @@ function renderSummary(){
   const end = document.getElementById('sumEnd')?.value;
   const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
 
+  const hoje = new Date().toISOString().split('T')[0];
+
   const groups = {};
 
-  // 🔥 1. BASE = PLANEAMENTO (TODOS OS DIAS)
-  planeamentoData.forEach(p => {
+  // 🔥 1. BASE = PLANEAMENTO (apenas até hoje)
+  planeamentoData
+    .filter(p => p.data && p.data <= hoje)
+    .forEach(p => {
 
-    const key = (p.user || '') + '_' + (p.data || '');
+      const key = (p.user || '') + '_' + (p.data || '');
 
-    groups[key] = {
-      user: p.user,
-      nome: p.nome,
-      data: p.data,
-      estado: p.estado,
-      eventos: [],
-      pausas: [],
-      refeicoes: []
-    };
-  });
-
-  // 🔥 2. ENCAIXAR LOGS POR USER + DATA
-  allData.forEach(r => {
-
-    const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
-    const key = r.user + '_' + date;
-
-    if(!groups[key]){
       groups[key] = {
-        user: r.user,
-        nome: r.nome,
-        data: date,
-        estado: '',
+        user: p.user,
+        nome: p.nome,
+        data: p.data,
+        estado: p.estado,
         eventos: [],
         pausas: [],
         refeicoes: []
       };
-    }
+    });
 
-    const tipo = (r.tipo || '').toLowerCase();
+  // 🔥 2. LOGS (apenas até hoje também)
+  allData
+    .filter(r => {
 
-    if(isLogin(tipo) || isLogout(tipo)){
-      groups[key].eventos.push(r);
-    }
+      const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+      return date && date <= hoje; // ❌ remove futuro
+    })
+    .forEach(r => {
 
-    if(isPause(tipo)){
-      groups[key].pausas.push(r);
-    }
+      const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+      const key = r.user + '_' + date;
 
-    if(isMeal(tipo)){
-      groups[key].refeicoes.push(r);
-    }
-  });
+      if(!groups[key]){
+        groups[key] = {
+          user: r.user,
+          nome: r.nome,
+          data: date,
+          estado: '',
+          eventos: [],
+          pausas: [],
+          refeicoes: []
+        };
+      }
+
+      const tipo = (r.tipo || '').toLowerCase();
+
+      if(isLogin(tipo) || isLogout(tipo)){
+        groups[key].eventos.push(r);
+      }
+
+      if(isPause(tipo)){
+        groups[key].pausas.push(r);
+      }
+
+      if(isMeal(tipo)){
+        groups[key].refeicoes.push(r);
+      }
+    });
 
   const tbody = document.getElementById('summaryTable');
   tbody.innerHTML = '';
@@ -1425,9 +1439,12 @@ function renderSummary(){
   Object.values(groups).forEach(g => {
 
     // 🔎 filtro texto
-    if(f && !((g.user||'').toLowerCase().includes(f) || (g.nome||'').toLowerCase().includes(f))) return;
+    if(f && !(
+      (g.user||'').toLowerCase().includes(f) ||
+      (g.nome||'').toLowerCase().includes(f)
+    )) return;
 
-    // 📅 filtro datas (opcional)
+    // 📅 filtros manuais
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
