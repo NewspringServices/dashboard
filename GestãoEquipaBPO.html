@@ -436,7 +436,9 @@ button {
 <th>Pausa 1</th>
 <th>Pausa 2</th>
 <th>Refeição</th>
-<th>Tempo trabalhado</th>
+<th>Tempo Trabalhado</th>
+<th>Tempo em Falta</th>
+<th>Tempo Extra</th>
 <th>Tempo Excedidos</th>
 <th>Alerta</th>
 </tr>
@@ -1367,6 +1369,8 @@ function toggleKPI(tipo){
 
 function renderSummary(){
 
+  const TARGET_MIN = 450; // 7h30
+
   const f = document.getElementById('sumFilter')?.value?.toLowerCase() || '';
   const start = document.getElementById('sumStart')?.value;
   const end = document.getElementById('sumEnd')?.value;
@@ -1376,7 +1380,7 @@ function renderSummary(){
 
   const groups = {};
 
-  // 🔥 1. BASE = PLANEAMENTO (apenas até hoje)
+  // 🔥 1. BASE = PLANEAMENTO
   planeamentoData
     .filter(p => p.data && p.data <= hoje)
     .forEach(p => {
@@ -1394,12 +1398,11 @@ function renderSummary(){
       };
     });
 
-  // 🔥 2. LOGS (apenas até hoje também)
+  // 🔥 2. LOGS
   allData
     .filter(r => {
-
       const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
-      return date && date <= hoje; // ❌ remove futuro
+      return date && date <= hoje;
     })
     .forEach(r => {
 
@@ -1438,13 +1441,11 @@ function renderSummary(){
 
   Object.values(groups).forEach(g => {
 
-    // 🔎 filtro texto
     if(f && !(
       (g.user||'').toLowerCase().includes(f) ||
       (g.nome||'').toLowerCase().includes(f)
     )) return;
 
-    // 📅 filtros manuais
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
@@ -1477,6 +1478,10 @@ function renderSummary(){
     const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
     const netMin = totalMin - pausaMin - refeicaoMin;
 
+    // 🔥 NOVO: falta e extra
+    const faltaMin = Math.max(0, TARGET_MIN - netMin);
+    const extraMin = Math.max(0, netMin - TARGET_MIN);
+
     const format = (mins) => {
       const sec = Math.max(0, Math.floor(mins * 60));
       const h = Math.floor(sec / 3600);
@@ -1504,10 +1509,16 @@ function renderSummary(){
 <td>${p1}</td>
 <td>${p2}</td>
 <td>${ref}</td>
+
 <td>${format(netMin)}</td>
+
+<td>${format(faltaMin)}</td>
+<td>${format(extraMin)}</td>
+
 <td class="alert-excedidos" style="color:${getExcedidos(g) ? '#e74c3c' : '#999'};">
   ${getExcedidos(g)}
 </td>
+
 <td style="${getAlertaStyle(alerta)}">
   ${alerta}
 </td>
@@ -1767,3 +1778,4 @@ function exportSummary(){
 </body>
 
 </html>
+
