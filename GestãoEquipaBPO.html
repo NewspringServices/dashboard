@@ -1482,13 +1482,16 @@ function renderSummary(){
     const faltaMin = Math.max(0, TARGET_MIN - netMin);
     const extraMin = Math.max(0, netMin - TARGET_MIN);
 
-    const format = (mins) => {
-      const sec = Math.max(0, Math.floor(mins * 60));
-      const h = Math.floor(sec / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = sec % 60;
-      return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-    };
+ const format = (mins) => {
+  if (!mins || mins <= 0) return "";
+
+  const sec = Math.floor(mins * 60);
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+};
 
     const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
