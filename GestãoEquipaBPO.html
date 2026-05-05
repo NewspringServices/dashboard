@@ -1679,6 +1679,7 @@ function exportSummary(){
 
   const groups = {};
 
+  // 🔥 BASE PLANEAMENTO
   planeamentoData
     .filter(p => p.data && p.data <= hoje)
     .forEach(p => {
@@ -1696,6 +1697,7 @@ function exportSummary(){
       };
     });
 
+  // 🔥 LOGS
   allData
     .filter(r => {
       const date = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
@@ -1789,16 +1791,25 @@ function exportSummary(){
 
     if(alertaFiltro && alerta !== alertaFiltro) return;
 
+    // 🔥 PAUSAS E REFEIÇÃO (EXPORT CORRETO)
+    const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
+    const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
+    const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
+
     rows.push({
       Data: g.data,
       User: g.user,
       Nome: g.nome,
       Planeamento: g.estado || '',
+
       Login: timeOnly(primeiroLogin),
       Logout: timeOnly(ultimoLogout),
-      TempoTrabalhado: format(netMin),
 
-      // 🔥 SÓ TRABALHA
+      Pausa1: p1,
+      Pausa2: p2,
+      Refeicao: ref,
+
+      TempoTrabalhado: format(netMin),
       TempoFalta: g.estado === 'Trabalha' ? format(faltaMin) : '',
       TempoExtra: g.estado === 'Trabalha' ? format(extraMin) : '',
 
@@ -1813,7 +1824,6 @@ function exportSummary(){
 
   XLSX.writeFile(wb, "Relatório_BPO_Resumo_Dia.xlsx");
 }
-
 
 
 </script>
