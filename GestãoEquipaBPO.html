@@ -599,7 +599,9 @@ function showTab(i){
 }
 
 function getHojeISO(){
-  return new Date().toISOString().split('T')[0];
+  return new Date()
+    .toLocaleString('sv-SE', { timeZone: 'Europe/Lisbon' })
+    .split('T')[0];
 }
 
 function openAdminModal(){
@@ -650,6 +652,18 @@ const utilizadores = {
 };
 
 
+
+
+
+function getLisbonISO(){
+  const now = new Date();
+
+  const offset = now.getTimezoneOffset() * 60000;
+  const lisbonTime = new Date(now - offset);
+
+  return lisbonTime.toISOString().slice(0, 19);
+}
+
 async function enviarForcado(tipo){
 
   const nome = document.getElementById("nomeSelect").value;
@@ -663,14 +677,15 @@ async function enviarForcado(tipo){
 
   const user = utilizadores[nome];
 
-  const payload = {
-    data: new Date().toISOString().slice(0,10),
-    user,
-    nome,
-    tipo,
-    inicio: new Date().toISOString().slice(0,19)
-  };
 
+
+const payload = {
+  data: getLisbonISO().slice(0,10),
+  user,
+  nome,
+  tipo,
+  inicio: getLisbonISO()
+};
   const { error } = await client
     .from('BPO_registosNSS')
     .insert([payload]);
@@ -709,13 +724,18 @@ function checkAdmin(){
 
 function timeOnly(dt){
   if(!dt) return '';
-  const d=new Date(dt);
-  return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+
+  return new Intl.DateTimeFormat('pt-PT', {
+    timeZone: 'Europe/Lisbon',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(new Date(dt));
 }
-
-
 function getHoje(){
-  return new Date().toISOString().split('T')[0];
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Lisbon'
+  }).format(new Date());
 }
 function getPlaneadosHoje(){
   const hoje = getHoje();
@@ -739,9 +759,15 @@ function getLoginsHoje(){
   const hoje = getHoje();
 
   return allData.filter(r => {
-    const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+const data = r.data || (r.inicio ? getHojeFromDate(r.inicio) : '');
     return data === hoje && isLogin(r.tipo);
   }).length;
+}
+
+function getHojeFromDate(dt){
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Lisbon'
+  }).format(new Date(dt));
 }
 
 function exportPlaneamento(){
