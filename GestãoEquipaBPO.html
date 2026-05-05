@@ -1362,21 +1362,18 @@ function toggleKPI(tipo){
 }
 
 function renderSummary(){
-  const hoje = getHoje();
-const diaSelecionado = document.getElementById('sumStart')?.value || hoje;
-const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
+
   const f = document.getElementById('sumFilter')?.value?.toLowerCase() || '';
   const start = document.getElementById('sumStart')?.value;
   const end = document.getElementById('sumEnd')?.value;
+  const alertaFiltro = document.getElementById('sumAlertaFilter')?.value || '';
 
   const groups = {};
 
-  // 🔥 1. BASE = PLANEAMENTO (NÃO LOGINS)
-planeamentoData.forEach(p => {
+  // 🔥 1. BASE = PLANEAMENTO (TODOS OS DIAS)
+  planeamentoData.forEach(p => {
 
-  if ((p.data || '') !== diaSelecionado) return;
-
-  const key = (p.user || '') + '_' + (p.data || '');
+    const key = (p.user || '') + '_' + (p.data || '');
 
     groups[key] = {
       user: p.user,
@@ -1396,7 +1393,6 @@ planeamentoData.forEach(p => {
     const key = r.user + '_' + date;
 
     if(!groups[key]){
-      // caso não exista no planeamento, cria fallback
       groups[key] = {
         user: r.user,
         nome: r.nome,
@@ -1428,7 +1424,10 @@ planeamentoData.forEach(p => {
 
   Object.values(groups).forEach(g => {
 
+    // 🔎 filtro texto
     if(f && !((g.user||'').toLowerCase().includes(f) || (g.nome||'').toLowerCase().includes(f))) return;
+
+    // 📅 filtro datas (opcional)
     if(start && g.data < start) return;
     if(end && g.data > end) return;
 
@@ -1440,8 +1439,9 @@ planeamentoData.forEach(p => {
     let primeiroLogin = '';
     let ultimoLogout = '';
 
-    g.eventos.forEach(e=>{
-      const tipo = (e.tipo||'').toLowerCase();
+    g.eventos.forEach(e => {
+
+      const tipo = (e.tipo || '').toLowerCase();
 
       if(isLogin(tipo)){
         loginAtual = e.inicio;
@@ -1471,41 +1471,33 @@ planeamentoData.forEach(p => {
     const p1 = g.pausas[0] ? hhmmss(g.pausas[0].inicio,g.pausas[0].fim) : '';
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
     const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
-const alerta = getAlerta(g);
 
-if(alertaFiltro && alerta !== alertaFiltro) return;
+    const alerta = getAlerta(g);
 
-tbody.innerHTML += `
+    if(alertaFiltro && alerta !== alertaFiltro) return;
+
+    tbody.innerHTML += `
 <tr>
-
 <td>${g.data}</td>
 <td>${g.user}</td>
 <td>${g.nome}</td>
-
 <td>${g.estado || ''}</td>
-
 <td>${timeOnly(primeiroLogin)}</td>
 <td>${timeOnly(ultimoLogout)}</td>
-
 <td>${p1}</td>
 <td>${p2}</td>
 <td>${ref}</td>
-
 <td>${format(netMin)}</td>
-
 <td class="alert-excedidos" style="color:${getExcedidos(g) ? '#e74c3c' : '#999'};">
   ${getExcedidos(g)}
 </td>
-
-<td style="${getAlertaStyle(getAlerta(g))}">
-  ${getAlerta(g)}
+<td style="${getAlertaStyle(alerta)}">
+  ${alerta}
 </td>
-
 </tr>
 `;
   });
 }
-
 function getAlerta(g){
 
   if((g.estado || '').toLowerCase() !== 'trabalha'){
@@ -1758,4 +1750,3 @@ function exportSummary(){
 </body>
 
 </html>
-
