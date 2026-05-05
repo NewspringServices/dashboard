@@ -1,12 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
 <meta charset="UTF-8">
 <title>Dados Produção - Newspring</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
+.title-3d{
+  font-size: 20px;        /* 🔥 mais pequeno */
+  font-weight: 500;       /* menos pesado */
+  font-family: 'Roboto', Arial, sans-serif;
+
+  color: #ffffff;
+
+  /* sombra leve (profissional) */
+  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+
+  letter-spacing: 0.3px;
+}
+
+.title-3d:hover{
+  transform: translateY(-1px);
+  text-shadow:
+    0 4px 10px rgba(0,0,0,0.45);
+}
 
 body {
   font-family: Arial;
@@ -217,19 +238,26 @@ tr:hover td {
 
 </div> <!-- 🔥 FECHO CORRETO DO MODAL -->
 
+
 <div class="header">
+
+  <!-- ESQUERDA -->
   <div style="display:flex; align-items:center; gap:12px;">
     <img src="logo2.png" style="height:42px;">
-    <div>Painel Controlo Newspring_Serviços Administrativos Fidelidade</div>
-  </div>
+    <div class="title-3d">
+      Dashboard Operacional Fidelidade BPO
+    </div>
+  </div> <!-- ✅ FECHO EM FALTA -->
 
-  <!-- 🔥 container dos botões -->
+  <!-- DIREITA -->
   <div class="header-actions">
-<button class="btn-blue" onclick="openAdminModal()">🖥️ Administrador BD</button>
+    <button class="btn-blue" onclick="openAdminModal()">🖥️ Administrador BD</button>
     <button class="btn-blue" onclick="goMenu()">📁 Gestão de Equipa</button>
     <button class="btn-red" onclick="logout()">➜ Logout</button>
   </div>
+
 </div>
+
 
 <!-- 🔥 TABS -->
 <div class="tabs">
