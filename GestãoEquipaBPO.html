@@ -1031,11 +1031,12 @@ async function loadPlaneamento(){
 
   const hoje = getHoje();
 
-  const { data, error } = await client
-    .from('planeamento')
-    .select('*')
-    .eq('data', hoje)   // 👈 ISTO É O IMPORTANTE
-    .order('user', { ascending: true });
+
+const { data, error } = await client
+  .from('planeamento')
+  .select('*')
+  .order('data', { ascending: true })
+  .order('user', { ascending: true });
 
   if(error){
     console.error(error);
