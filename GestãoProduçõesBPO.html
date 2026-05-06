@@ -352,6 +352,12 @@ function closeAdminModal(){
   document.getElementById("adminPass").value = "";
 }
 
+
+function formatTempo(v){
+  if(!v || v === "00:00:00") return "";
+  return v;
+}
+
 function checkAdmin(){
 
   const pass = document.getElementById("adminPass").value;
@@ -539,15 +545,15 @@ function render(){
 <tr>
 <td>${r.data}</td>
 <td>${r.colaborador}</td>
-<td>${r.tempo_total}</td>
-<td>${r.DNP}</td>
-<td>${r.DNE}</td>
-<td>${r.PETS}</td>
-<td>${r["Auto-Indexações"]}</td>
-<td>${r["Auto-Aberturas"]}</td>
-<td>${r["AP Index"]}</td>
-<td>${r["AT Participações"]}</td>
-<td>${r["AT Index"]}</td>
+<td>${formatTempo(r.tempo_total)}</td>
+<td>${formatTempo(r.DNP)}</td>
+<td>${formatTempo(r.DNE)}</td>
+<td>${formatTempo(r.PETS)}</td>
+<td>${formatTempo(r["Auto-Indexações"])}</td>
+<td>${formatTempo(r["Auto-Aberturas"])}</td>
+<td>${formatTempo(r["AP Index"])}</td>
+<td>${formatTempo(r["AT Participações"])}</td>
+<td>${formatTempo(r["AT Index"])}</td>
 </tr>`;
   });
 }
@@ -570,19 +576,19 @@ function exportExcel(){
 
       return true;
     })
-    .map(r => ({
-      Data: r.data,
-      Colaborador: r.colaborador,
-      Tempo_Total: r.tempo_total,
-      DNP: r.DNP,
-      DNE: r.DNE,
-      PETS: r.PETS,
-      "Auto Indexações": r["Auto-Indexações"],
-      "Auto Aberturas": r["Auto-Aberturas"],
-      "AP Index": r["AP Index"],
-      "AT Participações": r["AT Participações"],
-      "AT Index": r["AT Index"]
-    }));
+.map(r => ({
+  Data: r.data,
+  Colaborador: r.colaborador,
+  Tempo_Total: formatTempo(r.tempo_total),
+  DNP: formatTempo(r.DNP),
+  DNE: formatTempo(r.DNE),
+  PETS: formatTempo(r.PETS),
+  "Auto Indexações": formatTempo(r["Auto-Indexações"]),
+  "Auto Aberturas": formatTempo(r["Auto-Aberturas"]),
+  "AP Index": formatTempo(r["AP Index"]),
+  "AT Participações": formatTempo(r["AT Participações"]),
+  "AT Index": formatTempo(r["AT Index"])
+}));
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
