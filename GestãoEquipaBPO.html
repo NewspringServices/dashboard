@@ -1596,7 +1596,7 @@ function getAlerta(g){
     return "Validar presença (sem logout)";
   }
 
-  // 🔢 cálculo normal
+  // 🔥 CALCULAR TEMPO REAL TRABALHADO
   let loginAtual = null;
   let total = 0;
 
@@ -1615,7 +1615,13 @@ function getAlerta(g){
     }
   });
 
-  if(total < 450){
+  const pausaMin = g.pausas.reduce((a,p)=>a + duration(p.inicio,p.fim),0);
+  const refeicaoMin = g.refeicoes.reduce((a,r)=>a + duration(r.inicio,r.fim),0);
+
+  const netMin = total - pausaMin - refeicaoMin;
+
+  // 🔥 AQUI ESTÁ A CORREÇÃO
+  if(netMin < 450){
     return "Ausência Parcial";
   }
 
