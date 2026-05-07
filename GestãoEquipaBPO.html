@@ -310,7 +310,7 @@ button {
   <div style="display:flex; align-items:center; gap:12px;">
     <img src="logo2.png" style="height:42px;">
     <div class="title-3d">
-      Dashboard Operacional Fidelidade BPO
+      Dashboard Operacional Newspring_BPO
     </div>
   </div> <!-- ✅ FECHO EM FALTA -->
 
@@ -955,7 +955,7 @@ function getAlertaStyle(alerta){
     return 'color:#e74c3c;';
   }
 
-  if(alerta === 'Tempo em falta - Validar Ausência'){
+  if(alerta === 'Tempo em Falta - Validar Ausência'){
     return 'color:#f39c12;';
   }
 
@@ -1094,16 +1094,11 @@ function duration(a,b){
 
 
 function hhmmss(a,b){
-  if(!a || !b) return "";
-
-  const diff = new Date(b) - new Date(a);
-  if(isNaN(diff) || diff <= 0) return "";
-
-  const s = Math.floor(diff / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-
+  if(!a||!b) return "00:00:00";
+  const s=Math.floor((new Date(b)-new Date(a))/1000);
+  const h=Math.floor(s/3600);
+  const m=Math.floor((s%3600)/60);
+  const sec=s%60;
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
 }
 
@@ -1627,7 +1622,7 @@ function getAlerta(g){
 
   // 🔥 AQUI ESTÁ A CORREÇÃO
   if(netMin < 450){
-    return "Tempo em falta - Validar Ausência";
+    return "Ausência Parcial";
   }
 
   return "";
@@ -1670,40 +1665,22 @@ function exportAlerts(){
   XLSX.writeFile(wb, "alertas.xlsx");
 }
 function exportExcel(){
-
-  const rows = allData.map(r => {
-
-    const dur = hhmmss(r.inicio, r.fim);
-
-    return {
-      Data: r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : ''),
-      User: r.user || '',
-      Nome: r.nome || '',
-      Tipo: r.tipo || '',
-
-      Inicio: r.inicio ? timeOnly(r.inicio) : '',
-      Fim: r.fim ? timeOnly(r.fim) : '',
-
-      // 🔥 sem zeros falsos
-      Duracao: dur
-    };
-  });
-
-  const ws = XLSX.utils.json_to_sheet(rows);
-
-  // 🔥 largura automática equilibrada
-  ws["!cols"] = Object.keys(rows[0] || {}).map(() => ({
-    wch: 18
+  const rows = allData.map(r => ({
+    Data: r.data,
+    User: r.user,
+    Nome: r.nome,
+    Tipo: r.tipo,
+    Inicio: timeOnly(r.inicio),
+    Fim: timeOnly(r.fim),
+    Duracao: hhmmss(r.inicio, r.fim)
   }));
 
+  const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Logins");
-
-  XLSX.writeFile(
-    wb,
-    "Relatório_BPO_Dados_de_Logins_e_Inatividade.xlsx"
-  );
+  XLSX.writeFile(wb, "Relatório_BPO_Dados de Logins e Inatividade.xlsx");
 }
+
 async function init(){
   await Promise.all([
     load(),
@@ -1862,35 +1839,27 @@ function exportSummary(){
     const p2 = g.pausas[1] ? hhmmss(g.pausas[1].inicio,g.pausas[1].fim) : '';
     const ref = g.refeicoes[0] ? hhmmss(g.refeicoes[0].inicio,g.refeicoes[0].fim) : '';
 
-rows.push({
-  Data: g.data,
-  User: g.user,
-  Nome: g.nome,
-  Planeamento: g.estado || '',
+    rows.push({
+      Data: g.data,
+      User: g.user,
+      Nome: g.nome,
+      Planeamento: g.estado || '',
 
-  Login: timeOnly(primeiroLogin),
-  Logout: timeOnly(ultimoLogout),
+      Login: timeOnly(primeiroLogin),
+      Logout: timeOnly(ultimoLogout),
 
-  Pausa1: p1,
-  Pausa2: p2,
-  Refeicao: ref,
+      Pausa1: p1,
+      Pausa2: p2,
+      Refeicao: ref,
 
-  // 🔥 CAMPOS QUE PEDISTE
-  TempoTrabalhado: format(netMin),
+      TempoTrabalhado: format(netMin),
+      TempoFalta: g.estado === 'Trabalha' ? format(faltaMin) : '',
+      TempoExtra: g.estado === 'Trabalha' ? format(extraMin) : '',
 
-  TempoFalta: g.estado === 'Trabalha'
-    ? format(faltaMin)
-    : '',
-
-  TempoExtra: g.estado === 'Trabalha'
-    ? format(extraMin)
-    : '',
-
-  TempoExcedidos: getExcedidos(g),
-
-  Alerta: alerta
-});
-
+      Alerta: alerta,
+      Excedidos: getExcedidos(g)
+    });
+  });
 
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
