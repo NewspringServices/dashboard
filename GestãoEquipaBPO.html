@@ -721,12 +721,16 @@ async function enviarForcado(tipo){
     console.error(error);
     return;
   }
+msg.style.color = "green";
+msg.innerText = `✔ ${tipo} registado com sucesso`;
 
-  msg.style.color = "green";
-  msg.innerText = `✔ ${tipo} registado com sucesso`;
+document.getElementById("nomeSelect").value = "";
 
-  load(); // atualiza dashboard
+setTimeout(() => {
+  msg.innerText = "";
+}, 3000);
 }
+
 function checkAdmin(){
 
   const pass = document.getElementById("adminPass").value;
@@ -1055,12 +1059,12 @@ function showToast(msg){
   toast.style.display = 'block';
   toast.style.opacity = '1';
 
+setTimeout(() => {
+  toast.style.opacity = '0';
   setTimeout(() => {
-    toast.style.opacity = '0';
-    setTimeout(() => {
-      toast.style.display = 'none';
-    }, 300);
-  }, 2000);
+    toast.style.display = 'none';
+  }, 300);
+}, 5000);
 }
 
 async function refreshDashboard(){
