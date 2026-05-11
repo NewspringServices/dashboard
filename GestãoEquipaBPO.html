@@ -563,9 +563,21 @@ button {
 <option>Vera Lúcia Centeio dos Santos Freitas</option>
     </select>
 
-    <div style="display:flex; gap:10px; margin-top:10px;">
-      <button onclick="enviarForcado('login')" style="background:green;">Login</button>
-      <button onclick="enviarForcado('logout')" class="btn-red">Logout</button>
+     <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+
+  <button onclick="enviarForcado('login')" style="background:green;">Login</button>
+
+  <button onclick="enviarForcado('logout')" class="btn-red">Logout</button>
+
+  <button onclick="enviarForcado('pausa1')" style="background:#f39c12;">Pausa 1 (15 min)</button>
+
+  <button onclick="enviarForcado('pausa2')" style="background:#e67e22;">Pausa 2 (15 min)</button>
+
+  <button onclick="enviarForcado('refeicao')" style="background:#f1c40f;color:#000;">
+    Refeição (60 min)
+  </button>
+
+</div>
     </div>
 
     <div id="msgForce" style="margin-top:10px; text-align:center; font-weight:bold;"></div>
@@ -677,15 +689,28 @@ async function enviarForcado(tipo){
 
   const user = utilizadores[nome];
 
+  const now = getLisbonISO();
 
+  let duracao = 0;
 
-const payload = {
-  data: getLisbonISO().slice(0,10),
-  user,
-  nome,
-  tipo,
-  inicio: getLisbonISO()
-};
+  // 🔥 regra automática de duração
+  if(tipo === "pausa1" || tipo === "pausa2"){
+    duracao = 15; // minutos
+  }
+
+  if(tipo === "refeicao"){
+    duracao = 60;
+  }
+
+  let payload = {
+    data: now.slice(0,10),
+    user,
+    nome,
+    tipo,
+    inicio: now,
+    fim: duracao ? new Date(new Date(now).getTime() + duracao*60000).toISOString() : null
+  };
+
   const { error } = await client
     .from('BPO_registosNSS')
     .insert([payload]);
@@ -698,11 +723,10 @@ const payload = {
   }
 
   msg.style.color = "green";
-  msg.innerText = "✔ Registo criado com sucesso";
+  msg.innerText = `✔ ${tipo} registado com sucesso`;
 
   load(); // atualiza dashboard
 }
-
 function checkAdmin(){
 
   const pass = document.getElementById("adminPass").value;
