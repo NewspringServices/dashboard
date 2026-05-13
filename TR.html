@@ -233,17 +233,23 @@ body {
   margin-bottom: 4px;
   display: block;
   font-size: 13px;
+}.form-group input,
+.form-group select {
+  display: flex;
+  align-items: center;
 }
 
 input,
 select {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
+  height: 44px;
   border-radius: 6px;
   border: 1px solid var(--border);
   font-size: 14px;
+  box-sizing: border-box;
+  background: #fff;
 }
-
 input:focus,
 select:focus {
   border-color: var(--primary);
@@ -642,3 +648,4 @@ intervalTarefa = null;
 
 
 </div></body></html>
+
