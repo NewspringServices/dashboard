@@ -11,247 +11,465 @@
 
 <style>
 
-.title-3d{
-  font-size: 20px;        /* 🔥 mais pequeno */
-  font-weight: 500;       /* menos pesado */
-  font-family: 'Roboto', Arial, sans-serif;
+/* ======================================================
+   RESET
+====================================================== */
 
-  color: #ffffff;
-
-  /* sombra leve (profissional) */
-  text-shadow: 0 1px 3px rgba(0,0,0,0.35);
-
-  letter-spacing: 0.3px;
-}
-
-.title-3d:hover{
-  transform: translateY(-1px);
-  text-shadow:
-    0 4px 10px rgba(0,0,0,0.45);
-}
-body {
-  font-family: Arial;
-  background:#f4f6f8;
+*{
   margin:0;
-}
-body {
-  font-size: 13px;
-}
-
-table, th, td {
-  font-size: 13px;
+  padding:0;
+  box-sizing:border-box;
 }
 
-.card {
-  font-size: 13px;
+/* ======================================================
+   FILTROS SELECT - TEXTO BRANCO
+====================================================== */
+
+.filter-absence{
+  background: rgba(15, 23, 32, 0.92) !important;
+
+  color: white !important;
+
+  border: 1px solid rgba(255,255,255,0.15) !important;
+
+  font-weight: 500;
+
+  backdrop-filter: blur(10px);
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.18);
+
+  transition: 0.25s ease;
 }
 
-.view {
-  font-size: 13px;
+.filter-absence:focus{
+  border-color:#19a463 !important;
+
+  box-shadow:
+    0 0 0 4px rgba(25,164,99,0.18);
 }
 
-input, select, textarea, button {
-  font-size: 13px;
-}
+/* opções do dropdown */
 
-/* ================= HEADER VERDE ================= */
-.header {
-  background: linear-gradient(90deg,#19a463,#22c974);
+.filter-absence option{
+  background:#13232f;
   color:white;
-  padding:15px;
+}
+
+/* labels dos filtros */
+
+label{
+  color:white !important;
+}
+
+body{
+  font-family:'Roboto',sans-serif;
+  background:
+    linear-gradient(
+      135deg,
+      #0f1720 0%,
+      #13232f 25%,
+      #163c2d 60%,
+      #1fa463 100%
+    );
+  min-height:100vh;
+  color:#1e293b;
+  font-size:13px;
+  overflow-x:hidden;
+}
+
+/* ======================================================
+   BACKGROUND EFFECT
+====================================================== */
+
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+
+  background:
+    radial-gradient(circle at top left,
+      rgba(255,255,255,0.08),
+      transparent 30%),
+
+    radial-gradient(circle at bottom right,
+      rgba(255,255,255,0.05),
+      transparent 25%);
+
+  pointer-events:none;
+}
+
+/* ======================================================
+   HEADER
+====================================================== */
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+
   display:flex;
   justify-content:space-between;
   align-items:center;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
-}
-/* ================= TABS ================= */
-.tabs {
-  display:flex;
-  background:white;
-  border-bottom:1px solid #ddd;
+
+  padding:16px 24px;
+
+  background:rgba(12,18,22,0.82);
+
+  backdrop-filter:blur(14px);
+
+  border-bottom:1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.25);
 }
 
-.tab {
-  padding:12px 18px;
-  cursor:pointer;
-  transition:0.2s;
-}
+/* ======================================================
+   TITLE
+====================================================== */
 
-.tab:hover {
-  background:#eaf7f0;
-}
-
-.tab.active {
-  border-bottom:3px solid #19a463;
-  font-weight:bold;
-  color:#0f6b3c;
-}
-
-/* ================= VIEWS ================= */
-.view {
-  display:none;
-  padding:20px;
-}
-
-.view.active {
-  display:block;
-}
-
-/* ================= INPUTS ================= */
-input, textarea {
-  padding:8px;
-  margin-right:8px;
-  margin-bottom:8px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
-}
-
-input:focus, textarea:focus {
-  outline:none;
-  border-color:#19a463;
-  box-shadow:0 0 0 2px rgba(25,164,99,0.15);
-}
-
-/* ================= BOTÕES ================= */
-button {
-  padding:8px 14px;
-  border:none;
-  border-radius:6px;
-  cursor:pointer;
-  font-weight:bold;
-  transition:0.2s;
-  background:#19a463;
+.title-3d{
+  font-size:20px;
+  font-weight:600;
   color:white;
+
+  letter-spacing:0.3px;
+
+  text-shadow:
+    0 2px 10px rgba(0,0,0,0.3);
 }
 
-button:hover {
-  background:#148a52;
-  transform:scale(1.03);
-}
+/* ======================================================
+   ACTIONS
+====================================================== */
 
-/* botão menu */
-.btn-blue {
-  background:#0f6b3c; /* verde escuro */
-  color:white;
-}
-
-.btn-blue:hover {
-  background:#0b4f2c;
-}
-
-/* botão logout */
-.btn-red {
-  background:#c1121f; /* vermelho forte */
-  color:white;
-}
-
-.btn-red:hover {
-  background:#8b0f18;
-  transform:scale(1.03);
-}
-
-
-/* ================= TABELAS (VERDE LIMPO) ================= */
-table {
-  width:100%;
-  background:white;
-  border-collapse:collapse;
-  margin-top:10px;
-  border-radius:8px;
-  overflow:hidden;
-}
-
-/* células */
-th, td {
-  padding:10px;
-  border-bottom:1px solid #e6e6e6;
-  vertical-align:top;
-}
-
-/* 🔥 FORÇA ABSOLUTA DO CABEÇALHO (SEM PRETO NUNCA) */
-table th,
-thead th,
-table thead th {
-  background: linear-gradient(90deg,#0f6b3c,#19a463) !important;
-  color: white !important;
-}
-
-/* hover suave verde */
-tr:hover td {
-  background:#f1fbf5;
-}
-
-/* ================= CARDS ================= */
-.card {
-  background:white;
-  padding:15px;
-  margin-bottom:10px;
-  border-radius:8px;
-  border-left:5px solid #19a463;
-}
-
-
-
-/* ================= SCROLL MAIS LIMPO ================= */
-table {
-  border-radius:8px;
-  overflow:hidden;
-}
-
-
-table th {
-  background: linear-gradient(90deg,#0f6b3c,#19a463) !important;
-  color: white !important;
-}
-
-input, textarea {
-  padding:8px;
-  width:100%;
-  box-sizing:border-box;
-}
-
-button {
-  padding:6px 10px;
-  cursor:pointer;
-}
-
-.card {
-  background:white;
-  padding:15px;
-  margin-bottom:10px;
-  border-radius:6px;
-}
-.header-actions {
+.header-actions{
   display:flex;
   gap:10px;
   align-items:center;
 }
-.estado-ferias {
-  color: #19a463;
+
+/* ======================================================
+   BUTTONS
+====================================================== */
+
+button{
+  border:none;
+  border-radius:10px;
+
+  padding:10px 16px;
+
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:0.25s ease;
+
+  color:white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #1db56c,
+      #149a59
+    );
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.18);
 }
 
-.estado-licenca {
-  color: #e74c3c;
+button:hover{
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.28);
+
+  filter:brightness(1.05);
 }
 
-.estado-normal {
-  color: #000;
+button:active{
+  transform:scale(0.98);
 }
-.filter-absence {
-  padding:8px 12px;
-  border-radius:6px;
-  border:1px solid #ccc;
+
+/* botão escuro */
+
+.btn-blue{
+  background:
+    linear-gradient(
+      135deg,
+      #1db56c,
+      #149a59
+    );
+
+  color:white;
+}
+label,
+h3{
+  color:white;
+}
+.card h3{
+  color:#1e293b;
+}
+.btn-blue:hover{
+  filter:brightness(1.08);
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,0.28);
+}
+/* logout */
+
+.btn-red{
+  background:
+    linear-gradient(
+      135deg,
+      #dc2626,
+      #991b1b
+    );
+}
+
+/* ======================================================
+   TABS
+====================================================== */
+
+.tabs{
+  display:flex;
+  gap:8px;
+
+  padding:14px 18px;
+
+  background:rgba(255,255,255,0.04);
+
+  backdrop-filter:blur(10px);
+
+  border-bottom:
+    1px solid rgba(255,255,255,0.08);
+}
+
+.tab{
+  padding:12px 18px;
+
+  border-radius:10px;
+
+  cursor:pointer;
+
+  transition:0.25s ease;
+
+  color:white;
+
+  font-weight:500;
+}
+
+.tab:hover{
+  background:rgba(255,255,255,0.08);
+}
+
+.tab.active{
+  background:
+    linear-gradient(
+      135deg,
+      #1db56c,
+      #169b5b
+    );
+
+  box-shadow:
+    0 6px 18px rgba(0,0,0,0.2);
+}
+
+/* ======================================================
+   VIEWS
+====================================================== */
+
+.view{
+  display:none;
+  padding:24px;
+}
+
+.view.active{
+  display:block;
+}
+
+/* ======================================================
+   CARDS
+====================================================== */
+
+.card{
+  background:rgba(255,255,255,0.92);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:18px;
+
+  padding:18px;
+
+  margin-bottom:16px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.12);
+
+  border:
+    1px solid rgba(255,255,255,0.25);
+}
+
+/* ======================================================
+   TABLES
+====================================================== */
+
+/* ======================================================
+   TABLES
+====================================================== */
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  overflow:hidden;
+  border-radius:18px;
   background:white;
-  color:#e74c3c;   /* vermelho mas NÃO bold */
-  font-weight:normal;
-  width:220px;
+
+  font-size:11px; /* 🔥 letras menores */
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.15);
 }
 
-.filter-absence:focus {
+thead{
+  background:
+    linear-gradient(
+      135deg,
+      #0f5132,
+      #19a463
+    );
+}
+
+thead th{
+  color:white;
+  padding:10px 8px; /* 🔥 menos altura */
+  text-align:left;
+
+  font-size:11px; /* 🔥 cabeçalho menor */
+  font-weight:600;
+}
+
+tbody td{
+  padding:8px 8px; /* 🔥 linhas mais compactas */
+  border-bottom:1px solid #edf2f7;
+
+  font-size:11px; /* 🔥 texto menor */
+}
+
+tbody tr{
+  transition:0.2s ease;
+}
+
+tbody tr:hover{
+  background:#f4fff8;
+}
+
+/* ======================================================
+   INPUTS
+====================================================== */
+input,
+textarea,
+select{
+  font-size:11px;
+}
+input,
+textarea,
+select{
+  width:100%;
+
+  padding:11px 14px;
+
+  border-radius:10px;
+
+  border:
+    1px solid rgba(0,0,0,0.08);
+
+  background:white;
+
+  transition:0.2s;
+
   outline:none;
-  border-color:#e74c3c;
-  box-shadow:0 0 0 2px rgba(231,76,60,0.15);
+}
+button{
+  font-size:11px;
+}
+input:focus,
+textarea:focus,
+select:focus{
+  border-color:#19a463;
+
+  box-shadow:
+    0 0 0 4px rgba(25,164,99,0.15);
+}
+
+/* ======================================================
+   KPI DASHBOARD
+====================================================== */
+
+#kpis-dashboard{
+  display:grid;
+
+  grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+  gap:16px;
+}
+
+/* ======================================================
+   TOAST
+====================================================== */
+
+#toast{
+  border-radius:14px !important;
+
+  backdrop-filter:blur(12px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #19a463,
+      #0f7d49
+    ) !important;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ======================================================
+   MODAL
+====================================================== */
+
+#adminModal{
+  backdrop-filter:blur(8px);
+}
+
+#adminModal > div{
+  border-radius:20px !important;
+
+  background:white !important;
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.3);
+}
+
+/* ======================================================
+   SCROLLBAR
+====================================================== */
+
+::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#19a463;
+  border-radius:20px;
+}
+
+::-webkit-scrollbar-track{
+  background:#e5e7eb;
 }
 
 </style>
@@ -310,7 +528,7 @@ button {
   <div style="display:flex; align-items:center; gap:12px;">
     <img src="logo2.png" style="height:42px;">
     <div class="title-3d">
-      Dashboard Operacional Newspring_BPO
+      Portal Supervisor
     </div>
   </div> <!-- ✅ FECHO EM FALTA -->
 
@@ -429,8 +647,8 @@ button {
 </div>
 
 <div style="margin:12px 0 6px 0;">
-  <label style="font-size:12px; color:#555; display:block; margin-bottom:4px;">
-    Filtrar ausência
+<label style="font-size:12px; display:block; margin-bottom:4px;">
+      Filtrar ausência
   </label>
 
   <select id="sumAlertaFilter" onchange="renderSummary()" class="filter-absence">
