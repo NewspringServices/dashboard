@@ -6,44 +6,105 @@
 
 <style>
 
+.password-input{
+  width:100%;
+  box-sizing:border-box;
+
+  padding:16px;
+  margin-bottom:14px;
+
+  border-radius:14px;
+  border:1px solid #dfe5e8;
+
+  background:#f7f9fb;
+
+  font-size:15px;
+  text-align:center;
+
+  transition:.25s;
+}
+
+.password-input:focus{
+  outline:none;
+  border-color:#19a463;
+
+  background:white;
+
+  box-shadow:
+    0 0 0 4px rgba(25,164,99,.12);
+}
+
+.subtitulo{
+  color:#6b7280;
+  font-size:14px;
+  margin-top:-10px;
+  margin-bottom:25px;
+}
 body{
   margin:0;
-  font-family: 'Inter', Arial;
+  font-family: 'Inter', Arial, sans-serif;
+  min-height:100vh;
 
-  background: url("fundo.png") no-repeat center center fixed;
+  background: url("fundo.png") no-repeat center center;
   background-size: cover;
 
   display:flex;
-  justify-content:center;
   align-items:center;
-  height:100vh;
+
+  /* 🔥 move para esquerda */
+  justify-content:flex-start;
+
+  overflow:hidden;
 }
 
 /* CARD */
 .box{
-  background: rgba(255,255,255,0.9);
-  padding:40px;
-  border-radius:18px;
-  width:320px;
+  width:420px;
+  height:100vh;
+
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(12px);
+
+  padding:50px 40px;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+
+  box-shadow:
+    10px 0 35px rgba(0,0,0,0.12);
+
+  border-right:
+    1px solid rgba(0,0,0,0.06);
+
   text-align:center;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
 }
 
 .logo{
-  width:140px;
-  margin-bottom:15px;
+  width:190px;
+  margin:0 auto 20px auto;
 }
 
 /* BOTÃO */
 button{
   width:100%;
-  padding:12px;
+  padding:14px;
   border:none;
-  border-radius:10px;
+  border-radius:14px;
+
   background: linear-gradient(135deg,#19a463,#0f6b3c);
+
   color:white;
-  font-weight:bold;
+  font-weight:700;
+  font-size:15px;
+
   cursor:pointer;
+  transition:.25s ease;
+}
+
+button:hover{
+  transform: translateY(-2px);
+  box-shadow:0 8px 20px rgba(25,164,99,.25);
 }
 
 /* MODAL */
@@ -86,10 +147,12 @@ button{
   font-size:14px;
   margin-top:8px;
   height:18px;
-}.titulo{
+}
+.titulo{
   color:#0f6b3c;
-  margin-bottom:20px;
+  margin-bottom:30px;
   font-weight:700;
+  font-size:28px;
 }
 
 </style>
@@ -97,51 +160,33 @@ button{
 
 <body>
 
-<!-- CARD INICIAL -->
 <div class="box">
+
   <img src="logo.png" class="logo">
 
-  <h2 class="titulo">Dashboard Gestão BPO</h2>
+  <h2 class="titulo">Portal Supervisor BPO</h2>
 
-  <button onclick="openModal()">Entrar</button>
-</div>
+  <p class="subtitulo">
+    Introduza a password para aceder
+  </p>
 
-<!-- MODAL PASSWORD -->
-<div class="modal" id="modal">
+  <input
+    type="password"
+    id="pass"
+    class="password-input"
+    placeholder="Introduzir password"
+  >
 
-  <div class="modal-box">
+  <div id="errorMsg" class="error"></div>
 
-    <h3>🔐 Acesso</h3>
-
-    <input type="password" id="pass" placeholder="Introduzir password">
-
-    <div id="errorMsg" class="error"></div>
-
-    <button onclick="check()">Entrar</button>
-
-    <button onclick="closeModal()" style="margin-top:8px; background:#c1121f;">
-      Cancelar
-    </button>
-
-  </div>
+  <button onclick="check()">
+    Entrar no Portal
+  </button>
 
 </div>
 
 <script>
 
-/* ABRIR MODAL */
-function openModal(){
-  document.getElementById("modal").style.display="flex";
-}
-
-/* FECHAR MODAL */
-function closeModal(){
-  document.getElementById("modal").style.display="none";
-  document.getElementById("pass").value="";
-  document.getElementById("errorMsg").innerText="";
-}
-
-/* LOGIN */
 function check(){
   const pass = document.getElementById("pass").value;
   const error = document.getElementById("errorMsg");
@@ -153,8 +198,8 @@ function check(){
   }
 }
 
-/* ENTER */
-document.getElementById("pass").addEventListener("keypress", function(e){
+document.getElementById("pass")
+.addEventListener("keypress", function(e){
   if(e.key === "Enter"){
     check();
   }
