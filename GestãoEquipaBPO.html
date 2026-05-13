@@ -1715,14 +1715,30 @@ function exportExcel(){
 }
 
 async function init(){
+
   await Promise.all([
     load(),
     loadPlaneamento()
   ]);
 
+  definirDataHojeLogins(); // 🔥 define hoje por defeito
+
+  renderTable();
   renderKPIs();
 }
+
 init();
+
+
+function definirDataHojeLogins() {
+  const hoje = getHoje(); // usa timezone Lisboa
+
+  const start = document.getElementById('dateStart');
+  const end = document.getElementById('dateEnd');
+
+  if (start && !start.value) start.value = hoje;
+  if (end && !end.value) end.value = hoje;
+}
 
 async function reloadAll(){
   await Promise.all([
