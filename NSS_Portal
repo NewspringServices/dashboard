@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Área Protegida - BPO</title>
+
+<style>
+
+.password-input{
+  width:100%;
+  box-sizing:border-box;
+
+  padding:16px;
+  margin-bottom:14px;
+
+  border-radius:14px;
+  border:1px solid #dfe5e8;
+
+  background:#f7f9fb;
+
+  font-size:15px;
+  text-align:center;
+
+  transition:.25s;
+}
+
+.password-input:focus{
+  outline:none;
+  border-color:#19a463;
+  background:white;
+
+  box-shadow:0 0 0 4px rgba(25,164,99,.12);
+}
+
+.subtitulo{
+  color:#6b7280;
+  font-size:14px;
+  margin-top:-10px;
+  margin-bottom:25px;
+}
+
+/* BODY */
+body{
+  margin:0;
+  font-family:'Inter', Arial, sans-serif;
+  min-height:100vh;
+
+  background: url("fundow.png") no-repeat center center;
+  background-size:cover;
+
+  display:flex;
+  justify-content:flex-start;
+  align-items:center;
+
+  padding-top:60px; /* 👈 isto desce tudo */
+}
+
+/* CARD LOGIN */
+
+
+/* BOTÃO */
+button{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+
+  background:linear-gradient(135deg,#19a463,#0f6b3c);
+  color:white;
+
+  font-weight:700;
+  font-size:15px;
+
+  cursor:pointer;
+  transition:.25s ease;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(25,164,99,.25);
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+
+  display:none;
+  justify-content:center;
+  align-items:center;
+
+  background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(6px);
+}
+.login-area{
+  position:absolute;
+  left:250px;   /* ajusta aqui a posição horizontal */
+  top:60%;
+  transform:translateY(-50%);
+  width:420px;
+}
+/* CAIXA MODAL */
+.modal-box{
+  background:white;
+  padding:25px;
+  border-radius:12px;
+  width:280px;
+  text-align:center;
+}
+
+.modal-box input{
+  width:200px;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+
+  text-align:center;
+  display:block;
+  margin:10px auto;
+}
+
+/* ERRO */
+.error{
+  color:#c1121f;
+  font-size:14px;
+  margin-top:8px;
+  height:18px;
+}
+
+/* TÍTULO */
+.titulo{
+  color:#0f6b3c;
+  margin-bottom:30px;
+  font-weight:700;
+  font-size:28px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-area">
+
+
+
+  <input
+    type="password"
+    id="pass"
+    class="password-input"
+    placeholder="Introduzir password"
+  >
+
+  <div id="errorMsg" class="error"></div>
+
+  <button onclick="check()">
+    Entrar no Portal
+  </button>
+
+</div>
+
+<script>
+function check(){
+  const pass = document.getElementById("pass").value;
+  const error = document.getElementById("errorMsg");
+
+  const passwordsValidas = [
+    "TRosa",
+    "AGralha"
+  ];
+
+  if(passwordsValidas.includes(pass)){
+    window.location.href = "PortalColabradorNSS.html";
+  } else {
+    error.innerText = "❌ User Inválido";
+  }
+}
+document.getElementById("pass")
+.addEventListener("keypress", function(e){
+  if(e.key === "Enter"){
+    check();
+  }
+});
+
+</script>
+
+</body>
+</html>
