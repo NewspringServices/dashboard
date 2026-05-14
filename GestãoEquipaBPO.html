@@ -561,6 +561,7 @@ select:focus{
 <div id="dash-pausa"></div>
 <div id="dash-refeicao"></div>
 <div id="dash-logout"></div>
+<div id="dash-duplicates"></div>
 </div>
 
 <!-- ALERTAS -->
@@ -835,6 +836,34 @@ function getHojeISO(){
 
 function openAdminModal(){
   document.getElementById("adminModal").style.display = "flex";
+}
+
+function getDuplicadosHoje(){
+
+  const hoje = getHoje();
+
+  const map = {};
+
+  allData.forEach(r => {
+
+    const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
+    if(data !== hoje) return;
+
+    const key = `${r.user}_${(r.tipo || '').toLowerCase()}`;
+
+    if(!map[key]){
+      map[key] = {
+        user: r.user,
+        nome: r.nome,
+        tipo: r.tipo,
+        count: 0
+      };
+    }
+
+    map[key].count++;
+  });
+
+  return Object.values(map).filter(x => x.count > 1);
 }
 
 function closeAdminModal(){
@@ -1507,9 +1536,11 @@ function parseDateSafe(dateStr){
   return new Date(dateStr);
 }
 
+
 function renderDashboard(){
 
   const hoje = new Date().toISOString().split('T')[0];
+const duplicados = getDuplicadosHoje();
 
   const dadosHoje = allData.filter(r => {
     const data = r.data || (r.inicio ? new Date(r.inicio).toISOString().split('T')[0] : '');
@@ -1539,7 +1570,7 @@ ${list.length ? list.map(r => {
     ? hhmmss(r.inicio,r.fim)
     : timeOnly(r.inicio);
 
-  return `• ${r.user} - ${r.nome} - ${value}`;
+  return `• ${r.user} - ${r.nome} (${r.tipo}) - duplicado`;
 }).join('<br>') : 'Sem registos'}
 </div>
 </div>
@@ -1556,6 +1587,15 @@ ${list.length ? list.map(r => {
 
   document.getElementById('dash-logout').innerHTML =
     card("⚫ Logouts","#2c3e50",logouts,'logout');
+
+document.getElementById('dash-duplicates').innerHTML =
+  card(
+    "🔁 Registos duplicados",
+    "#8e44ad",
+    duplicados,
+    'dup'
+  );
+
 }
 
 function renderTable(){
