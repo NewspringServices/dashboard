@@ -276,6 +276,7 @@ textarea{
 </style>
 </head>
 <!-- MODAL ADMIN -->
+
 <div id="adminModal" style="
   position:fixed;
   inset:0;
@@ -307,10 +308,15 @@ textarea{
         padding:12px;
         border-radius:10px;
         border:1px solid #ccc;
-        margin-bottom:12px;
+        margin-bottom:10px;
         text-align:center;
       "
     >
+
+    <!-- ERRO (SÓ 1 VEZ) -->
+    <div id="adminError"
+      style="color:#dc2626;font-size:13px;height:18px;margin-bottom:10px;">
+    </div>
 
     <button onclick="checkAdmin()" style="
       width:100%;
@@ -340,6 +346,9 @@ textarea{
 
   </div>
 </div>
+
+
+
 
 <body>
 
@@ -705,29 +714,36 @@ function closeAdmin(){
   document.getElementById("adminPass").value = "";
 }
 
+
+
 function checkAdmin(){
 
-  const pass = document.getElementById("adminPass").value;
+  const pass = document.getElementById("adminPass").value.trim();
+  const error = document.getElementById("adminError");
 
   const passwordsValidas = [
     "NSSWorten*2026",
   ];
 
-  if(passwordsValidas.includes(pass)){
-    window.location.href = "NSS_AcessoAdmin.html";
-  } else {
-    toast("❌ Password incorreta");
+  if(pass === ""){
+    error.innerText = "⚠️ Introduz uma password";
+    return;
   }
 
-  closeAdmin();
+  if(passwordsValidas.includes(pass)){
+    error.innerText = "";
+    closeAdmin();
+    window.location.href = "NSS_AcessoAdmin.html";
+  } else {
+    error.innerText = "❌ Password incorreta";
+  }
 }
-
 const agoraLisboa = new Date().toLocaleString("sv-SE", {
   timeZone: "Europe/Lisbon"
 });
 
 function logout(){
-  window.location.href = "NSS_AcessoAdmin.html";
+  window.location.href = "NSS_Portal.html.html";
 }
 
 </script>
