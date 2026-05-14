@@ -141,12 +141,12 @@
 
   <table>
 
-    <thead>
+ <thead>
   <tr>
     <th>Nome</th>
     <th>Equipa</th>
+    <th>Motivo</th>
     <th>Data</th>
-    <th>Observações</th>
     <th>Ação</th>
   </tr>
 </thead>
@@ -156,24 +156,29 @@
 </div>
 
 <!-- ================= ERROS ================= -->
+
 <div class="view" id="view1">
   <h3>💻 Erros Teletrabalho</h3>
   <button onclick="loadErros()">🔄 Atualizar</button>
   <button onclick="exportErros()">📥 Exportar Excel</button>
 
   <table>
-<thead>
-  <tr>
-    <th>Nome</th>
-    <th>Equipa</th>
-    <th>Tipo</th>
-    <th>Descrição</th>
-    <th>Ação</th>
-  </tr>
-</thead>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Equipa</th>
+        <th>Tipo</th>
+        <th>Descrição</th>
+        <th>Data</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+
     <tbody id="errosTable"></tbody>
   </table>
 </div>
+
+
 
 <!-- ================= AUSÊNCIAS ================= -->
 <div class="view" id="view2">
@@ -187,7 +192,7 @@
     <th>Nome</th>
     <th>Equipa</th>
     <th>Motivo</th>
-    <th>Observações</th>
+    <th>Data</th>
     <th>Ação</th>
   </tr>
 </thead>
@@ -267,18 +272,19 @@ function exportDisponibilidades(){
 
   XLSX.writeFile(wb, "Nss_Worten_disponibilidades.xlsx");
 }
-
 function exportErros(){
 
   const ws = XLSX.utils.json_to_sheet(
     Array.from(document.querySelectorAll("#errosTable tr"))
       .map(tr => {
         const tds = tr.querySelectorAll("td");
+
         return {
           Nome: tds[0]?.innerText,
           Equipa: tds[1]?.innerText,
-          Tipo: tds[2]?.innerText,
-          Descricao: tds[3]?.innerText
+          Tipo_erro: tds[2]?.innerText,
+          Descricao: tds[3]?.innerText,
+          Data_erro: tds[4]?.innerText
         };
       })
   );
@@ -295,11 +301,12 @@ function exportAusencias(){
     Array.from(document.querySelectorAll("#ausenciasTable tr"))
       .map(tr => {
         const tds = tr.querySelectorAll("td");
+
         return {
           Nome: tds[0]?.innerText,
           Equipa: tds[1]?.innerText,
           Motivo: tds[2]?.innerText,
-          Observacoes: tds[3]?.innerText
+          Data_logout: tds[3]?.innerText
         };
       })
   );
@@ -307,7 +314,7 @@ function exportAusencias(){
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Ausencias");
 
-  XLSX.writeFile(wb, "NSS_Worten_JustificaçãoAusencias.xlsx");
+  XLSX.writeFile(wb, "NSS_Worten_AusenciasParciais.xlsx");
 }
 
 async function loadDisponibilidades(){
@@ -338,7 +345,7 @@ async function loadDisponibilidades(){
         <td>${r.nome}</td>
         <td>${r.equipa}</td>
         <td>${r.data_disponibilidade}</td>
-        <td>${r.observacoes || ''}</td>
+<td>${r.data_logout || ''}</td>
         <td>
           <button onclick="askDelete('${r.id}')">❌ Apagar</button>
         </td>
@@ -490,19 +497,21 @@ async function loadErros(){
     return;
   }
 
-  data.forEach(r=>{
-    tbody.innerHTML += `
-      <tr>
-        <td>${r.nome}</td>
-        <td>${r.equipa}</td>
-        <td>${r.tipo_erro}</td>
-        <td>${r.descricao}</td>
-        <td>
-          <button onclick="askDeleteErro('${r.id}')">❌ Apagar</button>
-        </td>
-      </tr>
-    `;
-  });
+ data.forEach(r=>{
+  tbody.innerHTML += `
+    <tr>
+      <td>${r.nome}</td>
+      <td>${r.equipa}</td>
+      <td>${r.tipo_erro}</td>
+      <td>${r.descricao}</td>
+      <td>${r.data_erro || ''}</td>
+      <td>
+        <button onclick="askDeleteErro('${r.id}')">❌ Apagar</button>
+      </td>
+    </tr>
+  `;
+});
+    
 
   toast("Erros atualizados");
 }
@@ -531,19 +540,21 @@ async function loadAusencias(){
     return;
   }
 
+
+
   data.forEach(r=>{
-    tbody.innerHTML += `
-      <tr>
-        <td>${r.nome}</td>
-        <td>${r.equipa}</td>
-        <td>${r.motivo}</td>
-        <td>${r.observacoes || ''}</td>
-        <td>
-          <button onclick="askDeleteAusencia('${r.id}')">❌ Apagar</button>
-        </td>
-      </tr>
-    `;
-  });
+  tbody.innerHTML += `
+    <tr>
+      <td>${r.nome}</td>
+      <td>${r.equipa}</td>
+      <td>${r.motivo}</td>
+      <td>${r.data_logout || ''}</td>
+      <td>
+        <button onclick="askDeleteAusencia('${r.id}')">❌ Apagar</button>
+      </td>
+    </tr>
+  `;
+});
 
   toast("Ausências atualizadas");
 }
