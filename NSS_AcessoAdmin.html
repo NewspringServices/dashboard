@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Gestão Portal Colaborador</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+
+    body{
+      font-family:'Roboto',sans-serif;
+      background:linear-gradient(135deg,#0f1720,#13232f,#163c2d,#1fa463);
+      min-height:100vh;
+      color:white;
+    }
+
+    .header{
+      padding:16px;
+      background:rgba(0,0,0,0.4);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      padding:15px;
+      background:rgba(255,255,255,0.05);
+    }
+
+    .tab{
+      padding:10px 14px;
+      background:rgba(255,255,255,0.1);
+      border-radius:10px;
+      cursor:pointer;
+    }
+
+    .tab.active{
+      background:#1db56c;
+    }
+
+    .view{
+      display:none;
+      padding:20px;
+    }
+
+    .view.active{
+      display:block;
+    }
+
+    table{
+      width:100%;
+      margin-top:15px;
+      border-collapse:collapse;
+      background:white;
+      color:black;
+      border-radius:10px;
+      overflow:hidden;
+    }
+
+    th{
+      background:#1db56c;
+      color:white;
+      padding:10px;
+      text-align:left;
+    }
+
+    td{
+      padding:10px;
+      border-bottom:1px solid #eee;
+    }
+
+    button{
+      padding:8px 12px;
+      margin-top:10px;
+      border:none;
+      border-radius:8px;
+      background:#1db56c;
+      color:white;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="toast" style="
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  color: white;
+  font-weight: 600;
+  display: none;
+  z-index: 9999;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+"></div>
+
+
+<div class="header" style="display:flex; justify-content:space-between; align-items:center;">
+
+  <!-- LADO ESQUERDO (LOGO + TÍTULO) -->
+  <div style="display:flex; align-items:center; gap:12px;">
+    <img src="logo2.png" style="height:42px;">
+    <h2>📊 Gestão Registos Portal Colaborador</h2>
+  </div>
+
+  <!-- LADO DIREITO (LOGOUT) -->
+  <button onclick="logout()" style="
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+  ">
+      ➜ Logout
+  </button>
+
+</div>
+
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab(0)">📅 Disponibilidades</div>
+  <div class="tab" onclick="showTab(1)">💻 Erros Teletrabalho</div>
+  <div class="tab" onclick="showTab(2)">🚫 Ausências Parciais</div>
+</div>
+
+<!-- ================= DISPONIBILIDADES ================= -->
+<div class="view active" id="view0">
+  <h3>📅 Disponibilidades</h3>
+  <button onclick="loadDisponibilidades()">🔄 Atualizar</button>
+  <button onclick="exportDisponibilidades()">📥 Exportar Excel</button>
+
+  <table>
+
+    <thead>
+  <tr>
+    <th>Nome</th>
+    <th>Equipa</th>
+    <th>Data</th>
+    <th>Observações</th>
+    <th>Ação</th>
+  </tr>
+</thead>
+
+    <tbody id="dispTable"></tbody>
+  </table>
+</div>
+
+<!-- ================= ERROS ================= -->
+<div class="view" id="view1">
+  <h3>💻 Erros Teletrabalho</h3>
+  <button onclick="loadErros()">🔄 Atualizar</button>
+  <button onclick="exportErros()">📥 Exportar Excel</button>
+
+  <table>
+<thead>
+  <tr>
+    <th>Nome</th>
+    <th>Equipa</th>
+    <th>Tipo</th>
+    <th>Descrição</th>
+    <th>Ação</th>
+  </tr>
+</thead>
+    <tbody id="errosTable"></tbody>
+  </table>
+</div>
+
+<!-- ================= AUSÊNCIAS ================= -->
+<div class="view" id="view2">
+  <h3>🚫 Ausências Parciais</h3>
+  <button onclick="loadAusencias()">🔄 Atualizar</button>
+  <button onclick="exportAusencias()">📥 Exportar Excel</button>
+
+  <table>
+<thead>
+  <tr>
+    <th>Nome</th>
+    <th>Equipa</th>
+    <th>Motivo</th>
+    <th>Observações</th>
+    <th>Ação</th>
+  </tr>
+</thead>
+    <tbody id="ausenciasTable"></tbody>
+  </table>
+</div>
+
+<script>
+
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
+
+
+async function logout(){
+
+  const { error } = await client.auth.signOut();
+
+  if(error){
+    toast("Erro ao fazer logout", "error");
+    return;
+  }
+
+  toast("Logout feito com sucesso");
+
+  // redireciona para login
+  setTimeout(() => {
+    window.location.href = "login.html"; // muda para o teu ficheiro real
+  }, 800);
+}
+
+function showTab(i){
+
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab")[i].classList.add("active");
+
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view"+i).classList.add("active");
+
+  if(i===0) loadDisponibilidades();
+  if(i===1) loadErros();
+  if(i===2) loadAusencias();
+}
+
+function toast(msg, type = "success"){
+  const el = document.getElementById("toast");
+
+  el.innerText = msg;
+  el.style.display = "block";
+
+  el.style.background = type === "error" ? "#dc2626" : "#1db56c";
+
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 2500);
+}
+
+
+function exportDisponibilidades(){
+
+  const ws = XLSX.utils.json_to_sheet(
+    Array.from(document.querySelectorAll("#dispTable tr"))
+      .map(tr => {
+        const tds = tr.querySelectorAll("td");
+        return {
+          Nome: tds[0]?.innerText,
+          Equipa: tds[1]?.innerText,
+          Data: tds[2]?.innerText,
+          Observacoes: tds[3]?.innerText
+        };
+      })
+  );
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Disponibilidades");
+
+  XLSX.writeFile(wb, "Nss_Worten_disponibilidades.xlsx");
+}
+
+function exportErros(){
+
+  const ws = XLSX.utils.json_to_sheet(
+    Array.from(document.querySelectorAll("#errosTable tr"))
+      .map(tr => {
+        const tds = tr.querySelectorAll("td");
+        return {
+          Nome: tds[0]?.innerText,
+          Equipa: tds[1]?.innerText,
+          Tipo: tds[2]?.innerText,
+          Descricao: tds[3]?.innerText
+        };
+      })
+  );
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Erros");
+
+  XLSX.writeFile(wb, "NSS_Worten_errosteletrabalho.xlsx");
+}
+
+function exportAusencias(){
+
+  const ws = XLSX.utils.json_to_sheet(
+    Array.from(document.querySelectorAll("#ausenciasTable tr"))
+      .map(tr => {
+        const tds = tr.querySelectorAll("td");
+        return {
+          Nome: tds[0]?.innerText,
+          Equipa: tds[1]?.innerText,
+          Motivo: tds[2]?.innerText,
+          Observacoes: tds[3]?.innerText
+        };
+      })
+  );
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Ausencias");
+
+  XLSX.writeFile(wb, "NSS_Worten_JustificaçãoAusencias.xlsx");
+}
+
+async function loadDisponibilidades(){
+
+  toast("A atualizar disponibilidades...");
+
+  const { data, error } = await client
+    .from("disponibilidades_colaborador")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    toast("Erro ao carregar dados", "error");
+    return;
+  }
+
+  const tbody = document.getElementById("dispTable");
+  tbody.innerHTML = "";
+
+  if(!data || data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="5">Sem dados</td></tr>`;
+    return;
+  }
+
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.data_disponibilidade}</td>
+        <td>${r.observacoes || ''}</td>
+        <td>
+          <button onclick="askDelete('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  toast("Disponibilidades atualizadas");
+}
+
+
+
+
+let deleteTargetId = null;
+
+function askDelete(id){
+
+  deleteTargetId = id;
+
+  const el = document.getElementById("toast");
+
+  el.innerHTML = `
+    ⚠️ Confirmar eliminação?<br><br>
+    <button onclick="confirmDelete()" style="
+      margin-right:8px;
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#dc2626;
+      color:white;
+      cursor:pointer;
+    ">Eliminar</button>
+
+    <button onclick="closeToast()" style="
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#333;
+      color:white;
+      cursor:pointer;
+    ">Cancelar</button>
+  `;
+
+  el.style.display = "block";
+  el.style.background = "#1f2937";
+}
+
+async function confirmDelete(){
+
+  if(!deleteTargetId) return;
+
+  const { error } = await client
+    .from("disponibilidades_colaborador")
+    .delete()
+    .eq("id", deleteTargetId);
+
+  if(error){
+    toast("❌ Erro ao apagar", "error");
+    return;
+  }
+
+  toast("✅ Eliminado com sucesso");
+
+  deleteTargetId = null;
+  loadDisponibilidades();
+}
+
+function closeToast(){
+  document.getElementById("toast").style.display = "none";
+  deleteTargetId = null;
+}
+
+let deleteErroId = null;
+
+function askDeleteErro(id){
+
+  deleteErroId = id;
+
+  const el = document.getElementById("toast");
+
+  el.innerHTML = `
+    ⚠️ Confirmar eliminação do erro?<br><br>
+
+    <button onclick="confirmDeleteErro()" style="
+      margin-right:8px;
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#dc2626;
+      color:white;
+      cursor:pointer;
+    ">Eliminar</button>
+
+    <button onclick="closeToast()" style="
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#333;
+      color:white;
+      cursor:pointer;
+    ">Cancelar</button>
+  `;
+
+  el.style.display = "block";
+  el.style.background = "#1f2937";
+}
+
+async function confirmDeleteErro(){
+
+  if(!deleteErroId) return;
+
+  const { error } = await client
+    .from("erros_teletrabalho")
+    .delete()
+    .eq("id", deleteErroId);
+
+  if(error){
+    toast("❌ Erro ao apagar erro", "error");
+    return;
+  }
+
+  toast("✅ Erro eliminado com sucesso");
+
+  deleteErroId = null;
+  loadErros();
+}
+
+
+async function loadErros(){
+
+  toast("A atualizar erros...");
+
+  const { data, error } = await client
+    .from("erros_teletrabalho")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.log(error);
+    toast("Erro ao carregar erros", "error");
+    return;
+  }
+
+  const tbody = document.getElementById("errosTable");
+  tbody.innerHTML = "";
+
+  if(!data || data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="4">Sem dados</td></tr>`;
+    return;
+  }
+
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.tipo_erro}</td>
+        <td>${r.descricao}</td>
+        <td>
+          <button onclick="askDeleteErro('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  toast("Erros atualizados");
+}
+
+/* ================= AUSÊNCIAS ================= */
+
+async function loadAusencias(){
+
+  toast("A atualizar ausências...");
+
+  const { data, error } = await client
+    .from("logouts_colaborador")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    toast("Erro ao carregar ausências", "error");
+    return;
+  }
+
+  const tbody = document.getElementById("ausenciasTable");
+  tbody.innerHTML = "";
+
+  if(!data || data.length === 0){
+    tbody.innerHTML = `<tr><td colspan="4">Sem dados</td></tr>`;
+    return;
+  }
+
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.motivo}</td>
+        <td>${r.observacoes || ''}</td>
+        <td>
+          <button onclick="askDeleteAusencia('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  toast("Ausências atualizadas");
+}
+
+let deleteAusenciaId = null;
+
+function askDeleteAusencia(id){
+
+  deleteAusenciaId = id;
+
+  const el = document.getElementById("toast");
+
+  el.innerHTML = `
+    ⚠️ Confirmar eliminação da ausência?<br><br>
+    <button onclick="confirmDeleteAusencia()" style="
+      margin-right:8px;
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#dc2626;
+      color:white;
+      cursor:pointer;
+    ">Eliminar</button>
+
+    <button onclick="closeToast()" style="
+      padding:6px 10px;
+      border:none;
+      border-radius:6px;
+      background:#333;
+      color:white;
+      cursor:pointer;
+    ">Cancelar</button>
+  `;
+
+  el.style.display = "block";
+  el.style.background = "#1f2937";
+}
+
+async function confirmDeleteAusencia(){
+
+  if(!deleteAusenciaId) return;
+
+  const { error } = await client
+    .from("logouts_colaborador")
+    .delete()
+    .eq("id", deleteAusenciaId);
+
+  if(error){
+    toast("❌ Erro ao apagar ausência", "error");
+    return;
+  }
+
+  toast("✅ Ausência eliminada com sucesso");
+
+  deleteAusenciaId = null;
+  loadAusencias();
+}
+
+/* LOAD INICIAL */
+loadDisponibilidades();
+
+</script>
+
+</body>
+</html>
