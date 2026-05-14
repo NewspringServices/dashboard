@@ -388,7 +388,8 @@ textarea{
   </div>
 </div>
 
-<!-- DISPONIBILIDADES -->
+
+-<!-- DISPONIBILIDADES -->
 <div class="view active" id="tab0">
   <div class="card">
     <h2>📅 Registar Disponibilidades</h2>
@@ -416,7 +417,6 @@ textarea{
       <label>Observações</label>
       <textarea id="obsDisp"></textarea>
     </div>
-
     <button class="btn-green save-btn"
       onclick="guardarDisponibilidade()">
       Guardar Disponibilidade
@@ -442,7 +442,10 @@ textarea{
         <option>Equipa 2</option>
       </select>
     </div>
-
+<div class="form-group">
+  <label>Data *</label>
+  <input type="date" id="dataErro">
+</div>
     <div class="form-group">
       <label>Tipo de Erro *</label>
       <select id="tipoErro">
@@ -488,6 +491,11 @@ textarea{
     </div>
 
 <div class="form-group">
+  <label>Data *</label>
+  <input type="date" id="dataLogout">
+</div>
+
+<div class="form-group">
   <label>Motivo Logout *</label>
   <textarea
     id="motivoLogout"
@@ -496,10 +504,7 @@ textarea{
   ></textarea>
 </div>
 
-    <div class="form-group">
-      <label>Observações</label>
-      <textarea id="obsLogout"></textarea>
-    </div>
+ 
 
     <button class="btn-green save-btn"
       onclick="guardarLogout()">
@@ -552,71 +557,39 @@ function toast(msg){
 
 async function guardarDisponibilidade(){
 
-  const nome =
-    document.getElementById('nomeDisp')
-    .value.trim();
+  const nome = document.getElementById('nomeDisp').value.trim();
+  const equipa = document.getElementById('equipaDisp').value;
+  const data = document.getElementById('dataDisp').value;
 
-  const equipa =
-    document.getElementById('equipaDisp')
-    .value;
+  const obsEl = document.getElementById('obsDisp');
+  const observacoes = obsEl ? obsEl.value.trim() : null;
 
-  const data =
-    document.getElementById('dataDisp')
-    .value;
-
-  const observacoes =
-    document.getElementById('obsDisp')
-    .value.trim();
-
-  // validação
   if(!nome || !equipa || !data){
-
-    toast(
-      '⚠️ Preenche os campos obrigatórios'
-    );
-
+    toast('⚠️ Preenche os campos obrigatórios');
     return;
   }
 
-  // inserir no supabase
   const { error } = await client
     .from('disponibilidades_colaborador')
     .insert([{
-
-      nome: nome,
-      equipa: equipa,
+      nome,
+      equipa,
       data_disponibilidade: data,
       observacoes: observacoes || null
-
     }]);
 
   if(error){
-
     console.error(error);
-
-    toast(
-      '❌ Erro ao guardar disponibilidade'
-    );
-
+    toast('❌ Erro ao guardar disponibilidade: ' + error.message);
     return;
   }
 
-  // limpar formulário
-  document.getElementById('nomeDisp')
-    .value = '';
+  document.getElementById('nomeDisp').value = '';
+  document.getElementById('equipaDisp').value = '';
+  document.getElementById('dataDisp').value = '';
+  if(obsEl) obsEl.value = '';
 
-  document.getElementById('equipaDisp')
-    .value = '';
-
-  document.getElementById('dataDisp')
-    .value = '';
-
-  document.getElementById('obsDisp')
-    .value = '';
-
-  toast(
-    '✅ Disponibilidade registada com sucesso'
-  );
+  toast('✅ Disponibilidade registada com sucesso');
 }
 /* ERRO TELETRABALHO */
 async function guardarErro(){
@@ -626,7 +599,8 @@ async function guardarErro(){
 
   const equipa =
     document.getElementById('equipaErro').value;
-
+const data =
+  document.getElementById('dataErro').value;
   const tipo =
     document.getElementById('tipoErro').value;
 
@@ -637,16 +611,19 @@ async function guardarErro(){
     toast('⚠️ Preenche os campos obrigatórios');
     return;
   }
-
-  const { error } = await client
-    .from('erros_teletrabalho')
-    .insert([{
-      nome: nome,
-      equipa: equipa,
-      tipo_erro: tipo,
-      descricao: desc
-    }]);
-
+if(!nome || !equipa || !tipo || !desc || !data){
+  toast('⚠️ Preenche os campos obrigatórios');
+  return;
+}
+const { error } = await client
+  .from('erros_teletrabalho')
+  .insert([{
+    nome: nome,
+    equipa: equipa,
+    tipo_erro: tipo,
+    descricao: desc,
+    data_erro: data
+  }]);
   if(error){
     console.error(error);
     toast('❌ Erro ao guardar registo');
@@ -674,22 +651,22 @@ async function guardarLogout(){
   const motivo =
     document.getElementById('motivoLogout').value.trim();
 
-  const obs =
-    document.getElementById('obsLogout').value.trim();
+const data =
+  document.getElementById('dataLogout').value;
 
-  if(!nome || !equipa || !motivo){
-    toast('⚠️ Preenche os campos obrigatórios');
-    return;
-  }
+if(!nome || !equipa || !motivo || !data){
+  toast('⚠️ Preenche os campos obrigatórios');
+  return;
+}
 
-  const { error } = await client
-    .from('logouts_colaborador')
-    .insert([{
-      nome: nome,
-      equipa: equipa,
-      motivo: motivo,
-      observacoes: obs || null
-    }]);
+const { error } = await client
+  .from('logouts_colaborador')
+  .insert([{
+    nome: nome,
+    equipa: equipa,
+    motivo: motivo,
+    data_logout: data
+  }]);
 
   if(error){
     console.error(error);
@@ -701,9 +678,9 @@ async function guardarLogout(){
   document.getElementById('nomeLogout').value = '';
   document.getElementById('equipaLogout').value = '';
   document.getElementById('motivoLogout').value = '';
-  document.getElementById('obsLogout').value = '';
+document.getElementById('dataLogout').value = '';
 
-  toast('✅ Logout registado com sucesso');
+toast('✅ Logout registado com sucesso');
 }
 function admin(){
   document.getElementById("adminModal").style.display = "flex";
