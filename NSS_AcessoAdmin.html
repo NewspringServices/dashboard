@@ -138,7 +138,8 @@
   <h3>📅 Disponibilidades</h3>
   <button onclick="loadDisponibilidades()">🔄 Atualizar</button>
   <button onclick="exportDisponibilidades()">📥 Exportar Excel</button>
-
+<input id="filtroDispNome" placeholder="Filtrar por nome" oninput="filterDisponibilidades()" />
+<input id="filtroDispData" placeholder="Filtrar por data" oninput="filterDisponibilidades()" />
   <table>
 
  <thead>
@@ -161,7 +162,8 @@
   <h3>💻 Erros Teletrabalho</h3>
   <button onclick="loadErros()">🔄 Atualizar</button>
   <button onclick="exportErros()">📥 Exportar Excel</button>
-
+<input id="filtroErroNome" placeholder="Filtrar por nome" oninput="filterErros()" />
+<input id="filtroErroData" placeholder="Filtrar por data" oninput="filterErros()" />
   <table>
     <thead>
       <tr>
@@ -185,7 +187,8 @@
   <h3>🚫 Ausências Parciais</h3>
   <button onclick="loadAusencias()">🔄 Atualizar</button>
   <button onclick="exportAusencias()">📥 Exportar Excel</button>
-
+<input id="filtroAusNome" placeholder="Filtrar por nome" oninput="filterAusencias()" />
+<input id="filtroAusData" placeholder="Filtrar por data" oninput="filterAusencias()" />
   <table>
 <thead>
   <tr>
@@ -204,6 +207,11 @@
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+
+let cacheDisponibilidades = [];
+let cacheErros = [];
+let cacheAusencias = [];
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
 
@@ -318,6 +326,61 @@ function exportAusencias(){
   XLSX.writeFile(wb, "NSS_Worten_AusenciasParciais.xlsx");
 }
 
+function renderErros(data){
+
+  const tbody = document.getElementById("errosTable");
+  tbody.innerHTML = "";
+
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.tipo_erro}</td>
+        <td>${r.descricao}</td>
+        <td>${r.data_erro || ''}</td>
+        <td>
+          <button onclick="askDeleteErro('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterErros(){
+
+  const nome = document.getElementById("filtroErroNome")?.value.toLowerCase() || "";
+  const data = document.getElementById("filtroErroData")?.value || "";
+
+  const filtered = cacheErros.filter(r =>
+    (r.nome || "").toLowerCase().includes(nome) &&
+    (r.data_erro || "").includes(data)
+  );
+
+  renderErros(filtered);
+}
+async function loadErros(){
+
+  toast("A atualizar erros...");
+
+  const { data, error } = await client
+    .from("erros_teletrabalho")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.log(error);
+    toast("Erro ao carregar erros", "error");
+    return;
+  }
+
+  cacheErros = data; // 🔴 ISTO ESTAVA A FALTAR
+
+  renderErros(data);
+
+  toast("Erros atualizados");
+}
+
 async function loadDisponibilidades(){
 
   toast("A atualizar disponibilidades...");
@@ -332,27 +395,8 @@ async function loadDisponibilidades(){
     return;
   }
 
-  const tbody = document.getElementById("dispTable");
-  tbody.innerHTML = "";
-
-  if(!data || data.length === 0){
-    tbody.innerHTML = `<tr><td colspan="5">Sem dados</td></tr>`;
-    return;
-  }
-
-data.forEach(r=>{
-  tbody.innerHTML += `
-    <tr>
-      <td>${r.nome}</td>
-      <td>${r.equipa}</td>
-      <td>${r.data_disponibilidade}</td>
-      <td>${r.observacoes || ''}</td>
-      <td>
-        <button onclick="askDelete('${r.id}')">❌ Apagar</button>
-      </td>
-    </tr>
-  `;
-});
+  cacheDisponibilidades = data;
+  renderDisponibilidades(data);
 
   toast("Disponibilidades atualizadas");
 }
@@ -474,48 +518,72 @@ async function confirmDeleteErro(){
   loadErros();
 }
 
+function filterDisponibilidades(){
 
-async function loadErros(){
+  const nome = document.getElementById("filtroDispNome")?.value.toLowerCase() || "";
+  const data = document.getElementById("filtroDispData")?.value || "";
 
-  toast("A atualizar erros...");
+  const filtered = cacheDisponibilidades.filter(r =>
+    (r.nome || "").toLowerCase().includes(nome) &&
+    (r.data_disponibilidade || "").includes(data)
+  );
 
-  const { data, error } = await client
-    .from("erros_teletrabalho")
-    .select("*")
-    .order("created_at",{ascending:false});
+  renderDisponibilidades(filtered);
+}
 
-  if(error){
-    console.log(error);
-    toast("Erro ao carregar erros", "error");
-    return;
-  }
+function filterAusencias(){
 
-  const tbody = document.getElementById("errosTable");
+  const nome = document.getElementById("filtroAusNome")?.value.toLowerCase() || "";
+  const data = document.getElementById("filtroAusData")?.value || "";
+
+  const filtered = cacheAusencias.filter(r =>
+    (r.nome || "").toLowerCase().includes(nome) &&
+    (r.data_logout || "").includes(data)
+  );
+
+  renderAusencias(filtered);
+}
+
+function renderAusencias(data){
+
+  const tbody = document.getElementById("ausenciasTable");
   tbody.innerHTML = "";
 
-  if(!data || data.length === 0){
-    tbody.innerHTML = `<tr><td colspan="4">Sem dados</td></tr>`;
-    return;
-  }
-
- data.forEach(r=>{
-  tbody.innerHTML += `
-    <tr>
-      <td>${r.nome}</td>
-      <td>${r.equipa}</td>
-      <td>${r.tipo_erro}</td>
-      <td>${r.descricao}</td>
-      <td>${r.data_erro || ''}</td>
-      <td>
-        <button onclick="askDeleteErro('${r.id}')">❌ Apagar</button>
-      </td>
-    </tr>
-  `;
-});
-    
-
-  toast("Erros atualizados");
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.motivo}</td>
+        <td>${r.data_logout || ''}</td>
+        <td>
+          <button onclick="askDeleteAusencia('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
 }
+
+function renderDisponibilidades(data){
+
+  const tbody = document.getElementById("dispTable");
+  tbody.innerHTML = "";
+
+  data.forEach(r=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.nome}</td>
+        <td>${r.equipa}</td>
+        <td>${r.data_disponibilidade}</td>
+        <td>${r.observacoes || ''}</td>
+        <td>
+          <button onclick="askDelete('${r.id}')">❌ Apagar</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
 
 /* ================= AUSÊNCIAS ================= */
 
@@ -533,34 +601,14 @@ async function loadAusencias(){
     return;
   }
 
-  const tbody = document.getElementById("ausenciasTable");
-  tbody.innerHTML = "";
-
-  if(!data || data.length === 0){
-    tbody.innerHTML = `<tr><td colspan="4">Sem dados</td></tr>`;
-    return;
-  }
-
-
-
-  data.forEach(r=>{
-  tbody.innerHTML += `
-    <tr>
-      <td>${r.nome}</td>
-      <td>${r.equipa}</td>
-      <td>${r.motivo}</td>
-      <td>${r.data_logout || ''}</td>
-      <td>
-        <button onclick="askDeleteAusencia('${r.id}')">❌ Apagar</button>
-      </td>
-    </tr>
-  `;
-});
+  cacheAusencias = data;
+  renderAusencias(data);
 
   toast("Ausências atualizadas");
 }
 
 let deleteAusenciaId = null;
+
 
 function askDeleteAusencia(id){
 
