@@ -456,6 +456,7 @@ h3{
 <div class="tabs">
   <div class="tab active" onclick="showTab(0)">📊 Dados Produção</div>
   <div class="tab" onclick="showTab(1)">📈 Taxa de Ocupação</div>
+  <div class="tab" onclick="showTab(2)">📋 Resumo Produção (Documentos)</div>
 </div>
 
 <!-- ================= TAB 1 - PRODUÇÃO ================= -->
@@ -468,6 +469,7 @@ h3{
 <input type="date" id="startDate" onchange="render()">
 <input type="date" id="endDate" onchange="render()">
 <input id="filterUser" placeholder="Filtrar colaborador..." onkeyup="render()">
+
 <button class="btn-blue" onclick="exportExcel()">📤 Exportar Excel</button>
 
 <table>
@@ -506,17 +508,16 @@ h3{
 <input id="occFilter" placeholder="Filtrar colaborador..." onkeyup="renderOcc()">
 
 <button class="btn-blue" onclick="exportOcc()">📤 Exportar Excel</button>
+
 <table>
 <thead>
 <tr>
-
 <th>Data</th>
 <th>Colaborador</th>
 <th>Tempo Total</th>
 <th>Tempo Estimado</th>
 <th>% Ocupação</th>
 <th>Observações</th>
-
 </tr>
 </thead>
 
@@ -527,13 +528,42 @@ h3{
 
 </div>
 
+<!-- ================= TAB 3 - RESUMO DOCUMENTOS ================= -->
+<!-- ================= TAB 3 - RESUMO DOCUMENTOS ================= -->
+<div class="view" id="tab2">
+
+<div class="container">
+
+<h3>📋 Resumo Produção (Documentos)</h3>
+
+<input type="date" id="resumoStart" onchange="renderResumoDocs()">
+<input type="date" id="resumoEnd" onchange="renderResumoDocs()">
+<input id="resumoFilter" placeholder="Filtrar colaborador..." onkeyup="renderResumoDocs()">
+
+<button class="btn-blue" onclick="exportResumoDocs()">
+  📤 Exportar Excel
+</button>
+
+<table>
+
+<thead id="resumoHead"></thead>
+
+<tbody id="resumoBody"></tbody>
+
+</table>
+
+</div>
+
+
+</div>
+
 <script>
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
-
+let resumoDocs = [];
 let data = [];
 
 function openAdminModal(){
@@ -545,7 +575,65 @@ function closeAdminModal(){
   document.getElementById("adminPass").value = "";
 }
 
+function exportResumoDocs(){
 
+  const filtro =
+    document.getElementById('resumoFilter').value?.toLowerCase() || '';
+
+  const start =
+    document.getElementById('resumoStart').value;
+
+  const end =
+    document.getElementById('resumoEnd').value;
+
+  const rows = resumoDocs.filter(row => {
+
+    // NOME
+    const nome =
+      row.colaborador ||
+      row.nome ||
+      row.user ||
+      '';
+
+    if(filtro && !nome.toLowerCase().includes(filtro))
+      return false;
+
+    // DATA
+    const data =
+      row.data ||
+      row.date ||
+      '';
+
+    if(start && data < start)
+      return false;
+
+    if(end && data > end)
+      return false;
+
+    return true;
+
+  });
+
+  if(!rows.length){
+    alert("Sem dados para exportar.");
+    return;
+  }
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(
+    wb,
+    ws,
+    "Resumo Documentos"
+  );
+
+  XLSX.writeFile(
+    wb,
+    "Resumo_Producao_Documentos.xlsx"
+  );
+}
 function formatTempo(v){
   if(!v || v === "00:00:00") return "";
   return v;
@@ -579,6 +667,7 @@ function showTab(i){
 
   if(i === 0) render();
   if(i === 1) renderOcc();
+  if(i === 2) renderResumoDocs();
 }
 
 function toSeconds(hms){
@@ -690,6 +779,62 @@ tbody.innerHTML += `
   });
 }
 
+
+function renderResumoDocs(){
+
+  const thead = document.getElementById('resumoHead');
+  const tbody = document.getElementById('resumoBody');
+
+  thead.innerHTML = '';
+  tbody.innerHTML = '';
+
+  if(!resumoDocs.length) return;
+
+  // FILTROS
+  const filtro = document.getElementById('resumoFilter').value?.toLowerCase() || '';
+  const start = document.getElementById('resumoStart').value;
+  const end = document.getElementById('resumoEnd').value;
+
+  // COLUNAS
+  const columns = Object.keys(resumoDocs[0]);
+
+  // HEADER
+  thead.innerHTML = `
+    <tr>
+      ${columns.map(c => `<th>${c}</th>`).join('')}
+    </tr>
+  `;
+
+  // LINHAS
+  resumoDocs.forEach(row => {
+
+    // FILTRO NOME
+    const nome =
+      row.colaborador ||
+      row.nome ||
+      row.user ||
+      '';
+
+    if(filtro && !nome.toLowerCase().includes(filtro)) return;
+
+    // FILTRO DATA
+    const data =
+      row.data ||
+      row.date ||
+      '';
+
+    if(start && data < start) return;
+    if(end && data > end) return;
+
+    tbody.innerHTML += `
+      <tr>
+        ${columns.map(col => `
+          <td>${row[col] ?? ''}</td>
+        `).join('')}
+      </tr>
+    `;
+  });
+}
 function enableEdit(input){
   input.readOnly = false;
   input.style.background = "white";
@@ -802,7 +947,6 @@ function logout(){
 load();
 
 let ocupacao = [];
-
 async function load(){
 
   const { data: res } = await client
@@ -812,16 +956,23 @@ async function load(){
 
   data = res || [];
 
- const { data: occ } = await client
-  .from('resumo_ocupacao')
-  .select('id, data, colaborador, tempo_total, taxa_ocupacao, observacoes')
+  const { data: occ } = await client
+    .from('resumo_ocupacao')
+    .select('id, data, colaborador, tempo_total, taxa_ocupacao, observacoes')
     .order('data', { ascending: false });
 
   ocupacao = occ || [];
 
+  // NOVA TABELA
+  const { data: resumo } = await client
+    .from('bpo_resumo_producao')
+    .select('*')
+    .order('data', { ascending: false });
+
+  resumoDocs = resumo || [];
+
   render();
 }
-
 
 </script>
 
