@@ -457,6 +457,7 @@ h3{
   <div class="tab active" onclick="showTab(0)">📊 Dados Produção</div>
   <div class="tab" onclick="showTab(1)">📈 Taxa de Ocupação</div>
   <div class="tab" onclick="showTab(2)">📋 Resumo Produção (Documentos)</div>
+  <div class="tab" onclick="showTab(3)">⏱️ Tempos Médios</div>
 </div>
 
 <!-- ================= TAB 1 - PRODUÇÃO ================= -->
@@ -553,7 +554,37 @@ h3{
 </table>
 
 </div>
+</div>
 
+<!-- ================= TAB 4 - TEMPOS MÉDIOS ================= -->
+<div class="view" id="tab3">
+
+<div class="container">
+
+<h3>⏱️ Tempos Médios</h3>
+
+<input type="date" id="mediaStart" onchange="renderMedia()">
+<input type="date" id="mediaEnd" onchange="renderMedia()">
+<input id="mediaFilter" placeholder="Filtrar colaborador..." onkeyup="renderMedia()">
+
+<button class="btn-blue" onclick="exportMedia()">📤 Exportar Excel</button>
+
+<table>
+<thead>
+<tr>
+<th>Dia</th>
+<th>Colaborador</th>
+<th>Tarefa</th>
+<th>Tempo Médio</th>
+</tr>
+</thead>
+
+<tbody id="mediaTable"></tbody>
+</table>
+
+</div>
+
+</div>
 
 </div>
 
@@ -668,6 +699,7 @@ function showTab(i){
   if(i === 0) render();
   if(i === 1) renderOcc();
   if(i === 2) renderResumoDocs();
+if(i === 3) renderMedia();
 }
 
 function toSeconds(hms){
@@ -945,6 +977,7 @@ function logout(){
 }
 
 load();
+let mediaTempos = [];
 
 let ocupacao = [];
 async function load(){
@@ -963,6 +996,13 @@ async function load(){
 
   ocupacao = occ || [];
 
+const { data: media } = await client
+  .from('BPO_media_tarefas')
+  .select('*')
+  .order('dia', { ascending: false });
+
+mediaTempos = media || [];
+
   // NOVA TABELA
   const { data: resumo } = await client
     .from('bpo_resumo_producao')
@@ -972,6 +1012,60 @@ async function load(){
   resumoDocs = resumo || [];
 
   render();
+}
+function renderMedia(){
+
+  const tbody = document.getElementById('mediaTable');
+  tbody.innerHTML = '';
+
+  const f = document.getElementById('mediaFilter').value?.toLowerCase() || '';
+  const start = document.getElementById('mediaStart').value;
+  const end = document.getElementById('mediaEnd').value;
+
+  mediaTempos.forEach(r => {
+
+    if(f && !r.colaborador?.toLowerCase().includes(f)) return;
+    if(start && r.dia < start) return;
+    if(end && r.dia > end) return;
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.dia}</td>
+        <td>${r.colaborador}</td>
+        <td>${r.tarefaFinalizada}</td>
+        <td>${r.tempo_medio}</td>
+      </tr>
+    `;
+  });
+}
+function exportMedia(){
+
+  const f = document.getElementById('mediaFilter').value?.toLowerCase() || '';
+  const start = document.getElementById('mediaStart').value;
+  const end = document.getElementById('mediaEnd').value;
+
+  const rows = mediaTempos
+    .filter(r => {
+
+      if(f && !r.colaborador?.toLowerCase().includes(f)) return false;
+      if(start && r.dia < start) return false;
+      if(end && r.dia > end) return false;
+
+      return true;
+    })
+    .map(r => ({
+      Dia: r.dia,
+      Colaborador: r.colaborador,
+      Tarefa: r.tarefaFinalizada,
+      "Tempo Médio": r.tempo_medio
+    }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Tempos Médios");
+
+  XLSX.writeFile(wb, "Tempos_Medios_BPO.xlsx");
 }
 
 </script>
