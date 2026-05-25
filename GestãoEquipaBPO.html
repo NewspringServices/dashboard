@@ -740,62 +740,80 @@ select:focus{
 
     <h3 style="text-align:center;">Forçar Registo</h3>
 
-    <select id="nomeSelect">
-   <option value="">-- Selecionar nome --</option>
+    <div style="margin-top:10px;">
+      <label>Data do registo</label>
+      <input type="date" id="forceDate">
+    </div>
 
-<option>Ana Catarina Oliveira Mendonça Barão</option>
-<option>Ana Karina Spencer Martins</option>
-<option>Ana Sofia Pinheiro Garabito</option>
-<option>Andreia Sofia Figueiredo Grilo</option>
-<option>Bruno César Nogueira Manaças</option>
-<option>Carina Ourives Lavado</option>
-<option>Carla Alexandra Duarte Reis</option>
-<option>Carla Mariza Dias Trindade</option>
-<option>Carolina Adelaide Viegas Gomes Padeiro</option>
-<option>Cintia Maisa Gomes Carlos</option>
-<option>Délcia Filomena Emílio Mpengo</option>
-<option>Delson da Silva Carvalho</option>
-<option>Eunice Rosalina Moiane Machatine Chiau</option>
-<option>Fábio Rúben de Abreu Assunção</option>
-<option>Gilda Maria Infante Anjos</option>
-<option>Gisela Cristina Cidade Cabeca Ingles</option>
-<option>Jessica Silva Nogueira Manacas</option>
-<option>Joana de Almeida Figueiras</option>
-<option>Joana Emanuela Lenho da Costa Sousa</option>
-<option>Joel Quissama Mundjanga</option>
-<option>Madalena Farinha de Carvalho e Sousa Góis</option>
-<option>Marcos Felipe Bastos Moura</option>
-<option>Marta Sofia da Conceição Fernandes</option>
-<option>Mónica Sofia Pereira Valente</option>
-<option>Nádia Filipa Contins Cunha Oliveira</option>
-<option>Orlanda Leizi Gomes Francisco</option>
-<option>Patrícia Alexandra Viegas André</option>
-<option>Rachel Alvarez dos Santos Coelho</option>
-<option>Renan dos Santos Bezerra</option>
-<option>Sandra Isabel Domingues Facão</option>
-<option>Sandra Maria Moreira Bento</option>
-<option>Sara Banú Chotumiã</option>
-<option>Sofia Isabel Martins Cruz Mendes Ferreira</option>
-<option>Susana Carina Marques Bordalo</option>
-<option>Telma Sofia Pereira Rosa</option>
-<option>Vera Lúcia Centeio dos Santos Freitas</option>
-    </select>
+ 
 
-     <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+    <div style="margin-top:10px;">
+      <label>Selecionar colaborador</label>
 
-  <button onclick="enviarForcado('login')" style="background:green;">Login</button>
+      <select id="nomeSelect">
+        <option value="">-- Selecionar nome --</option>
 
-  <button onclick="enviarForcado('logout')" class="btn-red">Logout</button>
+        <option>Ana Catarina Oliveira Mendonça Barão</option>
+        <option>Ana Karina Spencer Martins</option>
+        <option>Ana Sofia Pinheiro Garabito</option>
+        <option>Andreia Sofia Figueiredo Grilo</option>
+        <option>Bruno César Nogueira Manaças</option>
+        <option>Carina Ourives Lavado</option>
+        <option>Carla Alexandra Duarte Reis</option>
+        <option>Carla Mariza Dias Trindade</option>
+        <option>Carolina Adelaide Viegas Gomes Padeiro</option>
+        <option>Cintia Maisa Gomes Carlos</option>
+        <option>Délcia Filomena Emílio Mpengo</option>
+        <option>Delson da Silva Carvalho</option>
+        <option>Eunice Rosalina Moiane Machatine Chiau</option>
+        <option>Fábio Rúben de Abreu Assunção</option>
+        <option>Gilda Maria Infante Anjos</option>
+        <option>Gisela Cristina Cidade Cabeca Ingles</option>
+        <option>Jessica Silva Nogueira Manacas</option>
+        <option>Joana de Almeida Figueiras</option>
+        <option>Joana Emanuela Lenho da Costa Sousa</option>
+        <option>Joel Quissama Mundjanga</option>
+        <option>Madalena Farinha de Carvalho e Sousa Góis</option>
+        <option>Marcos Felipe Bastos Moura</option>
+        <option>Marta Sofia da Conceição Fernandes</option>
+        <option>Mónica Sofia Pereira Valente</option>
+        <option>Nádia Filipa Contins Cunha Oliveira</option>
+        <option>Orlanda Leizi Gomes Francisco</option>
+        <option>Patrícia Alexandra Viegas André</option>
+        <option>Rachel Alvarez dos Santos Coelho</option>
+        <option>Renan dos Santos Bezerra</option>
+        <option>Sandra Isabel Domingues Facão</option>
+        <option>Sandra Maria Moreira Bento</option>
+        <option>Sara Banú Chotumiã</option>
+        <option>Sofia Isabel Martins Cruz Mendes Ferreira</option>
+        <option>Susana Carina Marques Bordalo</option>
+        <option>Telma Sofia Pereira Rosa</option>
+        <option>Vera Lúcia Centeio dos Santos Freitas</option>
+      </select>
+    </div>
 
-  <button onclick="enviarForcado('pausa1')" style="background:#f39c12;">Pausa 1 (15 min)</button>
+    <div style="display:flex; flex-direction:column; gap:8px; margin-top:15px;">
 
-  <button onclick="enviarForcado('pausa2')" style="background:#e67e22;">Pausa 2 (15 min)</button>
+      <button onclick="enviarForcado('login')" style="background:green;">
+        Login
+      </button>
 
-  <button onclick="enviarForcado('refeicao')" style="background:#f1c40f;color:#000;">
-    Refeição (60 min)
-  </button>
+      <button onclick="enviarForcado('logout')" class="btn-red">
+        Logout
+      </button>
 
-</div>
+      <button onclick="enviarForcado('pausa1')" style="background:#f39c12;">
+        Pausa 1 (15 min)
+      </button>
+
+      <button onclick="enviarForcado('pausa2')" style="background:#e67e22;">
+        Pausa 2 (15 min)
+      </button>
+
+      <button onclick="enviarForcado('refeicao')" style="background:#f1c40f;color:#000;">
+        Refeição (60 min)
+      </button>
+
     </div>
 
     <div id="msgForce" style="margin-top:10px; text-align:center; font-weight:bold;"></div>
@@ -939,9 +957,22 @@ async function enviarForcado(tipo){
   }
 
   const user = utilizadores[nome];
+const dataEscolhida = document.getElementById("forceDate").value;
 
-  const now = getLisbonISO();
+if(!dataEscolhida){
+  msg.style.color = "red";
+  msg.innerText = "Seleciona a data";
+  return;
+}
 
+// usa hora atual automática
+const agora = new Date();
+
+const hh = String(agora.getHours()).padStart(2,'0');
+const mm = String(agora.getMinutes()).padStart(2,'0');
+const ss = String(agora.getSeconds()).padStart(2,'0');
+
+const now = `${dataEscolhida}T${hh}:${mm}:${ss}`;
   let duracao = 0;
 
   // 🔥 regra automática de duração
@@ -959,7 +990,11 @@ async function enviarForcado(tipo){
     nome,
     tipo,
     inicio: now,
-    fim: duracao ? new Date(new Date(now).getTime() + duracao*60000).toISOString() : null
+fim: duracao
+  ? new Date(new Date(now).getTime() + duracao * 60000)
+      .toISOString()
+      .slice(0,19)
+  : null
   };
 
   const { error } = await client
