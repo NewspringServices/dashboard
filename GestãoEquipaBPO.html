@@ -984,18 +984,30 @@ const now = `${dataEscolhida}T${hh}:${mm}:${ss}`;
     duracao = 60;
   }
 
-  let payload = {
-    data: now.slice(0,10),
-    user,
-    nome,
-    tipo,
-    inicio: now,
-fim: duracao
-  ? new Date(new Date(now).getTime() + duracao * 60000)
-      .toISOString()
-      .slice(0,19)
-  : null
-  };
+let fim = null;
+
+if(duracao > 0){
+  const fimDate = new Date(new Date(now).getTime() + duracao * 60000);
+
+  const yyyy = fimDate.getFullYear();
+  const mm = String(fimDate.getMonth()+1).padStart(2,'0');
+  const dd = String(fimDate.getDate()).padStart(2,'0');
+
+  const hh = String(fimDate.getHours()).padStart(2,'0');
+  const mi = String(fimDate.getMinutes()).padStart(2,'0');
+  const ss = String(fimDate.getSeconds()).padStart(2,'0');
+
+  fim = `${yyyy}-${mm}-${dd}T${hh}:${mi}:${ss}`;
+}
+
+let payload = {
+  data: now.slice(0,10),
+  user,
+  nome,
+  tipo,
+  inicio: now,
+  fim
+};
 
   const { error } = await client
     .from('BPO_registosNSS')
