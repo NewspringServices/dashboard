@@ -1075,12 +1075,15 @@ function getPlaneadosHoje(){
 function getFeriasCount(){
   const hoje = getHoje();
 
-  return planeamentoData.filter(p =>
-    (p.data === hoje) &&
-    (p.estado || '').toLowerCase() === 'férias'
-  ).length;
-}
+  return planeamentoData.filter(p => {
+    const estado = (p.estado || '').toLowerCase();
 
+    return (
+      p.data === hoje &&
+      (estado === 'férias' || estado === 'dispensa')
+    );
+  }).length;
+}
 function getLoginsHoje(){
   const hoje = getHoje();
 
@@ -1157,7 +1160,7 @@ el.innerHTML = `
 </div>
 
 <div class="card" style="flex:1;border-left:5px solid #3498db;">
-  🏖️ Férias<br>
+  🏖️ Férias e Dispensas<br>
   <b>${getFeriasCount()}</b><br><br>
   <button onclick="toggleKPI('ferias', this)">
     ${kpiOpen.ferias ? "Esconder lista" : "Ver lista"}
@@ -1223,10 +1226,14 @@ function renderKPILists(planeados, logins, semLogin){
         <b>🏖️ Colaboradores de férias</b><br><br>
         ${
           planeamentoData
-.filter(p =>
-  (p.data === getHoje()) &&
-  (p.estado || '').toLowerCase() === 'férias'
-)
+.filter(p => {
+  const estado = (p.estado || '').toLowerCase();
+
+  return (
+    p.data === getHoje() &&
+    (estado === 'férias' || estado === 'dispensa')
+  );
+})
             .map(p => `• ${p.user} - ${p.nome}`)
             .join('<br>') || 'Nenhum colaborador em férias'
         }
