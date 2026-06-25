@@ -700,10 +700,15 @@ select:focus{
                 <h2 id="totalTarefas">0</h2>
             </div>
 
-            <div class="card">
-                <span>Tempo</span>
-                <h2 id="tempoHoje">00:00</h2>
-            </div>
+     <div class="card">
+    <span>Tempo Médio</span>
+    <h2 id="tempoHoje">00:00:00</h2>
+</div>
+
+<div class="card">
+    <span>Tempo Ocupado</span>
+    <h2 id="tempoTotal">00:00:00</h2>
+</div>
 
         </section>
 
@@ -864,7 +869,13 @@ async function atualizarKPIs() {
 
         document.getElementById("tempoHoje").textContent =
             `${h}:${m}:${s}`;
+// TEMPO OCUPADO (TOTAL)
+const totalH = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
+const totalM = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
+const totalS = String(totalSegundos % 60).padStart(2,"0");
 
+document.getElementById("tempoTotal").textContent =
+    `${totalH}:${totalM}:${totalS}`;
     } catch(err){
 
         console.error(err);
