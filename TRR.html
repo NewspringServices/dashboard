@@ -325,7 +325,7 @@ nav .active{
     font-weight:700;
 
 }
-    }
+    
     .card-presenca{
     background:#ecfdf5;
     border:1px solid #bbf7d0;
@@ -708,11 +708,21 @@ select:focus{
                 <span>Estado</span>
                 <h2 id="estadoLabel">ONLINE</h2>
             </div>
+<div class="card">
+    <span>Documentos</span>
+    <h2 id="totalDocs">0</h2>
 
-            <div class="card">
-                <span>Documentos</span>
-                <h2 id="totalDocs">0</h2>
-            </div>
+    <a href="#" id="verDetalheDocs">Ver detalhe</a>
+
+    <div id="detalheDocs" style="
+        display:none;
+        margin-top:15px;
+        padding-top:12px;
+        border-top:1px solid #e5e7eb;
+        font-size:14px;
+        line-height:1.8;
+    "></div>
+</div>
 
             <div class="card">
                 <span>Tarefas</span>
@@ -910,7 +920,7 @@ console.log(dados);   // <-- aqui
 
 }
 
-
+let dadosProducao = [];
 async function atualizarKPIs() {
 
     const hoje = new Date().toISOString().split("T")[0];
@@ -922,7 +932,7 @@ async function atualizarKPIs() {
         `colaborador=eq.${encodeURIComponent(nome)}` +
         `&inicio=gte.${hoje}T00:00:00` +
         `&inicio=lte.${hoje}T23:59:59` +
-        `&select=Documentos,tempo`;
+        `&select=Documentos,tempo,tarefaFinalizada`;
 
         const res = await fetch(url,{
             headers:{
@@ -932,7 +942,7 @@ async function atualizarKPIs() {
         });
 
         const dados = await res.json();
-
+dadosProducao = dados;
         let totalDocs = 0;
         let totalSegundos = 0;
 
@@ -1252,4 +1262,39 @@ clearInterval(intervalTarefa);
 intervalTarefa = null;
 
 };
+document.getElementById("verDetalheDocs").onclick = function(e){
+
+    e.preventDefault();
+
+    const detalhe = document.getElementById("detalheDocs");
+
+    // Fecha se já estiver aberto
+    if (detalhe.style.display === "block") {
+        detalhe.style.display = "none";
+        return;
+    }
+
+    let resumo = {};
+
+    dadosProducao.forEach(item => {
+        const tarefa = item.tarefaFinalizada || "Sem tarefa";
+        resumo[tarefa] = (resumo[tarefa] || 0) + Number(item.Documentos || 0);
+    });
+
+    let html = "";
+
+    for (const tarefa in resumo) {
+        html += `
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span>${tarefa}</span>
+                <strong>${resumo[tarefa]}</strong>
+            </div>
+        `;
+    }
+
+    detalhe.innerHTML = html;
+    detalhe.style.display = "block";
+};
+
+
 </script>
