@@ -973,21 +973,22 @@ const mm = String(agora.getMinutes()).padStart(2,'0');
 const ss = String(agora.getSeconds()).padStart(2,'0');
 
 const now = `${dataEscolhida}T${hh}:${mm}:${ss}`;
-  let duracao = 0;
+let minutos = 0;
+let duracao = null;
 
-  // 🔥 regra automática de duração
-  if(tipo === "pausa1" || tipo === "pausa2"){
-    duracao = 15; // minutos
-  }
+if(tipo === "pausa1" || tipo === "pausa2"){
+    minutos = 15;
+    duracao = "0.250";
+}
 
-  if(tipo === "refeicao"){
-    duracao = 60;
-  }
-
+if(tipo === "refeicao"){
+    minutos = 60;
+    duracao = "1.000";
+}
 let fim = null;
 
-if(duracao > 0){
-  const fimDate = new Date(new Date(now).getTime() + duracao * 60000);
+if(minutos > 0){
+  const fimDate = new Date(new Date(now).getTime() + minutos * 60000);
 
   const yyyy = fimDate.getFullYear();
   const mm = String(fimDate.getMonth()+1).padStart(2,'0');
@@ -1006,7 +1007,8 @@ let payload = {
   nome,
   tipo,
   inicio: now,
-  fim
+  fim,
+  duracao: duracao
 };
 
   const { error } = await client
