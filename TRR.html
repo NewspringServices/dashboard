@@ -1089,7 +1089,7 @@ producaoPanel.style.display = "block";
     fim: formatarDataHoraLocal(fimDataHora),
     duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
   }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
-
+await atualizarRegistosHoje();
   registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
   btnTerm.style.display = "none";
   btnSub.style.display = "inline-block";
@@ -1147,7 +1147,7 @@ btnSub.onclick = async () => {
           fim: formatarDataHoraLocal(fimDataHora),
           duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
         }, "BPO_registosNSS");
-
+await atualizarRegistosHoje();
         registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
         btnTerm.style.display = "none";
         btnSub.style.display = "inline-block";
