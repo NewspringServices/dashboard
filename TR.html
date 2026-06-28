@@ -1120,15 +1120,21 @@ producaoPanel.style.display = "block";
     btnTerm.onclick = async () => {
   fimDataHora = new Date();
 
-  await enviarAoSupabase({
+
+await enviarAoSupabase({
     data: dataHoje,
     user,
     nome,
     tipo: tipoSelecionado,
     inicio: formatarDataHoraLocal(inicioDataHora),
-    fim: formatarDataHoraLocal(fimDataHora),
-    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
-  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
+
+await atualizarRegistosHoje();   // Atualiza Login/Logout imediatamente
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
 await atualizarRegistosHoje();
   registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
   btnTerm.style.display = "none";
@@ -1158,17 +1164,20 @@ btnSub.onclick = async () => {
         return;
       }
 
-      await enviarAoSupabase({
-        data: dataHoje,
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: null,
-        duracao: null
-      }, "BPO_registosNSS");
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-      btnSub.disabled = true;
+await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
+
+await atualizarRegistosHoje();
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
 
     } else {
       registrarHistorico(tipoSelecionado, inicioDataHora);
