@@ -6,339 +6,793 @@
 <title>Dashboard Newspring</title>
 <style>
 
-:root {
-  --primary: #0b1f5e;
-  --success: #2e7d32;
-  --warning: #f59e0b;
-  --danger: #d50000;
-  --bg: #f6f7fb;
-  --card: #ffffff;
-  --text: #1f2937;
-  --border: #e6e8ef;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root{
+    
+
+--primary:#15803d;
+--primary-light:#22c55e;
+    --success:#16a34a;
+    --warning:#f59e0b;
+    --danger:#dc2626;
+
+    --sidebar:#166534;
+
+    --bg:#f4f7fb;
+    --card:#ffffff;
+
+    --text:#111827;
+    --text-light:#64748b;
+
+    --border:#e5e7eb;
+
+    --shadow:
+    0 10px 30px rgba(0,0,0,.06);
+
 }
 
-body {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  margin: 0;
-  background: linear-gradient(180deg, #f6fbf7 0%, #eef7f0 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-  color: var(--text);
-}
-/* CARDS (sidebar + form) */
-.sidebar,
-.form-container,
-.status-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 10px;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
 
-/* sombra leve só para dar “vida” */
-.sidebar,
-.form-container {
-  box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+body{
+
+    font-family:'Inter',sans-serif;
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    min-height:100vh;
+
 }
 
-/* SIDEBAR */
-.sidebar {
-  width: 100%;
-  max-width: 780px;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-sizing: border-box;
+.app{
+
+    display:flex;
+
+    min-height:100vh;
+
 }
 
-.sidebar-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar{
+
+    width:280px;
+
+    background:var(--sidebar);
+
+    color:white;
+
+    padding:30px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:space-between;
+
 }
 
-.avatar {
-  width: 60px;
-  height: 60px;
-  background: linear-gradient(135deg, var(--primary), #1f3a8a);
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  font-weight: 600;
-  font-size: 22px;
+.brand{
+
+    text-align:center;
+
+    margin-bottom:30px;
+
 }
 
-.nome {
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 4px;
+.brand img{
+
+    width:220px;
+
+    margin-bottom:15px;
+
 }
 
-.data {
-  font-size: 14px;
-  color: #6b7280;
+.brand h2{
+
+    font-size:22px;
+
+    font-weight:700;
+
 }
 
-/* HISTÓRICO */
-#historicoContainer {
-  flex-grow: 1;
-  overflow-y: auto;
-  max-height: calc(100vh - 250px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.user-card{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:15px;
+
+    padding:20px;
+
+    background:rgba(255,255,255,.05);
+
+    border-radius:16px;
+
+    margin-bottom:25px;
+
 }
 
-#historicoContainer img {
-  width: 380px;
-  height: 140px;
-  object-fit: contain;
-  margin-bottom: 12px;
-  opacity: 0.9;
+.avatar{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:50%;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--primary-light)
+    );
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:22px;
+
+    font-weight:700;
+
 }
 
-#historicoContainer h3 {
-  font-size: 14px;
-  margin: 8px 0;
-  color: #374151;
+nav{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
 }
 
-.historico-item {
-  font-size: 13px;
-  margin-bottom: 6px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: #f9fafb;
-  width: 100%;
+nav a{
+
+    padding:14px 18px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+    font-weight:500;
+
 }
 
-.historico-login { color: var(--success); }
-.historico-logout { color: var(--danger); }
-.historico-pausa,
-.historico-refeicao { color: var(--warning); }
-.historico-formacao { color: var(--primary); }
+nav a:hover{
 
-/* MAIN */
-.main {
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  box-sizing: border-box;
+    background:rgba(255,255,255,.08);
+
 }
 
-/* STATUS */
-.status-card {
-  border-left: 6px solid var(--danger);
-  padding: 14px;
-  margin-bottom: 12px;
-  text-align: center;
+nav .active{
+
+    background:rgba(59,130,246,.18);
+
 }
 
-#estadoLabel {
-  font-weight: 700;
+/* =========================
+   CONTENT
+========================= */
+
+.content{
+
+    flex:1;
+
+    padding:30px;
+
+    overflow:auto;
+
 }
 
-/* BOTÕES TIPO */
-#tipoButtons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
+.topbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
 }
 
-.tipo-btn {
-  padding: 12px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: #fff;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.topbar h1{
+
+    font-size:28px;
+
+    font-weight:700;
+
 }
 
-.tipo-btn:hover {
-  background: #f3f4f6;
+/* =========================
+   KPI
+========================= */
+
+.kpis{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+    margin-bottom:25px;
+
 }
 
-/* indicadores laterais mais suaves */
-[data-tipo="login"] { border-left: 4px solid var(--success); }
-[data-tipo="logout"] { border-left: 4px solid var(--danger); }
-[data-tipo^="pausa"],
-[data-tipo="refeicao"] { border-left: 4px solid var(--warning); }
-[data-tipo="formacao"] { border-left: 4px solid var(--primary); }
+.card{
 
-/* ACTIONS */
-.actions {
-  text-align: center;
-  margin-bottom: 20px;
+    background:var(--card);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:var(--shadow);
+
 }
 
-.actions button {
-  padding: 10px 18px;
-  border-radius: 6px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  margin-right: 6px;
+.card span{
+
+    color:var(--text-light);
+
+    font-size:13px;
+
 }
 
-#btnSubmeter {
-  background: var(--primary);
-  color: white;
+.card h2{
+
+    margin-top:10px;
+
+    font-size:30px;
+
 }
 
-#btnTerminar {
-  background: var(--danger);
-  color: white;
+/* =========================
+   PANELS
+========================= */
+
+.panel{
+
+    background:var(--card);
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:25px;
+
 }
 
-#mensagem {
-  margin-top: 8px;
-  font-weight: 600;
-  text-align: center;
-  color: var(--success);
+.panel h3{
+
+    margin-bottom:20px;
+
+    font-size:18px;
+
 }
 
-/* FORM */
-.form-container {
-  padding: 20px;
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
+.dashboard-grid{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:25px;
+
 }
 
-.titulo-gama {
-  text-align: center;
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--primary);
-  margin-bottom: 16px;
+/* =========================
+   STATUS CARD
+========================= */
+
+.status-card{
+
+    background:white;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    text-align:center;
+
+    border-left:6px solid var(--success);
+
+    margin-bottom:20px;
+
 }
 
-.form-group {
-  margin-bottom: 14px;
+#estadoLabel{
+
+    font-size:20px;
+
+    font-weight:700;
+
+}
+    
+    .card-presenca{
+    background:#ecfdf5;
+    border:1px solid #bbf7d0;
+    padding:16px;
+    min-height:110px;
 }
 
-.form-group label {
-  font-weight: 600;
-  margin-bottom: 4px;
-  display: block;
-  font-size: 13px;
-}.form-group input,
-.form-group select {
-  display: flex;
-  align-items: center;
+.card-presenca span{
+    color:#166534;
+    font-weight:600;
+    font-size:13px;
+}
+
+.card-presenca h2{
+    margin-top:8px;
+    font-size:24px;
+    color:#15803d;
+    font-weight:700;
+}
+
+/* =========================
+   BOTÕES ESTADO
+========================= */
+
+#tipoButtons{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:12px;
+
+}
+
+.tipo-btn{
+
+    background:white;
+
+    border:1px solid var(--border);
+
+    padding:14px;
+
+    border-radius:12px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.2s;
+
+}
+
+.tipo-btn:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:
+    0 8px 20px rgba(0,0,0,.08);
+
+}
+
+/* =========================
+   ACTIONS
+========================= */
+
+.actions{
+
+    margin-top:20px;
+
+    display:flex;
+
+    gap:12px;
+
+}
+
+button{
+
+    border:none;
+
+    border-radius:12px;
+
+    padding:14px 22px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+#btnSubmeter,
+#startButton{
+
+    background:var(--primary);
+
+    color:white;
+
+}
+
+#btnTerminar,
+#endButton{
+
+    background:var(--danger);
+
+    color:white;
+
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-container{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:20px;
+
+    box-shadow:var(--shadow);
+
+}
+
+.titulo-gama{
+
+    text-align:center;
+
+    margin-bottom:20px;
+
+    color:var(--primary);
+
+}
+
+.form-group{
+
+    margin-bottom:18px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:600;
+
+    font-size:14px;
+
 }
 
 input,
-select {
-  width: 100%;
-  padding: 12px;
-  height: 44px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  font-size: 14px;
-  box-sizing: border-box;
-  background: #fff;
+select{
+
+    width:100%;
+
+    height:48px;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    border:1px solid var(--border);
+
+    font-size:14px;
+
 }
+
 input:focus,
-select:focus {
-  border-color: var(--primary);
-  outline: none;
+select:focus{
+
+    outline:none;
+
+    border-color:var(--primary);
+
 }
 
-/* PRODUÇÃO */
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 14px;
-  gap: 8px;
+#tempoTarefa{
+
+    background:#f8fafc;
+
+    text-align:center;
+
+    font-weight:700;
+
 }
 
-.button-container button {
-  width: 48%;
-  padding: 10px 0;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+/* =========================
+   HISTÓRICO
+========================= */
+
+#historicoContainer{
+
+    display:flex;
+
+    flex-direction:column;
+
 }
 
-#startButton {
-  background: var(--success);
-  color: white;
+.historico-item{
+
+    padding:14px;
+
+    border-left:4px solid var(--primary);
+
+    background:#f8fafc;
+
+    border-radius:12px;
+
+    margin-bottom:10px;
+
+    font-size:14px;
+
 }
 
-#endButton {
-  background: var(--danger);
-  color: white;
+.historico-login{
+
+    border-left-color:var(--success);
+
 }
 
-#tempoTarefa {
-  text-align: center;
-  font-weight: 600;
-  background: #f3f4f6;
-  border-radius: 6px;
+.historico-logout{
+
+    border-left-color:var(--danger);
+
 }
 
-#responseMessage {
-  text-align: center;
-  margin-top: 12px;
-  font-weight: 600;
-  color: var(--success);
+.historico-pausa1,
+.historico-pausa2,
+.historico-refeicao{
+
+    border-left-color:var(--warning);
+
+}
+
+.historico-formacao{
+
+    border-left-color:var(--primary);
+
+}
+
+/* =========================
+   MENSAGENS
+========================= */
+
+#mensagem,
+#responseMessage{
+
+    margin-top:15px;
+
+    text-align:center;
+
+    font-weight:600;
+
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#cbd5e1;
+
+    border-radius:20px;
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:1000px){
+
+    .app{
+
+        flex-direction:column;
+
+    }
+
+    .sidebar{
+
+        width:100%;
+
+    }
+
+    .dashboard-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .content{
+
+        padding:15px;
+
+    }
+
+    .kpis{
+
+        grid-template-columns:1fr;
+
+
+
+    #tipoButtons{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .actions{
+
+        flex-direction:column;
+
+    }
+
+    button{
+
+        width:100%;
+
+    }
+
 }
 
 </style>
 </head>
-<body>>
+<body>
 
-<div class="sidebar">
-  <div class="sidebar-top">
-    <div style="display:flex; align-items:center;">
-      <div class="avatar" id="avatar">T</div>
-      <div>
-        <div class="nome" id="nomeUser"></div>
-        <div class="data" id="dataHoje"></div>
-      </div>
-    </div>
-  </div>
+<div class="app">
 
-  <div id="historicoContainer">
-    <img src="logo.png" alt="Logo">
-    <h3>Histórico de Ações</h3>
-    <div id="historicoList"></div>
-  </div>
+    <aside class="sidebar">
+
+        <div class="brand">
+            <img src="logo2.png" class="logo">
+            <h2>Newspring Services</h2>
+        </div>
+
+        <div class="user-card">
+            <div class="avatar" id="avatar">T</div>
+
+            <div>
+                <div class="nome" id="nomeUser"></div>
+                <div class="data" id="dataHoje"></div>
+            </div>
+        </div>
+
+        <nav>
+<nav>
+    <a class="menu-link active" data-tab="dashboard">Dashboard</a>
+
+</nav>           
+
+    </aside>
+
+    <main class="content">
+<div id="dashboardTab" class="tab-content">
+        <!-- KPIs -->
+        <section class="kpis">
+
+            <div class="card">
+                <span>Estado</span>
+                <h2 id="estadoLabel">ONLINE</h2>
+            </div>
+<div class="card">
+    <span>Documentos</span>
+    <h2 id="totalDocs">0</h2>
+
+    <a href="#" id="verDetalheDocs">Ver detalhe</a>
+
+    <div id="detalheDocs" style="
+        display:none;
+        margin-top:15px;
+        padding-top:12px;
+        border-top:1px solid #e5e7eb;
+        font-size:14px;
+        line-height:1.8;
+    "></div>
 </div>
 
-<div class="main">
-  <div class="status-card">
-    <div id="estadoLabel">🔴 OFFLINE</div>
-  </div>
+            <div class="card">
+                <span>Tarefas</span>
+                <h2 id="totalTarefas">0</h2>
+            </div>
 
-  <div id="tipoButtons">
-    <button class="tipo-btn" data-tipo="login">Login</button>
-    <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
-    <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
-    <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
-    <button class="tipo-btn" data-tipo="formacao">Formação/Meetings</button>
-    <button class="tipo-btn" data-tipo="logout">Logout</button>
-  </div>
+     <div class="card">
+    <span>Tempo Médio</span>
+    <h2 id="tempoHoje">00:00:00</h2>
+</div>
 
-  <div class="actions">
-    <button id="btnSubmeter" disabled>Submeter</button>
-    <button id="btnTerminar">Finalizar</button>
-    <div id="mensagem"></div>
-  </div>
+<div class="card">
+    <span>Tempo Ocupado</span>
+    <h2 id="tempoTotal">00:00:00</h2>
+</div>
 
+        </section>
+        <section class="kpis">
+
+<div class="card card-presenca">
+    <span>Login</span>
+    <h2 id="horaLogin">--:--</h2>
+</div>
+
+<div class="card card-presenca">
+    <span>Pausa 1</span>
+    <h2 id="tempoPausa1">00:00</h2>
+</div>
+
+<div class="card card-presenca">
+    <span>Pausa 2</span>
+    <h2 id="tempoPausa2">00:00</h2>
+</div>
+
+<div class="card card-presenca">
+    <span>Almoço</span>
+    <h2 id="tempoAlmoco">00:00</h2>
+</div>
+
+<div class="card card-presenca">
+    <span>Logout</span>
+    <h2 id="horaLogout">--:--</h2>
+</div>
+
+</section>
+
+        <!-- Estados -->
+   <section class="panel">
+
+    <h3>Gestão de Estado</h3>
+
+    <div id="tipoButtons">
+        <button class="tipo-btn" data-tipo="login">Login</button>
+        <button class="tipo-btn" data-tipo="pausa1">Pausa 1</button>
+        <button class="tipo-btn" data-tipo="pausa2">Pausa 2</button>
+        <button class="tipo-btn" data-tipo="refeicao">Refeição</button>
+        <button class="tipo-btn" data-tipo="formacao">Formação/Meetings</button>
+        <button class="tipo-btn" data-tipo="logout">Logout</button>
+    </div>
+
+    <div class="actions">
+        <button id="btnSubmeter" disabled>Submeter</button>
+        <button id="btnTerminar">Finalizar</button>
+    </div>
+
+</section>
+
+        <!-- Produção -->
+<section class="panel" id="producaoPanel">
   <div class="form-container">
     <h2 class="titulo-gama">Produção - Gestão Ocorrências</h2>
     <form id="gamaForm">
@@ -353,10 +807,12 @@ select:focus {
       <div class="form-group">
         <label>Tarefa Finalizada</label>
         <select id="tarefaFinalizada">
-                 <option>Auto-Aberturas</option>
+   <option>Auto-Aberturas</option>
         <option>Auto-Indexações</option>
         <option>Auto-Devolução de E-mail</option>
         <option>Erros/SPAMS</option>
+ 
+
         </select>
       </div>
       <div class="form-group">
@@ -370,17 +826,27 @@ select:focus {
       <div id="responseMessage"></div>
     </form>
   </div>
+        </section>
+
+        <!-- Histórico -->
+  <section class="panel">
+
+    <h3>Histórico</h3>
+
+    <div id="historicoList"></div>
+
+</section>
+
 </div>
+
 
 <script>
 // ================== Dados do Usuário ==================
  const user = "EX12704";
     const nome = "Sandra Maria Moreira Bento"; 
-
-
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-
+const producaoPanel = document.getElementById("producaoPanel");
 document.getElementById("nomeUser").textContent = nome;
 document.getElementById("avatar").textContent = nome.charAt(0).toUpperCase();
 document.getElementById("dataHoje").textContent = new Date().toLocaleDateString('pt-BR');
@@ -396,6 +862,157 @@ const btnTerm = document.getElementById("btnTerminar");
 const msgEl = document.getElementById("mensagem");
 const historicoList = document.getElementById("historicoList");
 let historicoContador = 0;
+
+
+
+function formatarDuracao(horasDecimais){
+
+    const totalSegundos = Math.round((horasDecimais || 0) * 3600);
+
+    const horas = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor((totalSegundos % 3600) / 60);
+    const segundos = totalSegundos % 60;
+
+    return `${String(horas).padStart(2,"0")}:${String(minutos).padStart(2,"0")}:${String(segundos).padStart(2,"0")}`;
+}
+
+async function atualizarRegistosHoje(){
+
+    const hoje = new Date().toISOString().split("T")[0];
+
+const url =
+`${SUPABASE_URL}/rest/v1/BPO_registosNSS?` +
+`user=eq.${user}` +
+`&inicio=gte.${hoje}T00:00:00` +
+`&inicio=lte.${hoje}T23:59:59` +
+`&select=tipo,inicio,duracao`;
+    const res = await fetch(url,{
+        headers:{
+            apikey:SUPABASE_API_KEY,
+            Authorization:`Bearer ${SUPABASE_API_KEY}`
+        }
+    });
+
+    const dados = await res.json();
+console.log(dados);   // <-- aqui
+    let login = "--:--";
+    let logout = "--:--";
+    let pausa1 = 0;
+    let pausa2 = 0;
+    let almoco = 0;
+
+    dados.forEach(r=>{
+
+        if(r.tipo==="login" && login==="--:--"){
+            login = r.inicio.substring(11,16);
+        }
+
+        if(r.tipo==="pausa1"){
+            pausa1 += Number(r.duracao || 0);
+        }
+
+        if(r.tipo==="pausa2"){
+            pausa2 += Number(r.duracao || 0);
+        }
+
+        if(r.tipo==="refeicao"){
+            almoco += Number(r.duracao || 0);
+        }
+        if(r.tipo==="logout"){
+    logout = r.inicio.substring(11,16);
+}
+
+    });
+
+    document.getElementById("horaLogin").textContent = login;
+    document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1);
+    document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2);
+    document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco);
+document.getElementById("horaLogout").textContent = logout;
+}
+
+let dadosProducao = [];
+async function atualizarKPIs() {
+
+    const hoje = new Date().toISOString().split("T")[0];
+
+    try {
+
+        const url =
+        `${SUPABASE_URL}/rest/v1/BPO_dadosprodução?` +
+        `colaborador=eq.${encodeURIComponent(nome)}` +
+        `&inicio=gte.${hoje}T00:00:00` +
+        `&inicio=lte.${hoje}T23:59:59` +
+        `&select=Documentos,tempo,tarefaFinalizada`;
+
+        const res = await fetch(url,{
+            headers:{
+                apikey: SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+
+        const dados = await res.json();
+dadosProducao = dados;
+        let totalDocs = 0;
+        let totalSegundos = 0;
+
+        dados.forEach(item => {
+
+            totalDocs += Number(item.Documentos || 0);
+
+            if(item.tempo){
+
+                const partes = item.tempo.split(":");
+
+                const horas = Number(partes[0] || 0);
+                const minutos = Number(partes[1] || 0);
+                const segundos = Number(partes[2] || 0);
+
+                totalSegundos +=
+                    horas * 3600 +
+                    minutos * 60 +
+                    segundos;
+            }
+
+        });
+
+        document.getElementById("totalDocs").textContent =
+            totalDocs;
+
+        document.getElementById("totalTarefas").textContent =
+            dados.length;
+
+        // MÉDIA POR TAREFA
+
+        let mediaSegundos =
+            dados.length > 0
+            ? Math.round(totalSegundos / dados.length)
+            : 0;
+
+        const h = String(Math.floor(mediaSegundos / 3600)).padStart(2,"0");
+        const m = String(Math.floor((mediaSegundos % 3600) / 60)).padStart(2,"0");
+        const s = String(mediaSegundos % 60).padStart(2,"0");
+
+        document.getElementById("tempoHoje").textContent =
+            `${h}:${m}:${s}`;
+// TEMPO OCUPADO (TOTAL)
+const totalH = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
+const totalM = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
+const totalS = String(totalSegundos % 60).padStart(2,"0");
+
+document.getElementById("tempoTotal").textContent =
+    `${totalH}:${totalM}:${totalS}`;
+    } catch(err){
+
+        console.error(err);
+
+    }
+
+}
+
+atualizarKPIs();
+atualizarRegistosHoje();
 
 function formatarDataHoraLocal(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")+"T"+
@@ -475,6 +1092,16 @@ async function enviarAoSupabase(dados, table, feedbackEl){
 document.querySelectorAll(".tipo-btn").forEach(btn => {
   btn.onclick = () => {
     tipoSelecionado = btn.dataset.tipo;
+    if (
+tipoSelecionado === "pausa1" ||
+tipoSelecionado === "pausa2" ||
+tipoSelecionado === "refeicao"
+){
+producaoPanel.style.display = "none";
+} else {
+producaoPanel.style.display = "block";
+}
+
     inicioDataHora = new Date();
     fimDataHora = null;
     btnSub.disabled = false;
@@ -484,6 +1111,7 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
 
     if(tipoSelecionado === "login"){
       estadoLabel.textContent = "🟢 ONLINE";
+      
     } else if(tipoSelecionado === "logout"){
       estadoLabel.textContent = "🔴 OFFLINE";
     } else {
@@ -493,21 +1121,28 @@ document.querySelectorAll(".tipo-btn").forEach(btn => {
     btnTerm.onclick = async () => {
   fimDataHora = new Date();
 
-  await enviarAoSupabase({
+
+await enviarAoSupabase({
     data: dataHoje,
     user,
     nome,
     tipo: tipoSelecionado,
     inicio: formatarDataHoraLocal(inicioDataHora),
-    fim: formatarDataHoraLocal(fimDataHora),
-    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
-  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
 
+await atualizarRegistosHoje();   // Atualiza Login/Logout imediatamente
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
+await atualizarRegistosHoje();
   registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
   btnTerm.style.display = "none";
   btnSub.style.display = "inline-block";
   btnSub.disabled = true;
   estadoLabel.textContent = "🟢 ONLINE";
+  producaoPanel.style.display = "block";
   document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
 };
 
@@ -530,17 +1165,20 @@ btnSub.onclick = async () => {
         return;
       }
 
-      await enviarAoSupabase({
-        data: dataHoje,
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: null,
-        duracao: null
-      }, "BPO_registosNSS");
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-      btnSub.disabled = true;
+await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
+
+await atualizarRegistosHoje();
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
 
     } else {
       registrarHistorico(tipoSelecionado, inicioDataHora);
@@ -559,12 +1197,13 @@ btnSub.onclick = async () => {
           fim: formatarDataHoraLocal(fimDataHora),
           duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
         }, "BPO_registosNSS");
-
+await atualizarRegistosHoje();
         registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
         btnTerm.style.display = "none";
         btnSub.style.display = "inline-block";
         btnSub.disabled = true;
         estadoLabel.textContent = "🟢 ONLINE";
+        producaoPanel.style.display = "block";
         document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
       };
     }
@@ -621,6 +1260,7 @@ endBtn.onclick = async ()=>{
       tempo: formatHHMMSS(duracaoMS)
     }, "BPO_dadosprodução");
     responseMessage.textContent="✅ Tarefa finalizada e enviada!";
+    await atualizarKPIs();
   }catch(err){
     responseMessage.textContent="❌ Erro ao enviar: "+err.message;
   }
@@ -642,10 +1282,39 @@ clearInterval(intervalTarefa);
 intervalTarefa = null;
 
 };
+document.getElementById("verDetalheDocs").onclick = function(e){
+
+    e.preventDefault();
+
+    const detalhe = document.getElementById("detalheDocs");
+
+    // Fecha se já estiver aberto
+    if (detalhe.style.display === "block") {
+        detalhe.style.display = "none";
+        return;
+    }
+
+    let resumo = {};
+
+    dadosProducao.forEach(item => {
+        const tarefa = item.tarefaFinalizada || "Sem tarefa";
+        resumo[tarefa] = (resumo[tarefa] || 0) + Number(item.Documentos || 0);
+    });
+
+    let html = "";
+
+    for (const tarefa in resumo) {
+        html += `
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+                <span>${tarefa}</span>
+                <strong>${resumo[tarefa]}</strong>
+            </div>
+        `;
+    }
+
+    detalhe.innerHTML = html;
+    detalhe.style.display = "block";
+};
+
+
 </script>
-
-
-
-
-
-</div></body></html>
