@@ -763,6 +763,11 @@ select:focus{
     <h2 id="tempoAlmoco">00:00</h2>
 </div>
 
+<div class="card card-presenca">
+    <span>Logout</span>
+    <h2 id="horaLogout">--:--</h2>
+</div>
+
 </section>
 
         <!-- Estados -->
@@ -890,6 +895,7 @@ const url =
     const dados = await res.json();
 console.log(dados);   // <-- aqui
     let login = "--:--";
+    let logout = "--:--";
     let pausa1 = 0;
     let pausa2 = 0;
     let almoco = 0;
@@ -911,6 +917,9 @@ console.log(dados);   // <-- aqui
         if(r.tipo==="refeicao"){
             almoco += Number(r.duracao || 0);
         }
+        if(r.tipo==="logout"){
+    logout = r.inicio.substring(11,16);
+}
 
     });
 
@@ -918,7 +927,7 @@ console.log(dados);   // <-- aqui
     document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1);
     document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2);
     document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco);
-
+document.getElementById("horaLogout").textContent = logout;
 }
 
 let dadosProducao = [];
