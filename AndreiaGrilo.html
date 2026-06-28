@@ -763,6 +763,11 @@ select:focus{
     <h2 id="tempoAlmoco">00:00</h2>
 </div>
 
+<div class="card card-presenca">
+    <span>Logout</span>
+    <h2 id="horaLogout">--:--</h2>
+</div>
+
 </section>
 
         <!-- Estados -->
@@ -802,7 +807,7 @@ select:focus{
       <div class="form-group">
         <label>Tarefa Finalizada</label>
         <select id="tarefaFinalizada">
-   <option>Auto-Aberturas</option>
+          <option>Auto-Aberturas</option>
         <option>Auto-Indexações</option>
         <option>Auto-Devolução de E-mail</option>
         
@@ -892,6 +897,7 @@ const url =
     const dados = await res.json();
 console.log(dados);   // <-- aqui
     let login = "--:--";
+    let logout = "--:--";
     let pausa1 = 0;
     let pausa2 = 0;
     let almoco = 0;
@@ -913,6 +919,9 @@ console.log(dados);   // <-- aqui
         if(r.tipo==="refeicao"){
             almoco += Number(r.duracao || 0);
         }
+        if(r.tipo==="logout"){
+    logout = r.inicio.substring(11,16);
+}
 
     });
 
@@ -920,7 +929,7 @@ console.log(dados);   // <-- aqui
     document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1);
     document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2);
     document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco);
-
+document.getElementById("horaLogout").textContent = logout;
 }
 
 let dadosProducao = [];
@@ -1113,15 +1122,21 @@ producaoPanel.style.display = "block";
     btnTerm.onclick = async () => {
   fimDataHora = new Date();
 
-  await enviarAoSupabase({
+
+await enviarAoSupabase({
     data: dataHoje,
     user,
     nome,
     tipo: tipoSelecionado,
     inicio: formatarDataHoraLocal(inicioDataHora),
-    fim: formatarDataHoraLocal(fimDataHora),
-    duracao: parseFloat(((fimDataHora - inicioDataHora)/3600000).toFixed(3))
-  }, "BPO_registosNSS", msgEl); // <--- Passa msgEl aqui
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
+
+await atualizarRegistosHoje();   // Atualiza Login/Logout imediatamente
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
 await atualizarRegistosHoje();
   registrarHistorico(tipoSelecionado, inicioDataHora, fimDataHora);
   btnTerm.style.display = "none";
@@ -1151,17 +1166,20 @@ btnSub.onclick = async () => {
         return;
       }
 
-      await enviarAoSupabase({
-        data: dataHoje,
-        user,
-        nome,
-        tipo: tipoSelecionado,
-        inicio: formatarDataHoraLocal(inicioDataHora),
-        fim: null,
-        duracao: null
-      }, "BPO_registosNSS");
-      registrarHistorico(tipoSelecionado, inicioDataHora);
-      btnSub.disabled = true;
+await enviarAoSupabase({
+    data: dataHoje,
+    user,
+    nome,
+    tipo: tipoSelecionado,
+    inicio: formatarDataHoraLocal(inicioDataHora),
+    fim: null,
+    duracao: null
+}, "BPO_registosNSS");
+
+await atualizarRegistosHoje();
+
+registrarHistorico(tipoSelecionado, inicioDataHora);
+btnSub.disabled = true;
 
     } else {
       registrarHistorico(tipoSelecionado, inicioDataHora);
