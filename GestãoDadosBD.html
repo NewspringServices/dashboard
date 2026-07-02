@@ -292,6 +292,7 @@ tbody tr:hover{
 <div class="tabs">
   <div class="tab active" onclick="showTab(0)">📅 Planeamento</div>
   <div class="tab" onclick="showTab(1)">📋 Gestão de Registos</div>
+  <div class="tab" onclick="showTab(2)">📊 Consulta Produção</div>
 </div>
 
 <!-- ================= PLANEAMENTO ================= -->
@@ -345,6 +346,43 @@ tbody tr:hover{
 
 </div>
 
+<div class="view" id="view2">
+
+    <h3>📊 Consulta Produção</h3>
+
+    <input
+        id="prodNome"
+        placeholder="Nome..."
+    >
+
+    <input
+        type="date"
+        id="prodData"
+    >
+
+    <button onclick="pesquisarProducao()">
+        🔍 Pesquisar
+    </button>
+
+    <table>
+ <thead>
+<tr>
+    <th>Data</th>
+    <th>Colaborador</th>
+    <th>Processo</th>
+    <th>Documentos</th>
+    <th>Tarefa</th>
+    <th>Tempo</th>
+</tr>
+</thead>
+
+        <tbody id="producaoTable"></tbody>
+
+    </table>
+
+</div>
+
+
 <script>
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
@@ -388,6 +426,61 @@ async function loadPlaneamento(){
 
   planeamentoData = data || [];
   renderPlaneamento();
+}
+
+async function pesquisarProducao(){
+
+    const nome = document.getElementById("prodNome").value.trim();
+    const data = document.getElementById("prodData").value;
+
+let query = client
+    .from("BPO_dadosprodução")
+    .select("id,inicio,colaborador,processoGama,Documentos,tarefaFinalizada,tempo")
+    .limit(1000);
+
+    if(nome){
+        query = query.ilike("colaborador", `%${nome}%`);
+    }
+
+    // filtrar pela data de início
+    if(data){
+        query = query.gte("inicio", data + "T00:00:00")
+                     .lt("inicio", data + "T23:59:59");
+    }
+
+    const { data: resultado, error } = await query;
+
+    if(error){
+        console.error(error);
+        alert(error.message);
+        return;
+    }
+
+    const tbody = document.getElementById("producaoTable");
+    tbody.innerHTML = "";
+
+    resultado.forEach(r => {
+
+        tbody.innerHTML += `
+        <tr>
+            <td>${new Date(r.inicio).toLocaleDateString('pt-PT')}</td>
+            <td>${r.colaborador}</td>
+            <td>${r.processoGama}</td>
+            
+            <td>
+    <input
+        type="number"
+        value="${r.Documentos ?? ''}"
+        style="width:70px"
+        onchange="atualizarDocumentos('${r.id}', this.value)"
+    >
+</td>
+
+            <td>${r.tarefaFinalizada}</td>
+            <td>${r.tempo}</td>
+        </tr>`;
+    });
+
 }
 
 async function saveToSupabase(){
@@ -440,6 +533,22 @@ function goGestaoEquipa(){
 
 function goGestaoProducoes(){
   window.location.href = "GestãoProduçõesBPO.html";
+}
+
+
+async function atualizarDocumentos(id, valor){
+
+    const { error } = await client
+        .from("BPO_dadosprodução")
+        .update({
+            Documentos: Number(valor)
+        })
+        .eq("id", id);
+
+    if(error){
+        console.error(error);
+        alert(error.message);
+    }
 }
 
 /* ================= EXCEL ================= */
