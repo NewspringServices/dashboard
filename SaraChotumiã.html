@@ -1248,9 +1248,13 @@ endBtn.onclick = async ()=>{
   const processo = document.getElementById("processoGama").value;
   const docs = document.getElementById("documentos").value;
   const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
-const processo = document.getElementById("processoGama").value;
-const docs = document.getElementById("documentos").value;
-const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
+const numDocs = parseInt(docs, 10);
+
+if (isNaN(numDocs) || numDocs < 1 || numDocs > 100) {
+    responseMessage.textContent = "❌ O número de documentos deve estar entre 1 e 100.";
+    document.getElementById("documentos").focus();
+    return;
+}
   try{
     await enviarAoSupabase({
       tipologiaPuxada:"",
