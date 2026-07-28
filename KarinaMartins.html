@@ -1246,7 +1246,9 @@ endBtn.onclick = async ()=>{
   const processo = document.getElementById("processoGama").value;
   const docs = document.getElementById("documentos").value;
   const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
-
+const processo = document.getElementById("processoGama").value;
+const docs = document.getElementById("documentos").value;
+const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
   try{
     await enviarAoSupabase({
       tipologiaPuxada:"",
@@ -1254,8 +1256,8 @@ endBtn.onclick = async ()=>{
       fim: formatarDataHoraLocal(fim),
       colaborador: nome,
       processoGama: processo || "",
-      Documentos: parseInt(docs)||0,
-      tarefaFinalizada: tarefaFinalizada,
+Documentos: numDocs,
+        tarefaFinalizada: tarefaFinalizada,
       tempo: formatHHMMSS(duracaoMS)
     }, "BPO_dadosprodução");
     responseMessage.textContent="✅ Tarefa finalizada e enviada!";
