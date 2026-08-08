@@ -878,61 +878,8 @@ function formatarDuracao(horasDecimais){
 
     return `${String(horas).padStart(2,"0")}:${String(minutos).padStart(2,"0")}:${String(segundos).padStart(2,"0")}`;
 }
+async function atualizarRegistosHoje(){ const hoje = new Date().toISOString().split("T")[0]; const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?` + `user=eq.${encodeURIComponent(user)}` + `&inicio=gte.${hoje}T00:00:00` + `&inicio=lte.${hoje}T23:59:59` + `&select=tipo,inicio,duracao` + `&order=inicio.asc`; try{ const res = await fetch(url,{ headers:{ apikey:SUPABASE_API_KEY, Authorization:`Bearer ${SUPABASE_API_KEY}` } }); if(!res.ok){ throw new Error("Erro ao carregar registos"); } const dados = await res.json(); console.log("Registos de hoje:", dados); /* ========================= LOGIN - TODOS ========================= */ const logins = dados .filter(r => r.tipo === "login") .map(r => r.inicio.substring(11,16)); /* ========================= LOGOUT - TODOS ========================= */ const logouts = dados .filter(r => r.tipo === "logout") .map(r => r.inicio.substring(11,16)); /* ========================= PAUSAS ========================= */ let pausa1 = 0; let pausa2 = 0; let almoco = 0; dados.forEach(r => { if(r.tipo === "pausa1"){ pausa1 += Number(r.duracao || 0); } if(r.tipo === "pausa2"){ pausa2 += Number(r.duracao || 0); } if(r.tipo === "refeicao"){ almoco += Number(r.duracao || 0); } }); /* ========================= MOSTRAR TODOS OS LOGINS ========================= */ document.getElementById("horaLogin").innerHTML = logins.length ? logins.join("<br>") : "--:--"; /* ========================= MOSTRAR TODOS OS LOGOUTS ========================= */ document.getElementById("horaLogout").innerHTML = logouts.length ? logouts.join("<br>") : "--:--"; /* ========================= PAUSAS / REFEIÇÃO ========================= */ document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1); document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2); document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco); }catch(err){ console.error( "Erro ao atualizar registos de hoje:", err ); } }
 
-async function atualizarRegistosHoje(){
-
-    const hoje = new Date().toISOString().split("T")[0];
-
-const url =
-`${SUPABASE_URL}/rest/v1/BPO_registosNSS?` +
-`user=eq.${user}` +
-`&inicio=gte.${hoje}T00:00:00` +
-`&inicio=lte.${hoje}T23:59:59` +
-`&select=tipo,inicio,duracao`;
-    const res = await fetch(url,{
-        headers:{
-            apikey:SUPABASE_API_KEY,
-            Authorization:`Bearer ${SUPABASE_API_KEY}`
-        }
-    });
-
-    const dados = await res.json();
-console.log(dados);   // <-- aqui
-    let login = "--:--";
-    let logout = "--:--";
-    let pausa1 = 0;
-    let pausa2 = 0;
-    let almoco = 0;
-
-    dados.forEach(r=>{
-
-        if(r.tipo==="login" && login==="--:--"){
-            login = r.inicio.substring(11,16);
-        }
-
-        if(r.tipo==="pausa1"){
-            pausa1 += Number(r.duracao || 0);
-        }
-
-        if(r.tipo==="pausa2"){
-            pausa2 += Number(r.duracao || 0);
-        }
-
-        if(r.tipo==="refeicao"){
-            almoco += Number(r.duracao || 0);
-        }
-        if(r.tipo==="logout"){
-    logout = r.inicio.substring(11,16);
-}
-
-    });
-
-    document.getElementById("horaLogin").textContent = login;
-    document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1);
-    document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2);
-    document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco);
-document.getElementById("horaLogout").textContent = logout;
-}
 
 let dadosProducao = [];
 async function atualizarKPIs() {
