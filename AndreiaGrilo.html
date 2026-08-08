@@ -9,6 +9,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root{
+
     
 
 --primary:#15803d;
@@ -807,12 +808,13 @@ select:focus{
       <div class="form-group">
         <label>Tarefa Finalizada</label>
         <select id="tarefaFinalizada">
-          <option>Auto-Aberturas</option>
+                     <option>Auto-Aberturas</option>
         <option>Auto-Indexações</option>
+                    <option>Auto-Indexações MIB</option>
+
         <option>Auto-Devolução de E-mail</option>
-           <option>Auto-Indexações MIB</option>
         <option>Erros/SPAMS</option>
-                <option>DNP</option>
+                    <option>DNP</option>
 
         </select>
       </div>
@@ -843,8 +845,8 @@ select:focus{
 
 <script>
 // ================== Dados do Usuário ==================
-   const user = "EX10677";
-    const nome = "Andreia Sofia Figueiredo Grilo";
+ const user = "EX10677";
+const nome = "Andreia Sofia Figueiredo Grilo";
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 const producaoPanel = document.getElementById("producaoPanel");
@@ -878,45 +880,6 @@ function formatarDuracao(horasDecimais){
 }
 
 async function atualizarRegistosHoje(){ const hoje = new Date().toISOString().split("T")[0]; const url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?` + `user=eq.${encodeURIComponent(user)}` + `&inicio=gte.${hoje}T00:00:00` + `&inicio=lte.${hoje}T23:59:59` + `&select=tipo,inicio,duracao` + `&order=inicio.asc`; try{ const res = await fetch(url,{ headers:{ apikey:SUPABASE_API_KEY, Authorization:`Bearer ${SUPABASE_API_KEY}` } }); if(!res.ok){ throw new Error("Erro ao carregar registos"); } const dados = await res.json(); console.log("Registos de hoje:", dados); /* ========================= LOGIN - TODOS ========================= */ const logins = dados .filter(r => r.tipo === "login") .map(r => r.inicio.substring(11,16)); /* ========================= LOGOUT - TODOS ========================= */ const logouts = dados .filter(r => r.tipo === "logout") .map(r => r.inicio.substring(11,16)); /* ========================= PAUSAS ========================= */ let pausa1 = 0; let pausa2 = 0; let almoco = 0; dados.forEach(r => { if(r.tipo === "pausa1"){ pausa1 += Number(r.duracao || 0); } if(r.tipo === "pausa2"){ pausa2 += Number(r.duracao || 0); } if(r.tipo === "refeicao"){ almoco += Number(r.duracao || 0); } }); /* ========================= MOSTRAR TODOS OS LOGINS ========================= */ document.getElementById("horaLogin").innerHTML = logins.length ? logins.join("<br>") : "--:--"; /* ========================= MOSTRAR TODOS OS LOGOUTS ========================= */ document.getElementById("horaLogout").innerHTML = logouts.length ? logouts.join("<br>") : "--:--"; /* ========================= PAUSAS / REFEIÇÃO ========================= */ document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1); document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2); document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco); }catch(err){ console.error( "Erro ao atualizar registos de hoje:", err ); } }
-
-
-    const dados = await res.json();
-console.log(dados);   // <-- aqui
-    let login = "--:--";
-    let logout = "--:--";
-    let pausa1 = 0;
-    let pausa2 = 0;
-    let almoco = 0;
-
-    dados.forEach(r=>{
-
-        if(r.tipo==="login" && login==="--:--"){
-            login = r.inicio.substring(11,16);
-        }
-
-        if(r.tipo==="pausa1"){
-            pausa1 += Number(r.duracao || 0);
-        }
-
-        if(r.tipo==="pausa2"){
-            pausa2 += Number(r.duracao || 0);
-        }
-
-        if(r.tipo==="refeicao"){
-            almoco += Number(r.duracao || 0);
-        }
-        if(r.tipo==="logout"){
-    logout = r.inicio.substring(11,16);
-}
-
-    });
-
-    document.getElementById("horaLogin").textContent = login;
-    document.getElementById("tempoPausa1").textContent = formatarDuracao(pausa1);
-    document.getElementById("tempoPausa2").textContent = formatarDuracao(pausa2);
-    document.getElementById("tempoAlmoco").textContent = formatarDuracao(almoco);
-document.getElementById("horaLogout").textContent = logout;
-}
 
 let dadosProducao = [];
 async function atualizarKPIs() {
