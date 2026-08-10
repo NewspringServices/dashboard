@@ -3,9 +3,12 @@
 <head>
 
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>BPO</title>
+<title>Gestão Equipa BPO</title>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 
@@ -13,19 +16,33 @@
     margin:0;
     padding:0;
     box-sizing:border-box;
-    font-family:Arial,sans-serif;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+:root{
+    --verde:#2E7D32;
+    --verde2:#43A047;
+    --verde3:#66BB6A;
+    --verdeClaro:#E8F5E9;
+    --branco:#ffffff;
+    --cinza:#f4f7f6;
+    --texto:#263238;
 }
 
 body{
-    background:#f4f7f6;
+    background:var(--cinza);
+    color:var(--texto);
+    min-height:100vh;
 }
 
-/* MENU PRINCIPAL */
 
-.top-menu{
+/* =========================
+   TOPO
+========================= */
 
-    width:100%;
-    height:65px;
+.topbar{
+
+    height:70px;
 
     background:linear-gradient(
         135deg,
@@ -34,97 +51,254 @@ body{
     );
 
     display:flex;
+
     align-items:center;
 
     padding:0 25px;
 
-    box-shadow:0 3px 12px rgba(0,0,0,.15);
+    box-shadow:
+        0 4px 15px rgba(0,0,0,.15);
 
+    position:relative;
+
+    z-index:1000;
 }
+
+
+/* LOGO / TÍTULO */
 
 .logo{
 
     color:white;
+
     font-size:21px;
-    font-weight:bold;
+
+    font-weight:700;
 
     margin-right:40px;
 
+    white-space:nowrap;
 }
 
-.menu-buttons{
+
+/* =========================
+   SEPARADORES
+========================= */
+
+.tabs{
 
     display:flex;
+
+    height:100%;
+
+    align-items:center;
+
     gap:8px;
 }
 
-.menu-buttons button{
 
-    background:transparent;
+.tab{
+
+    height:44px;
+
+    padding:0 25px;
 
     border:none;
 
+    border-radius:9px;
+
+    background:rgba(255,255,255,.12);
+
     color:white;
-
-    padding:12px 22px;
-
-    border-radius:8px;
-
-    cursor:pointer;
 
     font-size:14px;
 
     font-weight:600;
 
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    transition:.25s;
+
+    box-shadow:none;
 }
 
-.menu-buttons button:hover{
 
-    background:rgba(255,255,255,.15);
+.tab:hover{
 
+    background:rgba(255,255,255,.22);
+
+    transform:none;
+
+    box-shadow:none;
 }
 
-.menu-buttons button.active{
+
+.tab.active{
 
     background:white;
-    color:#2E7D32;
 
+    color:var(--verde);
+
+    box-shadow:
+        0 3px 10px rgba(0,0,0,.15);
 }
 
-/* ÁREA DAS ABAS */
+
+/* =========================
+   ÁREA DE CONTEÚDO
+========================= */
 
 .conteudo{
 
     width:100%;
-    height:calc(100vh - 65px);
 
+    min-height:
+        calc(100vh - 70px);
 }
 
-/* CADA ABA */
+
+/* =========================
+   ABAS
+========================= */
 
 .aba{
 
     display:none;
 
     width:100%;
-    height:100%;
 
+    min-height:
+        calc(100vh - 70px);
 }
+
 
 .aba.active{
 
     display:block;
-
 }
 
-/* IFRAME */
 
-.aba iframe{
+/* =========================
+   MULTICARE
+========================= */
+
+#abaMulticare{
+
+    padding:30px;
+}
+
+
+.paginaMulticare{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:30px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,.08);
+}
+
+
+.paginaMulticare h1{
+
+    color:var(--verde);
+
+    margin-bottom:10px;
+}
+
+
+.paginaMulticare p{
+
+    color:#666;
+
+    margin-bottom:25px;
+}
+
+
+/* =========================
+   IFRAME FIDELIDADE
+========================= */
+
+#abaFidelidade{
+
+    background:white;
+}
+
+
+#abaFidelidade iframe{
 
     width:100%;
-    height:100%;
+
+    height:
+        calc(100vh - 70px);
 
     border:none;
+
+    display:block;
+}
+
+
+/* =========================
+   RESPONSIVO
+========================= */
+
+@media(max-width:700px){
+
+    .topbar{
+
+        padding:10px;
+
+        height:auto;
+
+        min-height:70px;
+
+        flex-wrap:wrap;
+
+        gap:10px;
+    }
+
+
+    .logo{
+
+        width:100%;
+
+        margin-right:0;
+
+        text-align:center;
+    }
+
+
+    .tabs{
+
+        width:100%;
+
+        justify-content:center;
+
+        height:50px;
+    }
+
+
+    .tab{
+
+        padding:0 15px;
+
+        font-size:13px;
+    }
+
+
+    #abaFidelidade iframe{
+
+        height:
+            calc(100vh - 120px);
+    }
 
 }
 
@@ -132,32 +306,45 @@ body{
 
 </head>
 
+
 <body>
 
 
-<!-- MENU -->
+<!-- =====================================================
+     TOPO / SEPARADORES
+===================================================== -->
 
-<div class="top-menu">
+<div class="topbar">
 
     <div class="logo">
-        BPO
+        <i class="fa fa-users"></i>
+        Gestão Equipa BPO
     </div>
 
-    <div class="menu-buttons">
+
+    <div class="tabs">
 
         <button
-            id="btnMulticare"
-            onclick="abrirAba('multicare')"
-            class="active"
-        >
+            id="tabMulticare"
+            class="tab active"
+            onclick="abrirAba('multicare')">
+
+            <i class="fa fa-chart-line"></i>
+
             BPO Multicare
+
         </button>
 
+
         <button
-            id="btnFidelidade"
-            onclick="abrirAba('fidelidade')"
-        >
+            id="tabFidelidade"
+            class="tab"
+            onclick="abrirAba('fidelidade')">
+
+            <i class="fa fa-building"></i>
+
             BPO Fidelidade
+
         </button>
 
     </div>
@@ -165,47 +352,72 @@ body{
 </div>
 
 
-<!-- CONTEÚDO -->
+
+<!-- =====================================================
+     CONTEÚDO
+===================================================== -->
 
 <div class="conteudo">
 
 
-    <!-- MULTICARE -->
+    <!-- =================================================
+         ABA MULTICARE
+    ================================================== -->
 
     <div
         id="abaMulticare"
-        class="aba active"
-    >
+        class="aba active">
 
-        <div style="
-            padding:40px;
-            text-align:center;
-        ">
+        <div class="paginaMulticare">
 
-            <h1>BPO Multicare</h1>
+            <h1>
+                BPO Multicare
+            </h1>
 
-            <p style="
-                margin-top:10px;
-                color:#666;
-            ">
-                Área Multicare
+            <p>
+                Gestão da equipa BPO Multicare.
             </p>
+
+
+            <!--
+                AQUI VAIS COLOCAR O HTML DO MULTICARE
+                QUANDO O TIVERES.
+
+                Por enquanto fica esta área.
+            -->
+
+
+            <div style="
+                background:#E8F5E9;
+                border-radius:10px;
+                padding:20px;
+                color:#2E7D32;
+                font-weight:600;
+            ">
+
+                <i class="fa fa-info-circle"></i>
+
+                Área BPO Multicare
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- FIDELIDADE -->
+
+    <!-- =================================================
+         ABA FIDELIDADE
+    ================================================== -->
 
     <div
         id="abaFidelidade"
-        class="aba"
-    >
+        class="aba">
 
         <iframe
-            src="fidelidade.html"
-            title="BPO Fidelidade">
+            src="GestãoEquipaBPOFID.html"
+            title="Gestão Equipa BPO Fidelidade">
         </iframe>
 
     </div>
@@ -214,54 +426,81 @@ body{
 </div>
 
 
+
 <script>
+
+
+/* =====================================================
+   ABRIR ABA
+===================================================== */
 
 function abrirAba(aba){
 
-    const multicare =
+    const abaMulticare =
         document.getElementById("abaMulticare");
 
-    const fidelidade =
+    const abaFidelidade =
         document.getElementById("abaFidelidade");
 
-    const btnMulticare =
-        document.getElementById("btnMulticare");
 
-    const btnFidelidade =
-        document.getElementById("btnFidelidade");
+    const tabMulticare =
+        document.getElementById("tabMulticare");
 
-
-    /* ESCONDER TUDO */
-
-    multicare.classList.remove("active");
-    fidelidade.classList.remove("active");
-
-    btnMulticare.classList.remove("active");
-    btnFidelidade.classList.remove("active");
+    const tabFidelidade =
+        document.getElementById("tabFidelidade");
 
 
-    /* ABRIR MULTICARE */
+    /* esconder todas */
+
+    abaMulticare.classList.remove("active");
+
+    abaFidelidade.classList.remove("active");
+
+
+    tabMulticare.classList.remove("active");
+
+    tabFidelidade.classList.remove("active");
+
+
+    /* abrir Multicare */
 
     if(aba === "multicare"){
 
-        multicare.classList.add("active");
-        btnMulticare.classList.add("active");
+        abaMulticare.classList.add("active");
+
+        tabMulticare.classList.add("active");
 
     }
 
 
-    /* ABRIR FIDELIDADE */
+    /* abrir Fidelidade */
 
     if(aba === "fidelidade"){
 
-        fidelidade.classList.add("active");
-        btnFidelidade.classList.add("active");
+        abaFidelidade.classList.add("active");
+
+        tabFidelidade.classList.add("active");
 
     }
 
 }
 
+
+/* =====================================================
+   INICIAR NA ABA MULTICARE
+===================================================== */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function(){
+
+        abrirAba("multicare");
+
+    }
+);
+
 </script>
+
 
 </body>
 </html>
