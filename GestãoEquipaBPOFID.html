@@ -460,6 +460,10 @@ canvas{
     <a onclick="mostrarRetificarProducao()">
         <i class="fa fa-pen-to-square"></i> Retificar Produção
     </a>
+
+    <a onclick="mostrarDadosMes()">
+        <i class="fa fa-calendar-days"></i> Dados do Mês
+    </a>
 </div> </div></div> 
 <div class="main">
 
@@ -1182,6 +1186,67 @@ canvas{
 
 </div>
 
+<div id="dadosMes" style="display:none;padding:25px;">
+
+    <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;">
+            <div>
+                <h3><i class="fa fa-calendar-days"></i> Dados do Mês</h3>
+                <div style="font-size:12px;color:#777;margin-top:4px;">Histórico diário da produção guardado no Supabase</div>
+            </div>
+
+            <div>
+                <label>Mês</label><br>
+                <input type="month" id="fMesDadosProducao" onchange="carregarDadosMes()">
+<span style="display:inline-block;margin-left:12px;">
+    <label for="fDataDadosMes" style="font-size:12px;color:#666;">Dia</label><br>
+    <input
+        type="date"
+        id="fDataDadosMes"
+        onchange="carregarDadosMes()"
+        style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;"
+    >
+</span>
+
+            </div>
+
+            <div>
+                <label>Área</label><br>
+                <select id="fAreaDadosMes" onchange="carregarDadosMes()">
+                    <option value="">Todas as áreas</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="limparFiltrosDadosMes()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+
+            <button type="button" onclick="exportarDadosMesExcel()">
+                <i class="fa fa-file-excel"></i> Exportar Excel
+            </button>
+        </div>
+
+        <div id="cardsDadosMes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;margin:20px 0;"></div>
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;min-width:700px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo de Tarefa / Área</th>
+                        <th>Documentos</th>
+                        <th>Tarefas</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDadosMesBody"></tbody>
+            </table>
+        </div>
+
+        <div id="mensagemDadosMes" style="margin-top:15px;color:#777;font-size:12px;"></div>
+    </div>
+
+</div>
+
 <div id="retificarProducao" style="display:none;padding:25px;">
 
     <div class="panel">
@@ -1286,6 +1351,7 @@ const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 function mostrarPlaneamento(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("logins").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -1367,6 +1433,7 @@ function limparFiltrosLogins(){
 function mostrarPlataformas(){
 
        document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
     document.getElementById("logins").style.display="none";
@@ -1571,6 +1638,7 @@ Portal Newspring
 function mostrarForcarRegistos(){
 
       document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -1592,6 +1660,7 @@ function mostrarForcarRegistos(){
 function mostrarAlertas(){
 
      document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -1615,6 +1684,7 @@ function mostrarAlertas(){
 function mostrarEliminarRegistos(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -1637,6 +1707,7 @@ function mostrarEliminarRegistos(){
 function abrirRelatorioOcupacao(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
     document.getElementById("logins").style.display="none";
@@ -1655,6 +1726,7 @@ function abrirRelatorioOcupacao(){
 
 function mostrarLogins(){
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -1763,12 +1835,29 @@ async function carregarPlaneamentoDia(){
         function badgeLogin(nome){
 
             const nomeNormalizado = normalizarNome(nome);
-
             const lista = mapaRegistos[nomeNormalizado] || [];
 
+            /*
+             * IMPORTANTE:
+             * Pausas/refeição não significam que a pessoa fez logout.
+             * Para o Planeamento do Dia só interessam os eventos Login
+             * e Logout. Assim, se houve Login e depois uma pausa,
+             * continua a aparecer como Logado.
+             */
+            const estadosLogin = lista
+                .filter(r => {
+                    const tipo = (r.tipo || "")
+                        .toString()
+                        .trim()
+                        .toLowerCase();
 
-            if(!lista.length){
+                    return tipo === "login" || tipo === "logout";
+                })
+                .sort((a,b) =>
+                    new Date(a.inicio || 0) - new Date(b.inicio || 0)
+                );
 
+            if(!estadosLogin.length){
                 return `
                     <span style="
                         float:right;
@@ -1781,35 +1870,26 @@ async function carregarPlaneamentoDia(){
                         🔴 Sem Login
                     </span>
                 `;
-
             }
 
-
-            lista.sort((a,b) =>
-                new Date(a.inicio) - new Date(b.inicio)
-            );
-
-
-            const ultimo = lista[lista.length - 1];
+            const ultimo = estadosLogin[estadosLogin.length - 1];
 
             const tipo = (ultimo.tipo || "")
                 .toString()
                 .trim()
                 .toLowerCase();
 
+            const hora = ultimo.inicio
+                ? new Date(ultimo.inicio).toLocaleTimeString(
+                    "pt-PT",
+                    {
+                        hour:"2-digit",
+                        minute:"2-digit"
+                    }
+                )
+                : "";
 
             if(tipo === "login"){
-
-                const hora = ultimo.inicio
-                    ? new Date(ultimo.inicio).toLocaleTimeString(
-                        "pt-PT",
-                        {
-                            hour:"2-digit",
-                            minute:"2-digit"
-                        }
-                    )
-                    : "";
-
                 return `
                     <span style="
                         float:right;
@@ -1822,22 +1902,9 @@ async function carregarPlaneamentoDia(){
                         🟢 ${hora}
                     </span>
                 `;
-
             }
 
-
             if(tipo === "logout"){
-
-                const hora = ultimo.inicio
-                    ? new Date(ultimo.inicio).toLocaleTimeString(
-                        "pt-PT",
-                        {
-                            hour:"2-digit",
-                            minute:"2-digit"
-                        }
-                    )
-                    : "";
-
                 return `
                     <span style="
                         float:right;
@@ -1850,9 +1917,7 @@ async function carregarPlaneamentoDia(){
                         🟡 Logout ${hora}
                     </span>
                 `;
-
             }
-
 
             return `
                 <span style="
@@ -1866,7 +1931,6 @@ async function carregarPlaneamentoDia(){
                     🔴 Sem Login
                 </span>
             `;
-
         }
 
 
@@ -2081,6 +2145,7 @@ function togglePlaneamento(){
 function mostrarPlaneamentoDia(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display="none";
@@ -2105,6 +2170,7 @@ function mostrarPlaneamentoDia(){
 function abrirRelatorioTempos(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display="none";
@@ -2118,6 +2184,396 @@ document.getElementById("planeamentoMes").style.display="none";
 
 }
 
+
+async function guardarProducaoDia(producao, data){
+
+    try{
+
+        const dataGuardar = data || new Date().toISOString().slice(0,10);
+
+        // IMPORTANTE:
+        // O histórico mensal tem de usar exatamente a mesma fonte
+        // que alimenta o resumo/gráfico de produção do Dashboard.
+        // Aqui agrupamos por Tarefa Finalizada (a "área" mostrada
+        // no Dashboard), somando documentos e tarefas.
+        let todosDados = [];
+        let inicio = 0;
+        const tamanhoPagina = 1000;
+
+        while(true){
+
+            const resposta = await fetch(
+                `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?data=eq.${dataGuardar}&select=data,tarefafinalizada,total_documentos,total_tarefas&order=tarefafinalizada.asc&limit=${tamanhoPagina}&offset=${inicio}`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    }
+                }
+            );
+
+            if(!resposta.ok){
+                throw new Error(await resposta.text());
+            }
+
+            const pagina = await resposta.json();
+
+            todosDados.push(...pagina);
+
+            if(pagina.length < tamanhoPagina) break;
+
+            inicio += tamanhoPagina;
+        }
+
+        const resumo = {};
+
+        todosDados.forEach(r => {
+
+            const area = (r.tarefafinalizada || "Sem área")
+                .toString()
+                .trim() || "Sem área";
+
+            // Não guardar linhas que o próprio Dashboard considera
+            // inválidas para a produção.
+            const tarefa = area.toLowerCase();
+
+            if(
+                tarefa.includes("sem tarefa") ||
+                tarefa.includes("erro") ||
+                tarefa.includes("spam")
+            ){
+                return;
+            }
+
+            if(!resumo[area]){
+                resumo[area] = {
+                    documentos:0,
+                    tarefas:0
+                };
+            }
+
+            resumo[area].documentos += Number(r.total_documentos || 0);
+            resumo[area].tarefas += Number(r.total_tarefas || 0);
+
+        });
+
+        const linhas = Object.keys(resumo).map(area => ({
+            data:dataGuardar,
+            area:area,
+            total_documentos:resumo[area].documentos,
+            total_tarefas:resumo[area].tarefas
+        }));
+
+        // Primeiro apagar o resumo histórico desse dia.
+        // Assim, se o Forçar SQL alterar a produção, o histórico
+        // fica exatamente igual ao resumo atual.
+        const apagar = await fetch(
+            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes?data=eq.${dataGuardar}`,
+            {
+                method:"DELETE",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                }
+            }
+        );
+
+        if(!apagar.ok){
+            throw new Error(await apagar.text());
+        }
+
+        if(!linhas.length){
+            return;
+        }
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes`,
+            {
+                method:"POST",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    Prefer:"return=minimal"
+                },
+                body:JSON.stringify(linhas)
+            }
+        );
+
+        if(!resposta.ok){
+            throw new Error(await resposta.text());
+        }
+
+    }catch(e){
+
+        console.error("Erro ao guardar produção diária:",e);
+        throw e;
+
+    }
+}
+
+async function carregarDadosMes(){
+    try{
+        const inputMes = document.getElementById("fMesDadosProducao");
+        const inputData = document.getElementById("fDataDadosMes");
+
+        const hoje = new Date().toISOString().slice(0,10);
+        const mes = inputMes.value || hoje.slice(0,7);
+
+        inputMes.value = mes;
+
+        if(inputData && !inputData.value){
+            inputData.value = hoje;
+        }
+
+        const dataEscolhida = inputData?.value || "";
+        const filtroArea =
+            (document.getElementById("fAreaDadosMes")?.value || "").trim();
+
+        const [ano, numeroMes] = mes.split("-").map(Number);
+        const inicio = `${mes}-01`;
+
+        const proximoMes = numeroMes === 12
+            ? `${ano+1}-01-01`
+            : `${ano}-${String(numeroMes+1).padStart(2,"0")}-01`;
+
+        async function buscarDados(filtrosBase){
+            let todos = [];
+            let offset = 0;
+            const tamanhoPagina = 1000;
+
+            while(true){
+                let url =
+                    `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?` +
+                    `${filtrosBase.join("&")}` +
+                    `&limit=${tamanhoPagina}&offset=${offset}`;
+
+                if(filtroArea){
+                    url +=
+                        `&tarefafinalizada=eq.${encodeURIComponent(filtroArea)}`;
+                }
+
+                const resposta = await fetch(url,{
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    }
+                });
+
+                if(!resposta.ok) throw new Error(await resposta.text());
+
+                const pagina = await resposta.json();
+                todos.push(...pagina);
+
+                if(pagina.length < tamanhoPagina) break;
+                offset += tamanhoPagina;
+            }
+
+            return todos;
+        }
+
+        // TOTAL DO MÊS
+        const dadosMes = await buscarDados([
+            `data=gte.${inicio}`,
+            `data=lt.${proximoMes}`,
+            "select=data,tarefafinalizada,total_documentos,total_tarefas",
+            "order=data.asc,tarefafinalizada.asc"
+        ]);
+
+        let totalDocumentosMes = 0;
+        let totalTarefasMes = 0;
+
+        dadosMes.forEach(r => {
+            totalDocumentosMes += Number(r.total_documentos || 0);
+            totalTarefasMes += Number(r.total_tarefas || 0);
+        });
+
+        // TOTAL DO DIA SELECIONADO
+        let totalDocumentosDia = 0;
+        let totalTarefasDia = 0;
+        let dadosDia = [];
+
+        if(dataEscolhida){
+            dadosDia = await buscarDados([
+                `data=eq.${encodeURIComponent(dataEscolhida)}`,
+                "select=data,tarefafinalizada,total_documentos,total_tarefas",
+                "order=data.asc,tarefafinalizada.asc"
+            ]);
+
+            dadosDia.forEach(r => {
+                totalDocumentosDia += Number(r.total_documentos || 0);
+                totalTarefasDia += Number(r.total_tarefas || 0);
+            });
+        }
+
+        // 1º PAR: TOTAIS DO MÊS
+        const cards = document.getElementById("cardsDadosMes");
+
+        cards.innerHTML = `
+            <div class="card">
+                <h3>Documentos do Mês</h3>
+                <h1>${totalDocumentosMes.toLocaleString("pt-PT")}</h1>
+            </div>
+
+            <div class="card">
+                <h3>Tarefas do Mês</h3>
+                <h1>${totalTarefasMes.toLocaleString("pt-PT")}</h1>
+            </div>
+        `;
+
+        // 2º PAR: TOTAIS DO DIA, em cards separados por baixo
+        let cardsDia = document.getElementById("cardsDadosDia");
+
+        if(!cardsDia){
+            cardsDia = document.createElement("div");
+            cardsDia.id = "cardsDadosDia";
+            cardsDia.style.cssText = `
+                display:grid;
+                grid-template-columns:repeat(2,1fr);
+                gap:15px;
+                margin-top:15px;
+            `;
+            cards.parentNode.insertBefore(cardsDia, cards.nextSibling);
+        }
+
+        const dataFormatada = dataEscolhida
+            ? dataEscolhida.split("-").reverse().join("/")
+            : "Dia selecionado";
+
+        cardsDia.innerHTML = `
+            <div class="card">
+                <h3>Documentos do Dia — ${dataFormatada}</h3>
+                <h1>${totalDocumentosDia.toLocaleString("pt-PT")}</h1>
+            </div>
+
+            <div class="card">
+                <h3>Tarefas do Dia — ${dataFormatada}</h3>
+                <h1>${totalTarefasDia.toLocaleString("pt-PT")}</h1>
+            </div>
+        `;
+
+        // A tabela acompanha o dia selecionado.
+        const tbody = document.getElementById("tblDadosMesBody");
+
+        if(!dadosDia.length){
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4"
+                        style="text-align:center;color:#999;padding:20px;">
+                        Ainda não existem dados para esta data.
+                    </td>
+                </tr>
+            `;
+        }else{
+            tbody.innerHTML = dadosDia.map(r => `
+                <tr>
+                    <td>${escaparHTML(r.data || "")}</td>
+                    <td>${escaparHTML(r.tarefafinalizada || "Sem área")}</td>
+                    <td>${Number(r.total_documentos || 0).toLocaleString("pt-PT")}</td>
+                    <td>${Number(r.total_tarefas || 0).toLocaleString("pt-PT")}</td>
+                </tr>
+            `).join("");
+        }
+
+        document.getElementById("mensagemDadosMes").textContent =
+            `Mês: ${totalDocumentosMes.toLocaleString("pt-PT")} documentos e ` +
+            `${totalTarefasMes.toLocaleString("pt-PT")} tarefas. ` +
+            `Dia ${dataFormatada}: ${totalDocumentosDia.toLocaleString("pt-PT")} documentos e ` +
+            `${totalTarefasDia.toLocaleString("pt-PT")} tarefas.`;
+
+    }catch(e){
+        console.error("Erro ao carregar Dados do Mês:", e);
+        document.getElementById("mensagemDadosMes").textContent =
+            "Erro: " + e.message;
+    }
+}
+
+
+function limparFiltrosDadosMes(){
+
+    document.getElementById("fAreaDadosMes").value = "";
+
+    carregarDadosMes();
+
+}
+
+
+function exportarDadosMesExcel(){
+
+    const tabela =
+        document.querySelector("#dadosMes table");
+
+    if(!tabela){
+
+        alert("Não existe tabela para exportar.");
+
+        return;
+
+    }
+
+    const linhas = [];
+
+    tabela.querySelectorAll("tr").forEach(tr => {
+
+        const linha = [];
+
+        tr.querySelectorAll("th,td").forEach(td => {
+
+            linha.push(td.innerText.trim());
+
+        });
+
+        if(linha.length){
+
+            linhas.push(linha);
+
+        }
+
+    });
+
+    if(linhas.length <= 1){
+
+        alert("Não existem dados para exportar.");
+
+        return;
+
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    const ws = XLSX.utils.aoa_to_sheet(linhas);
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "Dados do Mês"
+    );
+
+    const mes =
+        document.getElementById("fMesDadosProducao").value || "mes";
+
+    XLSX.writeFile(
+        wb,
+        `Dados_Producao_${mes}.xlsx`
+    );
+
+}
+
+
+function mostrarDadosMes(){
+    document.querySelectorAll(".main > div").forEach(el => {
+        el.style.display = "none";
+    });
+
+    document.getElementById("dadosMes").style.display = "block";
+
+    const input = document.getElementById("fMesDadosProducao");
+    if(!input.value){
+        input.value = new Date().toISOString().slice(0,7);
+    }
+
+    carregarDadosMes();
+}
 
 async function carregarCardsDashboard(){
 
@@ -2159,6 +2615,8 @@ async function carregarCardsDashboard(){
     const registos = await registosReq.json();
     const producao = await producaoReq.json();
     const planeamento = await planeamentoReq.json();
+
+    guardarProducaoDia(producao, hoje);
 
     // SEM PRESENÇA
 const usersTrabalham = new Set(
@@ -2424,6 +2882,7 @@ async function carregarRelatorioOcupacao(){
 function abrirRelatorioProducao(){
 
     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display="none";
@@ -2577,6 +3036,7 @@ carregarGraficoProducao();
 function mostrarRelatorios(){
 
       document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("planeamentoDia").style.display="none";
@@ -2796,7 +3256,7 @@ async function carregarGraficoProducao(){
     const hoje = new Date().toISOString().slice(0,10);
 
     const resposta = await fetch(
-`${SUPABASE_URL}/rest/v1/bpo_resumo_producao?select=tarefafinalizada,total_documentos,total_tarefas&data=eq.${hoje}`,
+        `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?select=tarefafinalizada,total_documentos,total_tarefas&data=eq.${hoje}`,
         {
             headers:{
                 apikey:SUPABASE_API_KEY,
@@ -2805,125 +3265,99 @@ async function carregarGraficoProducao(){
         }
     );
 
-    const dados = await resposta.json();
-const resumo = {};
-
-let totalDocumentosDia = 0;
-let totalTarefasDia = 0;
-
-dados.forEach(r => {
-
-    const area = r.tarefafinalizada || "Sem área";
-
-    if(!resumo[area]){
-        resumo[area] = {
-            documentos:0,
-            tarefas:0
-        };
+    if(!resposta.ok){
+        throw new Error(await resposta.text());
     }
 
-    const documentos = Number(r.total_documentos || 0);
-    const tarefas = Number(r.total_tarefas || 0);
+    const dados = await resposta.json();
+    const resumo = {};
+    let totalDocumentosDia = 0;
+    let totalTarefasDia = 0;
 
-    resumo[area].documentos += documentos;
-    resumo[area].tarefas += tarefas;
+    dados.forEach(r => {
 
-    totalDocumentosDia += documentos;
-    totalTarefasDia += tarefas;
-});
+        const area = (r.tarefafinalizada || "Sem área")
+            .toString()
+            .trim() || "Sem área";
 
-const labels = Object.keys(resumo);
+        if(!resumo[area]){
+            resumo[area] = {
+                documentos:0,
+                tarefas:0
+            };
+        }
 
-const valores = labels.map(area =>
-    resumo[area].documentos
-);;
-const lista = document.getElementById("listaProducaoArea");
+        const documentos = Number(r.total_documentos || 0);
+        const tarefas = Number(r.total_tarefas || 0);
 
-const totalDocsEl = document.getElementById("dashboardTotalDocumentos");
-const totalTarefasEl = document.getElementById("dashboardTotalTarefas");
+        resumo[area].documentos += documentos;
+        resumo[area].tarefas += tarefas;
 
-if(totalDocsEl){
-    totalDocsEl.innerText = totalDocumentosDia.toLocaleString("pt-PT");
-}
+        totalDocumentosDia += documentos;
+        totalTarefasDia += tarefas;
+    });
 
-if(totalTarefasEl){
-    totalTarefasEl.innerText = totalTarefasDia.toLocaleString("pt-PT");
-}
+    const labels = Object.keys(resumo);
+    const valores = labels.map(area => resumo[area].documentos);
 
-lista.innerHTML = "";
-labels.forEach(area => {
+    const lista = document.getElementById("listaProducaoArea");
+    const totalDocsEl = document.getElementById("dashboardTotalDocumentos");
+    const totalTarefasEl = document.getElementById("dashboardTotalTarefas");
 
-    const documentos = resumo[area].documentos;
-    const tarefas = resumo[area].tarefas;
+    if(totalDocsEl){
+        totalDocsEl.innerText = totalDocumentosDia.toLocaleString("pt-PT");
+    }
 
-    const card = document.createElement("div");
+    if(totalTarefasEl){
+        totalTarefasEl.innerText = totalTarefasDia.toLocaleString("pt-PT");
+    }
 
-    card.style.cssText = `
-        background:#f7f9f7;
-        border-radius:10px;
-        padding:12px 15px;
-        border:1px solid #e5e8e5;
-        display:grid;
-        grid-template-columns:1fr auto auto;
-        gap:20px;
-        align-items:center;
-    `;
+    lista.innerHTML = "";
 
-    card.innerHTML = `
-        <div>
-            <div style="
-                font-weight:600;
-                font-size:13px;
-            ">
-                ${area}
+    labels.forEach(area => {
+
+        const documentos = resumo[area].documentos;
+        const tarefas = resumo[area].tarefas;
+
+        const card = document.createElement("div");
+
+        card.style.cssText = `
+            background:#f7f9f7;
+            border-radius:10px;
+            padding:12px 15px;
+            border:1px solid #e5e8e5;
+            display:grid;
+            grid-template-columns:1fr auto auto;
+            gap:20px;
+            align-items:center;
+        `;
+
+        card.innerHTML = `
+            <div>
+                <div style="font-weight:600;font-size:13px;">
+                    ${escaparHTML(area)}
+                </div>
+                <div style="font-size:10px;color:#888;">Área</div>
             </div>
 
-            <div style="
-                font-size:10px;
-                color:#888;
-            ">
-                Área
-            </div>
-        </div>
-
-        <div style="text-align:center;">
-            <div style="
-                font-size:17px;
-                font-weight:bold;
-                color:#2E7D32;
-            ">
-                ${documentos.toLocaleString("pt-PT")}
+            <div style="text-align:center;">
+                <div style="font-size:17px;font-weight:bold;color:#2E7D32;">
+                    ${documentos.toLocaleString("pt-PT")}
+                </div>
+                <div style="font-size:10px;color:#888;">Documentos</div>
             </div>
 
-            <div style="
-                font-size:10px;
-                color:#888;
-            ">
-                Documentos
+            <div style="text-align:center;">
+                <div style="font-size:17px;font-weight:bold;color:#2E7D32;">
+                    ${tarefas.toLocaleString("pt-PT")}
+                </div>
+                <div style="font-size:10px;color:#888;">Tarefas</div>
             </div>
-        </div>
+        `;
 
-        <div style="text-align:center;">
-            <div style="
-                font-size:17px;
-                font-weight:bold;
-                color:#2E7D32;
-            ">
-                ${tarefas.toLocaleString("pt-PT")}
-            </div>
+        lista.appendChild(card);
+    });
 
-            <div style="
-                font-size:10px;
-                color:#888;
-            ">
-                Tarefas
-            </div>
-        </div>
-    `;
-
-    lista.appendChild(card);
-
-});
     if(graficoProducao){
         graficoProducao.destroy();
     }
@@ -2941,26 +3375,13 @@ labels.forEach(area => {
             },
             options:{
                 responsive:true,
+                maintainAspectRatio:false,
                 plugins:{
-                    legend:{display:false},
-                    title:{
-                        display:true,
-                        text:"Volume por Tipo de Tarefa (Hoje)"
-                    }
+                    legend:{display:false}
                 },
                 scales:{
                     y:{
-                        beginAtZero:true,
-                        title:{
-                            display:true,
-                            text:"Documentos"
-                        }
-                    },
-                    x:{
-                        title:{
-                            display:true,
-                            text:"Tarefa"
-                        }
+                        beginAtZero:true
                     }
                 }
             }
@@ -4048,8 +4469,23 @@ async function atualizarRelatorios(){
             throw new Error(texto);
         }
 
+        // Depois de atualizar os relatórios, atualizar também
+        // o histórico mensal do dia atual.
+        const hoje = new Date().toISOString().slice(0,10);
+
+        msg.style.color = "#555";
+        msg.innerText = "✓ Relatórios atualizados. A guardar histórico da produção...";
+
+        await guardarProducaoDia(null, hoje);
+
+        // Se a aba Dados do Mês estiver aberta, atualiza imediatamente a tabela.
+        const dadosMes = document.getElementById("dadosMes");
+        if(dadosMes && dadosMes.style.display !== "none"){
+            await carregarDadosMes();
+        }
+
         msg.style.color = "green";
-        msg.innerText = "✓ Relatórios atualizados com sucesso.";
+        msg.innerText = "✓ Relatórios e histórico da produção atualizados com sucesso.";
 
     }catch(erro){
 
