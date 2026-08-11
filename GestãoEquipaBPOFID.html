@@ -1949,6 +1949,7 @@ function mostrarPlaneamentoDia(){
 function abrirRelatorioTempos(){
 
     document.getElementById("dashboard").style.display="none";
+    document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display="none";
     document.getElementById("resumoDia").style.display="none";
@@ -2402,6 +2403,7 @@ async function carregarRelatorioOcupacao(){
 function abrirRelatorioProducao(){
 
     document.getElementById("dashboard").style.display="none";
+    document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display="none";
     document.getElementById("resumoDia").style.display="none";
@@ -2475,6 +2477,7 @@ try{
 function abrirResumoDia(){
 
     document.getElementById("dashboard").style.display = "none";
+    document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("logins").style.display = "none";
     document.getElementById("relatorios").style.display = "none";
@@ -3545,7 +3548,6 @@ async function atualizarRelatorios(){
             throw new Error(texto);
         }
 
-        
         msg.style.color = "green";
         msg.innerText = "✓ Relatórios atualizados com sucesso.";
 
