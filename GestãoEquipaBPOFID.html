@@ -2639,68 +2639,88 @@ dados.forEach(registo => {
 
 }
 
+let dadosLoginsBase = null;
+
+async function obterDadosLogins(){
+
+    if(Array.isArray(dadosLoginsBase)){
+        return dadosLoginsBase;
+    }
+
+    const resposta = await fetch(
+        `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`,
+        {
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        }
+    );
+
+    const dados = await resposta.json();
+
+    if(!resposta.ok){
+        throw new Error(dados.message || JSON.stringify(dados));
+    }
+
+    dadosLoginsBase = Array.isArray(dados) ? dados : [];
+
+    return dadosLoginsBase;
+}
+
 async function carregarLogins(){
 
     try{
 
-        let url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao`;
+        const dadosBase = await obterDadosLogins();
 
         const data = document.getElementById("fDataLogins").value;
         const tipo = document.getElementById("fTipoLogins").value;
-        const user = document.getElementById("fUserLogins").value.trim();
-        const nome = document.getElementById("fNomeLogins").value.trim();
+        const user = document.getElementById("fUserLogins").value.trim().toLowerCase();
+        const nome = document.getElementById("fNomeLogins").value.trim().toLowerCase();
 
-        if(data){
-            url += `&data=eq.${data}`;
-        }
+        const dados = dadosBase.filter(registo => {
 
-        if(tipo){
-            url += `&tipo=eq.${encodeURIComponent(tipo)}`;
-        }
+            if(data && registo.data !== data)
+                return false;
 
-        if(user){
-            url += `&user=ilike.*${encodeURIComponent(user)}*`;
-        }
+            if(tipo && (registo.tipo || "") !== tipo)
+                return false;
 
-        if(nome){
-            url += `&nome=ilike.*${encodeURIComponent(nome)}*`;
-        }
+            if(user && !(registo.user || "").toLowerCase().includes(user))
+                return false;
 
-        url += "&order=data.desc,inicio.desc";
+            if(nome && !(registo.nome || "").toLowerCase().includes(nome))
+                return false;
 
-        const resposta = await fetch(url,{
-            headers:{
-                apikey: SUPABASE_API_KEY,
-                Authorization:`Bearer ${SUPABASE_API_KEY}`
-            }
+            return true;
         });
 
-        const dados = await resposta.json();
-
-        if(!resposta.ok){
-            console.error("Erro Supabase Logins:", dados);
-            alert("Erro ao carregar os Logins:\n\n" + (dados.message || JSON.stringify(dados)));
-            return;
-        }
-
         function formatarHora(dataHora){
+
             if(!dataHora) return "";
+
             try{
                 if(dataHora.includes("T")){
                     return dataHora.split("T")[1].substring(0,8);
                 }
+
                 return dataHora;
+
             }catch(e){
                 return dataHora;
             }
         }
 
         function formatarDuracao(horas){
+
             if(horas == null || horas === "") return "";
+
             const totalSegundos = Math.round(Number(horas) * 3600);
             const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
             const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
             const s = String(totalSegundos % 60).padStart(2,"0");
+
             return `${h}:${m}:${s}`;
         }
 
@@ -2708,6 +2728,7 @@ async function carregarLogins(){
         tbody.innerHTML = "";
 
         if(!dados.length){
+
             tbody.innerHTML = `
                 <tr>
                     <td colspan="7" style="text-align:center;padding:20px;color:#777;">
@@ -2715,10 +2736,12 @@ async function carregarLogins(){
                     </td>
                 </tr>
             `;
+
             return;
         }
 
         dados.forEach(registo => {
+
             tbody.innerHTML += `
                 <tr>
                     <td>${registo.data ?? ""}</td>
@@ -2733,18 +2756,13 @@ async function carregarLogins(){
         });
 
     }catch(e){
+
         console.error("Erro carregarLogins:", e);
-        alert("Ocorreu um erro ao carregar os Logins.");
+
+        alert("Ocorreu um erro ao carregar os Logins.\n\n" + e.message);
     }
+
 }
-
-
-setInterval(()=>clock.innerHTML=new Date().toLocaleString('pt-PT'),1000);
-
-
-
-
-let graficoProducao = null;
 
 async function carregarGraficoProducao(){
 
@@ -2912,18 +2930,11 @@ async function carregarResumoDia(){
 
     try{
 
-        const [registosReq, planeamentoReq] = await Promise.all([
-
-            fetch(
-                `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=*`,
-                {
-                    headers:{
-                        apikey:SUPABASE_API_KEY,
-                        Authorization:`Bearer ${SUPABASE_API_KEY}`
-                    }
-                }
-            ),
-
+        // Os registos de Login/Logout/Pausas vêm da mesma fonte
+        // já utilizada pela aba Logins. A tabela de Planeamento
+        // continua a ser consultada apenas para obter o estado.
+        const [registos, planeamentoReq] = await Promise.all([
+            obterDadosLogins(),
             fetch(
                 `${SUPABASE_URL}/rest/v1/planeamento?select=*`,
                 {
@@ -2933,183 +2944,196 @@ async function carregarResumoDia(){
                     }
                 }
             )
-
         ]);
 
-      
-const registos = await registosReq.json();
-const planeamento = await planeamentoReq.json();
-const resumo = {};
+        const planeamento = await planeamentoReq.json();
 
-registos.forEach(r=>{
+        if(!planeamentoReq.ok){
+            console.error("Erro Planeamento:", planeamento);
+            return;
+        }
 
-    const chave = `${r.data}_${r.user}`;
+        const resumo = {};
 
-    if(!resumo[chave]){
+        registos.forEach(r=>{
 
-        resumo[chave] = {
+            const chave = `${r.data}_${r.user}`;
 
-            data: r.data,
-            user: r.user,
-            nome: r.nome,
-     logins:[],
-logouts:[],
-            pausa1: "",
-            pausa2: "",
-            refeicao: "",
-            estado: "",
-            trabalhado: 0,
-            pausas: 0
+            if(!resumo[chave]){
 
-        };
+                resumo[chave] = {
+                    data: r.data,
+                    user: r.user,
+                    nome: r.nome || "",
+                    logins:[],
+                    logouts:[],
+                    pausa1: "",
+                    pausa2: "",
+                    refeicao: "",
+                    estado: "",
+                    trabalhado: 0,
+                    pausas: 0
+                };
+            }
 
-    }
+            const linha = resumo[chave];
+            const tipo = (r.tipo || "").toLowerCase();
 
-            const linha=resumo[chave];
+            if(tipo.includes("login"))
+                linha.logins.push(r.inicio);
 
-            const tipo=(r.tipo||"").toLowerCase();
-
-     if(tipo.includes("login"))
-    linha.logins.push(r.inicio);
-
-if(tipo.includes("logout"))
-    linha.logouts.push(r.inicio);
+            if(tipo.includes("logout"))
+                linha.logouts.push(r.inicio);
 
             if(tipo.includes("pausa1"))
-                linha.pausa1=r.duracao||0;
+                linha.pausa1 = r.duracao || 0;
 
             if(tipo.includes("pausa2"))
-                linha.pausa2=r.duracao||0;
+                linha.pausa2 = r.duracao || 0;
 
             if(tipo.includes("refeição") || tipo.includes("refeicao"))
-                linha.refeicao=r.duracao||0;
+                linha.refeicao = r.duracao || 0;
 
         });
-          
-          planeamento.forEach(p=>{
 
-    const chave = `${p.data}_${p.user}`;
+        planeamento.forEach(p=>{
 
-    if(!resumo[chave]){
+            const chave = `${p.data}_${p.user}`;
 
-        resumo[chave] = {
+            if(!resumo[chave]){
 
-            data: p.data,
-            user: p.user,
-            nome: p.nome || "",
-            logins: [],
-            logouts: [],
-            pausa1: "",
-            pausa2: "",
-            refeicao: "",
-            estado: p.estado || "",
-            trabalhado: 0,
-            pausas: 0
+                resumo[chave] = {
+                    data: p.data,
+                    user: p.user,
+                    nome: p.nome || "",
+                    logins: [],
+                    logouts: [],
+                    pausa1: "",
+                    pausa2: "",
+                    refeicao: "",
+                    estado: p.estado || "",
+                    trabalhado: 0,
+                    pausas: 0
+                };
 
-        };
+            }else{
 
-    }else{
+                resumo[chave].estado = p.estado || resumo[chave].estado;
 
-        resumo[chave].estado = p.estado || resumo[chave].estado;
-        
-        if(!resumo[chave].nome)
-            resumo[chave].nome = p.nome || "";
+                if(!resumo[chave].nome)
+                    resumo[chave].nome = p.nome || "";
+            }
 
-    }
+        });
 
-});
+        const tbody = document.getElementById("tblResumoDiaBody");
+        tbody.innerHTML = "";
 
-        const tbody=document.getElementById("tblResumoDiaBody");
-
-        tbody.innerHTML="";
         const fData = document.getElementById("fDataResumo").value.toLowerCase();
-const fUser = document.getElementById("fUserResumo").value.toLowerCase();
-const fNome = document.getElementById("fNomeResumo").value.toLowerCase();
-const fEstado = document.getElementById("fEstadoResumo").value.toLowerCase();
+        const fUser = document.getElementById("fUserResumo").value.toLowerCase();
+        const fNome = document.getElementById("fNomeResumo").value.toLowerCase();
+        const fEstado = document.getElementById("fEstadoResumo").value.toLowerCase();
 
-Object.values(resumo)
-.filter(r => {
+        const resultados = Object.values(resumo).filter(r => {
 
-    if (fData && r.data !== fData) return false;
+            if(fData && r.data !== fData)
+                return false;
 
-    if (fUser && !(r.user || "").toLowerCase().includes(fUser))
-        return false;
+            if(fUser && !(r.user || "").toLowerCase().includes(fUser))
+                return false;
 
-    if (fNome && !(r.nome || "").toLowerCase().includes(fNome))
-        return false;
+            if(fNome && !(r.nome || "").toLowerCase().includes(fNome))
+                return false;
 
-    if (fEstado && !(r.estado || "").toLowerCase().includes(fEstado))
-        return false;
+            if(fEstado && !(r.estado || "").toLowerCase().includes(fEstado))
+                return false;
 
-    return true;
+            return true;
+        });
 
-})
-.forEach(r=>{
-          
-          let tempoTrabalhado = 0;
+        if(!resultados.length){
 
-const logins = (r.logins || [])
-    .filter(Boolean)
-    .map(x => new Date(x))
-    .sort((a,b) => a-b);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="14" style="text-align:center;padding:20px;color:#777;">
+                        Não foram encontrados registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
 
-const logouts = (r.logouts || [])
-    .filter(Boolean)
-    .map(x => new Date(x))
-    .sort((a,b) => a-b);
+            return;
+        }
 
-let iLogin = 0;
-let iLogout = 0;
+        resultados.forEach(r=>{
 
-while(iLogin < logins.length && iLogout < logouts.length){
+            let tempoTrabalhado = 0;
 
-    const login = logins[iLogin];
-    const logout = logouts[iLogout];
+            const logins = (r.logins || [])
+                .filter(Boolean)
+                .map(x => new Date(x))
+                .sort((a,b) => a-b);
 
-    if(logout > login){
+            const logouts = (r.logouts || [])
+                .filter(Boolean)
+                .map(x => new Date(x))
+                .sort((a,b) => a-b);
 
-        tempoTrabalhado += (logout - login) / 1000;
+            let iLogin = 0;
+            let iLogout = 0;
 
-        iLogin++;
-        iLogout++;
+            while(iLogin < logins.length && iLogout < logouts.length){
 
-    }else{
+                const login = logins[iLogin];
+                const logout = logouts[iLogout];
 
-        iLogout++;
+                if(logout > login){
 
-    }
-}
+                    tempoTrabalhado += (logout - login) / 1000;
+                    iLogin++;
+                    iLogout++;
 
-tempoTrabalhado -= (Number(r.pausa1) || 0) * 3600;
-tempoTrabalhado -= (Number(r.pausa2) || 0) * 3600;
-tempoTrabalhado -= (Number(r.refeicao) || 0) * 3600;
+                }else{
+                    iLogout++;
+                }
+            }
 
-tempoTrabalhado = Math.max(0, tempoTrabalhado);
+            // O Tempo Trabalhado corresponde ao tempo efetivamente
+            // trabalhado entre cada par Login -> Logout, retirando
+            // as pausas e a refeição.
+            // As durações de pausa/refeição vêm em horas decimais.
+            const totalPausas =
+                (Number(r.pausa1) || 0) +
+                (Number(r.pausa2) || 0) +
+                (Number(r.refeicao) || 0);
 
-            const jornada=8*3600;
+            tempoTrabalhado = Math.max(
+                0,
+                tempoTrabalhado - (totalPausas * 3600)
+            );
 
-            const falta=Math.max(0,jornada-tempoTrabalhado);
+            const jornada = 7.5 * 3600;
+            const falta = Math.max(0, jornada - tempoTrabalhado);
+            const extra = Math.max(0, tempoTrabalhado - jornada);
 
-            const extra=Math.max(0,tempoTrabalhado-jornada);
+            let alerta = "";
 
-            let alerta="";
+            if(!r.logins || r.logins.length === 0)
+                alerta = "Sem Login";
+            else if(!r.logouts || r.logouts.length < r.logins.length)
+                alerta = "Sem Logout";
+            else if(falta > 0)
+                alerta = "Ausência Parcial";
+            else
+                alerta = "OK";
 
-       if(!r.logins || r.logins.length === 0)
-    alerta="Sem Login";
-else if(!r.logouts || r.logouts.length < r.logins.length)
-    alerta="Sem Logout";
-else if(falta>0)
-    alerta="Ausência Parcial";
-else
-    alerta="OK";
-                            tbody.innerHTML += `
+            tbody.innerHTML += `
                 <tr>
                     <td>${r.data ?? ""}</td>
                     <td>${r.user ?? ""}</td>
                     <td>${r.nome ?? ""}</td>
                     <td>${r.estado ?? ""}</td>
-                  <td>${(r.logins || []).map(x => timeOnly(x)).join("<br>")}</td>
-<td>${(r.logouts || []).map(x => timeOnly(x)).join("<br>")}</td>
+                    <td>${(r.logins || []).map(x => timeOnly(x)).join("<br>")}</td>
+                    <td>${(r.logouts || []).map(x => timeOnly(x)).join("<br>")}</td>
                     <td>${formatarHoras(r.pausa1)}</td>
                     <td>${formatarHoras(r.pausa2)}</td>
                     <td>${formatarHoras(r.refeicao)}</td>
@@ -3124,7 +3148,9 @@ else
         });
 
     }catch(e){
-        console.error(e);
+
+        console.error("Erro carregarResumoDia:", e);
+        alert("Ocorreu um erro ao carregar o Resumo Dia.\n\n" + e.message);
     }
 
 }
