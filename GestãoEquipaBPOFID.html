@@ -2115,8 +2115,7 @@ async function carregarCardsDashboard(){
         ),
 
         fetch(
-            `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?data=eq.${hoje}&select=tarefafinalizada,total_documentos`,
-            {
+`${SUPABASE_URL}/rest/v1/bpo_resumo_producao?data=eq.${hoje}&select=tarefafinalizada,total_documentos,total_tarefas`,            {
                 headers:{
                     apikey:SUPABASE_API_KEY,
                     Authorization:`Bearer ${SUPABASE_API_KEY}`
@@ -2773,7 +2772,7 @@ async function carregarGraficoProducao(){
     const hoje = new Date().toISOString().slice(0,10);
 
     const resposta = await fetch(
-        `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?select=tarefafinalizada,total_documentos&data=eq.${hoje}`,
+`${SUPABASE_URL}/rest/v1/bpo_resumo_producao?select=tarefafinalizada,total_documentos,total_tarefas&data=eq.${hoje}`,
         {
             headers:{
                 apikey:SUPABASE_API_KEY,
@@ -2800,8 +2799,7 @@ dados.forEach(r => {
         r.total_documentos || 0
     );
 
-    resumo[area].tarefas += 1;
-
+resumo[area].tarefas += Number(r.total_tarefas || 0);
 });
 
 const labels = Object.keys(resumo);
