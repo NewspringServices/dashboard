@@ -419,6 +419,10 @@ canvas{
     <a onclick="mostrarForcarSQL()">
         <i class="fa fa-database"></i> Forçar SQL
     </a>
+
+    <a onclick="mostrarRetificarProducao()">
+        <i class="fa fa-pen-to-square"></i> Retificar Produção
+    </a>
 </div> </div></div> 
 <div class="main">
 
@@ -1129,6 +1133,102 @@ canvas{
 
 </div>
 
+<div id="retificarProducao" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>
+            <i class="fa fa-pen-to-square"></i>
+            Retificar Produção
+        </h3>
+
+        <p style="margin:8px 0 18px;color:#666;">
+            Pesquisa apenas os registos que correspondem aos filtros.
+            A tabela de produção não é carregada integralmente.
+        </p>
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:15px;
+            align-items:end;
+            margin-bottom:18px;
+        ">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="fDataRetificarProducao">
+            </div>
+
+            <div>
+                <label>Colaborador / Nome</label><br>
+                <input type="text"
+                       id="fColaboradorRetificarProducao"
+                       placeholder="Nome ou colaborador">
+            </div>
+
+            <div>
+                <label>Tarefa Finalizada</label><br>
+                <input type="text"
+                       id="fTarefaRetificarProducao"
+                       placeholder="Tarefa">
+            </div>
+
+            <div>
+                <label>Processo GAMA</label><br>
+                <input type="text"
+                       id="fProcessoRetificarProducao"
+                       placeholder="Processo GAMA">
+            </div>
+
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+
+            <button type="button" onclick="pesquisarRetificarProducao()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button type="button" onclick="limparFiltrosRetificarProducao()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+
+        </div>
+
+        <div id="msgRetificarProducao"
+             style="margin:8px 0 15px;font-weight:600;color:#666;">
+            Aplique pelo menos um filtro para pesquisar.
+        </div>
+
+        <div style="overflow-x:auto;">
+
+            <table id="tblRetificarProducao"
+                   style="width:100%;border-collapse:collapse;min-width:1050px;">
+
+                <thead>
+                    <tr>
+                        <th>Data</th><th>Colaborador</th><th>Tarefa Finalizada</th><th>Processo GAMA</th><th>Documentos</th><th>Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tblRetificarProducaoBody">
+                    <tr>
+                        <td colspan="6"
+                            style="text-align:center;padding:25px;color:#777;">
+                            Nenhuma pesquisa efetuada.
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 <script>
 
 const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
@@ -1149,6 +1249,7 @@ function mostrarPlaneamento(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("planeamentoMes").style.display = "block";
 
@@ -1229,6 +1330,7 @@ function mostrarPlataformas(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("plataformas").style.display="block";
 
@@ -1432,6 +1534,7 @@ function mostrarForcarRegistos(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("forcarRegistos").style.display="block";
 
@@ -1452,6 +1555,7 @@ function mostrarAlertas(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("alertas").style.display = "block";
 
@@ -1474,6 +1578,7 @@ function mostrarEliminarRegistos(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("eliminarRegistos").style.display="block";
 
@@ -1513,6 +1618,7 @@ function mostrarLogins(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("logins").style.display = "block";
 
@@ -1938,6 +2044,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
     document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("planeamentoDia").style.display = "block";
 
@@ -2544,6 +2651,7 @@ function mostrarDashboard(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
         document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
 carregarGraficoProducao();
   carregarGraficoProducao();
@@ -2566,6 +2674,7 @@ function mostrarRelatorios(){
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
         document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("relatorios").style.display = "block";
 
@@ -2733,7 +2842,7 @@ async function carregarLogins(){
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7" style="text-align:center;padding:20px;color:#777;">
+                    <td colspan="6" style="text-align:center;padding:20px;color:#777;">
                         Não foram encontrados registos para os filtros selecionados.
                     </td>
                 </tr>
@@ -3508,6 +3617,461 @@ function exportarLoginsExcel(){
     XLSX.writeFile(wb,nome);
 
 }
+
+function mostrarRetificarProducao(){
+
+    document.querySelectorAll(".main > div").forEach(el => {
+        el.style.display = "none";
+    });
+
+    document.getElementById("retificarProducao").style.display = "block";
+
+    // Importante: não executar pesquisa automaticamente.
+    // A tabela BPO_dadosprodução só é consultada depois de aplicar filtros.
+    const tbody = document.getElementById("tblRetificarProducaoBody");
+
+    if(!tbody.children.length){
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                    Aplique pelo menos um filtro para pesquisar.
+                </td>
+            </tr>
+        `;
+    }
+
+}
+
+function limparFiltrosRetificarProducao(){
+
+    document.getElementById("fDataRetificarProducao").value = "";
+    document.getElementById("fColaboradorRetificarProducao").value = "";
+    document.getElementById("fTarefaRetificarProducao").value = "";
+    document.getElementById("fProcessoRetificarProducao").value = "";
+
+    document.getElementById("msgRetificarProducao").style.color = "#666";
+    document.getElementById("msgRetificarProducao").innerText =
+        "Aplique pelo menos um filtro para pesquisar.";
+
+    document.getElementById("tblRetificarProducaoBody").innerHTML = `
+        <tr>
+            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                Nenhuma pesquisa efetuada.
+            </td>
+        </tr>
+    `;
+
+}
+
+function proximaDataISO(data){
+
+    const d = new Date(`${data}T00:00:00`);
+    d.setDate(d.getDate() + 1);
+
+    return d.toISOString().slice(0,10);
+
+}
+
+function escaparHTML(valor){
+
+    return String(valor ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+function formatarCreatedAtRetificacao(valor){
+
+    if(!valor) return "";
+
+    try{
+
+        return new Date(valor).toLocaleString("pt-PT",{
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric",
+            hour:"2-digit",
+            minute:"2-digit",
+            second:"2-digit"
+        });
+
+    }catch(e){
+
+        return valor;
+
+    }
+
+}
+
+async function pesquisarRetificarProducao(){
+
+    const data = document.getElementById("fDataRetificarProducao").value.trim();
+    const colaborador = document
+        .getElementById("fColaboradorRetificarProducao")
+        .value.trim();
+
+    const tarefa = document
+        .getElementById("fTarefaRetificarProducao")
+        .value.trim();
+
+    const processo = document
+        .getElementById("fProcessoRetificarProducao")
+        .value.trim();
+
+    const msg = document.getElementById("msgRetificarProducao");
+    const tbody = document.getElementById("tblRetificarProducaoBody");
+
+    // Nunca permitir uma pesquisa sem filtros.
+    if(!data && !colaborador && !tarefa && !processo){
+
+        msg.style.color = "#b26a00";
+        msg.innerText =
+            "Seleciona pelo menos um filtro antes de pesquisar.";
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                    Nenhum filtro aplicado.
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
+
+    msg.style.color = "#555";
+    msg.innerText = "A pesquisar apenas os registos filtrados...";
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                A pesquisar...
+            </td>
+        </tr>
+    `;
+
+    try{
+
+        /*
+         * Pesquisa SERVER-SIDE:
+         * - Não faz select=* da tabela.
+         * - Não descarrega BPO_dadosprodução inteira.
+         * - A data é transformada num intervalo de created_at.
+         * - Os restantes filtros são aplicados diretamente no Supabase.
+         */
+        let url =
+            `${SUPABASE_URL}/rest/v1/BPO_dadosprodução` +
+            `?select=id,data,colaborador,tarefaFinalizada,processoGama,Documentos`;
+
+        if(data){
+
+            // A tabela já possui uma coluna "data" apenas com a data.
+            url += `&data=eq.${encodeURIComponent(data)}`;
+
+        }
+
+        if(colaborador){
+
+            // Colaborador tem de ser uma correspondência EXATA.
+            // Não usar ilike nem wildcards, para impedir que outros nomes
+            // sejam devolvidos.
+            url += `&colaborador=eq.${encodeURIComponent(colaborador)}`;
+
+        }
+
+        if(tarefa){
+
+            url += `&tarefaFinalizada=ilike.${encodeURIComponent(`*${tarefa}*`)}`;
+
+        }
+
+        if(processo){
+
+            url += `&processoGama=ilike.${encodeURIComponent(`*${processo}*`)}`;
+
+        }
+
+        url += "&order=created_at.desc&limit=1000";
+
+        const resposta = await fetch(url,{
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+
+            throw new Error(
+                dados?.message ||
+                dados?.hint ||
+                JSON.stringify(dados)
+            );
+
+        }
+
+        tbody.innerHTML = "";
+
+        if(!Array.isArray(dados) || !dados.length){
+
+            msg.style.color = "#777";
+            msg.innerText = "Não foram encontrados registos.";
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                        Não existem registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            return;
+
+        }
+
+        dados.forEach(registo => {
+
+            const colaboradorAtual =
+                registo.colaborador || "";
+            tbody.innerHTML += `
+                <tr data-id="${escaparHTML(registo.id)}">
+                    <td>${escaparHTML(registo.data)}</td>
+                    <td>${escaparHTML(registo.colaborador || "")}</td>
+
+                    <td>
+                        <input
+                            type="text"
+                            class="edit-tarefaFinalizada"
+                            value="${escaparHTML(registo.tarefaFinalizada || "")}"
+                            style="width:220px;"
+                        >
+                    </td>
+
+                    <td>${escaparHTML(registo.processoGama || "")}</td>
+
+                    <td>
+                        <input
+                            type="text"
+                            class="edit-Documentos"
+                            value="${escaparHTML(registo.Documentos ?? "")}"
+                            style="width:140px;"
+                        >
+                    </td>
+
+                    <td>
+                        <button
+                            type="button"
+                            onclick="guardarRetificacaoProducao(${Number(registo.id)}, this)">
+                            <i class="fa fa-floppy-disk"></i> Guardar
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="eliminarRetificacaoProducao(${Number(registo.id)}, this)"
+                            style="margin-left:6px;">
+                            <i class="fa fa-trash"></i> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+
+        });
+
+        msg.style.color = "#2E7D32";
+        msg.innerText = `${dados.length} registo(s) encontrado(s).`;
+
+    }catch(erro){
+
+        console.error("Erro Retificar Produção:",erro);
+
+        msg.style.color = "red";
+        msg.innerText = "Erro ao pesquisar: " + erro.message;
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;padding:25px;color:#b00020;">
+                    Ocorreu um erro ao pesquisar os registos.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+
+
+async function eliminarRetificacaoProducao(id, botao){
+
+    const linha = document.querySelector(
+        `#tblRetificarProducaoBody tr[data-id="${id}"]`
+    );
+
+    if(!linha) return;
+
+    const colaborador = linha.children[1]?.innerText?.trim() || "";
+    const data = linha.children[0]?.innerText?.trim() || "";
+
+    const confirmar = confirm(
+        "ATENÇÃO: esta ação vai eliminar definitivamente este registo.\n\n" +
+        "Data: " + data + "\n" +
+        "Colaborador: " + colaborador + "\n\n" +
+        "Queres mesmo eliminar?"
+    );
+
+    if(!confirmar){
+        return;
+    }
+
+    const textoOriginal = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A eliminar...';
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/BPO_dadosprodução?id=eq.${encodeURIComponent(id)}`,
+            {
+                method:"DELETE",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Prefer":"return=minimal"
+                }
+            }
+        );
+
+        const resultado = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(resultado);
+        }
+
+        linha.remove();
+
+        const tbody = document.getElementById("tblRetificarProducaoBody");
+
+        if(!tbody.children.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                        Não existem mais registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        const msg = document.getElementById("msgRetificarProducao");
+
+        if(msg){
+            const restantes = tbody.querySelectorAll("tr[data-id]").length;
+            msg.style.color = "#2E7D32";
+            msg.innerText =
+                `${restantes} registo(s) encontrado(s).`;
+        }
+
+    }catch(erro){
+
+        console.error("Erro ao eliminar registo:", erro);
+
+        botao.innerHTML = textoOriginal;
+        botao.disabled = false;
+
+        alert(
+            "Não foi possível eliminar o registo.\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+async function guardarRetificacaoProducao(id, botao){
+
+    const linha = document.querySelector(
+        `#tblRetificarProducaoBody tr[data-id="${id}"]`
+    );
+
+    if(!linha) return;
+
+    const tarefaFinalizada = linha
+        .querySelector(".edit-tarefaFinalizada")
+        .value
+        .trim();
+
+    const documentos = linha
+        .querySelector(".edit-Documentos")
+        .value
+        .trim();
+
+    if(!confirm("Guardar as alterações deste registo?")){
+        return;
+    }
+
+    const textoOriginal = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A guardar...';
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/BPO_dadosprodução?id=eq.${encodeURIComponent(id)}`,
+            {
+                method:"PATCH",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    "Prefer":"return=representation"
+                },
+                body:JSON.stringify({
+                    tarefaFinalizada: tarefaFinalizada || null,
+                    Documentos: documentos || null
+                })
+            }
+        );
+
+        const resultado = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(resultado);
+        }
+
+        linha.style.background = "#E8F5E9";
+
+        botao.innerHTML = '<i class="fa fa-check"></i> Guardado';
+
+        setTimeout(() => {
+            linha.style.background = "";
+            botao.innerHTML = textoOriginal;
+            botao.disabled = false;
+        }, 1500);
+
+    }catch(erro){
+
+        console.error("Erro ao guardar retificação:", erro);
+
+        botao.innerHTML = textoOriginal;
+        botao.disabled = false;
+
+        alert(
+            "Não foi possível guardar a alteração.\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+
 function mostrarForcarSQL(){
 
     document.querySelectorAll(".main > div").forEach(el => {
