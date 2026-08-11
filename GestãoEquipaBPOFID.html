@@ -6,7 +6,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{
-    
     margin:0;
     padding:0;
     box-sizing:border-box;
@@ -72,14 +71,15 @@ body{
 
 }
 
-/* LOGO DO MENU */
+/* LOGO */
+
 .logo{
     width:100%;
-    height:95px;
+    height:90px;
     display:flex;
     align-items:center;
     justify-content:center;
-    margin-bottom:18px;
+    margin-bottom:20px;
     overflow:hidden;
 }
 
@@ -489,12 +489,24 @@ canvas{
             </div>
         </div>
 
-        <!-- PRODUÇÃO POR ÁREA -->
-        <div class="content">
+        <!-- PRODUÇÃO POR ÁREA + TOTAL DO DIA -->
+        <div class="content" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px;align-items:start;">
             <div class="panel">
                 <h3>Produção por Área</h3>
+                <div id="listaProducaoArea"></div>
+            </div>
 
-                <div id="listaProducaoArea">
+            <div class="panel">
+                <h3>Produção Total do Dia</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;">
+                    <div style="background:#f7f9f7;border-radius:10px;padding:20px 10px;text-align:center;border:1px solid #e5e8e5;">
+                        <div id="dashboardTotalDocumentos" style="font-size:28px;font-weight:bold;color:#2E7D32;">0</div>
+                        <div style="font-size:11px;color:#888;margin-top:5px;">Documentos</div>
+                    </div>
+                    <div style="background:#f7f9f7;border-radius:10px;padding:20px 10px;text-align:center;border:1px solid #e5e8e5;">
+                        <div id="dashboardTotalTarefas" style="font-size:28px;font-weight:bold;color:#2E7D32;">0</div>
+                        <div style="font-size:11px;color:#888;margin-top:5px;">Tarefas</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1750,61 +1762,112 @@ async function carregarPlaneamentoDia(){
 
         function badgeLogin(nome){
 
-        const nomeNormalizado = normalizarNome(nome);
-        const lista = mapaRegistos[nomeNormalizado] || [];
+            const nomeNormalizado = normalizarNome(nome);
 
-        if(!lista.length){
+            const lista = mapaRegistos[nomeNormalizado] || [];
+
+
+            if(!lista.length){
+
+                return `
+                    <span style="
+                        float:right;
+                        background:#f8d7da;
+                        color:#721c24;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🔴 Sem Login
+                    </span>
+                `;
+
+            }
+
+
+            lista.sort((a,b) =>
+                new Date(a.inicio) - new Date(b.inicio)
+            );
+
+
+            const ultimo = lista[lista.length - 1];
+
+            const tipo = (ultimo.tipo || "")
+                .toString()
+                .trim()
+                .toLowerCase();
+
+
+            if(tipo === "login"){
+
+                const hora = ultimo.inicio
+                    ? new Date(ultimo.inicio).toLocaleTimeString(
+                        "pt-PT",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    )
+                    : "";
+
+                return `
+                    <span style="
+                        float:right;
+                        background:#d4edda;
+                        color:#155724;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🟢 ${hora}
+                    </span>
+                `;
+
+            }
+
+
+            if(tipo === "logout"){
+
+                const hora = ultimo.inicio
+                    ? new Date(ultimo.inicio).toLocaleTimeString(
+                        "pt-PT",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    )
+                    : "";
+
+                return `
+                    <span style="
+                        float:right;
+                        background:#fff3cd;
+                        color:#856404;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🟡 Logout ${hora}
+                    </span>
+                `;
+
+            }
+
+
             return `
-                <span style="float:right;background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
+                <span style="
+                    float:right;
+                    background:#f8d7da;
+                    color:#721c24;
+                    padding:3px 8px;
+                    border-radius:20px;
+                    font-size:11px;
+                    font-weight:bold;">
                     🔴 Sem Login
                 </span>
             `;
+
         }
-
-        let ultimoLogin = null;
-        let ultimoLogout = null;
-
-        lista.forEach(r => {
-            const tipo = (r.tipo || '').toString().trim().toLowerCase();
-
-            if(tipo === 'login' && (!ultimoLogin || new Date(r.inicio) > new Date(ultimoLogin.inicio))){
-                ultimoLogin = r;
-            }
-
-            if(tipo === 'logout' && (!ultimoLogout || new Date(r.inicio) > new Date(ultimoLogout.inicio))){
-                ultimoLogout = r;
-            }
-        });
-
-        if(!ultimoLogin){
-            return `
-                <span style="float:right;background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
-                    🔴 Sem Login
-                </span>
-            `;
-        }
-
-        const dataLogin = new Date(ultimoLogin.inicio);
-        const dataLogout = ultimoLogout ? new Date(ultimoLogout.inicio) : null;
-
-        if(!dataLogout || dataLogin > dataLogout){
-            const hora = dataLogin.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
-
-            return `
-                <span style="float:right;background:#d4edda;color:#155724;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
-                    🟢 Logado ${hora}
-                </span>
-            `;
-        }
-
-        const horaLogout = dataLogout.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
-
-        return `
-            <span style="float:right;background:#fff3cd;color:#856404;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
-                🟡 Logout ${horaLogout}
-            </span>
-        `;
-    }
 
 
         const lista = {
@@ -2745,6 +2808,9 @@ async function carregarGraficoProducao(){
     const dados = await resposta.json();
 const resumo = {};
 
+let totalDocumentosDia = 0;
+let totalTarefasDia = 0;
+
 dados.forEach(r => {
 
     const area = r.tarefafinalizada || "Sem área";
@@ -2756,11 +2822,14 @@ dados.forEach(r => {
         };
     }
 
-    resumo[area].documentos += Number(
-        r.total_documentos || 0
-    );
+    const documentos = Number(r.total_documentos || 0);
+    const tarefas = Number(r.total_tarefas || 0);
 
-resumo[area].tarefas += Number(r.total_tarefas || 0);
+    resumo[area].documentos += documentos;
+    resumo[area].tarefas += tarefas;
+
+    totalDocumentosDia += documentos;
+    totalTarefasDia += tarefas;
 });
 
 const labels = Object.keys(resumo);
@@ -2769,6 +2838,17 @@ const valores = labels.map(area =>
     resumo[area].documentos
 );;
 const lista = document.getElementById("listaProducaoArea");
+
+const totalDocsEl = document.getElementById("dashboardTotalDocumentos");
+const totalTarefasEl = document.getElementById("dashboardTotalTarefas");
+
+if(totalDocsEl){
+    totalDocsEl.innerText = totalDocumentosDia.toLocaleString("pt-PT");
+}
+
+if(totalTarefasEl){
+    totalTarefasEl.innerText = totalTarefasDia.toLocaleString("pt-PT");
+}
 
 lista.innerHTML = "";
 labels.forEach(area => {
@@ -3143,10 +3223,10 @@ const utilizadores = {
     "Carla Mariza Dias Trindade": "EX10613",
     "Nádia Filipa Contins Cunha Oliveira": "EX10622",
     "Gilda Maria Infante Anjos": "EX10867",
-    "Marcos Felipe Bastos Moura": "EX10889",
-    "Susana Carina Marques Bordalo": "EX10886",
+    "Marcos Felipe Bastos Moura": "EX10886",
+    "Susana Carina Marques Bordalo": "EX10888",
     "Sara Banú Chotumiã": "EX10891",
-    "Sofia Isabel Martins Cruz Mendes Ferreira": "EX10888",
+    "Sofia Isabel Martins Cruz Mendes Ferreira": "EX10889",
     "Rachel Alvarez dos Santos Coelho": "EX10884",
     "Carla Alexandra Duarte Reis": "EX10579",
     "Patrícia Alexandra Viegas André": "EX08554",
