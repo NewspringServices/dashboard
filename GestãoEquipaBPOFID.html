@@ -71,6 +71,26 @@ body{
 
 }
 
+/* LOGO DO MENU */
+.logo{
+    width:100%;
+    height:95px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:18px;
+    overflow:hidden;
+}
+
+.logo img{
+    display:block;
+    max-width:100%;
+    max-height:80px;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+}
+
 /* MENU */
 
 .sidebar{
@@ -1729,112 +1749,61 @@ async function carregarPlaneamentoDia(){
 
         function badgeLogin(nome){
 
-            const nomeNormalizado = normalizarNome(nome);
+        const nomeNormalizado = normalizarNome(nome);
+        const lista = mapaRegistos[nomeNormalizado] || [];
 
-            const lista = mapaRegistos[nomeNormalizado] || [];
-
-
-            if(!lista.length){
-
-                return `
-                    <span style="
-                        float:right;
-                        background:#f8d7da;
-                        color:#721c24;
-                        padding:3px 8px;
-                        border-radius:20px;
-                        font-size:11px;
-                        font-weight:bold;">
-                        🔴 Sem Login
-                    </span>
-                `;
-
-            }
-
-
-            lista.sort((a,b) =>
-                new Date(a.inicio) - new Date(b.inicio)
-            );
-
-
-            const ultimo = lista[lista.length - 1];
-
-            const tipo = (ultimo.tipo || "")
-                .toString()
-                .trim()
-                .toLowerCase();
-
-
-            if(tipo === "login"){
-
-                const hora = ultimo.inicio
-                    ? new Date(ultimo.inicio).toLocaleTimeString(
-                        "pt-PT",
-                        {
-                            hour:"2-digit",
-                            minute:"2-digit"
-                        }
-                    )
-                    : "";
-
-                return `
-                    <span style="
-                        float:right;
-                        background:#d4edda;
-                        color:#155724;
-                        padding:3px 8px;
-                        border-radius:20px;
-                        font-size:11px;
-                        font-weight:bold;">
-                        🟢 ${hora}
-                    </span>
-                `;
-
-            }
-
-
-            if(tipo === "logout"){
-
-                const hora = ultimo.inicio
-                    ? new Date(ultimo.inicio).toLocaleTimeString(
-                        "pt-PT",
-                        {
-                            hour:"2-digit",
-                            minute:"2-digit"
-                        }
-                    )
-                    : "";
-
-                return `
-                    <span style="
-                        float:right;
-                        background:#fff3cd;
-                        color:#856404;
-                        padding:3px 8px;
-                        border-radius:20px;
-                        font-size:11px;
-                        font-weight:bold;">
-                        🟡 Logout ${hora}
-                    </span>
-                `;
-
-            }
-
-
+        if(!lista.length){
             return `
-                <span style="
-                    float:right;
-                    background:#f8d7da;
-                    color:#721c24;
-                    padding:3px 8px;
-                    border-radius:20px;
-                    font-size:11px;
-                    font-weight:bold;">
+                <span style="float:right;background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
                     🔴 Sem Login
                 </span>
             `;
-
         }
+
+        let ultimoLogin = null;
+        let ultimoLogout = null;
+
+        lista.forEach(r => {
+            const tipo = (r.tipo || '').toString().trim().toLowerCase();
+
+            if(tipo === 'login' && (!ultimoLogin || new Date(r.inicio) > new Date(ultimoLogin.inicio))){
+                ultimoLogin = r;
+            }
+
+            if(tipo === 'logout' && (!ultimoLogout || new Date(r.inicio) > new Date(ultimoLogout.inicio))){
+                ultimoLogout = r;
+            }
+        });
+
+        if(!ultimoLogin){
+            return `
+                <span style="float:right;background:#f8d7da;color:#721c24;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
+                    🔴 Sem Login
+                </span>
+            `;
+        }
+
+        const dataLogin = new Date(ultimoLogin.inicio);
+        const dataLogout = ultimoLogout ? new Date(ultimoLogout.inicio) : null;
+
+        if(!dataLogout || dataLogin > dataLogout){
+            const hora = dataLogin.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+
+            return `
+                <span style="float:right;background:#d4edda;color:#155724;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
+                    🟢 Logado ${hora}
+                </span>
+            `;
+        }
+
+        const horaLogout = dataLogout.toLocaleTimeString('pt-PT',{hour:'2-digit',minute:'2-digit'});
+
+        return `
+            <span style="float:right;background:#fff3cd;color:#856404;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:bold;">
+                🟡 Logout ${horaLogout}
+            </span>
+        `;
+    }
 
 
         const lista = {
@@ -4334,4 +4303,3 @@ async function carregarAlertas(){
 
 }
         </script></body></html>
-
