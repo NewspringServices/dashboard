@@ -2643,84 +2643,101 @@ async function carregarLogins(){
 
     try{
 
-        const resposta = await fetch(
-            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc`,
-            {
-                headers:{
-                    apikey: SUPABASE_API_KEY,
-                    Authorization:`Bearer ${SUPABASE_API_KEY}`
-                }
+        let url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao`;
+
+        const data = document.getElementById("fDataLogins").value;
+        const tipo = document.getElementById("fTipoLogins").value;
+        const user = document.getElementById("fUserLogins").value.trim();
+        const nome = document.getElementById("fNomeLogins").value.trim();
+
+        if(data){
+            url += `&data=eq.${data}`;
+        }
+
+        if(tipo){
+            url += `&tipo=eq.${encodeURIComponent(tipo)}`;
+        }
+
+        if(user){
+            url += `&user=ilike.*${encodeURIComponent(user)}*`;
+        }
+
+        if(nome){
+            url += `&nome=ilike.*${encodeURIComponent(nome)}*`;
+        }
+
+        url += "&order=data.desc,inicio.desc";
+
+        const resposta = await fetch(url,{
+            headers:{
+                apikey: SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
             }
-        );
+        });
 
         const dados = await resposta.json();
 
         if(!resposta.ok){
-            console.log(dados);
+            console.error("Erro Supabase Logins:", dados);
+            alert("Erro ao carregar os Logins:\n\n" + (dados.message || JSON.stringify(dados)));
             return;
         }
 
-      function formatarHora(dataHora){
+        function formatarHora(dataHora){
+            if(!dataHora) return "";
+            try{
+                if(dataHora.includes("T")){
+                    return dataHora.split("T")[1].substring(0,8);
+                }
+                return dataHora;
+            }catch(e){
+                return dataHora;
+            }
+        }
 
-    if(!dataHora) return "";
+        function formatarDuracao(horas){
+            if(horas == null || horas === "") return "";
+            const totalSegundos = Math.round(Number(horas) * 3600);
+            const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
+            const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
+            const s = String(totalSegundos % 60).padStart(2,"0");
+            return `${h}:${m}:${s}`;
+        }
 
-    return dataHora.split("T")[1].substring(0,8);
+        const tbody = document.querySelector("#tblLogins tbody");
+        tbody.innerHTML = "";
 
-}
+        if(!dados.length){
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align:center;padding:20px;color:#777;">
+                        Não foram encontrados registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
 
-function formatarDuracao(horas){
-
-    if(horas == null) return "";
-
-    const totalSegundos = Math.round(Number(horas) * 3600);
-
-    const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
-    const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
-    const s = String(totalSegundos % 60).padStart(2,"0");
-
-    return `${h}:${m}:${s}`;
-
-}
-
-const tbody = document.querySelector("#tblLogins tbody");
-
-tbody.innerHTML = "";
-
-dados.forEach(registo => {
-
-    tbody.innerHTML += `
-        <tr>
-            <td>${registo.data ?? ""}</td>
-            <td>${registo.user ?? ""}</td>
-            <td>${registo.nome ?? ""}</td>
-            <td>${registo.tipo ?? ""}</td>
-            <td>${formatarHora(registo.inicio)}</td>
-            <td>${formatarHora(registo.fim)}</td>
-            <td>${formatarDuracao(registo.duracao)}</td>
-        </tr>
-    `;
-
-});
-
-function formatarDuracao(horas){
-
-    if(horas == null) return "";
-
-    const totalSegundos = Math.round(Number(horas) * 3600);
-
-    const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
-    const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
-    const s = String(totalSegundos % 60).padStart(2,"0");
-
-    return `${h}:${m}:${s}`;
-
-}
+        dados.forEach(registo => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${registo.data ?? ""}</td>
+                    <td>${registo.user ?? ""}</td>
+                    <td>${registo.nome ?? ""}</td>
+                    <td>${registo.tipo ?? ""}</td>
+                    <td>${formatarHora(registo.inicio)}</td>
+                    <td>${formatarHora(registo.fim)}</td>
+                    <td>${formatarDuracao(registo.duracao)}</td>
+                </tr>
+            `;
+        });
 
     }catch(e){
-        console.error(e);
+        console.error("Erro carregarLogins:", e);
+        alert("Ocorreu um erro ao carregar os Logins.");
     }
-
 }
+
 
 setInterval(()=>clock.innerHTML=new Date().toLocaleString('pt-PT'),1000);
 
