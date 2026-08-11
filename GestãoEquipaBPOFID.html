@@ -11,6 +11,27 @@
     box-sizing:border-box;
     font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
 }
+#tblRetificarProducao {
+    font-size: 12px;
+}
+
+#tblRetificarProducao th,
+#tblRetificarProducao td {
+    padding: 6px 8px;
+    white-space: nowrap;
+}
+
+#tblRetificarProducao input {
+    font-size: 12px;
+    padding: 5px 7px;
+    height: 30px;
+}
+
+#tblRetificarProducao button {
+    font-size: 11px;
+    padding: 5px 8px;
+    margin: 0;
+}
 
 #tblResumoDia th,
 #tblRelatorioTempos th{
@@ -323,6 +344,12 @@ tbody tr:hover{
     background:#E8F5E9;
 
 }
+.logo img {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
 
 /* LISTAS */
 
@@ -339,7 +366,9 @@ canvas{
 }
 </style></head><body>
 <div class="sidebar">
-<div class="logo"><i class="fa fa-chart-line"></i> Supervisor</div>
+<div class="logo">
+    <img src="logo2.png" alt="Logo">
+</div>
 <div class="menu">
 <a class="active" onclick="mostrarDashboard()">
     <i class="fa fa-house"></i> Dashboard</a>
@@ -3863,20 +3892,25 @@ async function pesquisarRetificarProducao(){
                         >
                     </td>
 
-                    <td>
-                        <button
-                            type="button"
-                            onclick="guardarRetificacaoProducao(${Number(registo.id)}, this)">
-                            <i class="fa fa-floppy-disk"></i> Guardar
-                        </button>
+                   <td>
+    <div style="display:flex; gap:5px; align-items:center; white-space:nowrap;">
 
-                        <button
-                            type="button"
-                            onclick="eliminarRetificacaoProducao(${Number(registo.id)}, this)"
-                            style="margin-left:6px;">
-                            <i class="fa fa-trash"></i> Eliminar
-                        </button>
-                    </td>
+        <button
+            type="button"
+            onclick="guardarRetificacaoProducao(${Number(registo.id)}, this)"
+            style="font-size:11px; padding:5px 8px;">
+            <i class="fa fa-floppy-disk"></i> Guardar
+        </button>
+
+        <button
+            type="button"
+            onclick="eliminarRetificacaoProducao(${Number(registo.id)}, this)"
+            style="font-size:11px; padding:5px 8px;">
+            <i class="fa fa-trash"></i> Eliminar
+        </button>
+
+    </div>
+</td>
                 </tr>
             `;
 
@@ -4126,3 +4160,4 @@ async function atualizarRelatorios(){
 }
 
         </script></body></html>
+
