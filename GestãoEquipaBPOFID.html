@@ -72,16 +72,12 @@ body{
 }
 
 .logo{
+
+    font-size:24px;
+    font-weight:700;
     text-align:center;
     margin-bottom:35px;
-}
 
-.logo img{
-    width:180px;
-    max-width:100%;
-    height:auto;
-    display:block;
-    margin:auto;
 }
 
 .menu a{
@@ -343,9 +339,7 @@ canvas{
 }
 </style></head><body>
 <div class="sidebar">
-<div class="logo">
-    <img src="logo2.png" alt="Newspring Services">
-</div>
+<div class="logo"><i class="fa fa-chart-line"></i> Supervisor</div>
 <div class="menu">
 <a class="active" onclick="mostrarDashboard()">
     <i class="fa fa-house"></i> Dashboard</a>
@@ -1543,6 +1537,7 @@ function toggleAdministracao(){
         menu.style.display === "block" ? "none" : "block";
 
 }
+
 async function carregarPlaneamentoDia(){
 
     try{
@@ -1559,18 +1554,18 @@ async function carregarPlaneamentoDia(){
         const resposta = await fetch(url,{
             headers:{
                 apikey: SUPABASE_API_KEY,
-                Authorization: `Bearer ${SUPABASE_API_KEY}`
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
             }
         });
 
         const dados = await resposta.json();
 
-        // Buscar registos do dia
+
         const respostaRegistos = await fetch(
-            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=nome,tipo,inicio&order=inicio.asc`,
+            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,nome,tipo,inicio&data=eq.${dataFiltro}&order=inicio.asc`,
             {
                 headers:{
-                    apikey: SUPABASE_API_KEY,
+                    apikey:SUPABASE_API_KEY,
                     Authorization:`Bearer ${SUPABASE_API_KEY}`
                 }
             }
@@ -1578,39 +1573,87 @@ async function carregarPlaneamentoDia(){
 
         const registos = await respostaRegistos.json();
 
-        const registosDia = registos.filter(r =>
-            (r.inicio || "").startsWith(dataFiltro)
-        );
+
+        function normalizarNome(nome){
+
+            return (nome || "")
+                .toString()
+                .trim()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g,"")
+                .replace(/\s+/g," ");
+
+        }
+
+
+        const mapaRegistos = {};
+
+
+        registos.forEach(r => {
+
+            const nomeNormalizado = normalizarNome(r.nome);
+
+            if(!nomeNormalizado) return;
+
+            if(!mapaRegistos[nomeNormalizado]){
+                mapaRegistos[nomeNormalizado] = [];
+            }
+
+            mapaRegistos[nomeNormalizado].push(r);
+
+        });
+
 
         function badgeLogin(nome){
 
-            const login = registosDia.find(r =>
-                r.nome === nome &&
-                (r.tipo || "").toLowerCase() === "login"
-            );
+            const nomeNormalizado = normalizarNome(nome);
 
-            const logout = registosDia.find(r =>
-                r.nome === nome &&
-                (r.tipo || "").toLowerCase() === "logout"
-            );
+            const lista = mapaRegistos[nomeNormalizado] || [];
 
-            if(logout){
+
+            if(!lista.length){
+
                 return `
                     <span style="
                         float:right;
-                        background:#fff3cd;
-                        color:#856404;
+                        background:#f8d7da;
+                        color:#721c24;
                         padding:3px 8px;
                         border-radius:20px;
                         font-size:11px;
                         font-weight:bold;">
-                        🟡 Logout
-                    </span>`;
+                        🔴 Sem Login
+                    </span>
+                `;
+
             }
 
-            if(login){
 
-                const hora = login.inicio.substring(11,16);
+            lista.sort((a,b) =>
+                new Date(a.inicio) - new Date(b.inicio)
+            );
+
+
+            const ultimo = lista[lista.length - 1];
+
+            const tipo = (ultimo.tipo || "")
+                .toString()
+                .trim()
+                .toLowerCase();
+
+
+            if(tipo === "login"){
+
+                const hora = ultimo.inicio
+                    ? new Date(ultimo.inicio).toLocaleTimeString(
+                        "pt-PT",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    )
+                    : "";
 
                 return `
                     <span style="
@@ -1622,8 +1665,39 @@ async function carregarPlaneamentoDia(){
                         font-size:11px;
                         font-weight:bold;">
                         🟢 ${hora}
-                    </span>`;
+                    </span>
+                `;
+
             }
+
+
+            if(tipo === "logout"){
+
+                const hora = ultimo.inicio
+                    ? new Date(ultimo.inicio).toLocaleTimeString(
+                        "pt-PT",
+                        {
+                            hour:"2-digit",
+                            minute:"2-digit"
+                        }
+                    )
+                    : "";
+
+                return `
+                    <span style="
+                        float:right;
+                        background:#fff3cd;
+                        color:#856404;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🟡 Logout ${hora}
+                    </span>
+                `;
+
+            }
+
 
             return `
                 <span style="
@@ -1635,122 +1709,210 @@ async function carregarPlaneamentoDia(){
                     font-size:11px;
                     font-weight:bold;">
                     🔴 Sem Login
-                </span>`;
+                </span>
+            `;
+
         }
 
+
         const lista = {
-            trabalha: [],
-            ferias: [],
-            baixa: [],
-            licenca: [],
-            dispensa: []
+            trabalha:[],
+            ferias:[],
+            baixa:[],
+            licenca:[],
+            dispensa:[]
         };
 
-        dados.forEach(r=>{
 
-            const estado = (r.estado || "").toLowerCase();
+        dados.forEach(r => {
+
+            const estado = (r.estado || "")
+                .toString()
+                .trim()
+                .toLowerCase();
+
 
             if(estado.includes("trabalha")){
+
                 lista.trabalha.push(r.nome);
+
             }
-            else if(estado.includes("férias") || estado.includes("ferias")){
+            else if(
+                estado.includes("férias") ||
+                estado.includes("ferias")
+            ){
+
                 lista.ferias.push(r.nome);
+
             }
             else if(estado.includes("baixa")){
+
                 lista.baixa.push(r.nome);
+
             }
-            else if(estado.includes("licença") || estado.includes("licenca")){
+            else if(
+                estado.includes("licença") ||
+                estado.includes("licenca")
+            ){
+
                 lista.licenca.push(r.nome);
+
             }
             else if(estado.includes("dispensa")){
+
                 lista.dispensa.push(r.nome);
+
             }
 
         });
 
+
         const cards = document.getElementById("cardsPlaneamentoDia");
 
+
         cards.innerHTML = `
+
             <div class="card">
-                <h3><i class="fa fa-user-check"></i> Trabalha (${lista.trabalha.length})</h3>
+
+                <h3>
+                    <i class="fa fa-user-check"></i>
+                    Trabalha (${lista.trabalha.length})
+                </h3>
+
                 <hr style="margin:10px 0;">
+
                 ${
                     lista.trabalha.length
-                    ? lista.trabalha.map(n=>`
-                        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ?
+                    lista.trabalha.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;
+                            min-height:30px;">
                             ${n}
                             ${badgeLogin(n)}
                         </div>
                     `).join("")
-                    : "<div style='color:#999'>Sem colaboradores</div>"
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
                 }
+
             </div>
 
+
             <div class="card">
-                <h3><i class="fa fa-umbrella-beach"></i> Férias (${lista.ferias.length})</h3>
+
+                <h3>
+                    <i class="fa fa-umbrella-beach"></i>
+                    Férias (${lista.ferias.length})
+                </h3>
+
                 <hr style="margin:10px 0;">
+
                 ${
                     lista.ferias.length
-                    ? lista.ferias.map(n=>`
-                        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ?
+                    lista.ferias.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
                             ${n}
                         </div>
                     `).join("")
-                    : "<div style='color:#999'>Sem colaboradores</div>"
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
                 }
+
             </div>
 
+
             <div class="card">
-                <h3><i class="fa fa-heart-pulse"></i> Baixa (${lista.baixa.length})</h3>
+
+                <h3>
+                    <i class="fa fa-heart-pulse"></i>
+                    Baixa (${lista.baixa.length})
+                </h3>
+
                 <hr style="margin:10px 0;">
+
                 ${
                     lista.baixa.length
-                    ? lista.baixa.map(n=>`
-                        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ?
+                    lista.baixa.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
                             ${n}
                         </div>
                     `).join("")
-                    : "<div style='color:#999'>Sem colaboradores</div>"
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
                 }
+
             </div>
 
+
             <div class="card">
-                <h3><i class="fa fa-file-medical"></i> Licença (${lista.licenca.length})</h3>
+
+                <h3>
+                    <i class="fa fa-file-medical"></i>
+                    Licença (${lista.licenca.length})
+                </h3>
+
                 <hr style="margin:10px 0;">
+
                 ${
                     lista.licenca.length
-                    ? lista.licenca.map(n=>`
-                        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ?
+                    lista.licenca.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
                             ${n}
                         </div>
                     `).join("")
-                    : "<div style='color:#999'>Sem colaboradores</div>"
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
                 }
+
             </div>
 
+
             <div class="card">
-                <h3><i class="fa fa-user-slash"></i> Dispensa (${lista.dispensa.length})</h3>
+
+                <h3>
+                    <i class="fa fa-user-slash"></i>
+                    Dispensa (${lista.dispensa.length})
+                </h3>
+
                 <hr style="margin:10px 0;">
+
                 ${
                     lista.dispensa.length
-                    ? lista.dispensa.map(n=>`
-                        <div style="padding:6px 0;border-bottom:1px solid #eee;">
+                    ?
+                    lista.dispensa.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
                             ${n}
                         </div>
                     `).join("")
-                    : "<div style='color:#999'>Sem colaboradores</div>"
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
                 }
+
             </div>
+
         `;
+
 
     }catch(e){
 
-        console.error(e);
+        console.error("Erro no Planeamento Dia:",e);
 
     }
 
 }
-
 
 function togglePlaneamento(){
 
