@@ -372,7 +372,7 @@ canvas{
 </style></head><body>
 <div class="sidebar">
 <div class="logo">
-    <img src="logo2.png" alt="Newspring Services">
+    <img src="logo.png" alt="Newspring Services">
 </div>
 <div class="menu">
 <a class="active" onclick="mostrarDashboard()">
@@ -1404,7 +1404,7 @@ async function carregarEliminarRegistos(){
 
 
     const dados = await resposta.json();
-
+console.log("DADOS DOS ALERTAS:", dados);
 
     const tbody = document.querySelector("#tblEliminarRegistos tbody");
 
@@ -2103,141 +2103,6 @@ document.getElementById("planeamentoMes").style.display="none";
 
 }
 
-async function carregarAlertas(){
-
-    try{
-
-        const hoje = new Date().toISOString().slice(0,10);
-
-        const resposta = await fetch(
-            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?data=eq.${hoje}&select=*`,
-            {
-                headers:{
-                    apikey:SUPABASE_API_KEY,
-                    Authorization:`Bearer ${SUPABASE_API_KEY}`
-                }
-            }
-        );
-
-        const dados = await resposta.json();
-
-   const alertas = {
-    login:[],
-    pausa1:[],
-    refeicao:[],
-    pausa2:[],
-    duplicados:[]
-};
-
-const primeiroLogin = {};
-const contador = {};
-
- dados.forEach(r=>{
-
-    const chave = `${r.user}_${r.tipo}`;
-    contador[chave] = (contador[chave] || 0) + 1;
-
-    const tipo = (r.tipo || "").toLowerCase();
-
-            // Login após as 09:00
-            if(tipo.includes("login")){
-
-                const hora = r.inicio.split("T")[1].substring(0,8);
-
-                if(hora > "09:00:00"){
-                    alertas.login.push(`${r.nome} (${hora})`);
-                }
-            }
-
-            // Pausa 1 >16 min
-            else if(tipo.includes("pausa1") && Number(r.duracao) > 0.2667){
-
-                alertas.pausa1.push(
-                    `${r.nome} (${formatarHoras(r.duracao)})`
-                );
-
-            }
-
-            // Refeição >65 min
-            else if((tipo.includes("refeição") || tipo.includes("refeicao")) && Number(r.duracao) > 1.0833){
-
-                alertas.refeicao.push(
-                    `${r.nome} (${formatarHoras(r.duracao)})`
-                );
-
-            }
-
-            // Pausa2 >16 min
-            else if(tipo.includes("pausa2") && Number(r.duracao) > 0.2667){
-
-                alertas.pausa2.push(
-                    `${r.nome} (${formatarHoras(r.duracao)})`
-                );
-
-            }
-
-        });
-
-        document.getElementById("cardsAlertas").innerHTML = `
-
-            <div class="card">
-                <h3>⏰ Logins Tardios (${alertas.login.length})</h3>
-                <hr style="margin:10px 0;">
-                ${
-                    alertas.login.length
-                    ? alertas.login.map(x=>`<div style="padding:4px 0">${x}</div>`).join("")
-                    : "<div style='color:#999'>Sem alertas</div>"
-                }
-            </div>
-
-            <div class="card">
-                <h3>☕ Pausa 1 Excedida (${alertas.pausa1.length})</h3>
-                <hr style="margin:10px 0;">
-                ${
-                    alertas.pausa1.length
-                    ? alertas.pausa1.map(x=>`<div style="padding:4px 0">${x}</div>`).join("")
-                    : "<div style='color:#999'>Sem alertas</div>"
-                }
-            </div>
-
-            <div class="card">
-                <h3>🍽️ Refeição Excedida (${alertas.refeicao.length})</h3>
-                <hr style="margin:10px 0;">
-                ${
-                    alertas.refeicao.length
-                    ? alertas.refeicao.map(x=>`<div style="padding:4px 0">${x}</div>`).join("")
-                    : "<div style='color:#999'>Sem alertas</div>"
-                }
-            </div>
-
-            <div class="card">
-                <h3>☕ Pausa 2 Excedida (${alertas.pausa2.length})</h3>
-                <hr style="margin:10px 0;">
-                ${
-                    alertas.pausa2.length
-                    ? alertas.pausa2.map(x=>`<div style="padding:4px 0">${x}</div>`).join("")
-                    : "<div style='color:#999'>Sem alertas</div>"
-                }
-            </div>
-<div class="card">
-    <h3>📄 Registos Duplicados (${alertas.duplicados.length})</h3>
-    <hr style="margin:10px 0;">
-    ${
-        alertas.duplicados.length
-        ? alertas.duplicados.map(x=>`<div style="padding:4px 0">${x}</div>`).join("")
-        : "<div style='color:#999'>Sem alertas</div>"
-    }
-</div>
-        `;
-
-    }catch(e){
-
-        console.error(e);
-
-    }
-
-}
-
 
 async function carregarCardsDashboard(){
 
@@ -2419,6 +2284,7 @@ const alertas = pessoasSemPresenca.length;
 document.getElementById("cardOperacionais").innerText = operacionais;
 document.getElementById("cardSemPresenca").innerText = semPresenca;
 }
+
 
 async function carregarRelatorioTempos(){
 
@@ -4163,5 +4029,326 @@ async function atualizarRelatorios(){
 
     }
 }
+async function carregarAlertas(){
 
+    try{
+
+        const hoje = new Date().toISOString().slice(0,10);
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?data=eq.${hoje}&select=id,user,nome,tipo,inicio,duracao&order=id.asc`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                },
+                cache:"no-store"
+            }
+        );
+
+        if(!resposta.ok){
+            throw new Error("Erro ao consultar BPO_registosNSS: " + resposta.status);
+        }
+
+        const dados = await resposta.json();
+
+        console.log("REGISTOS LIDOS DO SUPABASE:", dados);
+
+        const alertas = {
+            login:[],
+            pausa1:[],
+            refeicao:[],
+            pausa2:[],
+            duplicados:[]
+        };
+
+
+        // =====================================================
+        // ALERTAS NORMAIS
+        // =====================================================
+
+        dados.forEach(r => {
+
+            const tipo = String(r.tipo || "")
+                .trim()
+                .toLowerCase();
+
+            const nome = String(r.nome || "")
+                .trim();
+
+            // LOGIN APÓS 09:00
+            if(tipo.includes("login")){
+
+                if(r.inicio){
+
+                    const horaCompleta = String(r.inicio)
+                        .split("T")[1];
+
+                    if(horaCompleta){
+
+                        const hora = horaCompleta.substring(0,8);
+
+                        if(hora > "09:00:00"){
+
+                            alertas.login.push(
+                                `${nome} (${hora})`
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+            // PAUSA 1 > 16 MIN
+            if(
+                tipo.includes("pausa1") &&
+                Number(r.duracao) > 0.2667
+            ){
+
+                alertas.pausa1.push(
+                    `${nome} (${formatarHoras(r.duracao)})`
+                );
+
+            }
+
+
+            // REFEIÇÃO > 65 MIN
+            if(
+                (
+                    tipo.includes("refeicao") ||
+                    tipo.includes("refeição")
+                ) &&
+                Number(r.duracao) > 1.0833
+            ){
+
+                alertas.refeicao.push(
+                    `${nome} (${formatarHoras(r.duracao)})`
+                );
+
+            }
+
+
+            // PAUSA 2 > 16 MIN
+            if(
+                tipo.includes("pausa2") &&
+                Number(r.duracao) > 0.2667
+            ){
+
+                alertas.pausa2.push(
+                    `${nome} (${formatarHoras(r.duracao)})`
+                );
+
+            }
+
+        });
+
+
+        // =====================================================
+        // REGISTOS DUPLICADOS
+        // USA USER + TIPO
+        // =====================================================
+
+        const grupos = {};
+
+        dados.forEach(r => {
+
+            const user = String(r.user || "")
+                .trim()
+                .toLowerCase();
+
+            const tipo = String(r.tipo || "")
+                .trim()
+                .toLowerCase();
+
+            if(!user || !tipo){
+                return;
+            }
+
+            const chave = user + "|||" + tipo;
+
+            if(!grupos[chave]){
+                grupos[chave] = [];
+            }
+
+            grupos[chave].push(r);
+
+        });
+
+
+        Object.entries(grupos).forEach(([chave, registos]) => {
+
+            // Só é duplicado se EXISTIREM realmente
+            // pelo menos 2 registos na resposta atual
+            if(registos.length < 2){
+                return;
+            }
+
+            const partes = chave.split("|||");
+
+            const user = partes[0];
+            const tipo = partes[1];
+
+            const nome = registos[0].nome || user;
+
+            let tipoNome = tipo;
+
+            if(tipo.includes("login")){
+                tipoNome = "Login";
+            }
+            else if(tipo.includes("logout")){
+                tipoNome = "Logout";
+            }
+            else if(tipo.includes("pausa1")){
+                tipoNome = "Pausa 1";
+            }
+            else if(tipo.includes("pausa2")){
+                tipoNome = "Pausa 2";
+            }
+            else if(
+                tipo.includes("refeicao") ||
+                tipo.includes("refeição")
+            ){
+                tipoNome = "Refeição";
+            }
+            else if(tipo.includes("formacao")){
+                tipoNome = "Formação";
+            }
+
+            alertas.duplicados.push(
+                `${nome} (${user}) — ${tipoNome} (${registos.length} registos)`
+            );
+
+        });
+
+
+        // =====================================================
+        // LIMPAR O CONTEÚDO ANTIGO
+        // =====================================================
+
+        const container = document.getElementById("cardsAlertas");
+
+        if(!container){
+            console.error("Elemento cardsAlertas não encontrado.");
+            return;
+        }
+
+        container.innerHTML = "";
+
+
+        // =====================================================
+        // CONSTRUIR NOVAMENTE OS ALERTAS
+        // =====================================================
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <h3>
+                    ⏰ Logins Tardios (${alertas.login.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.login.length
+                    ? alertas.login
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    ☕ Pausa 1 Excedida (${alertas.pausa1.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.pausa1.length
+                    ? alertas.pausa1
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    🍽️ Refeição Excedida (${alertas.refeicao.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.refeicao.length
+                    ? alertas.refeicao
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    ☕ Pausa 2 Excedida (${alertas.pausa2.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.pausa2.length
+                    ? alertas.pausa2
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    📄 Registos Duplicados (${alertas.duplicados.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.duplicados.length
+                    ? alertas.duplicados
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+        `;
+
+        console.log("DUPLICADOS ENCONTRADOS:", alertas.duplicados);
+
+    }
+    catch(e){
+
+        console.error("ERRO AO CARREGAR ALERTAS:", e);
+
+    }
+
+}
         </script></body></html>
