@@ -805,13 +805,12 @@ select:focus{
         <input type="number" id="documentos">
       </div>
       <div class="form-group">
-        <label>Tarefa Finalizada</label>
-        <select id="tarefaFinalizada">
-    <option>PETS</option>
-<option>AT Participações</option>
-        <option>Erros/SPAMS</option>
-
-        </select>
+                <select id="tarefaFinalizada" required>
+    <option value="" selected disabled>Selecionar tarefa...</option>
+  <option value="PETS GAMA">PETS GAMA</option>
+  <option value="AT PS">AT PS</option>
+  <option value="Erros/SPAMS">Erros/SPAMS</option>
+</select>
       </div>
       <div class="form-group">
         <label>Tempo da Tarefa</label>
@@ -1191,6 +1190,11 @@ endBtn.onclick = async ()=>{
   const processo = document.getElementById("processoGama").value;
   const docs = document.getElementById("documentos").value;
   const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
+    if (!tarefaFinalizada) {
+    responseMessage.textContent = "❌ É obrigatório selecionar a Tarefa Finalizada.";
+    document.getElementById("tarefaFinalizada").focus();
+    return;
+}
 const numDocs = parseInt(docs, 10);
 
 if (isNaN(numDocs) || numDocs < 1 || numDocs > 100) {
