@@ -1091,19 +1091,20 @@ select:focus{
       </div>
       <div class="form-group">
         <label>Tarefa Finalizada</label>
-        <select id="tarefaFinalizada">
-                                <option>AT Indexações</option>
-
-                    <option>DNP</option>
-                    <option>DNE</option>
-                                <option>Auto - Aberturas</option>
-                    <option>Auto - Indexações</option>
-                                <option>Auto - Indexações MIB</option>
-
-          <option>Reembolsos Multicare</option>
-          <option>Formação/Meetings</option>
-        </select>
+  <select id="tarefaFinalizada" required>
+    <option value="" selected disabled>Selecionar tarefa...</option>
+    <option value="AT Indexações">AT Indexações</option>
+    <option value="DNP">DNP</option>
+    <option value="DNE">DNE</option>
+    <option value="Auto - Aberturas">Auto - Aberturas</option>
+    <option value="Auto - Indexações">Auto - Indexações</option>
+    <option value="Auto - Indexações MIB">Auto - Indexações MIB</option>
+    <option value="Reembolsos Multicare">Reembolsos Multicare</option>
+    <option value="Formação/Meetings">Formação/Meetings</option>
+</select>
       </div>
+
+        
       <div class="form-group">
         <label>Tempo da Tarefa</label>
         <input type="text" id="tempoTarefa" readonly>
@@ -1494,7 +1495,11 @@ endBtn.onclick = async ()=>{
   const docs = document.getElementById("documentos").value;
   const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
 const numDocs = parseInt(docs, 10);
-
+if (!tarefaFinalizada) {
+    responseMessage.textContent = "❌ É obrigatório selecionar a Tarefa Finalizada.";
+    document.getElementById("tarefaFinalizada").focus();
+    return;
+}
 if (isNaN(numDocs) || numDocs < 1 || numDocs > 100) {
     responseMessage.textContent = "❌ O número de documentos deve estar entre 1 e 100.";
     document.getElementById("documentos").focus();
