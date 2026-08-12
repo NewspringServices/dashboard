@@ -806,16 +806,16 @@ select:focus{
       </div>
       <div class="form-group">
         <label>Tarefa Finalizada</label>
-        <select id="tarefaFinalizada">
-                     <option>Auto-Aberturas</option>
-        <option>Auto-Indexações</option>
-                       <option>Auto-Indexações MIB</option>
+  <select id="tarefaFinalizada" required>
+    <option value="" selected disabled>Selecionar tarefa...</option>
+    <option value="Auto - Aberturas">Auto - Aberturas</option>
+    <option value="Auto - Indexações">Auto - Indexações</option>
+    <option value="Auto - Indexações MIB">Auto - Indexações MIB</option>
+                  <option value="Auto - Indexações MIB">Auto - Indexações MIB</option>
+    <option value="Erros/SPAMS">Erros/SPAMS</option>
+          <option value="DNP">DNP</option>
 
-        <option>Auto-Devolução de E-mail</option>
-        <option>Erros/SPAMS</option>
-                    <option>DNP</option>
-
-        </select>
+</select>
       </div>
       <div class="form-group">
         <label>Tempo da Tarefa</label>
@@ -1195,6 +1195,11 @@ endBtn.onclick = async ()=>{
   const processo = document.getElementById("processoGama").value;
   const docs = document.getElementById("documentos").value;
   const tarefaFinalizada = document.getElementById("tarefaFinalizada").value;
+    if (!tarefaFinalizada) {
+    responseMessage.textContent = "❌ É obrigatório selecionar a Tarefa Finalizada.";
+    document.getElementById("tarefaFinalizada").focus();
+    return;
+}
 const numDocs = parseInt(docs, 10);
 
 if (isNaN(numDocs) || numDocs < 1 || numDocs > 100) {
