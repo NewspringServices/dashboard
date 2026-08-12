@@ -1350,6 +1350,9 @@ const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhY
 
 function mostrarPlaneamento(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
@@ -1431,6 +1434,9 @@ function limparFiltrosLogins(){
 
 }
 function mostrarPlataformas(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
 
        document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1637,6 +1643,9 @@ Portal Newspring
 }
 function mostrarForcarRegistos(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
       document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
@@ -1658,6 +1667,9 @@ function mostrarForcarRegistos(){
 }
 
 function mostrarAlertas(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
 
      document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1683,6 +1695,9 @@ function mostrarAlertas(){
 
 function mostrarEliminarRegistos(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
@@ -1706,6 +1721,9 @@ function mostrarEliminarRegistos(){
 }
 function abrirRelatorioOcupacao(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
@@ -1725,6 +1743,9 @@ function abrirRelatorioOcupacao(){
 }
 
 function mostrarLogins(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
@@ -2144,6 +2165,9 @@ function togglePlaneamento(){
 
 function mostrarPlaneamentoDia(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("plataformas").style.display="none";
@@ -2168,6 +2192,9 @@ function mostrarPlaneamentoDia(){
 
 
 function abrirRelatorioTempos(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
 
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -2451,12 +2478,37 @@ async function carregarDadosMes(){
                 </tr>
             `;
         }else{
-            tbody.innerHTML = dadosDia.map(r => `
+            // Agrupar por DIA + TAREFA/ÁREA:
+            // se existirem várias linhas da mesma tarefa no mesmo dia,
+            // aparece apenas uma linha com os totais somados.
+            const agrupado = {};
+
+            dadosDia.forEach(r => {
+                const data = r.data || "";
+                const tarefa = (r.tarefafinalizada || "Sem área").trim();
+                const chave = `${data}|||${tarefa}`;
+
+                if(!agrupado[chave]){
+                    agrupado[chave] = {
+                        data,
+                        tarefa,
+                        total_documentos: 0,
+                        total_tarefas: 0
+                    };
+                }
+
+                agrupado[chave].total_documentos += Number(r.total_documentos || 0);
+                agrupado[chave].total_tarefas += Number(r.total_tarefas || 0);
+            });
+
+            const linhasAgrupadas = Object.values(agrupado);
+
+            tbody.innerHTML = linhasAgrupadas.map(r => `
                 <tr>
-                    <td>${escaparHTML(r.data || "")}</td>
-                    <td>${escaparHTML(r.tarefafinalizada || "Sem área")}</td>
-                    <td>${Number(r.total_documentos || 0).toLocaleString("pt-PT")}</td>
-                    <td>${Number(r.total_tarefas || 0).toLocaleString("pt-PT")}</td>
+                    <td>${escaparHTML(r.data)}</td>
+                    <td>${escaparHTML(r.tarefa)}</td>
+                    <td>${r.total_documentos.toLocaleString("pt-PT")}</td>
+                    <td>${r.total_tarefas.toLocaleString("pt-PT")}</td>
                 </tr>
             `).join("");
         }
@@ -2867,6 +2919,9 @@ async function carregarRelatorioOcupacao(){
 
 function abrirRelatorioProducao(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
     document.getElementById("alertas").style.display="none";
@@ -2942,6 +2997,9 @@ try{
 }
 function abrirResumoDia(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display = "none";
     document.getElementById("alertas").style.display="none";
 document.getElementById("planeamentoMes").style.display="none";
@@ -2997,6 +3055,9 @@ function isLogout(t){
 
 function mostrarDashboard(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.getElementById("dashboard").style.display="block";
     document.getElementById("plataformas").style.display="none";
     document.getElementById("planeamentoMes").style.display="none";
@@ -3020,6 +3081,9 @@ carregarGraficoProducao();
 
 }
 function mostrarRelatorios(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
 
       document.getElementById("dashboard").style.display="none";
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -3959,6 +4023,9 @@ function exportarLoginsExcel(){
 
 function mostrarRetificarProducao(){
 
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
     document.querySelectorAll(".main > div").forEach(el => {
         el.style.display = "none";
     });
@@ -4417,6 +4484,9 @@ async function guardarRetificacaoProducao(id, botao){
 
 
 function mostrarForcarSQL(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
 
     document.querySelectorAll(".main > div").forEach(el => {
         el.style.display = "none";
