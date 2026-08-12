@@ -4641,19 +4641,18 @@ async function carregarAlertas(){
 
 
             // REFEIÇÃO > 65 MIN
-            if(
-                (
-                    tipo.includes("refeicao") ||
-                    tipo.includes("refeição")
-                ) &&
-                Number(r.duracao) > 1.0833
-            ){
-
-                alertas.refeicao.push(
-                    `${nome} (${formatarHoras(r.duracao)})`
-                );
-
-            }
+          // REFEIÇÃO > 1 HORA
+if(
+    (
+        tipo.includes("refeicao") ||
+        tipo.includes("refeição")
+    ) &&
+    Number(r.duracao) > 1
+){
+    alertas.refeicao.push(
+        `${nome} (${formatarHoras(r.duracao)})`
+    );
+}
 
 
             // PAUSA 2 > 16 MIN
