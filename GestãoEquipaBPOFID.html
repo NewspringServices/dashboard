@@ -2264,37 +2264,23 @@ async function guardarProducaoDia(producao, data){
             total_tarefas:resumo[area].tarefas
         }));
 
-        // Primeiro apagar o resumo histórico desse dia.
-        // Assim, se o Forçar SQL alterar a produção, o histórico
-        // fica exatamente igual ao resumo atual.
-        const apagar = await fetch(
-            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes?data=eq.${dataGuardar}`,
-            {
-                method:"DELETE",
-                headers:{
-                    apikey:SUPABASE_API_KEY,
-                    Authorization:`Bearer ${SUPABASE_API_KEY}`
-                }
-            }
-        );
-
-        if(!apagar.ok){
-            throw new Error(await apagar.text());
-        }
-
+        // Atualizar o histórico através de UPSERT.
+        // O histórico tem uma constraint UNIQUE e, por isso, não devemos
+        // simplesmente fazer INSERT de linhas que já existem.
+        // O UPSERT cria a linha quando não existe e atualiza quando já existe.
         if(!linhas.length){
             return;
         }
 
         const resposta = await fetch(
-            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes`,
+            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes?on_conflict=data,area`,
             {
                 method:"POST",
                 headers:{
                     apikey:SUPABASE_API_KEY,
                     Authorization:`Bearer ${SUPABASE_API_KEY}`,
                     "Content-Type":"application/json",
-                    Prefer:"return=minimal"
+                    Prefer:"resolution=merge-duplicates,return=minimal"
                 },
                 body:JSON.stringify(linhas)
             }
@@ -3026,8 +3012,7 @@ function mostrarDashboard(){
     document.getElementById("eliminarRegistos").style.display="none";
         document.getElementById("forcarSQL").style.display = "none";
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
-    document.getElementById("dadosMes").style.display="none";
-    
+
 carregarGraficoProducao();
   carregarGraficoProducao();
     carregarCardsDashboard();
