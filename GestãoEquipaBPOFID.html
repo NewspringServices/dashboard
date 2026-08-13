@@ -525,6 +525,23 @@ canvas{
 
         <h3>Plataformas Colaboradores</h3>
 
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px;">
+            <input
+                id="filtroPlataformas"
+                type="text"
+                placeholder="🔍 Pesquisar colaborador..."
+                oninput="filtrarPlataformas()"
+                style="flex:1;min-width:240px;max-width:450px;"
+            >
+            <button
+                type="button"
+                onclick="limparFiltroPlataformas()"
+                style="padding:10px 16px;cursor:pointer;"
+            >
+                Limpar
+            </button>
+        </div>
+
         <div id="listaPlataformas"
         style="
         display:grid;
@@ -1601,46 +1618,74 @@ const colaboradores = [
 
 ];
 
-
-
-const div = document.getElementById("listaPlataformas");
-
-div.innerHTML = "";
-
-
-colaboradores.forEach(c => {
-
-div.innerHTML += `
-
-<div class="card">
-
-<h3>
-<i class="fa fa-user"></i>
-${c.nome}
-</h3>
-
-<hr style="margin:10px 0">
-
-<button 
-onclick="window.open('https://newspringservices.github.io/dashboard/${c.link}','_blank')"
-style="
-width:100%;
-padding:10px;
-cursor:pointer;
-">
-
-<i class="fa fa-laptop"></i>
-Portal Newspring
-
-</button>
-
-</div>
-
-`;
-
-});
+window.colaboradoresPlataformas = colaboradores;
+renderizarPlataformas(colaboradores);
 
 }
+
+function normalizarTextoPlataformas(texto){
+    return (texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function renderizarPlataformas(lista){
+
+    const div = document.getElementById("listaPlataformas");
+    if(!div) return;
+
+    if(!lista.length){
+        div.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:25px;color:#777;">
+                Nenhum colaborador encontrado.
+            </div>
+        `;
+        return;
+    }
+
+    div.innerHTML = lista.map(c => `
+        <div class="card">
+            <h3>
+                <i class="fa fa-user"></i>
+                ${c.nome}
+            </h3>
+
+            <hr style="margin:10px 0">
+
+            <button
+                onclick="window.open('https://newspringservices.github.io/dashboard/${c.link}','_blank')"
+                style="width:100%;padding:10px;cursor:pointer;"
+            >
+                <i class="fa fa-laptop"></i>
+                Portal Newspring
+            </button>
+        </div>
+    `).join("");
+}
+
+function filtrarPlataformas(){
+
+    const campo = document.getElementById("filtroPlataformas");
+    const pesquisa = normalizarTextoPlataformas(campo ? campo.value.trim() : "");
+
+    const lista = window.colaboradoresPlataformas || [];
+
+    const filtrados = lista.filter(c =>
+        normalizarTextoPlataformas(c.nome).includes(pesquisa)
+    );
+
+    renderizarPlataformas(filtrados);
+}
+
+function limparFiltroPlataformas(){
+
+    const campo = document.getElementById("filtroPlataformas");
+    if(campo) campo.value = "";
+
+    renderizarPlataformas(window.colaboradoresPlataformas || []);
+}
+
 function mostrarForcarRegistos(){
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
