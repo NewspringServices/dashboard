@@ -817,8 +817,8 @@ canvas{
             <th>Tempo Trabalhado</th>
             <th>Tempo em Falta</th>
             <th>Tempo Extra</th>
-            <th>Tempo Excedidos</th>
             <th>Alerta</th>
+            <th>Observação</th>
         </tr>
     </thead>
 
@@ -3489,6 +3489,31 @@ async function carregarGraficoProducao(){
 }
 
 
+const CHAVE_OBSERVACOES_RESUMO = "bpo_resumo_dia_observacoes";
+
+function obterObservacoesResumo(){
+    try{
+        return JSON.parse(localStorage.getItem(CHAVE_OBSERVACOES_RESUMO) || "{}");
+    }catch(e){
+        console.error("Erro ao ler observações do Resumo Dia:", e);
+        return {};
+    }
+}
+
+function obterObservacaoResumo(data, user){
+    const observacoes = obterObservacoesResumo();
+    return observacoes[`${data}_${user}`] || "";
+}
+
+function guardarObservacaoResumo(input){
+    const chave = decodeURIComponent(input.dataset.chave || "");
+    if(!chave) return;
+
+    const observacoes = obterObservacoesResumo();
+    observacoes[chave] = input.value;
+    localStorage.setItem(CHAVE_OBSERVACOES_RESUMO, JSON.stringify(observacoes));
+}
+
 async function carregarResumoDia(){
 
     try{
@@ -3703,8 +3728,18 @@ async function carregarResumoDia(){
                     <td>${segundosHHMMSS(tempoTrabalhado)}</td>
                     <td>${segundosHHMMSS(falta)}</td>
                     <td>${segundosHHMMSS(extra)}</td>
-                    <td>00:00:00</td>
                     <td>${alerta}</td>
+                    <td>
+                        <input
+                            type="text"
+                            class="observacaoResumo"
+                            data-chave="${encodeURIComponent(`${r.data}_${r.user}`)}"
+                            value="${obterObservacaoResumo(r.data, r.user)}"
+                            placeholder="Escrever observação..."
+                            oninput="guardarObservacaoResumo(this)"
+                            style="width:220px;min-width:180px;height:34px;padding:6px 8px;font-size:12px;border:1px solid #d0d7de;border-radius:7px;"
+                        >
+                    </td>
                 </tr>
             `;
 
@@ -3728,7 +3763,6 @@ function segundosHHMMSS(seg){
 
     return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
 }
-    
 
 function formatarHoras(valor){
 
@@ -3916,9 +3950,33 @@ function exportarResumoDiaExcel(){
 
     const tabela = document.getElementById("tblResumoDia");
 
-    const wb = XLSX.utils.table_to_book(tabela,{
-        sheet:"Resumo Dia"
+    // Criar o Excel manualmente para garantir que o conteúdo
+    // escrito nas Observações (inputs) é exportado.
+    const dados = [];
+
+    const cabecalhos = Array.from(tabela.querySelectorAll("thead th"))
+        .map(th => th.innerText.trim());
+
+    dados.push(cabecalhos);
+
+    tabela.querySelectorAll("tbody tr").forEach(tr => {
+
+        const celulas = Array.from(tr.querySelectorAll("td"));
+
+        if(!celulas.length) return;
+
+        const linha = celulas.map(td => {
+            const input = td.querySelector("input");
+            return input ? input.value : td.innerText.trim();
+        });
+
+        dados.push(linha);
     });
+
+    const ws = XLSX.utils.aoa_to_sheet(dados);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Resumo Dia");
 
     const data = document.getElementById("fDataResumo").value;
 
