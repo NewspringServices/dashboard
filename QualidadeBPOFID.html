@@ -14,7 +14,13 @@
 .readonly-criterion .answer{font-weight:700;margin-top:7px}
 .readonly-obs{margin-top:8px;background:#fff;padding:9px;border-radius:8px;border-left:3px solid var(--verde2)}
 </style></head><body>
-<div class="sidebar"><div class="logo"><div><b>NEWSPRING</b><br><span>DASHBOARD DE QUALIDADE</span></div></div><div class="menu"><a class="active" onclick="tab('dashboard',this)"><i class="fa fa-house"></i> Dashboard</a><a onclick="tab('nova',this)"><i class="fa fa-clipboard-check"></i> Nova Monitorização</a><a onclick="tab('historico',this)"><i class="fa fa-list"></i> Monitorizações</a><a onclick="tab('config',this)"><i class="fa fa-gear"></i> Configuração</a></div></div>
+<div class="sidebar"><div class="logo">
+  <div>
+    <img src="logo2.png" alt="Logo" style="max-width:190px;max-height:55px;object-fit:contain;display:block;margin:0 auto 10px;">
+    <b>NEWSPRING</b><br>
+    <span>DASHBOARD DE QUALIDADE</span>
+  </div>
+</div><div class="menu"><a class="active" onclick="tab('dashboard',this)"><i class="fa fa-house"></i> Dashboard</a><a onclick="tab('nova',this)"><i class="fa fa-clipboard-check"></i> Nova Monitorização</a><a onclick="tab('historico',this)"><i class="fa fa-list"></i> Monitorizações</a><a onclick="tab('config',this)"><i class="fa fa-gear"></i> Configuração</a></div></div>
 <div class="main"><div class="top"><h2>Dashboard de Qualidade</h2><div id="clock"></div></div>
 <section id="dashboard"><div class="cards"><div class="card"><h3>Qualidade Global</h3><h1 id="gq">100%</h1></div><div class="card"><h3>Monitorizações</h3><h1 id="gm">0</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="gc">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="ga">0</h1></div></div><div class="content"><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade</th></tr></thead><tbody id="eqBody"></tbody></table></div></div></div></section>
 <section id="nova" class="hidden"><div class="content"><div class="panel"><h3>Dados da Monitorização</h3><div class="grid"><div class="field"><label>Colaborador</label><select id="colaborador"><option value="">Selecionar colaborador</option></select></div><div class="field"><label>Equipa</label><select id="equipa"><option value="">Selecionar equipa</option><option>Automóvel</option><option>Ocorrências</option><option>Saúde</option></select></div><div class="field"><label>Tarefa Monitorizada</label><select id="tarefa"><option value="">Selecionar equipa primeiro</option></select></div><div class="field"><label>Tipo de Tarefa</label><select id="tipo"><option value="">Selecionar</option><option>Abertura</option><option>Indexação</option></select></div><div class="field"><label>Data Monitorização</label><input id="dataMonitorizacao" type="date"></div>
