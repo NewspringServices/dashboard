@@ -46,30 +46,25 @@
 </div>
 </div></div></section>
 <section id="config" class="hidden"><div class="content"><div class="panel"><h3>Configuração</h3>
-<div class="grid" style="margin-top:16px">
+<div class="field" style="margin-top:16px;margin-bottom:18px">
+<label>Pesquisar lista</label>
+<input id="pesquisarUsers" type="text" placeholder="Pesquisar por User ou Nome..." autocomplete="off" oninput="renderUsersNomes()">
+</div>
+<div class="grid">
 <div class="field"><label>User</label><input id="cfgUser" type="text" placeholder="Ex.: EX11398"></div>
 <div class="field"><label>Nome</label><input id="cfgNome" type="text" placeholder="Nome completo"></div>
 <div style="display:flex;align-items:end"><button type="button" onclick="addUserNome()"><i class="fa fa-plus"></i> Adicionar User</button></div>
 </div>
 <div id="usersNomes" style="margin-top:18px"></div>
 <hr style="margin:20px 0;border:0;border-top:1px solid #eee">
-<div class="grid" style="margin-top:16px">
-<div class="field">
-<label>Novo colaborador</label>
-<input id="novo" type="text" placeholder="Escreve o nome do colaborador" autocomplete="off"
-       onkeydown="if(event.key==='Enter'){event.preventDefault();addCol()}">
-</div>
-<div style="display:flex;align-items:end">
-<button type="button" onclick="addCol()"><i class="fa fa-plus"></i> Adicionar</button>
-</div>
-</div><div id="cols" style="margin-top:18px"></div><hr style="margin:20px 0;border:0;border-top:1px solid #eee"></div></div></section>
+<hr style="margin:20px 0;border:0;border-top:1px solid #eee"></div></div></section>
 </div>
 <script>
 const TASKS={'Automóvel':['Aberturas','Indexações'],'Saúde':['Reembolsos Multicare'],'Ocorrências':['Acidentes trabalho','PETS','Acidentes Pessoais','DNP','DNE']};
 const C={abertura:[['apolice','Apólice Válida',20,'nao'],['acidente','Tipo de Acidente selecionado Correto?',20,'nao'],['ts','Matrícula Correta de TS inserida',20,'nao'],['terceiro','Matrícula Correta de Terceiro inserida',20,'nao'],['docs','Número de Documentos Totais na Tarefa',0,'info'],['catalogacao','Documentos Mal Catalogados?',20,'sim']],indexacao:[['ocorrencia','Ocorrência Válida?',33.34,'nao'],['docs','Número de Documentos Totais na Tarefa',0,'info'],['catalogacao','Documentos Mal Catalogados?',33.33,'sim'],['sinistro','Indexado de forma correta a Sinistro/Subsinistro?',33.33]],generic:[['qualidade','Critério de Qualidade',100]]};
 let resp={};
 function data(){return JSON.parse(localStorage.getItem('qualidade_v1')||'[]')}function save(d){localStorage.setItem('qualidade_v1',JSON.stringify(d))}function cols(){return JSON.parse(localStorage.getItem('qualidade_cols_v2')||'["Ana Catarina Oliveira Mendonça Barão","Ana Karina Spencer Martins","Ana Sofia Pinheiro Garabito","André Miguel Marques Tavares","Andreia Sofia Figueiredo Grilo","Bruno César Nogueira Manaças","Carina Ourives Lavado","Carla Alexandra Duarte Reis","Carla Mariza Dias Trindade","Carolina Adelaide Viegas Gomes Padeiro","Cintia Maisa Gomes Carlos","Délcia Filomena Emílio Mpengo","Delson da Silva Carvalho","Eunice Rosalina Moiane Machatine Chiau","Fábio Rúben de Abreu Assunção","Gilda Maria Infante Anjos","Gisela Cristina Cidade Cabeca Ingles","Jessica Silva Nogueira Manacas","Joana de Almeida Figueiras","Joana Emanuela Lenho da Costa Sousa","Joel Quissama Mundjanga","Madalena Farinha de Carvalho e Sousa Góis","Marcos Felipe Bastos Moura","Marta Sofia da Conceição Fernandes","Mónica Sofia Pereira Valente","Nádia Filipa Contins Cunha Oliveira","Orlanda Leizi Gomes Francisco","Patrícia Alexandra Viegas André","Rachel Alvarez dos Santos Coelho","Renan dos Santos Bezerra","Sandra Isabel Domingues Facão","Sandra Maria Moreira Bento","Sara Banú Chotumiã","Sofia Isabel Martins Cruz Mendes Ferreira","Susana Carina Marques Bordalo","Vera Lúcia Centeio dos Santos Freitas"]')}function saveCols(c){localStorage.setItem('qualidade_cols_v2',JSON.stringify(c))}
-function tab(id,el){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');if(id==='dashboard')dash();if(id==='historico')renderHistorico();if(id==='config'){renderCols();renderUsersNomes()}}
+function tab(id,el){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');if(id==='dashboard')dash();if(id==='historico')renderHistorico();if(id==='config'){renderCols();const p=document.getElementById('pesquisarUsers');if(p)p.value='';renderUsersNomes()}}
 function fillCols(){let c=cols();let s=document.getElementById('colaborador');s.innerHTML='<option value="">Selecionar colaborador</option>'+c.map(x=>`<option>${x}</option>`).join('');let f=document.getElementById('fc');f.innerHTML='<option value="">Todos</option>'+c.map(x=>`<option>${x}</option>`).join('')}
 function renderCols(){fillCols();document.getElementById('cols').innerHTML=cols().map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee"><span>${x}</span><button class="danger" onclick="delCol(${i})">Remover</button></div>`).join('')}
 function addCol(){
@@ -140,7 +135,7 @@ function addUserNome(){
   const n=document.getElementById('cfgNome').value.trim();
   if(!u||!n)return alert('Preenche o User e o Nome.');
   const a=getUsersNomes();
-  if(a.some(x=>x.user===u))return alert('Esse User já existe.');
+  if(a.some(x=>x.user.toLowerCase()===u.toLowerCase())){document.getElementById('pesquisarUsers').value=u;renderUsersNomes();return alert('Esse User já existe na lista.');}
   a.push({user:u,nome:n}); saveUsersNomes(a);
   document.getElementById('cfgUser').value=''; document.getElementById('cfgNome').value='';
   renderUsersNomes();
@@ -151,10 +146,21 @@ function removeUserNome(i){
   a.splice(i,1); saveUsersNomes(a); renderUsersNomes();
 }
 function renderUsersNomes(){
-  const el=document.getElementById('usersNomes'); if(!el)return;
+  const el=document.getElementById('usersNomes');
+  if(!el)return;
   const a=getUsersNomes();
+  const pesquisa=(document.getElementById('pesquisarUsers')?.value||'').trim().toLowerCase();
+  const filtrados=a.map((x,i)=>({x,i})).filter(({x})=>{
+    if(!pesquisa)return true;
+    return String(x.user).toLowerCase().includes(pesquisa) ||
+           String(x.nome).toLowerCase().includes(pesquisa);
+  });
+
   el.innerHTML='<div class="table-wrap"><table><thead><tr><th>User</th><th>Nome</th><th></th></tr></thead><tbody>'+
-    a.map((x,i)=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join('')+
+    (filtrados.length
+      ? filtrados.map(({x,i})=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join('')
+      : '<tr><td colspan="3" class="small" style="text-align:center;padding:18px">Nenhum User ou Nome encontrado.</td></tr>'
+    )+
     '</tbody></table></div>';
 }
 function exportMonitorizacoes(){
@@ -374,5 +380,5 @@ function deleteDetail(){
 }
 
 function dash(){let d=data();document.getElementById('gm').textContent=d.length;document.getElementById('gc').textContent=new Set(d.map(x=>x.colaborador)).size;document.getElementById('ga').textContent=d.filter(x=>x.qualidade<90).length;document.getElementById('gq').textContent=(d.length?d.reduce((a,x)=>a+x.qualidade,0)/d.length:100).toFixed(1)+'%';let es=['Automóvel','Ocorrências','Saúde'];document.getElementById('eqBody').innerHTML=es.map(e=>{let x=d.filter(r=>r.equipa===e),q=x.length?x.reduce((a,r)=>a+r.qualidade,0)/x.length:0;return `<tr><td>${e}</td><td>${x.length}</td><td>${x.length?q.toFixed(1)+'%':'—'}</td></tr>`}).join('')}
-document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);document.getElementById('tipo').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();dash();
+document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);document.getElementById('tipo').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();dash();renderUsersNomes();
 </script></body></html>
