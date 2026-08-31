@@ -1233,7 +1233,7 @@ canvas{
                 <label>Mês</label><br>
                 <input type="month" id="fMesDadosProducao" onchange="carregarDadosMes()">
 <span style="display:inline-block;margin-left:12px;">
-    <label for="fDataDadosMes" style="font-size:12px;color:#666;">Dia</label><br>
+    <label for="fDataDadosMes" style="font-size:12px;color:#666;">Dia (opcional)</label><br>
     <input
         type="date"
         id="fDataDadosMes"
@@ -2442,201 +2442,54 @@ async function carregarDadosMes(){
     try{
         const inputMes = document.getElementById("fMesDadosProducao");
         const inputData = document.getElementById("fDataDadosMes");
-
         const hoje = new Date().toISOString().slice(0,10);
         const mes = inputMes.value || hoje.slice(0,7);
-
         inputMes.value = mes;
-
-        if(inputData && !inputData.value){
-            inputData.value = hoje;
-        }
-
+        // Dia opcional: vazio = mês completo.
         const dataEscolhida = inputData?.value || "";
-        const filtroArea =
-            (document.getElementById("fAreaDadosMes")?.value || "").trim();
-
+        const filtroArea = (document.getElementById("fAreaDadosMes")?.value || "").trim();
         const [ano, numeroMes] = mes.split("-").map(Number);
         const inicio = `${mes}-01`;
-
-        const proximoMes = numeroMes === 12
-            ? `${ano+1}-01-01`
-            : `${ano}-${String(numeroMes+1).padStart(2,"0")}-01`;
+        const proximoMes = numeroMes === 12 ? `${ano+1}-01-01` : `${ano}-${String(numeroMes+1).padStart(2,"0")}-01`;
 
         async function buscarDados(filtrosBase){
-            let todos = [];
-            let offset = 0;
-            const tamanhoPagina = 1000;
-
+            let todos=[]; let offset=0; const tamanhoPagina=1000;
             while(true){
-                let url =
-                    `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?` +
-                    `${filtrosBase.join("&")}` +
-                    `&limit=${tamanhoPagina}&offset=${offset}`;
-
-                if(filtroArea){
-                    url +=
-                        `&tarefafinalizada=eq.${encodeURIComponent(filtroArea)}`;
-                }
-
-                const resposta = await fetch(url,{
-                    headers:{
-                        apikey:SUPABASE_API_KEY,
-                        Authorization:`Bearer ${SUPABASE_API_KEY}`
-                    }
-                });
-
+                let url=`${SUPABASE_URL}/rest/v1/bpo_resumo_producao?${filtrosBase.join("&")}&limit=${tamanhoPagina}&offset=${offset}`;
+                if(filtroArea) url += `&tarefafinalizada=eq.${encodeURIComponent(filtroArea)}`;
+                const resposta=await fetch(url,{headers:{apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`}});
                 if(!resposta.ok) throw new Error(await resposta.text());
-
-                const pagina = await resposta.json();
-                todos.push(...pagina);
-
-                if(pagina.length < tamanhoPagina) break;
-                offset += tamanhoPagina;
+                const pagina=await resposta.json(); todos.push(...pagina);
+                if(pagina.length<tamanhoPagina) break; offset+=tamanhoPagina;
             }
-
             return todos;
         }
 
-        // TOTAL DO MÊS
-        const dadosMes = await buscarDados([
-            `data=gte.${inicio}`,
-            `data=lt.${proximoMes}`,
-            "select=data,tarefafinalizada,total_documentos,total_tarefas",
-            "order=data.asc,tarefafinalizada.asc"
-        ]);
+        const dadosMes=await buscarDados([`data=gte.${inicio}`,`data=lt.${proximoMes}`,"select=data,tarefafinalizada,total_documentos,total_tarefas","order=data.asc,tarefafinalizada.asc"]);
+        let totalDocumentosMes=0,totalTarefasMes=0;
+        dadosMes.forEach(r=>{totalDocumentosMes+=Number(r.total_documentos||0);totalTarefasMes+=Number(r.total_tarefas||0);});
+        const dadosMostrar=dataEscolhida ? dadosMes.filter(r=>r.data===dataEscolhida) : dadosMes;
 
-        let totalDocumentosMes = 0;
-        let totalTarefasMes = 0;
+        const cards=document.getElementById("cardsDadosMes");
+        cards.innerHTML=`<div class="card"><h3>Documentos do Mês</h3><h1>${totalDocumentosMes.toLocaleString("pt-PT")}</h1></div><div class="card"><h3>Tarefas do Mês</h3><h1>${totalTarefasMes.toLocaleString("pt-PT")}</h1></div>`;
 
-        dadosMes.forEach(r => {
-            totalDocumentosMes += Number(r.total_documentos || 0);
-            totalTarefasMes += Number(r.total_tarefas || 0);
-        });
-
-        // TOTAL DO DIA SELECIONADO
-        let totalDocumentosDia = 0;
-        let totalTarefasDia = 0;
-        let dadosDia = [];
-
+        let cardsDia=document.getElementById("cardsDadosDia");
+        if(!cardsDia){cardsDia=document.createElement("div");cardsDia.id="cardsDadosDia";cardsDia.style.cssText="display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin-top:15px;";cards.parentNode.insertBefore(cardsDia,cards.nextSibling);}
         if(dataEscolhida){
-            dadosDia = await buscarDados([
-                `data=eq.${encodeURIComponent(dataEscolhida)}`,
-                "select=data,tarefafinalizada,total_documentos,total_tarefas",
-                "order=data.asc,tarefafinalizada.asc"
-            ]);
+            let td=0,tt=0; dadosMostrar.forEach(r=>{td+=Number(r.total_documentos||0);tt+=Number(r.total_tarefas||0);});
+            const df=dataEscolhida.split("-").reverse().join("/");
+            cardsDia.style.display="grid"; cardsDia.innerHTML=`<div class="card"><h3>Documentos do Dia — ${df}</h3><h1>${td.toLocaleString("pt-PT")}</h1></div><div class="card"><h3>Tarefas do Dia — ${df}</h3><h1>${tt.toLocaleString("pt-PT")}</h1></div>`;
+        }else{cardsDia.style.display="none";cardsDia.innerHTML="";}
 
-            dadosDia.forEach(r => {
-                totalDocumentosDia += Number(r.total_documentos || 0);
-                totalTarefasDia += Number(r.total_tarefas || 0);
-            });
+        const tbody=document.getElementById("tblDadosMesBody");
+        if(!dadosMostrar.length){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:#999;padding:20px;">Não existem dados para os filtros selecionados.</td></tr>`;}
+        else{
+            const agrupado={};
+            dadosMostrar.forEach(r=>{const data=r.data||"";const tarefa=(r.tarefafinalizada||"Sem área").trim();const chave=`${data}|||${tarefa}`;if(!agrupado[chave]) agrupado[chave]={data,tarefa,total_documentos:0,total_tarefas:0};agrupado[chave].total_documentos+=Number(r.total_documentos||0);agrupado[chave].total_tarefas+=Number(r.total_tarefas||0);});
+            tbody.innerHTML=Object.values(agrupado).map(r=>`<tr><td>${escaparHTML(r.data)}</td><td>${escaparHTML(r.tarefa)}</td><td>${r.total_documentos.toLocaleString("pt-PT")}</td><td>${r.total_tarefas.toLocaleString("pt-PT")}</td></tr>`).join("");
         }
-
-        // 1º PAR: TOTAIS DO MÊS
-        const cards = document.getElementById("cardsDadosMes");
-
-        cards.innerHTML = `
-            <div class="card">
-                <h3>Documentos do Mês</h3>
-                <h1>${totalDocumentosMes.toLocaleString("pt-PT")}</h1>
-            </div>
-
-            <div class="card">
-                <h3>Tarefas do Mês</h3>
-                <h1>${totalTarefasMes.toLocaleString("pt-PT")}</h1>
-            </div>
-        `;
-
-        // 2º PAR: TOTAIS DO DIA, em cards separados por baixo
-        let cardsDia = document.getElementById("cardsDadosDia");
-
-        if(!cardsDia){
-            cardsDia = document.createElement("div");
-            cardsDia.id = "cardsDadosDia";
-            cardsDia.style.cssText = `
-                display:grid;
-                grid-template-columns:repeat(2,1fr);
-                gap:15px;
-                margin-top:15px;
-            `;
-            cards.parentNode.insertBefore(cardsDia, cards.nextSibling);
-        }
-
-        const dataFormatada = dataEscolhida
-            ? dataEscolhida.split("-").reverse().join("/")
-            : "Dia selecionado";
-
-        cardsDia.innerHTML = `
-            <div class="card">
-                <h3>Documentos do Dia — ${dataFormatada}</h3>
-                <h1>${totalDocumentosDia.toLocaleString("pt-PT")}</h1>
-            </div>
-
-            <div class="card">
-                <h3>Tarefas do Dia — ${dataFormatada}</h3>
-                <h1>${totalTarefasDia.toLocaleString("pt-PT")}</h1>
-            </div>
-        `;
-
-        // A tabela acompanha o dia selecionado.
-        const tbody = document.getElementById("tblDadosMesBody");
-
-        if(!dadosDia.length){
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="4"
-                        style="text-align:center;color:#999;padding:20px;">
-                        Ainda não existem dados para esta data.
-                    </td>
-                </tr>
-            `;
-        }else{
-            // Agrupar por DIA + TAREFA/ÁREA:
-            // se existirem várias linhas da mesma tarefa no mesmo dia,
-            // aparece apenas uma linha com os totais somados.
-            const agrupado = {};
-
-            dadosDia.forEach(r => {
-                const data = r.data || "";
-                const tarefa = (r.tarefafinalizada || "Sem área").trim();
-                const chave = `${data}|||${tarefa}`;
-
-                if(!agrupado[chave]){
-                    agrupado[chave] = {
-                        data,
-                        tarefa,
-                        total_documentos: 0,
-                        total_tarefas: 0
-                    };
-                }
-
-                agrupado[chave].total_documentos += Number(r.total_documentos || 0);
-                agrupado[chave].total_tarefas += Number(r.total_tarefas || 0);
-            });
-
-            const linhasAgrupadas = Object.values(agrupado);
-
-            tbody.innerHTML = linhasAgrupadas.map(r => `
-                <tr>
-                    <td>${escaparHTML(r.data)}</td>
-                    <td>${escaparHTML(r.tarefa)}</td>
-                    <td>${r.total_documentos.toLocaleString("pt-PT")}</td>
-                    <td>${r.total_tarefas.toLocaleString("pt-PT")}</td>
-                </tr>
-            `).join("");
-        }
-
-        document.getElementById("mensagemDadosMes").textContent =
-            `Mês: ${totalDocumentosMes.toLocaleString("pt-PT")} documentos e ` +
-            `${totalTarefasMes.toLocaleString("pt-PT")} tarefas. ` +
-            `Dia ${dataFormatada}: ${totalDocumentosDia.toLocaleString("pt-PT")} documentos e ` +
-            `${totalTarefasDia.toLocaleString("pt-PT")} tarefas.`;
-
-    }catch(e){
-        console.error("Erro ao carregar Dados do Mês:", e);
-        document.getElementById("mensagemDadosMes").textContent =
-            "Erro: " + e.message;
-    }
+        document.getElementById("mensagemDadosMes").textContent=dataEscolhida ? `Mês: ${totalDocumentosMes.toLocaleString("pt-PT")} documentos e ${totalTarefasMes.toLocaleString("pt-PT")} tarefas. Dia ${dataEscolhida.split("-").reverse().join("/")}: filtro aplicado.` : `Mês: ${totalDocumentosMes.toLocaleString("pt-PT")} documentos e ${totalTarefasMes.toLocaleString("pt-PT")} tarefas. A mostrar todos os dias do mês.`;
+    }catch(e){console.error("Erro ao carregar Dados do Mês:",e);document.getElementById("mensagemDadosMes").textContent="Erro: "+e.message;}
 }
 
 
