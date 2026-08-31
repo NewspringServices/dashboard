@@ -468,6 +468,10 @@ canvas{
     <a onclick="mostrarDadosMes()">
         <i class="fa fa-calendar-days"></i> Dados do Mês
     </a>
+
+    <a onclick="mostrarCarregarPlaneamento()">
+        <i class="fa fa-file-arrow-up"></i> Carregar Planeamento
+    </a>
 </div> </div></div> 
 <div class="main">
 
@@ -1275,6 +1279,33 @@ canvas{
         <div id="mensagemDadosMes" style="margin-top:15px;color:#777;font-size:12px;"></div>
     </div>
 
+</div>
+
+
+<div id="carregarPlaneamentoAdmin" style="display:none;padding:25px;">
+    <div class="panel">
+        <h3>
+            <i class="fa fa-file-arrow-up"></i>
+            Carregar Planeamento
+        </h3>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px;">
+            <input
+                type="file"
+                id="ficheiroPlaneamento"
+                accept=".xlsx,.xls"
+                style="padding:8px;"
+            >
+
+            <button type="button" onclick="carregarFicheiroPlaneamento()">
+                <i class="fa fa-upload"></i> Carregar
+            </button>
+        </div>
+
+        <div id="msgCarregarPlaneamento"
+             style="margin-top:15px;font-weight:600;">
+        </div>
+    </div>
 </div>
 
 <div id="retificarProducao" style="display:none;padding:25px;">
@@ -4632,6 +4663,160 @@ async function guardarRetificacaoProducao(id, botao){
 
 }
 
+
+
+async function carregarFicheiroPlaneamento(){
+    const input = document.getElementById("ficheiroPlaneamento");
+    const msg = document.getElementById("msgCarregarPlaneamento");
+
+    if(!input || !input.files || !input.files.length){
+        msg.style.color = "red";
+        msg.innerText = "Seleciona um ficheiro Excel.";
+        return;
+    }
+
+    try{
+        msg.style.color = "#555";
+        msg.innerText = "A ler o ficheiro...";
+
+        const ficheiro = input.files[0];
+        const buffer = await ficheiro.arrayBuffer();
+
+        const workbook = XLSX.read(buffer, {
+            type: "array",
+            cellDates: true
+        });
+
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        const dados = XLSX.utils.sheet_to_json(sheet, {
+            defval: "",
+            raw: true
+        });
+
+        if(!dados.length){
+            throw new Error("O ficheiro não tem dados.");
+        }
+
+        const normalizar = valor =>
+            String(valor ?? "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .toLowerCase();
+
+        const registos = dados.map(linha => {
+            const campos = {};
+
+            Object.keys(linha).forEach(chave => {
+                campos[normalizar(chave)] = linha[chave];
+            });
+
+            let data = campos["data"];
+
+            // Excel pode devolver a data como Date, número serial ou texto.
+            if(data instanceof Date && !isNaN(data.getTime())){
+                // Usar os componentes locais para não deslocar a data por causa do fuso horário.
+                data =
+                    `${data.getFullYear()}-` +
+                    `${String(data.getMonth()+1).padStart(2,"0")}-` +
+                    `${String(data.getDate()).padStart(2,"0")}`;
+
+            }else if(typeof data === "number"){
+                const d = XLSX.SSF.parse_date_code(data);
+
+                if(!d || !d.y || !d.m || !d.d){
+                    data = "";
+                }else{
+                    data =
+                        `${d.y}-` +
+                        `${String(d.m).padStart(2,"0")}-` +
+                        `${String(d.d).padStart(2,"0")}`;
+                }
+
+            }else{
+                data = String(data ?? "").trim();
+
+                // DD/MM/YYYY
+                let match = data.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+                if(match){
+                    data =
+                        `${match[3]}-` +
+                        `${String(match[2]).padStart(2,"0")}-` +
+                        `${String(match[1]).padStart(2,"0")}`;
+
+                }else{
+                    // DD-MM-YYYY
+                    match = data.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+
+                    if(match){
+                        data =
+                            `${match[3]}-` +
+                            `${String(match[2]).padStart(2,"0")}-` +
+                            `${String(match[1]).padStart(2,"0")}`;
+                    }
+                }
+            }
+
+            return {
+                data: data,
+                user: String(campos["user"] ?? "").trim(),
+                nome: String(campos["nome"] ?? "").trim(),
+                estado: String(campos["estado"] ?? "").trim()
+            };
+        }).filter(r => r.data && r.user && r.nome && r.estado);
+
+        if(!registos.length){
+            throw new Error(
+                "Não foram encontrados registos válidos. O Excel deve ter: Data, User, Nome e Estado."
+            );
+        }
+
+        msg.innerText = `A carregar ${registos.length} registos para o Supabase...`;
+
+        const tamanhoLote = 500;
+
+        for(let i = 0; i < registos.length; i += tamanhoLote){
+
+            const lote = registos.slice(i, i + tamanhoLote);
+
+            const resposta = await fetch(
+                `${SUPABASE_URL}/rest/v1/planeamento`,
+                {
+                    method: "POST",
+                    headers: {
+                        apikey: SUPABASE_API_KEY,
+                        Authorization: `Bearer ${SUPABASE_API_KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "return=minimal"
+                    },
+                    body: JSON.stringify(lote)
+                }
+            );
+
+            if(!resposta.ok){
+                const erro = await resposta.text();
+                throw new Error(erro || "Erro ao inserir na tabela planeamento.");
+            }
+        }
+
+        msg.style.color = "#2E7D32";
+        msg.innerText =
+            `✔ ${registos.length} registos carregados com sucesso para a tabela planeamento.`;
+
+        input.value = "";
+
+    }catch(erro){
+        console.error("Erro ao carregar planeamento:", erro);
+
+        msg.style.color = "red";
+        msg.innerText =
+            "Erro: " + (erro.message || "não foi possível carregar o ficheiro.");
+    }
+}
+
+function mostrarCarregarPlaneamento(){ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
 
 function mostrarForcarSQL(){
 
