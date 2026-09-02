@@ -19,10 +19,20 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .conteudo{width:100%;min-height:calc(100vh - 70px)}
 .aba{display:none;width:100%;min-height:calc(100vh - 70px)}
 .aba.active{display:block}
-#abaMulticare{padding:30px}
-.paginaMulticare{background:white;border-radius:14px;padding:30px;box-shadow:0 5px 20px rgba(0,0,0,.08)}
-.paginaMulticare h1{color:var(--verde);margin-bottom:10px}
-.paginaMulticare p{color:#666;margin-bottom:25px}
+#abaMulticare,
+#abaFidelidade,
+#abaQualidade{
+    background:white;
+}
+
+#abaMulticare iframe,
+#abaFidelidade iframe,
+#abaQualidade iframe{
+    width:100%;
+    height:calc(100vh - 70px);
+    border:none;
+    display:block;
+}px}
 #abaFidelidade,#abaQualidade{background:white}
 #abaFidelidade iframe,#abaQualidade iframe{width:100%;height:calc(100vh - 70px);border:none;display:block}
 .qualidade-selecao{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:30px}
@@ -35,12 +45,7 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .qualidade-opcoes button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(46,125,50,.25)}
 .qualidade-opcoes button i{font-size:30px}
 @media(max-width:600px){.qualidade-opcoes{grid-template-columns:1fr}}
-#abaMulticare iframe{
-    width:100%;
-    height:calc(100vh - 70px);
-    border:none;
-    display:block;
-}
+
 
 /* PASSWORD */
 .password-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:5000}
