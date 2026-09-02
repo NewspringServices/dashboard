@@ -35,7 +35,12 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .qualidade-opcoes button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(46,125,50,.25)}
 .qualidade-opcoes button i{font-size:30px}
 @media(max-width:600px){.qualidade-opcoes{grid-template-columns:1fr}}
-
+#abaMulticare iframe{
+    width:100%;
+    height:calc(100vh - 70px);
+    border:none;
+    display:block;
+}
 
 /* PASSWORD */
 .password-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:5000}
@@ -86,16 +91,10 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 
 <div class="conteudo">
 
-
-    <div id="abaMulticare" class="aba active">
-        <div class="paginaMulticare">
-            <h1>BPO Multicare</h1>
-            <p>Gestão da equipa BPO Multicare.</p>
-            <div style="background:#E8F5E9;border-radius:10px;padding:20px;color:#2E7D32;font-weight:600">
-                <i class="fa fa-info-circle"></i> Área BPO Multicare
-            </div>
-        </div>
-    </div>
+<div id="abaMulticare" class="aba active">
+    <iframe src="GestãoEquipaBPOMTC.html"
+            title="Gestão Equipa BPO Multicare"></iframe>
+</div>
 
     <div id="abaFidelidade" class="aba">
         <iframe src="GestãoEquipaBPOFID.html" title="Gestão Equipa BPO Fidelidade"></iframe>
