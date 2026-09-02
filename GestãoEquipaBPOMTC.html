@@ -1,0 +1,5294 @@
+<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Supervisor Dashboard</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+}
+#tblRetificarProducao {
+    font-size: 12px;
+}
+
+#tblRetificarProducao th,
+#tblRetificarProducao td {
+    padding: 6px 8px;
+    white-space: nowrap;
+}
+
+#tblRetificarProducao input {
+    font-size: 12px;
+    padding: 5px 7px;
+    height: 30px;
+}
+
+#tblRetificarProducao button {
+    font-size: 11px;
+    padding: 5px 8px;
+    margin: 0;
+}
+
+#tblResumoDia th,
+#tblRelatorioTempos th{
+
+    padding:8px 6px;
+    font-size:12px;
+    white-space:nowrap;
+
+}
+
+#tblResumoDia td,
+#tblRelatorioTempos td{
+
+    padding:8px 6px;
+    font-size:12px;
+
+}
+
+:root{
+
+    --verde:#2E7D32;
+    --verde2:#43A047;
+    --verde3:#66BB6A;
+    --verdeClaro:#E8F5E9;
+
+    --branco:#ffffff;
+    --cinza:#f4f7f6;
+    --texto:#263238;
+
+}
+
+body{
+
+    display:flex;
+    background:var(--cinza);
+    color:var(--texto);
+
+}
+
+/* LOGO */
+
+.logo{
+    width:100%;
+    height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:20px;
+    overflow:hidden;
+}
+
+.logo img{
+    display:block;
+    max-width:100%;
+    max-height:80px;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+}
+
+/* MENU */
+
+.sidebar{
+
+    width:260px;
+    height:100vh;
+    max-height:100vh;
+    overflow-y:auto;
+    overflow-x:hidden;
+    box-sizing:border-box;
+
+    position:fixed;
+    left:0;
+    top:0;
+
+    background:linear-gradient(180deg,#2E7D32,#1B5E20);
+
+    color:white;
+
+    padding:25px 18px;
+
+    box-shadow:4px 0 20px rgba(0,0,0,.15);
+
+}
+
+
+
+.menu a{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    color:white;
+    text-decoration:none;
+
+    padding:13px 15px;
+
+    border-radius:10px;
+
+    margin-bottom:8px;
+
+    transition:.25s;
+
+    font-weight:500;
+
+}
+
+.menu a:hover{
+
+    background:rgba(255,255,255,.18);
+
+    transform:translateX(6px);
+
+}
+
+.menu a.active{
+
+    background:white;
+    color:#2E7D32;
+    font-weight:700;
+
+}
+
+/* ÁREA PRINCIPAL */
+
+.main{
+
+    margin-left:260px;
+    flex:1;
+
+}
+
+/* TOPO */
+
+.top{
+
+    background:white;
+
+    padding:20px 30px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.08);
+
+}
+
+/* CARDS */
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+
+    gap:20px;
+
+    padding:25px;
+
+}
+
+.card{
+
+    background:white;
+
+    border-left:6px solid var(--verde);
+
+    border-radius:14px;
+
+    padding:22px;
+
+    box-shadow:0 5px 18px rgba(0,0,0,.08);
+
+    transition:.25s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 10px 25px rgba(46,125,50,.18);
+
+}
+
+/* PAINÉIS */
+
+.content{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:20px;
+
+    padding:0 25px 25px;
+
+}
+
+.panel{
+
+    background:white;
+
+    border-radius:14px;
+
+    padding:22px;
+
+    box-shadow:0 6px 20px rgba(0,0,0,.08);
+
+}
+
+.panel h3{
+
+    color:var(--verde);
+
+    margin-bottom:18px;
+
+}
+
+/* BOTÕES */
+
+button{
+
+    background:linear-gradient(135deg,#43A047,#2E7D32);
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 18px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.25s;
+
+}
+
+button:hover{
+
+    background:linear-gradient(135deg,#2E7D32,#1B5E20);
+
+    transform:translateY(-2px);
+
+    box-shadow:0 8px 18px rgba(46,125,50,.25);
+
+}
+
+/* INPUTS */
+
+input,
+select{
+
+    height:42px;
+
+    border:1px solid #d0d7de;
+
+    border-radius:8px;
+
+    padding:0 12px;
+
+    background:white;
+
+    transition:.2s;
+
+}
+
+input:focus,
+select:focus{
+
+    outline:none;
+
+    border-color:var(--verde2);
+
+    box-shadow:0 0 0 3px rgba(67,160,71,.18);
+
+}
+
+/* TABELAS */
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    overflow:hidden;
+
+    border-radius:12px;
+
+}
+
+th{
+
+    background:#2E7D32;
+
+    color:white;
+
+    padding:12px;
+
+    text-align:left;
+
+}
+
+td{
+
+    padding:10px;
+
+    border-bottom:1px solid #ECEFF1;
+
+}
+
+tbody tr:nth-child(even){
+
+    background:#F8FBF8;
+
+}
+
+tbody tr:hover{
+
+    background:#E8F5E9;
+
+}
+
+/* LISTAS */
+
+ul{
+
+    padding-left:20px;
+
+}
+
+canvas{
+
+    max-height:320px;
+
+}
+</style></head><body>
+<div class="sidebar">
+<div class="logo">
+    <img src="logo2.png" alt="Newspring Services">
+</div>
+<div class="menu">
+<a class="active" onclick="mostrarDashboard()">
+    <i class="fa fa-house"></i> Dashboard</a>
+
+<a onclick="toggleColaboradores()">
+    <i class="fa fa-users"></i> Colaboradores
+    <i style="float:right" class="fa fa-chevron-down"></i>
+</a>
+
+<div id="menuColaboradores" style="display:none;padding-left:20px;">
+
+    <a onclick="mostrarForcarRegistos()">
+        <i class="fa fa-user-clock"></i> Forçar Registos
+    </a>
+
+    <a onclick="mostrarPlataformas()">
+        <i class="fa fa-laptop"></i> Plataformas
+    </a>
+
+</div>
+<a onclick="mostrarLogins()">
+    <i class="fa fa-clock"></i> Logins</a>
+<a onclick="togglePlaneamento()">
+    <i class="fa fa-calendar"></i> Planeamento
+    <i style="float:right" class="fa fa-chevron-down"></i>
+</a>
+
+<div id="menuPlaneamento" style="display:none;padding-left:20px;">
+
+ <a href="javascript:mostrarPlaneamento();">
+    <i class="fa fa-calendar-days"></i> Planeamento Mês
+</a>
+
+    <a onclick="mostrarPlaneamentoDia()">
+        <i class="fa fa-calendar-day"></i> Planeamento Dia
+    </a>
+
+</div>
+<a onclick="mostrarAlertas()">
+    <i class="fa fa-triangle-exclamation"></i> Alertas
+</a>
+<a onclick="toggleRelatorios()">
+    <i class="fa fa-file"></i> Relatórios
+    <i style="float:right" class="fa fa-chevron-down"></i>
+</a>
+
+<div id="menuRelatorios" style="display:none;padding-left:20px;">
+
+    <a onclick="abrirResumoDia()">
+        <i class="fa fa-calendar-day"></i> Resumo Dia
+    </a>
+
+    <a onclick="abrirRelatorioProducao()">
+        <i class="fa fa-chart-column"></i> Produção
+    </a>
+
+<a onclick="abrirRelatorioOcupacao()">
+    <i class="fa fa-chart-pie"></i> Taxa de Ocupação
+</a>
+
+<a onclick="abrirRelatorioTempos()">
+    <i class="fa fa-stopwatch"></i> Tempos Médios
+</a>
+
+</div>
+<a onclick="toggleAdministracao()">
+    <i class="fa fa-gear"></i> Administração
+    <i style="float:right" class="fa fa-chevron-down"></i>
+</a>
+
+<div id="menuAdministracao" style="display:none;padding-left:20px;">
+
+    <a onclick="mostrarEliminarRegistos()">
+        <i class="fa fa-trash"></i> Eliminar Registos
+    </a>
+
+    <a onclick="mostrarForcarSQL()">
+        <i class="fa fa-database"></i> Forçar SQL
+    </a>
+
+    <a onclick="mostrarRetificarProducao()">
+        <i class="fa fa-pen-to-square"></i> Retificar Produção
+    </a>
+
+    <a onclick="mostrarDadosMes()">
+        <i class="fa fa-calendar-days"></i> Dados do Mês
+    </a>
+
+    <a onclick="mostrarCarregarPlaneamento()">
+        <i class="fa fa-file-arrow-up"></i> Carregar Planeamento
+    </a>
+</div> </div></div> 
+<div class="main">
+
+    <div class="top">
+        <h2>Dashboard Supervisor</h2>
+        <div id="clock"></div>
+    </div>
+
+    <div id="dashboard">
+
+        <div class="cards">
+            <div class="card">
+                <h3>Operacionais</h3>
+                <h1 id="cardOperacionais">0</h1>
+            </div>
+
+            <div class="card">
+                <h3>Ausências</h3>
+                <h1 id="cardSemPresenca">0</h1>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="panel">
+                <h3>Produção por Hora</h3>
+                <canvas id="graficoProducao"></canvas>
+            </div>
+        </div>
+
+        <!-- PRODUÇÃO POR ÁREA + TOTAL DO DIA -->
+        <div class="content" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px;align-items:start;">
+            <div class="panel">
+                <h3>Produção por Área</h3>
+                <div id="listaProducaoArea"></div>
+            </div>
+
+            <div class="panel">
+                <h3>Produção Total do Dia</h3>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;">
+                    <div style="background:#f7f9f7;border-radius:10px;padding:20px 10px;text-align:center;border:1px solid #e5e8e5;">
+                        <div id="dashboardTotalTarefasArea" style="font-size:28px;font-weight:bold;color:#2E7D32;">0</div>
+                        <div style="font-size:11px;color:#888;margin-top:5px;">Tarefas</div>
+                    </div>
+                    <div style="background:#f7f9f7;border-radius:10px;padding:20px 10px;text-align:center;border:1px solid #e5e8e5;">
+                        <div id="dashboardTotalColaboradores" style="font-size:28px;font-weight:bold;color:#2E7D32;">0</div>
+                        <div style="font-size:11px;color:#888;margin-top:5px;">Colaboradores</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+<div id="plataformas" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Plataformas Colaboradores</h3>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:15px;">
+            <input
+                id="filtroPlataformas"
+                type="text"
+                placeholder="🔍 Pesquisar colaborador..."
+                oninput="filtrarPlataformas()"
+                style="flex:1;min-width:240px;max-width:450px;"
+            >
+            <button
+                type="button"
+                onclick="limparFiltroPlataformas()"
+                style="padding:10px 16px;cursor:pointer;"
+            >
+                Limpar
+            </button>
+        </div>
+
+        <div id="listaPlataformas"
+        style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+        gap:20px;
+        margin-top:20px;
+        ">
+        </div>
+
+    </div>
+
+</div>
+
+
+<div id="planeamentoMes" style="display:none;padding:25px;">
+
+      <div class="panel">
+
+    <h3>Planeamento</h3>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:20px 0;">
+
+    <div>
+        <label>Data</label><br>
+        <input type="date" id="fData">
+    </div>
+
+    <div>
+        <label>User</label><br>
+        <input type="text" id="fUser" placeholder="User">
+    </div>
+
+    <div>
+        <label>Nome</label><br>
+        <input type="text" id="fNome" placeholder="Nome">
+    </div>
+
+    <div>
+        <label>Estado</label><br>
+        <input type="text" id="fEstado" placeholder="Estado">
+    </div>
+
+    <button onclick="carregarPlaneamento()">
+        <i class="fa fa-search"></i> Pesquisar
+    </button>
+
+    <button onclick="limparFiltros()">
+        <i class="fa fa-eraser"></i> Limpar
+    </button>
+
+    <button onclick="carregarPlaneamento()">
+        <i class="fa fa-rotate-right"></i> Atualizar
+    </button>
+<button onclick="exportarPlaneamentoExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+</div>
+
+        <table id="tblPlaneamento" style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>User</th>
+                    <th>Nome</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+
+</div>
+</div> <!-- fim planeamento -->
+
+<div id="planeamentoDia" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Planeamento Dia</h3>
+
+        <div style="display:flex;gap:10px;align-items:end;margin-bottom:20px;">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="fDataPlaneamentoDia">
+            </div>
+
+            <div>
+                <label>Nome</label><br>
+                <input type="text" id="fNomePlaneamentoDia" placeholder="Nome">
+            </div>
+
+            <button onclick="carregarPlaneamentoDia()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button onclick="limparFiltrosPlaneamentoDia()">
+                <i class="fa fa-eraser"></i> Limpar filtros
+            </button>
+
+            <button onclick="document.getElementById('fDataPlaneamentoDia').value='';carregarPlaneamentoDia();">
+                <i class="fa fa-rotate-right"></i> Hoje
+            </button>
+
+            <button onclick="carregarPlaneamentoDia()">
+                <i class="fa fa-sync"></i> Atualizar
+            </button>
+
+        </div>
+
+        <div id="cardsPlaneamentoDia"
+             style="
+                display:grid;
+                grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+                gap:20px;
+             ">
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="logins" style="display:none;padding:25px;">    <div class="panel">
+<h3>Logins</h3>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+
+    <div>
+        <label>Data</label><br>
+        <input type="date" id="fDataLogins">
+    </div>
+
+    <div>
+        <label>Tipo</label><br>
+        <select id="fTipoLogins">
+            <option value="">Todos</option>
+            <option value="login">Login</option>
+            <option value="logout">Logout</option>
+            <option value="pausa1">Pausa 1</option>
+            <option value="pausa2">Pausa 2</option>
+            <option value="refeicao">Refeição</option>
+        </select>
+    </div>
+
+    <div>
+        <label>User</label><br>
+        <input type="text" id="fUserLogins" placeholder="User">
+    </div>
+
+    <div>
+        <label>Nome</label><br>
+        <input type="text" id="fNomeLogins" placeholder="Nome">
+    </div>
+
+    <button onclick="carregarLogins()">
+        <i class="fa fa-search"></i> Pesquisar
+    </button>
+
+    <button onclick="limparFiltrosLogins()">
+        <i class="fa fa-eraser"></i> Limpar
+    </button>
+
+    <button onclick="carregarLogins()">
+        <i class="fa fa-rotate-right"></i> Atualizar
+    </button>
+<button onclick="exportarLoginsExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+</div>
+
+<table id="tblLogins" style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>User</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Duração</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+</div>
+
+<div id="relatorios" style="display:none;padding:25px;">
+
+    <h2 style="margin-bottom:20px;">Relatórios</h2>
+
+    <div style="
+        display:grid;
+        grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+        gap:20px;
+    ">
+
+        <div class="card" onclick="abrirResumoDia()" style="cursor:pointer;">
+            <h3><i class="fa fa-calendar-day"></i> Resumo Dia</h3>
+            <p>Resumo diário por colaborador.</p>
+        </div>
+
+       
+
+  
+
+        <div class="card" onclick="abrirRelatorioAlertas()" style="cursor:pointer;">
+            <h3><i class="fa fa-triangle-exclamation"></i> Alertas</h3>
+            <p>Relatório de alertas.</p>
+        </div>
+
+        <div class="card" onclick="abrirRelatorioFerias()" style="cursor:pointer;">
+            <h3><i class="fa fa-umbrella-beach"></i> Férias</h3>
+            <p>Relatório de férias.</p>
+        </div>
+
+    </div>
+</div>
+    <div id="resumoDia" style="display:none;padding:25px;">
+
+<div class="panel">
+
+<h3>Resumo Dia</h3>
+
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:20px 0;">
+
+    <div>
+        <label>Data</label><br>
+        <input type="date" id="fDataResumo">
+    </div>
+
+    <div>
+        <label>User</label><br>
+        <input type="text" id="fUserResumo" placeholder="User">
+    </div>
+
+    <div>
+        <label>Nome</label><br>
+        <input type="text" id="fNomeResumo" placeholder="Nome">
+    </div>
+
+    <div>
+        <label>Planeamento</label><br>
+        <input type="text" id="fEstadoResumo" placeholder="Estado">
+    </div>
+
+    <button onclick="carregarResumoDia()">
+        <i class="fa fa-search"></i> Pesquisar
+    </button>
+
+    <button onclick="limparFiltrosResumo()">
+        <i class="fa fa-eraser"></i> Limpar
+    </button>
+
+    <button onclick="carregarResumoDia()">
+        <i class="fa fa-rotate-right"></i> Atualizar
+    </button>
+    <button onclick="exportarResumoDiaExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+
+</div>
+
+<table id="tblResumoDia" style="width:100%;border-collapse:collapse;">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>User</th>
+            <th>Nome</th>
+            <th>Planeamento</th>
+            <th>Login</th>
+            <th>Logout</th>
+            <th>Pausa1</th>
+            <th>Pausa2</th>
+            <th>Refeição</th>
+            <th>Tempo Trabalhado</th>
+            <th>Tempo em Falta</th>
+            <th>Tempo Extra</th>
+            <th>Alerta</th>
+            <th>Observação</th>
+        </tr>
+    </thead>
+
+    <tbody id="tblResumoDiaBody"></tbody>
+</table>
+
+
+
+</div>
+</div> <!-- fim resumoDia -->
+
+<div id="relatorioProducao" style="display:none;padding:25px;">
+
+<div class="panel">
+
+    <h3>Relatório Produção</h3>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+
+        <div>
+            <label>Data</label><br>
+            <input type="date" id="fDataProducao">
+        </div>
+
+        <div>
+            <label>Colaborador</label><br>
+            <input type="text" id="fColaboradorProducao" placeholder="Nome">
+        </div>
+
+        <div>
+            <label>Tarefa</label><br>
+            <input type="text" id="fTarefaProducao" placeholder="Tarefa">
+        </div>
+
+        <button onclick="carregarRelatorioProducao()">
+            <i class="fa fa-search"></i> Pesquisar
+        </button>
+
+        <button onclick="limparFiltrosProducao()">
+            <i class="fa fa-eraser"></i> Limpar
+        </button>
+
+        <button onclick="carregarRelatorioProducao()">
+            <i class="fa fa-rotate-right"></i> Atualizar
+        </button>
+        <button onclick="exportarRelatorioProducaoExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+
+    </div>
+
+    <table id="tblRelatorioProducao" style="width:100%;border-collapse:collapse;">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Colaborador</th>
+                <th>Tarefa Finalizada</th>
+                <th>Total Tarefas</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+</div>
+
+</div>
+      
+
+<div id="relatorioOcupacao" style="display:none;padding:25px;">
+
+
+    <div class="panel">
+
+        <h3>Taxa de Ocupação</h3>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+
+    <div>
+        <label>Data</label><br>
+        <input type="date" id="fDataOcupacao">
+    </div>
+
+    <div>
+        <label>Colaborador</label><br>
+        <input type="text" id="fColaboradorOcupacao" placeholder="Nome">
+    </div>
+
+    <button onclick="carregarRelatorioOcupacao()">
+        <i class="fa fa-search"></i> Pesquisar
+    </button>
+
+    <button onclick="limparFiltrosOcupacao()">
+        <i class="fa fa-eraser"></i> Limpar
+    </button>
+
+    <button onclick="carregarRelatorioOcupacao()">
+        <i class="fa fa-rotate-right"></i> Atualizar
+    </button>
+    <button onclick="exportarRelatorioOcupacaoExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+
+</div>
+        <button onclick="carregarRelatorioOcupacao()">
+            Atualizar
+        </button>
+
+        <br><br>
+
+        <table id="tblRelatorioOcupacao" style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Colaborador</th>
+                    <th>Tempo Total</th>
+                    <th>Tempo Previsto</th>
+                    <th>Taxa Ocupação</th>
+                    <th>Observações</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<div id="relatorioTempos" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Tempos Médios</h3>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+
+    <div>
+        <label>Data</label><br>
+        <input type="date" id="fDataTempos">
+    </div>
+
+    <div>
+        <label>Colaborador</label><br>
+        <input type="text" id="fColaboradorTempos" placeholder="Nome">
+    </div>
+
+    <button onclick="carregarRelatorioTempos()">
+        <i class="fa fa-search"></i> Pesquisar
+    </button>
+
+    <button onclick="limparFiltrosTempos()">
+        <i class="fa fa-eraser"></i> Limpar
+    </button>
+
+    <button onclick="carregarRelatorioTempos()">
+        <i class="fa fa-rotate-right"></i> Atualizar
+    </button>
+<button onclick="exportarRelatorioTemposExcel()">
+    <i class="fa fa-file-excel"></i> Exportar Excel
+</button>
+
+</div> 
+
+        <button onclick="carregarRelatorioTempos()">
+            Atualizar
+        </button>
+
+        <br><br>
+
+        <table id="tblRelatorioTempos" style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Colaborador</th>
+                    <th>Tempo Total</th>
+                    <th>DNP</th>
+                    <th>DNE</th>
+                    <th>Reembolsos</th>
+                    <th>Multicare</th>
+                    <th>PETS</th>
+                    <th>Auto-Indexações</th>
+                    <th>Auto-Aberturas</th>
+                    <th>AP Index</th>
+                    <th>AT Participações</th>
+                    <th>AT Index</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div id="alertas" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Alertas do Dia</h3>
+
+        <button onclick="carregarAlertas()">
+            Atualizar
+        </button>
+
+        <br><br>
+
+<div id="cardsAlertas"
+    style="
+        display:flex;
+        flex-direction:column;
+        gap:20px;
+    ">
+</div>
+
+    </div>
+
+</div>
+
+<div id="forcarRegistos" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Forçar Registos</h3>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px;margin-top:20px;">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="forceDate">
+            </div>
+
+            <div>
+                <label>Hora</label><br>
+                <input type="time" id="forceHora" step="1">
+            </div>
+
+            <div>
+                <label>Nome</label><br>
+                <select id="nomeSelect">
+                    <option value="">Selecionar...</option>
+                    <option>Ana Rita Coelho Antão</option>
+                    <option>Davi Rocha Santos</option>
+                    <option>Marco André Pereira</option>
+                    <option>Joanes Mateus da Costa</option>
+                    <option>João Filipe Da Costa Marques Dos Santos</option>
+                    <option>Sónia Maria Raminhos Correia</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Tipo</label><br>
+                <select id="tipoSelect">
+                    <option value="login">Login</option>
+                    <option value="logout">Logout</option>
+                    <option value="pausa1">Pausa1</option>
+                    <option value="pausa2">Pausa2</option>
+                    <option value="refeicao">Refeição</option>
+                </select>
+            </div>
+
+        </div>
+
+        <br>
+
+        <button onclick="enviarForcado()">
+            <i class="fa fa-floppy-disk"></i>
+            Forçar Registo
+        </button>
+
+        <p id="msgForce" style="margin-top:15px;font-weight:bold"></p>
+
+    </div>
+
+</div>
+
+<div id="eliminarRegistos" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>Eliminar Registos</h3>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
+
+            <input type="date" id="fDataEliminar">
+
+            <input type="text" id="fNomeEliminar" placeholder="Nome">
+
+            <select id="fTipoEliminar">
+                <option value="">Todos os tipos</option>
+                <option value="login">Login</option>
+                <option value="logout">Logout</option>
+                <option value="pausa1">Pausa1</option>
+                <option value="pausa2">Pausa2</option>
+                <option value="refeicao">Refeição</option>
+            </select>
+
+            <button onclick="carregarEliminarRegistos()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button onclick="carregarEliminarRegistos()">
+                <i class="fa fa-rotate-right"></i> Atualizar
+            </button>
+
+        </div>
+
+        <table id="tblEliminarRegistos" style="width:100%;border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>User</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Início</th>
+                    <th>Fim</th>
+                    <th>Duração</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+
+            <tbody></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div id="forcarSQL" style="display:none;">
+
+    <div class="panel">
+
+        <h3>
+            <i class="fa fa-database"></i>
+            Forçar SQL
+        </h3>
+
+        <p style="margin:15px 0;color:#666;">
+            Atualiza os relatórios a partir dos dados existentes.
+        </p>
+
+        <button type="button" onclick="atualizarRelatorios()">
+            🔄 Atualizar Relatórios
+        </button>
+
+        <div id="msgAtualizarRelatorios"
+             style="margin-top:12px;">
+        </div>
+
+    </div>
+
+</div>
+
+<div id="dadosMes" style="display:none;padding:25px;">
+
+    <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;">
+            <div>
+                <h3><i class="fa fa-calendar-days"></i> Dados do Mês</h3>
+                <div style="font-size:12px;color:#777;margin-top:4px;">Histórico diário da produção guardado no Supabase</div>
+            </div>
+
+            <div>
+                <label>Mês</label><br>
+                <input type="month" id="fMesDadosProducao" onchange="carregarDadosMes()">
+<span style="display:inline-block;margin-left:12px;">
+    <label for="fDataDadosMes" style="font-size:12px;color:#666;">Dia (opcional)</label><br>
+    <input
+        type="date"
+        id="fDataDadosMes"
+        onchange="carregarDadosMes()"
+        style="padding:8px 10px;border:1px solid #ddd;border-radius:8px;"
+    >
+</span>
+
+            </div>
+
+            <div>
+                <label>Área</label><br>
+                <select id="fAreaDadosMes" onchange="carregarDadosMes()">
+                    <option value="">Todas as áreas</option>
+                </select>
+            </div>
+
+            <button type="button" onclick="limparFiltrosDadosMes()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+
+            <button type="button" onclick="exportarDadosMesExcel()">
+                <i class="fa fa-file-excel"></i> Exportar Excel
+            </button>
+        </div>
+
+        <div id="cardsDadosMes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;margin:20px 0;"></div>
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;min-width:700px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo de Tarefa / Área</th>
+                        <th>Tarefas</th>
+                    </tr>
+                </thead>
+                <tbody id="tblDadosMesBody"></tbody>
+            </table>
+        </div>
+
+        <div id="mensagemDadosMes" style="margin-top:15px;color:#777;font-size:12px;"></div>
+    </div>
+
+</div>
+
+
+<div id="carregarPlaneamentoAdmin" style="display:none;padding:25px;">
+    <div class="panel">
+        <h3>
+            <i class="fa fa-file-arrow-up"></i>
+            Carregar Planeamento
+        </h3>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px;">
+            <input
+                type="file"
+                id="ficheiroPlaneamento"
+                accept=".xlsx,.xls"
+                style="padding:8px;"
+            >
+
+            <button type="button" onclick="carregarFicheiroPlaneamento()">
+                <i class="fa fa-upload"></i> Carregar
+            </button>
+        </div>
+
+        <div id="msgCarregarPlaneamento"
+             style="margin-top:15px;font-weight:600;">
+        </div>
+    </div>
+</div>
+
+<div id="retificarProducao" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <h3>
+            <i class="fa fa-pen-to-square"></i>
+            Retificar Produção
+        </h3>
+
+        <p style="margin:8px 0 18px;color:#666;">
+            Pesquisa apenas os registos que correspondem aos filtros.
+            A tabela de produção não é carregada integralmente.
+        </p>
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:15px;
+            align-items:end;
+            margin-bottom:18px;
+        ">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="fDataRetificarProducao">
+            </div>
+
+            <div>
+                <label>Colaborador / Nome</label><br>
+                <input type="text"
+                       id="fColaboradorRetificarProducao"
+                       placeholder="Nome ou colaborador">
+            </div>
+
+            <div>
+                <label>Tarefa Finalizada</label><br>
+                <input type="text"
+                       id="fTarefaRetificarProducao"
+                       placeholder="Tarefa">
+            </div>
+
+            <div>
+                <label>Lote</label><br>
+                <input type="text"
+                       id="fLoteRetificarProducao"
+                       placeholder="Lote">
+            </div>
+
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px;">
+
+            <button type="button" onclick="pesquisarRetificarProducao()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button type="button" onclick="limparFiltrosRetificarProducao()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+
+        </div>
+
+        <div id="msgRetificarProducao"
+             style="margin:8px 0 15px;font-weight:600;color:#666;">
+            Aplique pelo menos um filtro para pesquisar.
+        </div>
+
+        <div style="overflow-x:auto;">
+
+            <table id="tblRetificarProducao"
+                   style="width:100%;border-collapse:collapse;min-width:1050px;">
+
+                <thead>
+                    <tr>
+                        <th>Data</th><th>Colaborador</th><th>Tarefa Finalizada</th><th>Lote</th><th>Ação</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tblRetificarProducaoBody">
+                    <tr>
+                        <td colspan="5"
+                            style="text-align:center;padding:25px;color:#777;">
+                            Nenhuma pesquisa efetuada.
+                        </td>
+                    </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+function limparFiltrosPlaneamentoDia(){
+    document.getElementById('fDataPlaneamentoDia').value = '';
+    const nome = document.getElementById('fNomePlaneamentoDia');
+    if(nome) nome.value = '';
+    carregarPlaneamentoDia();
+}
+
+
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+
+function mostrarPlaneamento(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("planeamentoMes").style.display = "block";
+
+    carregarPlaneamento();
+}
+document.getElementById("planeamentoMes").style.display="none";
+
+
+function toggleColaboradores(){
+
+    const menu = document.getElementById("menuColaboradores");
+
+    menu.style.display =
+        menu.style.display === "block" ? "none" : "block";
+
+}
+
+function limparFiltrosOcupacao(){
+
+    document.getElementById("fDataOcupacao").value = "";
+    document.getElementById("fColaboradorOcupacao").value = "";
+
+    carregarRelatorioOcupacao();
+
+}
+
+function limparFiltrosTempos(){
+
+    document.getElementById("fDataTempos").value = "";
+    document.getElementById("fColaboradorTempos").value = "";
+
+    carregarRelatorioTempos();
+
+}
+
+function limparFiltrosResumo(){
+
+    document.getElementById("fDataResumo").value = "";
+    document.getElementById("fUserResumo").value = "";
+    document.getElementById("fNomeResumo").value = "";
+    document.getElementById("fEstadoResumo").value = "";
+
+    carregarResumoDia();
+}
+
+function limparFiltrosProducao(){
+
+    document.getElementById("fDataProducao").value="";
+    document.getElementById("fColaboradorProducao").value="";
+    document.getElementById("fTarefaProducao").value="";
+
+    carregarRelatorioProducao();
+
+}
+
+function limparFiltrosLogins(){
+
+    document.getElementById("fDataLogins").value = "";
+    document.getElementById("fTipoLogins").value = "";
+    document.getElementById("fUserLogins").value = "";
+    document.getElementById("fNomeLogins").value = "";
+
+    carregarLogins();
+
+}
+function mostrarPlataformas(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+       document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("plataformas").style.display="block";
+
+    carregarPlataformas();
+
+}
+
+
+async function carregarEliminarRegistos(){
+
+    let url = `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?select=id,data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`;
+
+    const data = document.getElementById("fDataEliminar").value;
+    const nome = document.getElementById("fNomeEliminar").value;
+    const tipo = document.getElementById("fTipoEliminar").value;
+
+
+    if(data){
+        url += `&data=eq.${data}`;
+    }
+
+    if(nome){
+        url += `&nome=ilike.*${nome}*`;
+    }
+
+    if(tipo){
+        url += `&tipo=eq.${tipo}`;
+    }
+
+
+    const resposta = await fetch(url,{
+        headers:{
+            apikey:SUPABASE_API_KEY,
+            Authorization:`Bearer ${SUPABASE_API_KEY}`
+        }
+    });
+
+
+    const dados = await resposta.json();
+console.log("DADOS DOS ALERTAS:", dados);
+
+    const tbody = document.querySelector("#tblEliminarRegistos tbody");
+
+    tbody.innerHTML="";
+
+
+    dados.forEach(r=>{
+
+        tbody.innerHTML += `
+
+        <tr>
+
+            <td>${r.data ?? ""}</td>
+            <td>${r.user ?? ""}</td>
+            <td>${r.nome ?? ""}</td>
+            <td>${r.tipo ?? ""}</td>
+            <td>${r.inicio ? r.inicio.replace("T"," ").substring(0,19) : ""}</td>
+            <td>${r.fim ? r.fim.replace("T"," ").substring(0,19) : ""}</td>
+            <td>${r.duracao ?? ""}</td>
+
+            <td>
+                <button onclick="eliminarRegisto(${r.id})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </td>
+
+        </tr>
+
+        `;
+
+    });
+
+}
+
+async function eliminarRegisto(id){
+
+    if(!confirm("Tem a certeza que quer eliminar este registo?")){
+        return;
+    }
+
+
+    const resposta = await fetch(
+        `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?id=eq.${id}`,
+        {
+            method:"DELETE",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        }
+    );
+
+
+    if(resposta.ok){
+
+        alert("Registo eliminado.");
+
+        carregarEliminarRegistos();
+
+    }else{
+
+        alert("Erro ao eliminar registo.");
+
+    }
+
+}
+function carregarPlataformas(){
+
+const colaboradores = [
+
+{nome:"Ana Barão", link:"AnaBarão.html"},
+{nome:"Ana Karina", link:"KarinaMartins.html"},
+{nome:"Ana Sofia Garabito", link:"SofiaGarabito.html"},
+{nome:"Andreia Grilo", link:"AndreiaGrilo.html"},
+{nome:"Bruno Manacas", link:"BrunoManacas.html"},
+{nome:"Carina Lavado", link:"CarinaLavado.html"},
+{nome:"Carla Reis", link:"CarlaReis.html"},
+{nome:"Carla Trindade", link:"CarlaTrindade.html"},
+{nome:"Carolina Padeiro", link:"CarolinaPadeiro.html"},
+{nome:"Cintia Carlos", link:"CintiaCarlos.html"},
+{nome:"Délcia Mpengo", link:"DélciaMpengo.html"},
+{nome:"Delson Carvalho", link:"DelsonCarvalho.html"},
+{nome:"Eunice Chiau", link:"EuniceChiau.html"},
+{nome:"Fábio Abreu", link:"FábioAbreu.html"},
+{nome:"Gilda Anjos", link:"GildaAnjos.html"},
+{nome:"Gisela Inglês", link:"GiselaInglês.html"},
+{nome:"Jessica Manacas", link:"JessicaManacas.html"},
+{nome:"Joana Figueiras", link:"JoanaFigueiras.html"},
+{nome:"Joana Sousa", link:"JoanaSousa.html"},
+{nome:"Joel Mundjanga", link:"JoelMundjanga.html"},
+{nome:"Madalena Góis", link:"MadalenaGois.html"},
+{nome:"Marcos Moura", link:"MarcosMoura.html"},
+{nome:"Marta Fernandes", link:"MartaFernandes.html"},
+{nome:"Monica Valente", link:"MonicaValente.html"},
+{nome:"Nádia Oliveira", link:"NádiaOliveira.html"},
+{nome:"Orlanda Francisco", link:"OrlandaFrancisco.html"},
+{nome:"Patricia Andre", link:"PatriciaAndre.html"},
+{nome:"Rachel Coelho", link:"RachelCoelho.html"},
+{nome:"Renan Santos", link:"RenanSantos.html"},
+{nome:"Sandra Bento", link:"SandraBento.html"},
+{nome:"Sandra Facao", link:"SandraFacao.html"},
+{nome:"Sara Chotumiã", link:"SaraChotumiã.html"},
+{nome:"Sofia Ferreira", link:"SofiaFerreira.html"},
+{nome:"Susana Bordalo", link:"SusanaBordalo.html"},
+{nome:"Vera Freitas", link:"VeraFreitas.html"}
+
+];
+
+window.colaboradoresPlataformas = colaboradores;
+renderizarPlataformas(colaboradores);
+
+}
+
+function normalizarTextoPlataformas(texto){
+    return (texto || "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
+}
+
+function renderizarPlataformas(lista){
+
+    const div = document.getElementById("listaPlataformas");
+    if(!div) return;
+
+    if(!lista.length){
+        div.innerHTML = `
+            <div style="grid-column:1/-1;text-align:center;padding:25px;color:#777;">
+                Nenhum colaborador encontrado.
+            </div>
+        `;
+        return;
+    }
+
+    div.innerHTML = lista.map(c => `
+        <div class="card">
+            <h3>
+                <i class="fa fa-user"></i>
+                ${c.nome}
+            </h3>
+
+            <hr style="margin:10px 0">
+
+            <button
+                onclick="window.open('https://newspringservices.github.io/dashboard/${c.link}','_blank')"
+                style="width:100%;padding:10px;cursor:pointer;"
+            >
+                <i class="fa fa-laptop"></i>
+                Portal Newspring
+            </button>
+        </div>
+    `).join("");
+}
+
+function filtrarPlataformas(){
+
+    const campo = document.getElementById("filtroPlataformas");
+    const pesquisa = normalizarTextoPlataformas(campo ? campo.value.trim() : "");
+
+    const lista = window.colaboradoresPlataformas || [];
+
+    const filtrados = lista.filter(c =>
+        normalizarTextoPlataformas(c.nome).includes(pesquisa)
+    );
+
+    renderizarPlataformas(filtrados);
+}
+
+function limparFiltroPlataformas(){
+
+    const campo = document.getElementById("filtroPlataformas");
+    if(campo) campo.value = "";
+
+    renderizarPlataformas(window.colaboradoresPlataformas || []);
+}
+
+function mostrarForcarRegistos(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+      document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("forcarRegistos").style.display="block";
+
+}
+
+function mostrarAlertas(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+     document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("alertas").style.display = "block";
+
+    carregarAlertas();
+
+}
+
+function mostrarEliminarRegistos(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("eliminarRegistos").style.display="block";
+
+    carregarEliminarRegistos();
+
+}
+function abrirRelatorioOcupacao(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+
+
+    document.getElementById("relatorioOcupacao").style.display="block";
+
+    carregarRelatorioOcupacao();
+
+}
+
+function mostrarLogins(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("logins").style.display = "block";
+
+    // Não carregar dados automaticamente: a aba só consulta o Supabase
+    // quando o utilizador aplicar pelo menos um filtro.
+    const tbody = document.querySelector("#tblLogins tbody");
+    if(tbody && !tbody.dataset.inicializado){
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#777;">
+            <i class="fa fa-filter"></i> Aplique pelo menos um filtro e clique em Pesquisar.
+        </td></tr>`;
+        tbody.dataset.inicializado = "1";
+    }
+
+}
+function toggleRelatorios(){
+
+    const menu = document.getElementById("menuRelatorios");
+
+    menu.style.display =
+        menu.style.display === "block" ? "none" : "block";
+
+}
+
+
+function toggleAdministracao(){
+
+    const menu = document.getElementById("menuAdministracao");
+
+    menu.style.display =
+        menu.style.display === "block" ? "none" : "block";
+
+}
+
+async function carregarPlaneamentoDia(){
+
+    try{
+
+        let url = `${SUPABASE_URL}/rest/v1/MTCplaneamento?select=data,nome,estado`;
+
+        const data = document.getElementById("fDataPlaneamentoDia").value;
+
+        const dataFiltro = data || new Date().toISOString().slice(0,10);
+
+        url += `&data=eq.${dataFiltro}`;
+        url += "&order=nome.asc";
+
+        const resposta = await fetch(url,{
+            headers:{
+                apikey: SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+
+        let dados = await resposta.json();
+
+        const nomeFiltro = (document.getElementById("fNomePlaneamentoDia")?.value || "")
+            .trim().toLowerCase();
+
+        if(nomeFiltro){
+            dados = dados.filter(r =>
+                (r.nome || "").toString().toLowerCase().includes(nomeFiltro)
+            );
+        }
+
+
+        const respostaRegistos = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?select=data,nome,tipo,inicio&data=eq.${dataFiltro}&order=inicio.asc`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                }
+            }
+        );
+
+        const registos = await respostaRegistos.json();
+
+
+        function normalizarNome(nome){
+
+            return (nome || "")
+                .toString()
+                .trim()
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g,"")
+                .replace(/\s+/g," ");
+
+        }
+
+
+        const mapaRegistos = {};
+
+
+        registos.forEach(r => {
+
+            const nomeNormalizado = normalizarNome(r.nome);
+
+            if(!nomeNormalizado) return;
+
+            if(!mapaRegistos[nomeNormalizado]){
+                mapaRegistos[nomeNormalizado] = [];
+            }
+
+            mapaRegistos[nomeNormalizado].push(r);
+
+        });
+
+
+        function badgeLogin(nome){
+
+            const nomeNormalizado = normalizarNome(nome);
+            const lista = mapaRegistos[nomeNormalizado] || [];
+
+            /*
+             * IMPORTANTE:
+             * Pausas/refeição não significam que a pessoa fez logout.
+             * Para o Planeamento do Dia só interessam os eventos Login
+             * e Logout. Assim, se houve Login e depois uma pausa,
+             * continua a aparecer como Logado.
+             */
+            const estadosLogin = lista
+                .filter(r => {
+                    const tipo = (r.tipo || "")
+                        .toString()
+                        .trim()
+                        .toLowerCase();
+
+                    return tipo === "login" || tipo === "logout";
+                })
+                .sort((a,b) =>
+                    new Date(a.inicio || 0) - new Date(b.inicio || 0)
+                );
+
+            if(!estadosLogin.length){
+                return `
+                    <span style="
+                        float:right;
+                        background:#f8d7da;
+                        color:#721c24;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🔴 Sem Login
+                    </span>
+                `;
+            }
+
+            const ultimo = estadosLogin[estadosLogin.length - 1];
+
+            const tipo = (ultimo.tipo || "")
+                .toString()
+                .trim()
+                .toLowerCase();
+
+            const hora = ultimo.inicio
+                ? new Date(ultimo.inicio).toLocaleTimeString(
+                    "pt-PT",
+                    {
+                        hour:"2-digit",
+                        minute:"2-digit"
+                    }
+                )
+                : "";
+
+            if(tipo === "login"){
+                return `
+                    <span style="
+                        float:right;
+                        background:#d4edda;
+                        color:#155724;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🟢 ${hora}
+                    </span>
+                `;
+            }
+
+            if(tipo === "logout"){
+                return `
+                    <span style="
+                        float:right;
+                        background:#fff3cd;
+                        color:#856404;
+                        padding:3px 8px;
+                        border-radius:20px;
+                        font-size:11px;
+                        font-weight:bold;">
+                        🟡 Logout ${hora}
+                    </span>
+                `;
+            }
+
+            return `
+                <span style="
+                    float:right;
+                    background:#f8d7da;
+                    color:#721c24;
+                    padding:3px 8px;
+                    border-radius:20px;
+                    font-size:11px;
+                    font-weight:bold;">
+                    🔴 Sem Login
+                </span>
+            `;
+        }
+
+
+        const lista = {
+            trabalha:[],
+            ferias:[],
+            baixa:[],
+            licenca:[],
+            dispensa:[]
+        };
+
+
+        dados.forEach(r => {
+
+            const estado = (r.estado || "")
+                .toString()
+                .trim()
+                .toLowerCase();
+
+
+            if(estado.includes("trabalha")){
+
+                lista.trabalha.push(r.nome);
+
+            }
+            else if(
+                estado.includes("férias") ||
+                estado.includes("ferias")
+            ){
+
+                lista.ferias.push(r.nome);
+
+            }
+            else if(estado.includes("baixa")){
+
+                lista.baixa.push(r.nome);
+
+            }
+            else if(
+                estado.includes("licença") ||
+                estado.includes("licenca")
+            ){
+
+                lista.licenca.push(r.nome);
+
+            }
+            else if(estado.includes("dispensa")){
+
+                lista.dispensa.push(r.nome);
+
+            }
+
+        });
+
+
+        const cards = document.getElementById("cardsPlaneamentoDia");
+
+
+        cards.innerHTML = `
+
+            <div class="card">
+
+                <h3>
+                    <i class="fa fa-user-check"></i>
+                    Trabalha (${lista.trabalha.length})
+                </h3>
+
+                <hr style="margin:10px 0;">
+
+                ${
+                    lista.trabalha.length
+                    ?
+                    lista.trabalha.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;
+                            min-height:30px;">
+                            ${n}
+                            ${badgeLogin(n)}
+                        </div>
+                    `).join("")
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    <i class="fa fa-umbrella-beach"></i>
+                    Férias (${lista.ferias.length})
+                </h3>
+
+                <hr style="margin:10px 0;">
+
+                ${
+                    lista.ferias.length
+                    ?
+                    lista.ferias.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
+                            ${n}
+                        </div>
+                    `).join("")
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    <i class="fa fa-heart-pulse"></i>
+                    Baixa (${lista.baixa.length})
+                </h3>
+
+                <hr style="margin:10px 0;">
+
+                ${
+                    lista.baixa.length
+                    ?
+                    lista.baixa.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
+                            ${n}
+                        </div>
+                    `).join("")
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    <i class="fa fa-file-medical"></i>
+                    Licença (${lista.licenca.length})
+                </h3>
+
+                <hr style="margin:10px 0;">
+
+                ${
+                    lista.licenca.length
+                    ?
+                    lista.licenca.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
+                            ${n}
+                        </div>
+                    `).join("")
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    <i class="fa fa-user-slash"></i>
+                    Dispensa (${lista.dispensa.length})
+                </h3>
+
+                <hr style="margin:10px 0;">
+
+                ${
+                    lista.dispensa.length
+                    ?
+                    lista.dispensa.map(n => `
+                        <div style="
+                            padding:6px 0;
+                            border-bottom:1px solid #eee;">
+                            ${n}
+                        </div>
+                    `).join("")
+                    :
+                    "<div style='color:#999'>Sem colaboradores</div>"
+                }
+
+            </div>
+
+        `;
+
+
+    }catch(e){
+
+        console.error("Erro no Planeamento Dia:",e);
+
+    }
+
+}
+
+function togglePlaneamento(){
+
+    const menu = document.getElementById("menuPlaneamento");
+
+    menu.style.display =
+        menu.style.display === "block" ? "none" : "block";
+
+}
+
+function mostrarPlaneamentoDia(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+    document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("planeamentoDia").style.display = "block";
+
+    carregarPlaneamentoDia();
+
+}
+
+
+function abrirRelatorioTempos(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("alertas").style.display="none";
+document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+
+    document.getElementById("relatorioTempos").style.display="block";
+
+    carregarRelatorioTempos();
+
+}
+
+
+async function guardarProducaoDia(producao, data){
+
+    try{
+
+        const dataGuardar = data || new Date().toISOString().slice(0,10);
+
+        // IMPORTANTE:
+        // O histórico mensal tem de usar exatamente a mesma fonte
+        // que alimenta o resumo/gráfico de produção do Dashboard.
+        // Aqui agrupamos por Tarefa Finalizada (a "área" mostrada
+        // no Dashboard), somando documentos e tarefas.
+        let todosDados = [];
+        let inicio = 0;
+        const tamanhoPagina = 1000;
+
+        while(true){
+
+            const resposta = await fetch(
+                `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_producao?data=eq.${dataGuardar}&select=data,tarefafinalizada,total_documentos,total_tarefas&order=tarefafinalizada.asc&limit=${tamanhoPagina}&offset=${inicio}`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    }
+                }
+            );
+
+            if(!resposta.ok){
+                throw new Error(await resposta.text());
+            }
+
+            const pagina = await resposta.json();
+
+            todosDados.push(...pagina);
+
+            if(pagina.length < tamanhoPagina) break;
+
+            inicio += tamanhoPagina;
+        }
+
+        const resumo = {};
+
+        todosDados.forEach(r => {
+
+            const area = (r.tarefafinalizada || "Sem área")
+                .toString()
+                .trim() || "Sem área";
+
+            // Não guardar linhas que o próprio Dashboard considera
+            // inválidas para a produção.
+            const tarefa = area.toLowerCase();
+
+            if(
+                tarefa.includes("sem tarefa") ||
+                tarefa.includes("erro") ||
+                tarefa.includes("spam")
+            ){
+                return;
+            }
+
+            if(!resumo[area]){
+                resumo[area] = {
+                    documentos:0,
+                    tarefas:0
+                };
+            }
+
+            resumo[area].documentos += Number(r.total_documentos || 0);
+            resumo[area].tarefas += Number(r.total_tarefas || 0);
+
+        });
+
+        const linhas = Object.keys(resumo).map(area => ({
+            data:dataGuardar,
+            area:area,
+            total_documentos:resumo[area].documentos,
+            total_tarefas:resumo[area].tarefas
+        }));
+
+        // Atualizar o histórico através de UPSERT.
+        // O histórico tem uma constraint UNIQUE e, por isso, não devemos
+        // simplesmente fazer INSERT de linhas que já existem.
+        // O UPSERT cria a linha quando não existe e atualiza quando já existe.
+        if(!linhas.length){
+            return;
+        }
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/bpo_historico_producao_mes?on_conflict=data,area`,
+            {
+                method:"POST",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    Prefer:"resolution=merge-duplicates,return=minimal"
+                },
+                body:JSON.stringify(linhas)
+            }
+        );
+
+        if(!resposta.ok){
+            throw new Error(await resposta.text());
+        }
+
+    }catch(e){
+
+        console.error("Erro ao guardar produção diária:",e);
+        throw e;
+
+    }
+}
+
+async function carregarDadosMes(){
+
+    try{
+
+        const inputMes = document.getElementById("fMesDadosProducao");
+        const inputData = document.getElementById("fDataDadosMes");
+        const hoje = new Date().toISOString().slice(0,10);
+
+        const mes = inputMes.value || hoje.slice(0,7);
+        inputMes.value = mes;
+
+        const dataEscolhida = inputData?.value || "";
+        const filtroArea =
+            (document.getElementById("fAreaDadosMes")?.value || "").trim();
+
+        const [ano, numeroMes] = mes.split("-").map(Number);
+
+        const inicio = `${mes}-01`;
+
+        const proximoMes =
+            numeroMes === 12
+                ? `${ano + 1}-01-01`
+                : `${ano}-${String(numeroMes + 1).padStart(2,"0")}-01`;
+
+        async function buscarDados(){
+
+            let todos = [];
+            let offset = 0;
+            const tamanhoPagina = 1000;
+
+            while(true){
+
+                let url =
+                    `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_producao` +
+                    `?data=gte.${inicio}` +
+                    `&data=lt.${proximoMes}` +
+                    `&select=data,colaborador,tarefafinalizada,total_tarefas` +
+                    `&order=data.asc,tarefafinalizada.asc,colaborador.asc` +
+                    `&limit=${tamanhoPagina}` +
+                    `&offset=${offset}`;
+
+                if(filtroArea){
+                    url += `&tarefafinalizada=eq.${encodeURIComponent(filtroArea)}`;
+                }
+
+                const resposta = await fetch(url,{
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    },
+                    cache:"no-store"
+                });
+
+                if(!resposta.ok){
+                    throw new Error(await resposta.text());
+                }
+
+                const pagina = await resposta.json();
+
+                todos.push(...pagina);
+
+                if(pagina.length < tamanhoPagina){
+                    break;
+                }
+
+                offset += tamanhoPagina;
+
+            }
+
+            return todos;
+
+        }
+
+        const dadosMes = await buscarDados();
+
+        /*
+         * A fonte é exclusivamente:
+         * MTCBPO_resumo_producao
+         *
+         * Campos:
+         * data
+         * colaborador
+         * tarefafinalizada
+         * total_tarefas
+         */
+
+        const dadosMostrar = dataEscolhida
+            ? dadosMes.filter(r => r.data === dataEscolhida)
+            : dadosMes;
+
+        let totalTarefasMes = 0;
+
+        dadosMes.forEach(r => {
+            totalTarefasMes += Number(r.total_tarefas || 0);
+        });
+
+        const cards = document.getElementById("cardsDadosMes");
+
+        cards.innerHTML = `
+            <div class="card">
+                <h3>Tarefas do Mês</h3>
+                <h1>${totalTarefasMes.toLocaleString("pt-PT")}</h1>
+            </div>
+        `;
+
+        let cardsDia = document.getElementById("cardsDadosDia");
+
+        if(!cardsDia){
+
+            cardsDia = document.createElement("div");
+            cardsDia.id = "cardsDadosDia";
+
+            cardsDia.style.cssText =
+                "display:grid;grid-template-columns:1fr;gap:15px;margin-top:15px;";
+
+            cards.parentNode.insertBefore(
+                cardsDia,
+                cards.nextSibling
+            );
+
+        }
+
+        if(dataEscolhida){
+
+            let totalDia = 0;
+
+            dadosMostrar.forEach(r => {
+                totalDia += Number(r.total_tarefas || 0);
+            });
+
+            const df =
+                dataEscolhida
+                    .split("-")
+                    .reverse()
+                    .join("/");
+
+            cardsDia.style.display = "grid";
+
+            cardsDia.innerHTML = `
+                <div class="card">
+                    <h3>Tarefas do Dia — ${df}</h3>
+                    <h1>${totalDia.toLocaleString("pt-PT")}</h1>
+                </div>
+            `;
+
+        }else{
+
+            cardsDia.style.display = "none";
+            cardsDia.innerHTML = "";
+
+        }
+
+        const tbody = document.getElementById("tblDadosMesBody");
+
+        if(!dadosMostrar.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="3"
+                        style="text-align:center;color:#999;padding:20px;">
+                        Não existem dados para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+        }else{
+
+            /*
+             * Agrupa por DATA + TAREFA/ÁREA.
+             * O colaborador continua a ser usado na fonte,
+             * mas o relatório mensal mantém a apresentação
+             * por área/tarefa como no Dashboard.
+             */
+            const agrupado = {};
+
+            dadosMostrar.forEach(r => {
+
+                const data = r.data || "";
+                const tarefa =
+                    (r.tarefafinalizada || "Sem área")
+                        .toString()
+                        .trim() || "Sem área";
+
+                const chave = `${data}|||${tarefa}`;
+
+                if(!agrupado[chave]){
+
+                    agrupado[chave] = {
+                        data:data,
+                        tarefa:tarefa,
+                        total_tarefas:0
+                    };
+
+                }
+
+                agrupado[chave].total_tarefas +=
+                    Number(r.total_tarefas || 0);
+
+            });
+
+            tbody.innerHTML =
+                Object.values(agrupado)
+                    .map(r => `
+                        <tr>
+                            <td>${escaparHTML(r.data)}</td>
+                            <td>${escaparHTML(r.tarefa)}</td>
+                            <td>${r.total_tarefas.toLocaleString("pt-PT")}</td>
+                        </tr>
+                    `)
+                    .join("");
+
+        }
+
+        const mensagem =
+            document.getElementById("mensagemDadosMes");
+
+        mensagem.textContent =
+            dataEscolhida
+                ? `Mês: ${totalTarefasMes.toLocaleString("pt-PT")} tarefas. Dia ${dataEscolhida.split("-").reverse().join("/")}: filtro aplicado.`
+                : `Mês: ${totalTarefasMes.toLocaleString("pt-PT")} tarefas. A mostrar todos os dias do mês.`;
+
+    }catch(e){
+
+        console.error("Erro ao carregar Dados do Mês:",e);
+
+        document.getElementById("mensagemDadosMes").textContent =
+            "Erro: " + e.message;
+
+    }
+
+}
+
+
+function limparFiltrosDadosMes(){
+
+    document.getElementById("fAreaDadosMes").value = "";
+
+    carregarDadosMes();
+
+}
+
+
+function exportarDadosMesExcel(){
+
+    const tabela =
+        document.querySelector("#dadosMes table");
+
+    if(!tabela){
+
+        alert("Não existe tabela para exportar.");
+
+        return;
+
+    }
+
+    const linhas = [];
+
+    tabela.querySelectorAll("tr").forEach(tr => {
+
+        const linha = [];
+
+        tr.querySelectorAll("th,td").forEach(td => {
+
+            linha.push(td.innerText.trim());
+
+        });
+
+        if(linha.length){
+
+            linhas.push(linha);
+
+        }
+
+    });
+
+    if(linhas.length <= 1){
+
+        alert("Não existem dados para exportar.");
+
+        return;
+
+    }
+
+    const wb = XLSX.utils.book_new();
+
+    const ws = XLSX.utils.aoa_to_sheet(linhas);
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "BPOMTC_Dados do Mês"
+    );
+
+    const mes =
+        document.getElementById("fMesDadosProducao").value || "mes";
+
+    XLSX.writeFile(
+        wb,
+        `Dados_Producao_${mes}.xlsx`
+    );
+
+}
+
+
+function mostrarDadosMes(){
+    document.querySelectorAll(".main > div").forEach(el => {
+        el.style.display = "none";
+    });
+
+    document.getElementById("dadosMes").style.display = "block";
+
+    const input = document.getElementById("fMesDadosProducao");
+    if(!input.value){
+        input.value = new Date().toISOString().slice(0,7);
+    }
+
+    carregarDadosMes();
+}
+
+async function carregarCardsDashboard(){
+
+    const hoje = new Date().toISOString().slice(0,10);
+
+    const [registosReq, producaoReq, planeamentoReq] = await Promise.all([
+
+        fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?data=eq.${hoje}&select=user,nome,tipo,inicio&order=inicio.asc`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                }
+            }
+        ),
+
+        fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_producao?data=eq.${hoje}&select=data,colaborador,tarefafinalizada,total_tarefas`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                },
+                cache:"no-store"
+            }
+        ),
+
+        fetch(
+           `${SUPABASE_URL}/rest/v1/MTCplaneamento?data=eq.${hoje}&select=user,nome,estado`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                }
+            }
+        )
+
+    ]);
+
+    const registos = await registosReq.json();
+    const producao = await producaoReq.json();
+    const planeamento = await planeamentoReq.json();
+
+    // A produção do Dashboard vem diretamente de MTCBPO_resumo_producao.
+
+    // SEM PRESENÇA
+const usersTrabalham = new Set(
+    planeamento
+        .filter(p => (p.estado || "").toLowerCase().includes("trabalha"))
+        .map(p => (p.user || "").trim().toLowerCase())
+        .filter(Boolean)
+);
+
+const usersComRegisto = new Set(
+    registos
+        .filter(r => {
+            const tipo = (r.tipo || "").toLowerCase();
+            return tipo.includes("login") || tipo.includes("logout");
+        })
+        .map(r => (r.user || "").trim().toLowerCase())
+        .filter(Boolean)
+);
+
+const semPresenca = [...usersTrabalham]
+    .filter(user => !usersComRegisto.has(user))
+    .length;
+// ----------------------------
+// OPERACIONAIS E LOGOUTS
+// ----------------------------
+
+const ultimoEstado = {};
+
+registos.forEach(r => {
+
+    if(!r.user || !r.inicio)
+        return;
+
+    const tipo = (r.tipo || "").toLowerCase();
+
+    // Guardamos sempre o último evento de cada user
+    if(
+        tipo.includes("login") ||
+        tipo.includes("logout")
+    ){
+        ultimoEstado[r.user] = {
+            tipo: tipo,
+            inicio: r.inicio
+        };
+    }
+
+});
+
+let operacionais = 0;
+let logouts = 0;
+
+Object.values(ultimoEstado).forEach(r => {
+
+    // Último evento foi Login
+    if(r.tipo.includes("login")){
+        operacionais++;
+    }
+
+    // Último evento foi Logout
+    else if(r.tipo.includes("logout")){
+        logouts++;
+    }
+
+});
+
+    // ----------------------------
+    // PRODUÇÃO
+    // ----------------------------
+
+    let totalProducao = 0;
+
+    producao.forEach(r=>{
+
+        const tarefa=(r.tarefafinalizada || "").toLowerCase();
+
+        if(
+            tarefa.includes("sem tarefa") ||
+            tarefa.includes("erro") ||
+            tarefa.includes("spam")
+        ){
+            return;
+        }
+
+        totalProducao += Number(r.total_tarefas || 0);
+
+    });
+
+    // ----------------------------
+    // ALERTAS
+    // ----------------------------
+// ----------------------------
+// ALERTAS = TRABALHA MAS SEM LOGIN NEM LOGOUT
+// ----------------------------
+
+const nomesTrabalham = new Set();
+
+planeamento.forEach(r => {
+
+    const estado = (r.estado || "").toLowerCase().trim();
+
+    if(estado.includes("trabalha") && r.nome){
+        nomesTrabalham.add(r.nome.trim());
+    }
+
+});
+
+const nomesComPresenca = new Set();
+
+registos.forEach(r => {
+
+    if(!r.nome)
+        return;
+
+    const tipo = (r.tipo || "").toLowerCase();
+
+    if(
+        tipo.includes("login") ||
+        tipo.includes("logout")
+    ){
+        nomesComPresenca.add(r.nome.trim());
+    }
+
+});
+
+const pessoasSemPresenca = [...nomesTrabalham]
+    .filter(nome => !nomesComPresenca.has(nome));
+
+const alertas = pessoasSemPresenca.length;
+
+
+// ----------------------------
+// ATUALIZAR CARDS
+// ----------------------------
+
+document.getElementById("cardOperacionais").innerText = operacionais;
+document.getElementById("cardSemPresenca").innerText = semPresenca;
+}
+
+
+async function carregarRelatorioTempos(){
+
+    try{
+
+    const resposta = await fetch(
+`${SUPABASE_URL}/rest/v1/resumo_producao_diaria?select=*`,
+{
+    headers:{
+        apikey: SUPABASE_API_KEY,
+        Authorization:`Bearer ${SUPABASE_API_KEY}`
+    }
+}
+);
+
+        const dados = await resposta.json();
+const fData = document.getElementById("fDataTempos").value;
+const fColaborador = document.getElementById("fColaboradorTempos").value.toLowerCase().trim();
+        console.log(dados);
+
+        const tbody = document.querySelector("#tblRelatorioTempos tbody");
+
+        tbody.innerHTML = "";
+
+dados
+.filter(r => {
+
+    if (fData && r.data !== fData)
+        return false;
+
+    if (fColaborador &&
+        !(r.colaborador || "").toLowerCase().includes(fColaborador))
+        return false;
+
+    return true;
+
+})
+.forEach(r => {
+          tbody.innerHTML += `
+<tr>
+    <td>${r.data ?? ""}</td>
+    <td>${r.colaborador ?? ""}</td>
+<td>${r.tempo_total === "00:00:00" ? "" : (r.tempo_total ?? "")}</td>
+<td>${r["DNP"] === "00:00:00" ? "" : (r["DNP"] ?? "")}</td>
+<td>${r["DNE"] === "00:00:00" ? "" : (r["DNE"] ?? "")}</td>
+<td>${r["Reembolsos Multicare"] === "00:00:00" ? "" : (r["Reembolsos Multicare"] ?? "")}</td>
+<td>${r["PETS"] === "00:00:00" ? "" : (r["PETS"] ?? "")}</td>
+<td>${r["Auto-Indexações"] === "00:00:00" ? "" : (r["Auto-Indexações"] ?? "")}</td>
+<td>${r["Auto-Aberturas"] === "00:00:00" ? "" : (r["Auto-Aberturas"] ?? "")}</td>
+<td>${r["AP Index"] === "00:00:00" ? "" : (r["AP Index"] ?? "")}</td>
+<td>${r["AT Participações"] === "00:00:00" ? "" : (r["AT Participações"] ?? "")}</td>
+<td>${r["AT Index"] === "00:00:00" ? "" : (r["AT Index"] ?? "")}</td>
+`;
+        });
+
+    }catch(e){
+
+        console.error(e);
+
+    }
+
+}
+
+async function guardarObservacaoOcupacao(input){
+
+    const data = input.dataset.data || "";
+    const colaborador = input.dataset.colaborador || "";
+
+    if(!data || !colaborador){
+        alert("Não foi possível identificar a data e o colaborador.");
+        return;
+    }
+
+    const valor = input.value.trim();
+
+    input.disabled = true;
+    const valorOriginal = input.value;
+
+    try{
+
+        // Atualiza exatamente o registo correspondente a DATA + COLABORADOR.
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_ocupacao?data=eq.${encodeURIComponent(data)}&colaborador=eq.${encodeURIComponent(colaborador)}`,
+            {
+                method:"PATCH",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    "Prefer":"return=minimal"
+                },
+                body:JSON.stringify({
+                    observacoes: valor || null
+                })
+            }
+        );
+
+        const texto = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(texto || `Erro ${resposta.status} ao guardar a observação.`);
+        }
+
+        input.style.borderColor = "#2E7D32";
+        input.style.backgroundColor = "#f1f8f3";
+
+        setTimeout(() => {
+            input.style.borderColor = "#ddd";
+            input.style.backgroundColor = "#fff";
+        }, 1200);
+
+    }catch(e){
+
+        console.error("Erro ao guardar observação da ocupação:", e);
+
+        input.value = valorOriginal;
+        input.style.borderColor = "#c62828";
+
+        alert(
+            "Não foi possível guardar a observação no Supabase.\n\n" +
+            (e.message || e)
+        );
+
+    }finally{
+
+        input.disabled = false;
+
+    }
+
+}
+
+async function carregarRelatorioOcupacao(){
+
+    const tbody = document.querySelector("#tblRelatorioOcupacao tbody");
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_ocupacao?select=data,colaborador,tempo_total,tempo_previsto,taxa_ocupacao,observacoes&order=data.desc,colaborador.asc`,
+            {
+                headers:{
+                    apikey: SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                },
+                cache:"no-store"
+            }
+        );
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(
+                dados?.message ||
+                dados?.hint ||
+                JSON.stringify(dados)
+            );
+        }
+
+        const fData = document.getElementById("fDataOcupacao").value;
+        const fColaborador =
+            document.getElementById("fColaboradorOcupacao")
+                .value.toLowerCase().trim();
+
+        tbody.innerHTML = "";
+
+        const filtrados = (Array.isArray(dados) ? dados : [])
+            .filter(r => {
+
+                if(fData && r.data !== fData)
+                    return false;
+
+                if(
+                    fColaborador &&
+                    !(r.colaborador || "")
+                        .toLowerCase()
+                        .includes(fColaborador)
+                )
+                    return false;
+
+                return true;
+
+            });
+
+        if(!filtrados.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        style="text-align:center;padding:25px;color:#777;">
+                        Não existem registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        filtrados.forEach(r => {
+
+            const data = String(r.data ?? "");
+            const colaborador = String(r.colaborador ?? "");
+
+            const inputObservacao = document.createElement("input");
+
+            inputObservacao.type = "text";
+            inputObservacao.value = r.observacoes ?? "";
+            inputObservacao.dataset.data = data;
+            inputObservacao.dataset.colaborador = colaborador;
+
+            inputObservacao.placeholder = "Escrever observação...";
+            inputObservacao.title = "A observação é gravada automaticamente no Supabase ao sair do campo.";
+
+            inputObservacao.style.cssText = `
+                width:100%;
+                min-width:180px;
+                box-sizing:border-box;
+                padding:7px 9px;
+                border:1px solid #ddd;
+                border-radius:6px;
+                background:#fff;
+                font-size:12px;
+                outline:none;
+            `;
+
+            // Guarda automaticamente quando a utilizadora sai do campo.
+            inputObservacao.addEventListener(
+                "blur",
+                () => guardarObservacaoOcupacao(inputObservacao)
+            );
+
+            // Também permite gravar com Enter.
+            inputObservacao.addEventListener("keydown", event => {
+
+                if(event.key === "Enter"){
+
+                    event.preventDefault();
+                    inputObservacao.blur();
+
+                }
+
+            });
+
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td>${escaparHTML(data)}</td>
+                <td>${escaparHTML(colaborador)}</td>
+                <td>${escaparHTML(r.tempo_total ?? "")}</td>
+                <td>${escaparHTML(r.tempo_previsto ?? "")}</td>
+                <td>${escaparHTML(r.taxa_ocupacao ?? "")}</td>
+                <td></td>
+            `;
+
+            tr.lastElementChild.appendChild(inputObservacao);
+
+            tbody.appendChild(tr);
+
+        });
+
+    }catch(e){
+
+        console.error("Erro ao carregar relatório de ocupação:", e);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    style="text-align:center;padding:25px;color:#c62828;">
+                    Erro ao carregar a Taxa de Ocupação:
+                    ${escaparHTML(e.message || e)}
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+function abrirRelatorioProducao(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("alertas").style.display="none";
+document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="block";
+
+    carregarRelatorioProducao();
+
+}
+async function carregarRelatorioProducao(){
+
+    const tbody = document.querySelector("#tblRelatorioProducao tbody");
+
+    try{
+
+        const fData = document.getElementById("fDataProducao").value;
+        const fColaborador = document.getElementById("fColaboradorProducao").value.toLowerCase().trim();
+        const fTarefa = document.getElementById("fTarefaProducao").value.toLowerCase().trim();
+
+        let url = `${SUPABASE_URL}/rest/v1/MTCBPO_dadosprodução?select=data,colaborador,tarefaFinalizada`;
+
+        if(fData){
+            url += `&data=eq.${encodeURIComponent(fData)}`;
+        }
+
+        if(fColaborador){
+            url += `&colaborador=ilike.${encodeURIComponent(`*${fColaborador}*`)}`;
+        }
+
+        if(fTarefa){
+            url += `&tarefaFinalizada=ilike.${encodeURIComponent(`*${fTarefa}*`)}`;
+        }
+
+        url += `&order=data.desc&limit=5000`;
+
+        const resposta = await fetch(url,{
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            },
+            cache:"no-store"
+        });
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(dados?.message || dados?.hint || JSON.stringify(dados));
+        }
+
+        const resumo = {};
+
+        (Array.isArray(dados) ? dados : []).forEach(r => {
+            const data = r.data || "";
+            const colaborador = r.colaborador || "";
+            const tarefaFinalizada = r.tarefaFinalizada || "";
+            const chave = `${data}|||${colaborador}|||${tarefaFinalizada}`;
+
+            if(!resumo[chave]){
+                resumo[chave] = {
+                    data,
+                    colaborador,
+                    tarefaFinalizada,
+                    total_tarefas:0
+                };
+            }
+
+            resumo[chave].total_tarefas += 1;
+        });
+
+        const linhas = Object.values(resumo).sort((a,b) => {
+            if(a.data !== b.data) return b.data.localeCompare(a.data);
+            if(a.colaborador !== b.colaborador) return a.colaborador.localeCompare(b.colaborador, "pt");
+            return a.tarefaFinalizada.localeCompare(b.tarefaFinalizada, "pt");
+        });
+
+        tbody.innerHTML = "";
+
+        if(!linhas.length){
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:20px;color:#777;">
+                        Não foram encontrados registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        linhas.forEach(r => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${escaparHTML(r.data)}</td>
+                    <td>${escaparHTML(r.colaborador)}</td>
+                    <td>${escaparHTML(r.tarefaFinalizada)}</td>
+                    <td>${r.total_tarefas}</td>
+                </tr>
+            `;
+        });
+
+    }catch(e){
+
+        console.error("Erro ao carregar relatório de produção:", e);
+
+        if(tbody){
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:20px;color:#c62828;">
+                        Erro ao carregar o relatório de produção: ${escaparHTML(e.message || e)}
+                    </td>
+                </tr>
+            `;
+        }
+
+    }
+
+}
+
+function abrirResumoDia(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("alertas").style.display="none";
+document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("logins").style.display = "none";
+    document.getElementById("relatorios").style.display = "none";
+
+    document.getElementById("resumoDia").style.display = "block";
+
+    carregarResumoDia();
+
+}
+
+function duration(a,b){
+    if(!a || !b) return 0;
+    return (new Date(b)-new Date(a))/60000;
+}
+
+function hhmmss(a,b){
+
+    if(!a || !b) return "";
+
+    const s=Math.floor((new Date(b)-new Date(a))/1000);
+
+    const h=Math.floor(s/3600);
+    const m=Math.floor((s%3600)/60);
+    const sec=s%60;
+
+    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(sec).padStart(2,"0")}`;
+}
+
+function timeOnly(dt){
+
+    if(!dt) return "";
+
+    return dt.split("T")[1].substring(0,8);
+}
+
+function isLogin(t){
+    return (t||"").toLowerCase().includes("login");
+}
+
+function isPause(t){
+    return (t||"").toLowerCase().includes("pausa");
+}
+
+function isMeal(t){
+    return (t||"").toLowerCase().includes("refeicao");
+}
+
+function isLogout(t){
+    return (t||"").toLowerCase().includes("logout");
+}
+
+function mostrarDashboard(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="block";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+        document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+carregarGraficoProducao();
+  carregarGraficoProducao();
+    carregarCardsDashboard();
+
+
+}
+function mostrarRelatorios(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+      document.getElementById("dashboard").style.display="none";
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+    document.getElementById("eliminarRegistos").style.display="none";
+        document.getElementById("forcarSQL").style.display = "none";
+    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
+
+    document.getElementById("relatorios").style.display = "block";
+
+}
+
+function limparFiltros() {
+    document.getElementById("fData").value = "";
+    document.getElementById("fUser").value = "";
+    document.getElementById("fNome").value = "";
+    document.getElementById("fEstado").value = "";
+
+    carregarPlaneamento();
+}
+async function carregarPlaneamento() {
+
+    try {
+
+        let url = `${SUPABASE_URL}/rest/v1/MTCplaneamento?select=data,user,nome,estado`;
+
+        const data = document.getElementById("fData").value;
+        const user = document.getElementById("fUser").value.trim();
+        const nome = document.getElementById("fNome").value.trim();
+        const estado = document.getElementById("fEstado").value.trim();
+
+        if (data)
+            url += `&data=eq.${data}`;
+
+        if (user)
+            url += `&user=ilike.*${encodeURIComponent(user)}*`;
+
+        if (nome)
+            url += `&nome=ilike.*${encodeURIComponent(nome)}*`;
+
+        if (estado)
+            url += `&estado=ilike.*${encodeURIComponent(estado)}*`;
+
+        url += "&order=data.desc";
+
+        const resposta = await fetch(url, {
+            headers: {
+                apikey: SUPABASE_API_KEY,
+                Authorization: `Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+
+        const dados = await resposta.json();
+
+        if (!resposta.ok) {
+            console.log(dados);
+            return;
+        }
+
+const tbody = document.querySelector("#tblPlaneamento tbody");
+
+tbody.innerHTML = "";
+
+dados.forEach(registo => {
+
+    tbody.innerHTML += `
+        <tr>
+            <td>${registo.data ?? ""}</td>
+            <td>${registo.user ?? ""}</td>
+            <td>${registo.nome ?? ""}</td>
+            <td>${registo.estado ?? ""}</td>
+        </tr>
+    `;
+
+});
+
+    } catch (e) {
+        console.error(e);
+    }
+
+}
+
+let dadosLoginsBase = null;
+
+async function obterDadosLogins(){
+
+    if(Array.isArray(dadosLoginsBase)){
+        return dadosLoginsBase;
+    }
+
+    const resposta = await fetch(
+        `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`,
+        {
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        }
+    );
+
+    const dados = await resposta.json();
+
+    if(!resposta.ok){
+        throw new Error(dados.message || JSON.stringify(dados));
+    }
+
+    dadosLoginsBase = Array.isArray(dados) ? dados : [];
+
+    return dadosLoginsBase;
+}
+
+async function carregarLogins(){
+
+    try{
+
+        const data = document.getElementById("fDataLogins").value;
+        const tipo = document.getElementById("fTipoLogins").value;
+        const user = document.getElementById("fUserLogins").value.trim().toLowerCase();
+        const nome = document.getElementById("fNomeLogins").value.trim().toLowerCase();
+
+        // A consulta só é feita quando pelo menos um filtro foi preenchido.
+        if(!data && !tipo && !user && !nome){
+            const tbody = document.querySelector("#tblLogins tbody");
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#777;">
+                <i class="fa fa-filter"></i> Aplique pelo menos um filtro e clique em Pesquisar.
+            </td></tr>`;
+            return;
+        }
+
+        const dadosBase = await obterDadosLogins();
+
+        const dados = dadosBase.filter(registo => {
+
+            if(data && registo.data !== data)
+                return false;
+
+            if(tipo && (registo.tipo || "") !== tipo)
+                return false;
+
+            if(user && !(registo.user || "").toLowerCase().includes(user))
+                return false;
+
+            if(nome && !(registo.nome || "").toLowerCase().includes(nome))
+                return false;
+
+            return true;
+        });
+
+        function formatarHora(dataHora){
+
+            if(!dataHora) return "";
+
+            try{
+                if(dataHora.includes("T")){
+                    return dataHora.split("T")[1].substring(0,8);
+                }
+
+                return dataHora;
+
+            }catch(e){
+                return dataHora;
+            }
+        }
+
+        function formatarDuracao(horas){
+
+            if(horas == null || horas === "") return "";
+
+            const totalSegundos = Math.round(Number(horas) * 3600);
+            const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
+            const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
+            const s = String(totalSegundos % 60).padStart(2,"0");
+
+            return `${h}:${m}:${s}`;
+        }
+
+        const tbody = document.querySelector("#tblLogins tbody");
+        tbody.innerHTML = "";
+
+        if(!dados.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:20px;color:#777;">
+                        Não foram encontrados registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        dados.forEach(registo => {
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${registo.data ?? ""}</td>
+                    <td>${registo.user ?? ""}</td>
+                    <td>${registo.nome ?? ""}</td>
+                    <td>${registo.tipo ?? ""}</td>
+                    <td>${formatarHora(registo.inicio)}</td>
+                    <td>${formatarHora(registo.fim)}</td>
+                    <td>${formatarDuracao(registo.duracao)}</td>
+                </tr>
+            `;
+        });
+
+    }catch(e){
+
+        console.error("Erro carregarLogins:", e);
+
+        alert("Ocorreu um erro ao carregar os Logins.\n\n" + e.message);
+    }
+
+}
+let graficoProducao = null;
+
+async function carregarGraficoProducao(){
+
+    const hoje = new Date().toISOString().slice(0,10);
+
+    const resposta = await fetch(
+        `${SUPABASE_URL}/rest/v1/MTCBPO_resumo_producao?select=data,colaborador,tarefafinalizada,total_tarefas&data=eq.${hoje}&order=tarefafinalizada.asc,colaborador.asc`,
+        {
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            },
+            cache:"no-store"
+        }
+    );
+
+    if(!resposta.ok){
+        throw new Error(await resposta.text());
+    }
+
+    const dados = await resposta.json();
+
+    const resumo = {};
+    let totalTarefasDia = 0;
+    const colaboradores = new Set();
+
+    (Array.isArray(dados) ? dados : []).forEach(r => {
+
+        const area = (r.tarefafinalizada || "Sem área")
+            .toString()
+            .trim() || "Sem área";
+
+        const tarefas = Number(r.total_tarefas || 0);
+
+        if(r.colaborador){
+            colaboradores.add(String(r.colaborador).trim());
+        }
+
+        if(!resumo[area]){
+            resumo[area] = { tarefas:0 };
+        }
+
+        resumo[area].tarefas += tarefas;
+        totalTarefasDia += tarefas;
+
+    });
+
+    const labels = Object.keys(resumo);
+    const valores = labels.map(area => resumo[area].tarefas);
+
+    const lista = document.getElementById("listaProducaoArea");
+    const totalTarefasEl = document.getElementById("dashboardTotalTarefasArea");
+    const totalColaboradoresEl = document.getElementById("dashboardTotalColaboradores");
+
+    if(totalTarefasEl){
+        totalTarefasEl.innerText = totalTarefasDia.toLocaleString("pt-PT");
+    }
+
+    if(totalColaboradoresEl){
+        totalColaboradoresEl.innerText = colaboradores.size.toLocaleString("pt-PT");
+    }
+
+    if(lista){
+        lista.innerHTML = "";
+
+        if(!labels.length){
+            lista.innerHTML = `
+                <div style="text-align:center;padding:25px;color:#777;">
+                    Sem produção registada para hoje.
+                </div>
+            `;
+        }
+
+        labels.forEach(area => {
+
+            const tarefas = resumo[area].tarefas;
+
+            const card = document.createElement("div");
+
+            card.style.cssText = `
+                background:#f7f9f7;
+                border-radius:10px;
+                padding:12px 15px;
+                border:1px solid #e5e8e5;
+                display:grid;
+                grid-template-columns:1fr auto;
+                gap:20px;
+                align-items:center;
+            `;
+
+            card.innerHTML = `
+                <div>
+                    <div style="font-weight:600;font-size:13px;">
+                        ${escaparHTML(area)}
+                    </div>
+                    <div style="font-size:10px;color:#888;">Área</div>
+                </div>
+
+                <div style="text-align:center;">
+                    <div style="font-size:17px;font-weight:bold;color:#2E7D32;">
+                        ${tarefas.toLocaleString("pt-PT")}
+                    </div>
+                    <div style="font-size:10px;color:#888;">Tarefas</div>
+                </div>
+            `;
+
+            lista.appendChild(card);
+        });
+    }
+
+    const canvas = document.getElementById("graficoProducao");
+
+    if(graficoProducao){
+        graficoProducao.destroy();
+    }
+
+    graficoProducao = new Chart(
+        canvas,
+        {
+            type:"bar",
+            data:{
+                labels:labels,
+                datasets:[{
+                    label:"Tarefas",
+                    data:valores
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{
+                    legend:{display:false}
+                },
+                scales:{
+                    y:{
+                        beginAtZero:true,
+                        ticks:{precision:0}
+                    }
+                }
+            }
+        }
+    );
+
+}
+
+const CHAVE_OBSERVACOES_RESUMO = "bpo_resumo_dia_observacoes";
+
+function obterObservacoesResumo(){
+    try{
+        return JSON.parse(localStorage.getItem(CHAVE_OBSERVACOES_RESUMO) || "{}");
+    }catch(e){
+        console.error("Erro ao ler observações do Resumo Dia:", e);
+        return {};
+    }
+}
+
+function obterObservacaoResumo(data, user){
+    const observacoes = obterObservacoesResumo();
+    return observacoes[`${data}_${user}`] || "";
+}
+
+function guardarObservacaoResumo(input){
+    const chave = decodeURIComponent(input.dataset.chave || "");
+    if(!chave) return;
+
+    const observacoes = obterObservacoesResumo();
+    observacoes[chave] = input.value;
+    localStorage.setItem(CHAVE_OBSERVACOES_RESUMO, JSON.stringify(observacoes));
+}
+
+async function carregarResumoDia(){
+
+    try{
+
+        // Os registos de Login/Logout/Pausas vêm da mesma fonte
+        // já utilizada pela aba Logins. A tabela de Planeamento
+        // continua a ser consultada apenas para obter o estado.
+        const [registosReq, planeamentoReq] = await Promise.all([
+            fetch(
+                `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.asc`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    },
+                    cache:"no-store"
+                }
+            ),
+            fetch(
+                `${SUPABASE_URL}/rest/v1/MTCplaneamento?select=*`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    }
+                }
+            )
+        ]);
+
+        const registos = await registosReq.json();
+        const planeamento = await planeamentoReq.json();
+
+        if(!registosReq.ok){
+            console.error("Erro Registos MTC:", registos);
+            return;
+        }
+
+        if(!planeamentoReq.ok){
+            console.error("Erro Planeamento:", planeamento);
+            return;
+        }
+
+        const resumo = {};
+
+        registos.forEach(r=>{
+
+            const chave = `${r.data}_${r.user}`;
+
+            if(!resumo[chave]){
+
+                resumo[chave] = {
+                    data: r.data,
+                    user: r.user,
+                    nome: r.nome || "",
+                    logins:[],
+                    logouts:[],
+                    pausa1: "",
+                    pausa2: "",
+                    refeicao: "",
+                    estado: "",
+                    trabalhado: 0,
+                    pausas: 0
+                };
+            }
+
+            const linha = resumo[chave];
+            const tipo = (r.tipo || "").toLowerCase();
+
+            if(tipo.includes("login"))
+                linha.logins.push(r.inicio);
+
+            if(tipo.includes("logout"))
+                linha.logouts.push(r.inicio);
+
+            if(tipo.includes("pausa1"))
+                linha.pausa1 = r.duracao || 0;
+
+            if(tipo.includes("pausa2"))
+                linha.pausa2 = r.duracao || 0;
+
+            if(tipo.includes("refeição") || tipo.includes("refeicao"))
+                linha.refeicao = r.duracao || 0;
+
+        });
+
+        planeamento.forEach(p=>{
+
+            const chave = `${p.data}_${p.user}`;
+
+            if(!resumo[chave]){
+
+                resumo[chave] = {
+                    data: p.data,
+                    user: p.user,
+                    nome: p.nome || "",
+                    logins: [],
+                    logouts: [],
+                    pausa1: "",
+                    pausa2: "",
+                    refeicao: "",
+                    estado: p.estado || "",
+                    trabalhado: 0,
+                    pausas: 0
+                };
+
+            }else{
+
+                resumo[chave].estado = p.estado || resumo[chave].estado;
+
+                if(!resumo[chave].nome)
+                    resumo[chave].nome = p.nome || "";
+            }
+
+        });
+
+        const tbody = document.getElementById("tblResumoDiaBody");
+        tbody.innerHTML = "";
+
+        const fData = document.getElementById("fDataResumo").value.toLowerCase();
+        const fUser = document.getElementById("fUserResumo").value.toLowerCase();
+        const fNome = document.getElementById("fNomeResumo").value.toLowerCase();
+        const fEstado = document.getElementById("fEstadoResumo").value.toLowerCase();
+
+        const resultados = Object.values(resumo).filter(r => {
+
+            if(fData && r.data !== fData)
+                return false;
+
+            if(fUser && !(r.user || "").toLowerCase().includes(fUser))
+                return false;
+
+            if(fNome && !(r.nome || "").toLowerCase().includes(fNome))
+                return false;
+
+            if(fEstado && !(r.estado || "").toLowerCase().includes(fEstado))
+                return false;
+
+            return true;
+        });
+
+        if(!resultados.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="14" style="text-align:center;padding:20px;color:#777;">
+                        Não foram encontrados registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        resultados.forEach(r=>{
+
+            let tempoTrabalhado = 0;
+
+            const logins = (r.logins || [])
+                .filter(Boolean)
+                .map(x => new Date(x))
+                .sort((a,b) => a-b);
+
+            const logouts = (r.logouts || [])
+                .filter(Boolean)
+                .map(x => new Date(x))
+                .sort((a,b) => a-b);
+
+            let iLogin = 0;
+            let iLogout = 0;
+
+            while(iLogin < logins.length && iLogout < logouts.length){
+
+                const login = logins[iLogin];
+                const logout = logouts[iLogout];
+
+                if(logout > login){
+
+                    tempoTrabalhado += (logout - login) / 1000;
+                    iLogin++;
+                    iLogout++;
+
+                }else{
+                    iLogout++;
+                }
+            }
+
+            // O Tempo Trabalhado corresponde ao tempo efetivamente
+            // trabalhado entre cada par Login -> Logout, retirando
+            // as pausas e a refeição.
+            // As durações de pausa/refeição vêm em horas decimais.
+            const totalPausas =
+                (Number(r.pausa1) || 0) +
+                (Number(r.pausa2) || 0) +
+                (Number(r.refeicao) || 0);
+
+            tempoTrabalhado = Math.max(
+                0,
+                tempoTrabalhado - (totalPausas * 3600)
+            );
+
+            const jornada = 7.5 * 3600;
+            const falta = Math.max(0, jornada - tempoTrabalhado);
+            const extra = Math.max(0, tempoTrabalhado - jornada);
+
+            let alerta = "";
+
+            if(!r.logins || r.logins.length === 0)
+                alerta = "Sem Login";
+            else if(!r.logouts || r.logouts.length < r.logins.length)
+                alerta = "Sem Logout";
+            else if(falta > 0)
+                alerta = "Ausência Parcial";
+            else
+                alerta = "OK";
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${r.data ?? ""}</td>
+                    <td>${r.user ?? ""}</td>
+                    <td>${r.nome ?? ""}</td>
+                    <td>${r.estado ?? ""}</td>
+                    <td>${(r.logins || []).map(x => timeOnly(x)).join("<br>")}</td>
+                    <td>${(r.logouts || []).map(x => timeOnly(x)).join("<br>")}</td>
+                    <td>${formatarHoras(r.pausa1)}</td>
+                    <td>${formatarHoras(r.pausa2)}</td>
+                    <td>${formatarHoras(r.refeicao)}</td>
+                    <td>${segundosHHMMSS(tempoTrabalhado)}</td>
+                    <td>${segundosHHMMSS(falta)}</td>
+                    <td>${segundosHHMMSS(extra)}</td>
+                    <td>${alerta}</td>
+                    <td>
+                        <input
+                            type="text"
+                            class="observacaoResumo"
+                            data-chave="${encodeURIComponent(`${r.data}_${r.user}`)}"
+                            value="${obterObservacaoResumo(r.data, r.user)}"
+                            placeholder="Escrever observação..."
+                            oninput="guardarObservacaoResumo(this)"
+                            style="width:220px;min-width:180px;height:34px;padding:6px 8px;font-size:12px;border:1px solid #d0d7de;border-radius:7px;"
+                        >
+                    </td>
+                </tr>
+            `;
+
+        });
+
+    }catch(e){
+
+        console.error("Erro carregarResumoDia:", e);
+        alert("Ocorreu um erro ao carregar o Resumo Dia.\n\n" + e.message);
+    }
+
+}
+
+function segundosHHMMSS(seg){
+
+    seg = Math.max(0, Math.floor(seg));
+
+    const h = Math.floor(seg/3600);
+    const m = Math.floor((seg%3600)/60);
+    const s = seg%60;
+
+    return `${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function formatarHoras(valor){
+
+    if(valor==null || valor==="") return "";
+
+    return segundosHHMMSS(Number(valor)*3600);
+
+}
+const utilizadores = {
+    "Ana Rita Coelho Antão": "EX13342",
+    "Davi Rocha Santos": "EX13343",
+    "Marco André Pereira": "EX13344",
+    "Joanes Mateus da Costa": "EX05724",
+    "João Filipe Da Costa Marques Dos Santos": "EX06688",
+    "Sónia Maria Raminhos Correia": "EX05535"
+};
+
+async function enviarForcado(){
+
+    const tipo = document.getElementById("tipoSelect").value;
+    const nome = document.getElementById("nomeSelect").value;
+    const msg = document.getElementById("msgForce");
+
+    if(!nome){
+        msg.style.color="red";
+        msg.innerText="Seleciona um nome";
+        return;
+    }
+
+    const user = utilizadores[nome];
+
+    const dataEscolhida=document.getElementById("forceDate").value;
+
+    if(!dataEscolhida){
+        msg.style.color="red";
+        msg.innerText="Seleciona a data";
+        return;
+    }
+
+  const hora = document.getElementById("forceHora").value;
+
+if(!hora){
+    msg.style.color="red";
+    msg.innerText="Seleciona a hora";
+    return;
+}
+
+const now = `${dataEscolhida}T${hora.length === 5 ? hora + ":00" : hora}`;
+    let minutos=0;
+    let duracao=null;
+
+    if(tipo==="pausa1" || tipo==="pausa2"){
+        minutos=15;
+        duracao="0.250";
+    }
+
+    if(tipo==="refeicao"){
+        minutos=60;
+        duracao="1.000";
+    }
+let fim = null;
+
+if(minutos > 0){
+
+const fimDate = new Date(now.replace("T", " "));
+    fimDate.setMinutes(fimDate.getMinutes() + minutos);
+
+    fim = fimDate.toISOString().slice(0,19);
+
+}
+    const payload={
+        data:dataEscolhida,
+        user,
+        nome,
+        tipo,
+        inicio:now,
+        fim,
+        duracao
+    };
+
+   try{
+
+    const resposta = await fetch(`${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS`,{
+        method:"POST",
+        headers:{
+            apikey:SUPABASE_API_KEY,
+            Authorization:`Bearer ${SUPABASE_API_KEY}`,
+            "Content-Type":"application/json",
+            "Prefer":"return=representation"
+        },
+        body:JSON.stringify(payload)
+    });
+
+    const texto = await resposta.text();
+
+    console.log("Payload:", payload);
+    console.log("Status:", resposta.status);
+    console.log("Resposta:", texto);
+
+    if(!resposta.ok){
+        throw new Error(texto);
+    }
+
+    msg.style.color="green";
+    msg.innerText=`✔ ${tipo} registado com sucesso`;
+
+
+
+
+}catch(err){
+
+    console.error(err);
+
+    msg.style.color="red";
+    msg.innerText=err.message;
+
+}
+
+    document.getElementById("nomeSelect").value="";
+
+    setTimeout(()=>{
+        msg.innerText="";
+    },3000);
+
+}
+function exportarPlaneamentoExcel(){
+
+    const tabela = document.getElementById("tblPlaneamento");
+
+    const wb = XLSX.utils.table_to_book(tabela,{
+        sheet:"Planeamento"
+    });
+
+    const primeiraData = tabela.rows[1]?.cells[0]?.innerText;
+
+    let nomeFicheiro = "Planeamento.xlsx";
+
+    if(primeiraData){
+
+        const data = new Date(primeiraData);
+
+        const mes = data.toLocaleString("pt-PT",{month:"long"});
+        const ano = data.getFullYear();
+
+        nomeFicheiro = `BPOMTC_Planeamento_${mes}_${ano}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nomeFicheiro);
+
+}
+
+function exportarResumoDiaExcel(){
+
+    const tabela = document.getElementById("tblResumoDia");
+
+    // Criar o Excel manualmente para garantir que o conteúdo
+    // escrito nas Observações (inputs) é exportado.
+    const dados = [];
+
+    const cabecalhos = Array.from(tabela.querySelectorAll("thead th"))
+        .map(th => th.innerText.trim());
+
+    dados.push(cabecalhos);
+
+    tabela.querySelectorAll("tbody tr").forEach(tr => {
+
+        const celulas = Array.from(tr.querySelectorAll("td"));
+
+        if(!celulas.length) return;
+
+        const linha = celulas.map(td => {
+            const input = td.querySelector("input");
+            return input ? input.value : td.innerText.trim();
+        });
+
+        dados.push(linha);
+    });
+
+    const ws = XLSX.utils.aoa_to_sheet(dados);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, ws, "Resumo Dia");
+
+    const data = document.getElementById("fDataResumo").value;
+
+    let nome;
+
+    if(data){
+
+        nome = `Resumo_Dia_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nome = `BPOMTC_Resumo_Dia_${ano}-${mes}-${dia}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nome);
+
+}
+
+function exportarRelatorioProducaoExcel(){
+
+    const tabela = document.getElementById("tblRelatorioProducao");
+
+    const wb = XLSX.utils.table_to_book(tabela,{
+        sheet:"Produção"
+    });
+
+    const data = document.getElementById("fDataProducao").value;
+
+    let nome;
+
+    if(data){
+
+        nome = `Relatorio_Producao_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nome = `BPOMTC_Relatorio_Producao_${ano}-${mes}-${dia}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nome);
+
+}
+
+function exportarRelatorioOcupacaoExcel(){
+
+    const tabela = document.getElementById("tblRelatorioOcupacao");
+
+    const inputs = Array.from(tabela.querySelectorAll("input"));
+
+    inputs.forEach(input => {
+        input.dataset.exportOriginal = input.outerHTML;
+        input.replaceWith(document.createTextNode(input.value || ""));
+    });
+
+    const wb = XLSX.utils.table_to_book(tabela,{
+        sheet:"Taxa Ocupação"
+    });
+
+    // Restaurar os campos de observação depois da exportação.
+    inputs.forEach(input => {
+        const placeholder = Array.from(tabela.querySelectorAll("td"))
+            .find(td => td.textContent === (input.value || ""));
+
+        if(placeholder){
+            placeholder.textContent = "";
+            placeholder.appendChild(input);
+        }
+    });
+
+    const data = document.getElementById("fDataOcupacao").value;
+
+    let nome;
+
+    if(data){
+
+        nome = `Taxa_Ocupacao_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nome = `BPOMTC_Taxa_Ocupacao_${ano}-${mes}-${dia}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nome);
+
+}
+
+function exportarRelatorioTemposExcel(){
+
+    const tabela = document.getElementById("tblRelatorioTempos");
+
+    const wb = XLSX.utils.table_to_book(tabela,{
+        sheet:"Tempos Médios"
+    });
+
+    const data = document.getElementById("fDataTempos").value;
+
+    let nome;
+
+    if(data){
+
+        nome = `Tempos_Medios_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nome = `BPOMTC_Tempos_Medios_${ano}-${mes}-${dia}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nome);
+
+}
+function exportarLoginsExcel(){
+
+    const tabela = document.getElementById("tblLogins");
+
+    const wb = XLSX.utils.table_to_book(tabela,{
+        sheet:"Logins"
+    });
+
+    const data = document.getElementById("fDataLogins").value;
+
+    let nome;
+
+    if(data){
+
+        nome = `Logins_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nome = `BPOMTC_Logins_${ano}-${mes}-${dia}.xlsx`;
+
+    }
+
+    XLSX.writeFile(wb,nome);
+
+}
+
+function mostrarRetificarProducao(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.querySelectorAll(".main > div").forEach(el => {
+        el.style.display = "none";
+    });
+
+    document.getElementById("retificarProducao").style.display = "block";
+
+    // Importante: não executar pesquisa automaticamente.
+    // A tabela BPO_dadosprodução só é consultada depois de aplicar filtros.
+    const tbody = document.getElementById("tblRetificarProducaoBody");
+
+    if(!tbody.children.length){
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center;padding:25px;color:#777;">
+                    Aplique pelo menos um filtro para pesquisar.
+                </td>
+            </tr>
+        `;
+    }
+
+}
+
+function limparFiltrosRetificarProducao(){
+
+    document.getElementById("fDataRetificarProducao").value = "";
+    document.getElementById("fColaboradorRetificarProducao").value = "";
+    document.getElementById("fTarefaRetificarProducao").value = "";
+    document.getElementById("fLoteRetificarProducao").value = "";
+
+    document.getElementById("msgRetificarProducao").style.color = "#666";
+    document.getElementById("msgRetificarProducao").innerText =
+        "Aplique pelo menos um filtro para pesquisar.";
+
+    document.getElementById("tblRetificarProducaoBody").innerHTML = `
+        <tr>
+            <td colspan="5" style="text-align:center;padding:25px;color:#777;">
+                Nenhuma pesquisa efetuada.
+            </td>
+        </tr>
+    `;
+
+}
+
+function proximaDataISO(data){
+
+    const d = new Date(`${data}T00:00:00`);
+    d.setDate(d.getDate() + 1);
+
+    return d.toISOString().slice(0,10);
+
+}
+
+function escaparHTML(valor){
+
+    return String(valor ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+function formatarCreatedAtRetificacao(valor){
+
+    if(!valor) return "";
+
+    try{
+
+        return new Date(valor).toLocaleString("pt-PT",{
+            day:"2-digit",
+            month:"2-digit",
+            year:"numeric",
+            hour:"2-digit",
+            minute:"2-digit",
+            second:"2-digit"
+        });
+
+    }catch(e){
+
+        return valor;
+
+    }
+
+}
+
+async function pesquisarRetificarProducao(){
+
+    const data = document.getElementById("fDataRetificarProducao").value.trim();
+    const colaborador = document.getElementById("fColaboradorRetificarProducao").value.trim();
+    const tarefa = document.getElementById("fTarefaRetificarProducao").value.trim();
+    const lote = document.getElementById("fLoteRetificarProducao").value.trim();
+
+    const msg = document.getElementById("msgRetificarProducao");
+    const tbody = document.getElementById("tblRetificarProducaoBody");
+
+    if(!data && !colaborador && !tarefa && !lote){
+        msg.style.color = "#b26a00";
+        msg.innerText = "Seleciona pelo menos um filtro antes de pesquisar.";
+        tbody.innerHTML = `
+            <tr><td colspan="5" style="text-align:center;padding:25px;color:#777;">Nenhum filtro aplicado.</td></tr>
+        `;
+        return;
+    }
+
+    msg.style.color = "#555";
+    msg.innerText = "A pesquisar apenas os registos filtrados...";
+    tbody.innerHTML = `
+        <tr><td colspan="5" style="text-align:center;padding:25px;color:#777;">A pesquisar...</td></tr>
+    `;
+
+    try{
+        let url =
+            `${SUPABASE_URL}/rest/v1/MTCBPO_dadosprodução` +
+            `?select=id,data,colaborador,tarefaFinalizada,lote`;
+
+        if(data) url += `&data=eq.${encodeURIComponent(data)}`;
+        if(colaborador) url += `&colaborador=eq.${encodeURIComponent(colaborador)}`;
+        if(tarefa) url += `&tarefaFinalizada=ilike.${encodeURIComponent(`*${tarefa}*`)}`;
+        if(lote) url += `&lote=ilike.${encodeURIComponent(`*${lote}*`)}`;
+
+        url += "&order=data.desc&limit=1000";
+
+        const resposta = await fetch(url,{
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            }
+        });
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(dados?.message || dados?.hint || JSON.stringify(dados));
+        }
+
+        tbody.innerHTML = "";
+
+        if(!Array.isArray(dados) || !dados.length){
+            msg.style.color = "#777";
+            msg.innerText = "Não foram encontrados registos.";
+            tbody.innerHTML = `
+                <tr><td colspan="5" style="text-align:center;padding:25px;color:#777;">Não existem registos para os filtros selecionados.</td></tr>
+            `;
+            return;
+        }
+
+        dados.forEach(registo => {
+            tbody.innerHTML += `
+                <tr data-id="${escaparHTML(registo.id)}">
+                    <td>${escaparHTML(registo.data || "")}</td>
+                    <td>${escaparHTML(registo.colaborador || "")}</td>
+                    <td>
+                        <input type="text" class="edit-tarefaFinalizada"
+                               value="${escaparHTML(registo.tarefaFinalizada || "")}"
+                               style="width:260px;">
+                    </td>
+                    <td>
+                        <input type="text" class="edit-lote"
+                               value="${escaparHTML(registo.lote ?? "")}"
+                               style="width:160px;">
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:5px;align-items:center;white-space:nowrap;">
+                            <button type="button" onclick="guardarRetificacaoProducao(${Number(registo.id)}, this)" style="font-size:11px;padding:5px 8px;">
+                                <i class="fa fa-floppy-disk"></i> Guardar
+                            </button>
+                            <button type="button" onclick="eliminarRetificacaoProducao(${Number(registo.id)}, this)" style="font-size:11px;padding:5px 8px;">
+                                <i class="fa fa-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+
+        msg.style.color = "#2E7D32";
+        msg.innerText = `${dados.length} registo(s) encontrado(s).`;
+
+    }catch(erro){
+        console.error("Erro Retificar Produção:",erro);
+        msg.style.color = "red";
+        msg.innerText = "Erro ao pesquisar: " + erro.message;
+        tbody.innerHTML = `
+            <tr><td colspan="5" style="text-align:center;padding:25px;color:#b00020;">Ocorreu um erro ao pesquisar os registos.</td></tr>
+        `;
+    }
+
+}
+
+
+async function eliminarRetificacaoProducao(id, botao){
+
+    const linha = document.querySelector(
+        `#tblRetificarProducaoBody tr[data-id="${id}"]`
+    );
+
+    if(!linha) return;
+
+    const colaborador = linha.children[1]?.innerText?.trim() || "";
+    const data = linha.children[0]?.innerText?.trim() || "";
+
+    const confirmar = confirm(
+        "ATENÇÃO: esta ação vai eliminar definitivamente este registo.\n\n" +
+        "Data: " + data + "\n" +
+        "Colaborador: " + colaborador + "\n\n" +
+        "Queres mesmo eliminar?"
+    );
+
+    if(!confirmar){
+        return;
+    }
+
+    const textoOriginal = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A eliminar...';
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_dadosprodução?id=eq.${encodeURIComponent(id)}`,
+            {
+                method:"DELETE",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Prefer":"return=minimal"
+                }
+            }
+        );
+
+        const resultado = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(resultado);
+        }
+
+        linha.remove();
+
+        const tbody = document.getElementById("tblRetificarProducaoBody");
+
+        if(!tbody.children.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" style="text-align:center;padding:25px;color:#777;">
+                        Não existem mais registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        const msg = document.getElementById("msgRetificarProducao");
+
+        if(msg){
+            const restantes = tbody.querySelectorAll("tr[data-id]").length;
+            msg.style.color = "#2E7D32";
+            msg.innerText =
+                `${restantes} registo(s) encontrado(s).`;
+        }
+
+    }catch(erro){
+
+        console.error("Erro ao eliminar registo:", erro);
+
+        botao.innerHTML = textoOriginal;
+        botao.disabled = false;
+
+        alert(
+            "Não foi possível eliminar o registo.\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+async function guardarRetificacaoProducao(id, botao){
+
+    const linha = document.querySelector(
+        `#tblRetificarProducaoBody tr[data-id="${id}"]`
+    );
+
+    if(!linha) return;
+
+    const tarefaFinalizada = linha
+        .querySelector(".edit-tarefaFinalizada")
+        .value.trim();
+
+    const lote = linha
+        .querySelector(".edit-lote")
+        .value.trim();
+
+    if(!confirm("Guardar a tarefa e o lote deste registo?")) return;
+
+    const textoOriginal = botao.innerHTML;
+    botao.disabled = true;
+    botao.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A guardar...';
+
+    try{
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_dadosprodução?id=eq.${encodeURIComponent(id)}`,
+            {
+                method:"PATCH",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    "Prefer":"return=representation"
+                },
+                body:JSON.stringify({
+                    tarefaFinalizada: tarefaFinalizada || null,
+                    lote: lote || null
+                })
+            }
+        );
+
+        const resultado = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(resultado?.message || resultado?.hint || JSON.stringify(resultado));
+        }
+
+        botao.innerHTML = '<i class="fa fa-check"></i> Guardado';
+        setTimeout(()=>{ botao.innerHTML = textoOriginal; botao.disabled = false; },1200);
+
+    }catch(erro){
+        console.error("Erro ao guardar retificação:",erro);
+        botao.innerHTML = textoOriginal;
+        botao.disabled = false;
+        alert("Não foi possível guardar a tarefa e o lote.\n\n" + erro.message);
+    }
+
+}
+
+async function carregarFicheiroPlaneamento(){
+    const input = document.getElementById("ficheiroPlaneamento");
+    const msg = document.getElementById("msgCarregarPlaneamento");
+
+    if(!input || !input.files || !input.files.length){
+        msg.style.color = "red";
+        msg.innerText = "Seleciona um ficheiro Excel.";
+        return;
+    }
+
+    try{
+        msg.style.color = "#555";
+        msg.innerText = "A ler o ficheiro...";
+
+        const ficheiro = input.files[0];
+        const buffer = await ficheiro.arrayBuffer();
+
+        const workbook = XLSX.read(buffer, {
+            type: "array",
+            cellDates: true
+        });
+
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        const dados = XLSX.utils.sheet_to_json(sheet, {
+            defval: "",
+            raw: true
+        });
+
+        if(!dados.length){
+            throw new Error("O ficheiro não tem dados.");
+        }
+
+        const normalizar = valor =>
+            String(valor ?? "")
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim()
+                .toLowerCase();
+
+        const registos = dados.map(linha => {
+            const campos = {};
+
+            Object.keys(linha).forEach(chave => {
+                campos[normalizar(chave)] = linha[chave];
+            });
+
+            let data = campos["data"];
+
+            // Excel pode devolver a data como Date, número serial ou texto.
+            if(data instanceof Date && !isNaN(data.getTime())){
+                // Usar os componentes locais para não deslocar a data por causa do fuso horário.
+                data =
+                    `${data.getFullYear()}-` +
+                    `${String(data.getMonth()+1).padStart(2,"0")}-` +
+                    `${String(data.getDate()).padStart(2,"0")}`;
+
+            }else if(typeof data === "number"){
+                const d = XLSX.SSF.parse_date_code(data);
+
+                if(!d || !d.y || !d.m || !d.d){
+                    data = "";
+                }else{
+                    data =
+                        `${d.y}-` +
+                        `${String(d.m).padStart(2,"0")}-` +
+                        `${String(d.d).padStart(2,"0")}`;
+                }
+
+            }else{
+                data = String(data ?? "").trim();
+
+                // DD/MM/YYYY
+                let match = data.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+                if(match){
+                    data =
+                        `${match[3]}-` +
+                        `${String(match[2]).padStart(2,"0")}-` +
+                        `${String(match[1]).padStart(2,"0")}`;
+
+                }else{
+                    // DD-MM-YYYY
+                    match = data.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+
+                    if(match){
+                        data =
+                            `${match[3]}-` +
+                            `${String(match[2]).padStart(2,"0")}-` +
+                            `${String(match[1]).padStart(2,"0")}`;
+                    }
+                }
+            }
+
+            return {
+                data: data,
+                user: String(campos["user"] ?? "").trim(),
+                nome: String(campos["nome"] ?? "").trim(),
+                estado: String(campos["estado"] ?? "").trim()
+            };
+        }).filter(r => r.data && r.user && r.nome && r.estado);
+
+        if(!registos.length){
+            throw new Error(
+                "Não foram encontrados registos válidos. O Excel deve ter: Data, User, Nome e Estado."
+            );
+        }
+
+        msg.innerText = `A carregar ${registos.length} registos para o Supabase...`;
+
+        const tamanhoLote = 500;
+
+        for(let i = 0; i < registos.length; i += tamanhoLote){
+
+            const lote = registos.slice(i, i + tamanhoLote);
+
+            const resposta = await fetch(
+                `${SUPABASE_URL}/rest/v1/MTCplaneamento`,
+                {
+                    method: "POST",
+                    headers: {
+                        apikey: SUPABASE_API_KEY,
+                        Authorization: `Bearer ${SUPABASE_API_KEY}`,
+                        "Content-Type": "application/json",
+                        "Prefer": "return=minimal"
+                    },
+                    body: JSON.stringify(lote)
+                }
+            );
+
+            if(!resposta.ok){
+                const erro = await resposta.text();
+                throw new Error(erro || "Erro ao inserir na tabela MTCplaneamento.");
+            }
+        }
+
+        msg.style.color = "#2E7D32";
+        msg.innerText =
+            `✔ ${registos.length} registos carregados com sucesso para a tabela MTCplaneamento.`;
+
+        input.value = "";
+
+    }catch(erro){
+        console.error("Erro ao carregar planeamento:", erro);
+
+        msg.style.color = "red";
+        msg.innerText =
+            "Erro: " + (erro.message || "não foi possível carregar o ficheiro.");
+    }
+}
+
+function mostrarCarregarPlaneamento(){ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
+
+function mostrarForcarSQL(){
+
+    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+
+    document.querySelectorAll(".main > div").forEach(el => {
+        el.style.display = "none";
+    });
+
+    document.getElementById("forcarSQL").style.display = "block";
+}
+async function atualizarRelatorios(){
+
+    const msg = document.getElementById("msgAtualizarRelatorios");
+
+    msg.style.color = "#555";
+    msg.innerText = "A atualizar relatórios...";
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/atualizar_relatorios_mtcbpo`,
+            {
+                method: "POST",
+                headers:{
+                    apikey: SUPABASE_API_KEY,
+                    Authorization: `Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            }
+        );
+
+        const texto = await resposta.text();
+
+        console.log("Status:", resposta.status);
+        console.log("Resposta Supabase:", texto);
+
+        if(!resposta.ok){
+            throw new Error(texto);
+        }
+
+        // Depois de atualizar os relatórios, atualizar também
+        // o histórico mensal do dia atual.
+        const hoje = new Date().toISOString().slice(0,10);
+
+        msg.style.color = "#555";
+        msg.innerText = "✓ Relatórios atualizados. A guardar histórico da produção...";
+
+        await guardarProducaoDia(null, hoje);
+
+        // Se a aba Dados do Mês estiver aberta, atualiza imediatamente a tabela.
+        const dadosMes = document.getElementById("dadosMes");
+        if(dadosMes && dadosMes.style.display !== "none"){
+            await carregarDadosMes();
+        }
+
+        msg.style.color = "green";
+        msg.innerText = "✓ Relatórios e histórico da produção atualizados com sucesso.";
+
+    }catch(erro){
+
+        console.error("ERRO COMPLETO:", erro);
+
+        msg.style.color = "red";
+        msg.innerText =
+            "✗ Erro: " + erro.message;
+
+    }
+}
+async function carregarAlertas(){
+
+    try{
+
+        const hoje = new Date().toISOString().slice(0,10);
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?data=eq.${hoje}&select=id,user,nome,tipo,inicio,duracao&order=id.asc`,
+            {
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`
+                },
+                cache:"no-store"
+            }
+        );
+
+        if(!resposta.ok){
+            throw new Error("Erro ao consultar MTCBPO_registosNSS: " + resposta.status);
+        }
+
+        const dados = await resposta.json();
+
+        console.log("REGISTOS LIDOS DO SUPABASE:", dados);
+
+        const alertas = {
+            login:[],
+            pausa1:[],
+            refeicao:[],
+            pausa2:[],
+            duplicados:[]
+        };
+
+
+        // =====================================================
+        // ALERTAS NORMAIS
+        // =====================================================
+
+        dados.forEach(r => {
+
+            const tipo = String(r.tipo || "")
+                .trim()
+                .toLowerCase();
+
+            const nome = String(r.nome || "")
+                .trim();
+
+            // LOGIN APÓS 09:00
+            if(tipo.includes("login")){
+
+                if(r.inicio){
+
+                    const horaCompleta = String(r.inicio)
+                        .split("T")[1];
+
+                    if(horaCompleta){
+
+                        const hora = horaCompleta.substring(0,8);
+
+                        if(hora > "09:00:00"){
+
+                            alertas.login.push(
+                                `${nome} (${hora})`
+                            );
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+
+            // PAUSA 1 > 16 MIN
+            if(
+                tipo.includes("pausa1") &&
+                Number(r.duracao) > 0.2667
+            ){
+
+                alertas.pausa1.push(
+                    `${nome} (${formatarHoras(r.duracao)})`
+                );
+
+            }
+
+
+            // REFEIÇÃO > 65 MIN
+          // REFEIÇÃO > 1 HORA
+if(
+    (
+        tipo.includes("refeicao") ||
+        tipo.includes("refeição")
+    ) &&
+    Number(r.duracao) > 1
+){
+    alertas.refeicao.push(
+        `${nome} (${formatarHoras(r.duracao)})`
+    );
+}
+
+
+            // PAUSA 2 > 16 MIN
+            if(
+                tipo.includes("pausa2") &&
+                Number(r.duracao) > 0.2667
+            ){
+
+                alertas.pausa2.push(
+                    `${nome} (${formatarHoras(r.duracao)})`
+                );
+
+            }
+
+        });
+
+
+        // =====================================================
+        // REGISTOS DUPLICADOS
+        // USA USER + TIPO
+        // =====================================================
+
+        const grupos = {};
+
+        dados.forEach(r => {
+
+            const user = String(r.user || "")
+                .trim()
+                .toLowerCase();
+
+            const tipo = String(r.tipo || "")
+                .trim()
+                .toLowerCase();
+
+            if(!user || !tipo){
+                return;
+            }
+
+            const chave = user + "|||" + tipo;
+
+            if(!grupos[chave]){
+                grupos[chave] = [];
+            }
+
+            grupos[chave].push(r);
+
+        });
+
+
+        Object.entries(grupos).forEach(([chave, registos]) => {
+
+            // Só é duplicado se EXISTIREM realmente
+            // pelo menos 2 registos na resposta atual
+            if(registos.length < 2){
+                return;
+            }
+
+            const partes = chave.split("|||");
+
+            const user = partes[0];
+            const tipo = partes[1];
+
+            const nome = registos[0].nome || user;
+
+            let tipoNome = tipo;
+
+            if(tipo.includes("login")){
+                tipoNome = "Login";
+            }
+            else if(tipo.includes("logout")){
+                tipoNome = "Logout";
+            }
+            else if(tipo.includes("pausa1")){
+                tipoNome = "Pausa 1";
+            }
+            else if(tipo.includes("pausa2")){
+                tipoNome = "Pausa 2";
+            }
+            else if(
+                tipo.includes("refeicao") ||
+                tipo.includes("refeição")
+            ){
+                tipoNome = "Refeição";
+            }
+            else if(tipo.includes("formacao")){
+                tipoNome = "Formação";
+            }
+
+            alertas.duplicados.push(
+                `${nome} (${user}) — ${tipoNome} (${registos.length} registos)`
+            );
+
+        });
+
+
+        // =====================================================
+        // LIMPAR O CONTEÚDO ANTIGO
+        // =====================================================
+
+        const container = document.getElementById("cardsAlertas");
+
+        if(!container){
+            console.error("Elemento cardsAlertas não encontrado.");
+            return;
+        }
+
+        container.innerHTML = "";
+
+
+        // =====================================================
+        // CONSTRUIR NOVAMENTE OS ALERTAS
+        // =====================================================
+
+        container.innerHTML = `
+
+            <div class="card">
+
+                <h3>
+                    ⏰ Logins Tardios (${alertas.login.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.login.length
+                    ? alertas.login
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    ☕ Pausa 1 Excedida (${alertas.pausa1.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.pausa1.length
+                    ? alertas.pausa1
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    🍽️ Refeição Excedida (${alertas.refeicao.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.refeicao.length
+                    ? alertas.refeicao
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    ☕ Pausa 2 Excedida (${alertas.pausa2.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.pausa2.length
+                    ? alertas.pausa2
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+
+            <div class="card">
+
+                <h3>
+                    📄 Registos Duplicados (${alertas.duplicados.length})
+                </h3>
+
+                <hr>
+
+                ${
+                    alertas.duplicados.length
+                    ? alertas.duplicados
+                        .map(x => `<div style="padding:4px 0">${x}</div>`)
+                        .join("")
+                    : `<div style="color:#999">Sem alertas</div>`
+                }
+
+            </div>
+
+        `;
+
+        console.log("DUPLICADOS ENCONTRADOS:", alertas.duplicados);
+
+    }
+    catch(e){
+
+        console.error("ERRO AO CARREGAR ALERTAS:", e);
+
+    }
+
+}
+        </script></body></html>
