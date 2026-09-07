@@ -3454,12 +3454,47 @@ tbody.innerHTML = "";
 
 dados.forEach(registo => {
 
+    const dataPlaneamento = String(registo.data ?? "");
+    const userPlaneamento = String(registo.user ?? "");
+    const nomePlaneamento = String(registo.nome ?? "");
+    const estadoAtual = String(registo.estado ?? "");
+
+    const opcoesEstado = [
+        "Trabalha",
+        "Baixa",
+        "Férias",
+        "Licença",
+        "Dispensa"
+    ];
+
+    if (estadoAtual && !opcoesEstado.some(op => op.toLowerCase() === estadoAtual.toLowerCase())) {
+        opcoesEstado.unshift(estadoAtual);
+    }
+
+    const opcoesHTML = opcoesEstado.map(opcao => `
+        <option value="${escaparHTML(opcao)}" ${opcao.toLowerCase() === estadoAtual.toLowerCase() ? "selected" : ""}>
+            ${escaparHTML(opcao)}
+        </option>
+    `).join("");
+
     tbody.innerHTML += `
         <tr>
-            <td>${registo.data ?? ""}</td>
-            <td>${registo.user ?? ""}</td>
-            <td>${registo.nome ?? ""}</td>
-            <td>${registo.estado ?? ""}</td>
+            <td>${escaparHTML(dataPlaneamento)}</td>
+            <td>${escaparHTML(userPlaneamento)}</td>
+            <td>${escaparHTML(nomePlaneamento)}</td>
+            <td>
+                <select
+                    class="estado-planeamento"
+                    style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;min-width:130px;"
+                    data-data="${escaparHTML(dataPlaneamento)}"
+                    data-user="${escaparHTML(userPlaneamento)}"
+                    data-nome="${escaparHTML(nomePlaneamento)}"
+                    data-estado-anterior="${escaparHTML(estadoAtual)}"
+                    onchange="atualizarEstadoPlaneamento(this)"
+                >
+                    ${opcoesHTML}
+                </select>
+            </td>
         </tr>
     `;
 
@@ -3469,6 +3504,90 @@ dados.forEach(registo => {
         console.error(e);
     }
 
+}
+
+async function atualizarEstadoPlaneamento(select) {
+
+    const novoEstado = select.value;
+    const data = select.dataset.data || "";
+    const user = select.dataset.user || "";
+    const nome = select.dataset.nome || "";
+    const estadoAnterior = select.dataset.estadoAnterior || "";
+
+    if (!data || !user) {
+        alert("Não foi possível identificar o registo do planeamento.");
+        return;
+    }
+
+    select.disabled = true;
+
+    try {
+
+        const filtroData = encodeURIComponent(data);
+        const filtroUser = encodeURIComponent(user);
+        const filtroNome = encodeURIComponent(nome);
+
+        let url =
+            `${SUPABASE_URL}/rest/v1/planeamento` +
+            `?data=eq.${filtroData}` +
+            `&user=eq.${filtroUser}`;
+
+        if (nome) {
+            url += `&nome=eq.${filtroNome}`;
+        }
+
+        const resposta = await fetch(url, {
+            method: "PATCH",
+            headers: {
+                apikey: SUPABASE_API_KEY,
+                Authorization: `Bearer ${SUPABASE_API_KEY}`,
+                "Content-Type": "application/json",
+                Prefer: "return=representation"
+            },
+            body: JSON.stringify({
+                estado: novoEstado
+            })
+        });
+
+        const resultado = await resposta.json().catch(() => []);
+
+        if (!resposta.ok) {
+            console.error("Erro ao atualizar estado:", resultado);
+            throw new Error(
+                resultado?.message ||
+                resultado?.details ||
+                "Não foi possível atualizar o estado no Supabase."
+            );
+        }
+
+        if (!Array.isArray(resultado) || resultado.length === 0) {
+            throw new Error("O estado não foi atualizado: não foi encontrado o registo correspondente.");
+        }
+
+        select.dataset.estadoAnterior = novoEstado;
+
+        // Pequeno feedback visual de sucesso
+        const estadoOriginal = select.style.borderColor;
+        select.style.borderColor = "#28a745";
+
+        setTimeout(() => {
+            select.style.borderColor = estadoOriginal;
+        }, 1000);
+
+    } catch (e) {
+
+        console.error(e);
+
+        alert("Erro ao atualizar o estado no Supabase:\n\n" + e.message);
+
+        // Repor o valor anterior caso a gravação falhe
+        if (estadoAnterior) {
+            select.value = estadoAnterior;
+        }
+
+    } finally {
+        select.disabled = false;
+    }
 }
 
 let dadosLoginsBase = null;
