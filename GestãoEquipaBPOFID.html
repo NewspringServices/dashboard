@@ -2765,65 +2765,395 @@ document.getElementById("cardSemPresenca").innerText = semPresenca;
 
 async function carregarRelatorioTempos(){
 
+    const tbody = document.querySelector("#tblRelatorioTempos tbody");
+
     try{
 
-    const resposta = await fetch(
-`${SUPABASE_URL}/rest/v1/resumo_producao_diaria?select=*`,
-{
-    headers:{
-        apikey: SUPABASE_API_KEY,
-        Authorization:`Bearer ${SUPABASE_API_KEY}`
-    }
-}
-);
+        const fData =
+            document.getElementById("fDataTempos").value;
 
-        const dados = await resposta.json();
-const fData = document.getElementById("fDataTempos").value;
-const fColaborador = document.getElementById("fColaboradorTempos").value.toLowerCase().trim();
-        console.log(dados);
+        const fColaborador =
+            document.getElementById("fColaboradorTempos").value
+                .toLowerCase()
+                .trim();
 
-        const tbody = document.querySelector("#tblRelatorioTempos tbody");
+        /*
+         * IMPORTANTE:
+         * O relatório de Tempos Médios NÃO deve usar
+         * resumo_producao_diaria, porque essa tabela contém
+         * valores agregados/totalizados.
+         *
+         * Aqui vamos diretamente aos registos de produção
+         * e calculamos a MÉDIA do campo "tempo" por:
+         *   Data + Colaborador + Tarefa Finalizada
+         *
+         * Assim, se uma pessoa fizer a mesma tarefa 10 vezes,
+         * a coluna mostra o tempo médio dessas 10 tarefas,
+         * e não a soma das 10 durações.
+         */
+
+        let dados = [];
+        let offset = 0;
+        const pagina = 1000;
+
+        while(true){
+
+            let url =
+                `${SUPABASE_URL}/rest/v1/BPO_dadosprodução` +
+                `?select=data,colaborador,tarefaFinalizada,tempo` +
+                `&order=data.asc,colaborador.asc,tarefaFinalizada.asc` +
+                `&limit=${pagina}&offset=${offset}`;
+
+            if(fData){
+                url += `&data=eq.${encodeURIComponent(fData)}`;
+            }
+
+            if(fColaborador){
+                url += `&colaborador=ilike.${encodeURIComponent(`*${fColaborador}*`)}`;
+            }
+
+            const resposta = await fetch(url,{
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Range":`${offset}-${offset + pagina - 1}`
+                },
+                cache:"no-store"
+            });
+
+            const paginaDados = await resposta.json();
+
+            if(!resposta.ok){
+                throw new Error(
+                    paginaDados?.message ||
+                    paginaDados?.hint ||
+                    JSON.stringify(paginaDados)
+                );
+            }
+
+            if(!Array.isArray(paginaDados) || !paginaDados.length){
+                break;
+            }
+
+            dados.push(...paginaDados);
+
+            if(paginaDados.length < pagina){
+                break;
+            }
+
+            offset += pagina;
+
+        }
 
         tbody.innerHTML = "";
 
-dados
-.filter(r => {
+        if(!dados.length){
 
-    if (fData && r.data !== fData)
-        return false;
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="13"
+                        style="text-align:center;padding:25px;color:#777;">
+                        Não existem registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
 
-    if (fColaborador &&
-        !(r.colaborador || "").toLowerCase().includes(fColaborador))
-        return false;
+            return;
+        }
 
-    return true;
+        // ---------------------------------------------------------
+        // Converte HH:MM:SS para segundos
+        // ---------------------------------------------------------
+        function tempoParaSegundos(valor){
 
-})
-.forEach(r => {
-          tbody.innerHTML += `
-<tr>
-    <td>${r.data ?? ""}</td>
-    <td>${r.colaborador ?? ""}</td>
-<td>${r.tempo_total === "00:00:00" ? "" : (r.tempo_total ?? "")}</td>
-<td>${r["DNP"] === "00:00:00" ? "" : (r["DNP"] ?? "")}</td>
-<td>${r["DNE"] === "00:00:00" ? "" : (r["DNE"] ?? "")}</td>
-<td>${r["Reembolsos Multicare"] === "00:00:00" ? "" : (r["Reembolsos Multicare"] ?? "")}</td>
-<td>${r["PETS"] === "00:00:00" ? "" : (r["PETS"] ?? "")}</td>
-<td>${r["Auto-Indexações"] === "00:00:00" ? "" : (r["Auto-Indexações"] ?? "")}</td>
-<td>${r["Auto-Aberturas"] === "00:00:00" ? "" : (r["Auto-Aberturas"] ?? "")}</td>
-<td>${r["AP Index"] === "00:00:00" ? "" : (r["AP Index"] ?? "")}</td>
-<td>${r["AT Participações"] === "00:00:00" ? "" : (r["AT Participações"] ?? "")}</td>
-<td>${r["AT Index"] === "00:00:00" ? "" : (r["AT Index"] ?? "")}</td>
-`;
+            if(valor === null || valor === undefined || valor === ""){
+                return null;
+            }
+
+            const partes = String(valor).trim().split(":");
+
+            if(partes.length !== 3){
+                return null;
+            }
+
+            const h = Number(partes[0]);
+            const m = Number(partes[1]);
+            const s = Number(partes[2]);
+
+            if(
+                !Number.isFinite(h) ||
+                !Number.isFinite(m) ||
+                !Number.isFinite(s)
+            ){
+                return null;
+            }
+
+            return h * 3600 + m * 60 + s;
+
+        }
+
+        // ---------------------------------------------------------
+        // Converte segundos para HH:MM:SS
+        // ---------------------------------------------------------
+        function segundosParaTempo(segundos){
+
+            if(
+                segundos === null ||
+                segundos === undefined ||
+                !Number.isFinite(segundos)
+            ){
+                return "";
+            }
+
+            segundos = Math.round(segundos);
+
+            const h =
+                String(Math.floor(segundos / 3600))
+                    .padStart(2,"0");
+
+            const m =
+                String(Math.floor((segundos % 3600) / 60))
+                    .padStart(2,"0");
+
+            const s =
+                String(segundos % 60)
+                    .padStart(2,"0");
+
+            return `${h}:${m}:${s}`;
+
+        }
+
+        // ---------------------------------------------------------
+        // Normalização dos nomes das tarefas
+        // ---------------------------------------------------------
+        function normalizarTarefa(valor){
+
+            return String(valor || "")
+                .trim()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g,"")
+                .toLowerCase()
+                .replace(/\s+/g," ");
+
+        }
+
+        /*
+         * As chaves abaixo correspondem às colunas apresentadas
+         * no relatório.
+         */
+        const colunasTarefas = [
+            "DNP",
+            "DNE",
+            "Reembolsos",
+            "Multicare",
+            "PETS",
+            "Auto-Indexações",
+            "Auto-Aberturas",
+            "AP Index",
+            "AT Participações",
+            "AT Index"
+        ];
+
+        function colunaDaTarefa(tarefa){
+
+            const t = normalizarTarefa(tarefa);
+
+            if(t === "dnp") return "DNP";
+            if(t === "dne") return "DNE";
+
+            if(
+                t === "reembolsos" ||
+                t === "reembolsos multicare"
+            ){
+                return "Reembolsos";
+            }
+
+            if(t === "multicare") return "Multicare";
+            if(t === "pets") return "PETS";
+
+            if(
+                t === "auto-indexacoes" ||
+                t === "auto - indexacoes" ||
+                t === "auto-indexacoes mib" ||
+                t === "auto - indexacoes mib"
+            ){
+                return "Auto-Indexações";
+            }
+
+            if(
+                t === "auto-aberturas" ||
+                t === "auto - aberturas"
+            ){
+                return "Auto-Aberturas";
+            }
+
+            if(
+                t === "ap index" ||
+                t === "ap indexacoes" ||
+                t === "ap indexações"
+            ){
+                return "AP Index";
+            }
+
+            if(
+                t === "at participacoes" ||
+                t === "at participações"
+            ){
+                return "AT Participações";
+            }
+
+            if(
+                t === "at index" ||
+                t === "at indexacoes" ||
+                t === "at indexações"
+            ){
+                return "AT Index";
+            }
+
+            return null;
+
+        }
+
+        // ---------------------------------------------------------
+        // Agrupamento por Data + Colaborador
+        // ---------------------------------------------------------
+        const grupos = {};
+
+        dados.forEach(registo => {
+
+            const data = registo.data || "";
+            const colaborador = registo.colaborador || "";
+
+            if(!data || !colaborador){
+                return;
+            }
+
+            const chave = `${data}|||${colaborador}`;
+
+            if(!grupos[chave]){
+
+                grupos[chave] = {
+                    data,
+                    colaborador,
+
+                    // Média do tempo de TODAS as tarefas do dia.
+                    total: {
+                        soma:0,
+                        quantidade:0
+                    },
+
+                    tarefas:{}
+
+                };
+
+            }
+
+            const segundos = tempoParaSegundos(registo.tempo);
+
+            if(segundos !== null){
+
+                grupos[chave].total.soma += segundos;
+                grupos[chave].total.quantidade++;
+
+            }
+
+            const coluna =
+                colunaDaTarefa(registo.tarefaFinalizada);
+
+            if(!coluna || segundos === null){
+                return;
+            }
+
+            if(!grupos[chave].tarefas[coluna]){
+
+                grupos[chave].tarefas[coluna] = {
+                    soma:0,
+                    quantidade:0
+                };
+
+            }
+
+            grupos[chave].tarefas[coluna].soma += segundos;
+            grupos[chave].tarefas[coluna].quantidade++;
+
         });
+
+        // ---------------------------------------------------------
+        // Mostrar uma linha por Data + Colaborador
+        // ---------------------------------------------------------
+        Object.values(grupos)
+            .sort((a,b) => {
+
+                const dataCompare =
+                    String(b.data).localeCompare(String(a.data));
+
+                if(dataCompare !== 0){
+                    return dataCompare;
+                }
+
+                return String(a.colaborador)
+                    .localeCompare(String(b.colaborador));
+
+            })
+            .forEach(grupo => {
+
+                const mediaTotal =
+                    grupo.total.quantidade > 0
+                    ? grupo.total.soma / grupo.total.quantidade
+                    : null;
+
+                const valores = {};
+
+                colunasTarefas.forEach(coluna => {
+
+                    const t = grupo.tarefas[coluna];
+
+                    valores[coluna] =
+                        t && t.quantidade > 0
+                        ? segundosParaTempo(
+                            t.soma / t.quantidade
+                        )
+                        : "";
+
+                });
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${escaparHTML(grupo.data)}</td>
+                        <td>${escaparHTML(grupo.colaborador)}</td>
+                        <td>${escaparHTML(segundosParaTempo(mediaTotal))}</td>
+                        <td>${escaparHTML(valores["DNP"])}</td>
+                        <td>${escaparHTML(valores["DNE"])}</td>
+                        <td>${escaparHTML(valores["Reembolsos"])}</td>
+                        <td>${escaparHTML(valores["Multicare"])}</td>
+                        <td>${escaparHTML(valores["PETS"])}</td>
+                        <td>${escaparHTML(valores["Auto-Indexações"])}</td>
+                        <td>${escaparHTML(valores["Auto-Aberturas"])}</td>
+                        <td>${escaparHTML(valores["AP Index"])}</td>
+                        <td>${escaparHTML(valores["AT Participações"])}</td>
+                        <td>${escaparHTML(valores["AT Index"])}</td>
+                    </tr>
+                `;
+
+            });
 
     }catch(e){
 
-        console.error(e);
+        console.error("Erro ao carregar Tempos Médios:",e);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="13"
+                    style="text-align:center;padding:25px;color:#b00020;">
+                    Erro ao carregar os Tempos Médios.
+                </td>
+            </tr>
+        `;
 
     }
 
 }
+
 
 async function carregarRelatorioOcupacao(){
 
