@@ -826,7 +826,7 @@ select:focus{
       </div>
       <div class="form-group">
         <label>Tarefa Finalizada</label>
-   <select id="tarefaFinalizada" required>
+ <select id="tarefaFinalizada" required>
     <option value="" selected disabled>Selecionar tarefa...</option>
     <option value="Auto - Aberturas">Auto - Aberturas</option>
     <option value="Auto - Indexações">Auto - Indexações</option>
@@ -1067,11 +1067,29 @@ const estadoText = document.getElementById("estadoText");
 const estadoIcon = document.getElementById("estadoIcon");
 const nomesEstados={login:"Login",pausa1:"Pausa 1",pausa2:"Pausa 2",refeicao:"Refeição",formacao:"Formação / Meetings",logout:"Logout"};
 const iconesEstados={login:"●",pausa1:"Ⅱ",pausa2:"Ⅱ",refeicao:"🍴",formacao:"🎓",logout:"●"};
+
+function resetarSelecaoEstado(){
+  tipoSelecionado = "";
+  inicioDataHora = null;
+  fimDataHora = null;
+  estadoText.textContent = "Selecionar estado...";
+  estadoIcon.textContent = "☰";
+  estadoCombobox.classList.remove("open");
+  btnSub.style.display = "inline-block";
+  btnSub.textContent = "Submeter";
+  btnSub.disabled = true;
+  btnTerm.style.display = "none";
+}
 estadoSelected.onclick=()=>estadoCombobox.classList.toggle("open");
 document.querySelectorAll(".estado-option").forEach(btn=>{btn.onclick=()=>{
   tipoSelecionado=btn.dataset.tipo; estadoText.textContent=nomesEstados[tipoSelecionado]; estadoIcon.textContent=iconesEstados[tipoSelecionado]; estadoCombobox.classList.remove("open");
   if(["pausa1","pausa2","refeicao"].includes(tipoSelecionado)) producaoPanel.style.display="none"; else producaoPanel.style.display="block";
-  inicioDataHora=new Date(); fimDataHora=null; btnSub.disabled=false; btnSub.style.display="inline-block"; btnTerm.style.display="none"; msgEl.textContent="";
+  inicioDataHora=new Date(); fimDataHora=null;
+  btnSub.disabled=false;
+  btnSub.style.display="inline-block";
+  btnTerm.style.display="none";
+  btnSub.textContent = ["pausa1","pausa2","refeicao","formacao"].includes(tipoSelecionado) ? "Iniciar" : "Submeter";
+  if(msgEl) msgEl.textContent="";
   if(tipoSelecionado==="login") estadoLabel.textContent="🟢 ONLINE"; else if(tipoSelecionado==="logout") estadoLabel.textContent="🔴 OFFLINE"; else estadoLabel.textContent="⏸ "+nomesEstados[tipoSelecionado];
 };});
 document.addEventListener("click",e=>{if(!estadoCombobox.contains(e.target)) estadoCombobox.classList.remove("open")});
@@ -1083,9 +1101,9 @@ btnSub.onclick = async () => {
     if(tipoSelecionado === "login" || tipoSelecionado === "logout"){
       const bloqueado = await existeRegistoUltimos15Min(user, tipoSelecionado);
       if(bloqueado){
-        msgEl.textContent = "⚠️ Registo já enviado";
+        if(msgEl) msgEl.textContent = "⚠️ Registo já enviado";
         btnSub.disabled = true;
-        setTimeout(() => { msgEl.textContent = ""; }, 5000);
+        setTimeout(() => { if(msgEl) msgEl.textContent = ""; }, 5000);
         return;
       }
 
@@ -1102,7 +1120,7 @@ await enviarAoSupabase({
 await atualizarRegistosHoje();
 
 registrarHistorico(tipoSelecionado, inicioDataHora);
-btnSub.disabled = true;
+resetarSelecaoEstado();
 
     } else {
       registrarHistorico(tipoSelecionado, inicioDataHora);
@@ -1128,13 +1146,14 @@ await atualizarRegistosHoje();
         btnSub.disabled = true;
         estadoLabel.textContent = "🟢 ONLINE";
         producaoPanel.style.display = "block";
-        document.querySelector(".status-card").style.borderLeftColor = "var(--success)";
+
+        resetarSelecaoEstado();
       };
     }
 
   } catch(err){
     console.error(err);
-    msgEl.textContent = "❌ Erro ao validar registo";
+    if(msgEl) msgEl.textContent = "❌ Erro ao validar registo";
   }
 };
 
