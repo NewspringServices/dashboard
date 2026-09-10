@@ -68,6 +68,50 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .tab{padding:0 15px;font-size:13px}
 #abaFidelidade iframe,#abaQualidade iframe{height:calc(100vh - 120px)}
 }
+
+/* ===== MEU PAINEL ===== */
+#abaPainel{background:#f4f7f6;padding:28px;overflow:auto}
+.painel-wrap{max-width:1400px;margin:0 auto}
+.painel-topo{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;margin-bottom:24px}
+.painel-topo h1{font-size:28px;color:#263238;margin-bottom:6px}
+.painel-topo p{color:#6b7780;font-size:14px}
+.painel-data{background:#fff;border-radius:14px;padding:12px 18px;box-shadow:0 4px 14px rgba(0,0,0,.06);font-weight:700;color:var(--verde);white-space:nowrap}
+.painel-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+.painel-card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 5px 18px rgba(0,0,0,.07);display:flex;align-items:center;gap:15px}
+.painel-card .icone{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--verdeClaro);color:var(--verde)}
+.painel-card h3{font-size:25px;margin-bottom:3px}
+.painel-card span{font-size:13px;color:#718096}
+.painel-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:20px}
+.painel-box{background:#fff;border-radius:18px;padding:22px;box-shadow:0 5px 18px rgba(0,0,0,.07)}
+.painel-box h2{font-size:18px;color:#263238;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+.painel-box h2 i{color:var(--verde)}
+.painel-lista{display:flex;flex-direction:column;gap:10px;min-height:80px}
+.painel-item{border:1px solid #e8eceb;border-left:4px solid var(--verde2);border-radius:11px;padding:13px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.painel-item:hover{background:#fafdfb}
+.painel-item-main{min-width:0}
+.painel-item strong{display:block;font-size:14px;margin-bottom:4px}
+.painel-item small{color:#77838a;font-size:12px}
+.painel-item .acoes{display:flex;gap:6px;flex-shrink:0}
+.painel-item button{border:none;background:#eef5ef;color:var(--verde);width:30px;height:30px;border-radius:8px;cursor:pointer}
+.painel-item button:hover{background:var(--verde);color:#fff}
+.tipo-pendente{border-left-color:#e67e22}
+.tipo-ausencia{border-left-color:#d35454}
+.tipo-agenda{border-left-color:#3478c7}
+.vazio{color:#98a2a8;text-align:center;padding:25px 10px;font-size:13px}
+.painel-add{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.painel-add button{border:none;border-radius:9px;padding:10px 14px;color:#fff;font-weight:600;cursor:pointer;background:linear-gradient(135deg,#43A047,#2E7D32)}
+.painel-add button.sec{background:#eef5ef;color:var(--verde)}
+.painel-form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:15px}
+.painel-form input,.painel-form select{height:40px;border:1px solid #d8e0dd;border-radius:9px;padding:0 11px;font-size:13px;outline:none}
+.painel-form input:focus,.painel-form select:focus{border-color:var(--verde2);box-shadow:0 0 0 3px rgba(67,160,71,.1)}
+.painel-form .full{grid-column:1/-1}
+.painel-form-actions{display:flex;justify-content:flex-end;gap:8px;grid-column:1/-1}
+.painel-form-actions button{border:none;border-radius:9px;padding:9px 15px;cursor:pointer;font-weight:600}
+.btn-guardar{background:linear-gradient(135deg,#43A047,#2E7D32);color:#fff}
+.btn-cancelar{background:#eceff0;color:#526067}
+@media(max-width:900px){.painel-resumo{grid-template-columns:1fr 1fr}.painel-grid{grid-template-columns:1fr}}
+@media(max-width:600px){#abaPainel{padding:16px}.painel-resumo{grid-template-columns:1fr}.painel-topo{align-items:flex-start;flex-direction:column}.painel-form{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -80,7 +124,11 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
     </div>
 
     <div class="tabs">
-        <button id="tabMulticare" class="tab active" onclick="abrirAba('multicare')">
+        <button id="tabPainel" class="tab active" onclick="abrirAba('painel')">
+            <i class="fa fa-house"></i> Meu Painel
+        </button>
+
+        <button id="tabMulticare" class="tab" onclick="abrirAba('multicare')">
             <i class="fa fa-chart-line"></i> BPO Multicare
         </button>
 
@@ -96,7 +144,72 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 
 <div class="conteudo">
 
-<div id="abaMulticare" class="aba active">
+
+<div id="abaPainel" class="aba active">
+    <div class="painel-wrap">
+        <div class="painel-topo">
+            <div>
+                <h1>Meu Painel</h1>
+                <p>Organiza aqui as tuas tarefas, pendentes, ausências e compromissos.</p>
+            </div>
+            <div class="painel-data" id="painelData"></div>
+        </div>
+
+        <div class="painel-resumo">
+            <div class="painel-card">
+                <div class="icone"><i class="fa fa-calendar-day"></i></div>
+                <div><h3 id="totalAgenda">0</h3><span>Agenda</span></div>
+            </div>
+            <div class="painel-card">
+                <div class="icone"><i class="fa fa-clock"></i></div>
+                <div><h3 id="totalPendentes">0</h3><span>Pendentes</span></div>
+            </div>
+            <div class="painel-card">
+                <div class="icone"><i class="fa fa-user-clock"></i></div>
+                <div><h3 id="totalAusencias">0</h3><span>Ausências</span></div>
+            </div>
+            <div class="painel-card">
+                <div class="icone"><i class="fa fa-list-check"></i></div>
+                <div><h3 id="totalItens">0</h3><span>Total de registos</span></div>
+            </div>
+        </div>
+
+        <div class="painel-grid">
+            <div class="painel-box">
+                <h2><i class="fa fa-calendar"></i> Agenda</h2>
+                <div id="listaAgenda" class="painel-lista"></div>
+                <div class="painel-add">
+                    <button onclick="mostrarFormularioPainel('agenda')"><i class="fa fa-plus"></i> Novo compromisso</button>
+                </div>
+            </div>
+
+            <div class="painel-box">
+                <h2><i class="fa fa-clock"></i> Pendentes</h2>
+                <div id="listaPendentes" class="painel-lista"></div>
+                <div class="painel-add">
+                    <button onclick="mostrarFormularioPainel('pendente')"><i class="fa fa-plus"></i> Novo pendente</button>
+                </div>
+            </div>
+
+            <div class="painel-box">
+                <h2><i class="fa fa-user-clock"></i> Ausências</h2>
+                <div id="listaAusencias" class="painel-lista"></div>
+                <div class="painel-add">
+                    <button onclick="mostrarFormularioPainel('ausencia')"><i class="fa fa-plus"></i> Registar ausência</button>
+                </div>
+            </div>
+
+            <div class="painel-box">
+                <h2><i class="fa fa-plus-circle"></i> Novo registo</h2>
+                <div id="painelFormulario">
+                    <div class="vazio">Escolhe uma das opções para adicionar um registo ao teu painel.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="abaMulticare" class="aba">
     <iframe src="GestãoEquipaBPOMTC.html"
             title="Gestão Equipa BPO Multicare"></iframe>
 </div>
@@ -165,12 +278,14 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 function abrirAba(aba){
 
     const abas = [
+        document.getElementById("abaPainel"),
         document.getElementById("abaMulticare"),
         document.getElementById("abaFidelidade"),
         document.getElementById("abaQualidade")
     ];
 
     const tabs = [
+        document.getElementById("tabPainel"),
         document.getElementById("tabMulticare"),
         document.getElementById("tabFidelidade"),
         document.getElementById("tabQualidade")
@@ -178,6 +293,11 @@ function abrirAba(aba){
 
     abas.forEach(x => x.classList.remove("active"));
     tabs.forEach(x => x.classList.remove("active"));
+
+    if(aba === "painel"){
+        document.getElementById("abaPainel").classList.add("active");
+        document.getElementById("tabPainel").classList.add("active");
+    }
 
     if(aba === "multicare"){
         document.getElementById("abaMulticare").classList.add("active");
@@ -251,8 +371,153 @@ function validarPassword(){
     }
 }
 
+/* ===== DADOS DO MEU PAINEL ===== */
+let painelRegistos = JSON.parse(localStorage.getItem("meuPainelRegistos") || "[]");
+
+function guardarPainel(){
+    localStorage.setItem("meuPainelRegistos", JSON.stringify(painelRegistos));
+}
+
+function formatarData(data){
+    if(!data) return "";
+    const p = data.split("-");
+    return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : data;
+}
+
+function escapePainel(txt){
+    return String(txt || "").replace(/[&<>"']/g, function(c){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+    });
+}
+
+function renderPainel(){
+    const agenda = painelRegistos.filter(x => x.tipo === "agenda").sort((a,b) => (a.data+" "+a.hora).localeCompare(b.data+" "+b.hora));
+    const pendentes = painelRegistos.filter(x => x.tipo === "pendente").sort((a,b) => a.data.localeCompare(b.data));
+    const ausencias = painelRegistos.filter(x => x.tipo === "ausencia").sort((a,b) => a.data.localeCompare(b.data));
+
+    document.getElementById("totalAgenda").textContent = agenda.length;
+    document.getElementById("totalPendentes").textContent = pendentes.length;
+    document.getElementById("totalAusencias").textContent = ausencias.length;
+    document.getElementById("totalItens").textContent = painelRegistos.length;
+
+    renderLista("listaAgenda", agenda, "agenda");
+    renderLista("listaPendentes", pendentes, "pendente");
+    renderLista("listaAusencias", ausencias, "ausencia");
+
+    const agora = new Date();
+    document.getElementById("painelData").textContent =
+        agora.toLocaleDateString("pt-PT", {weekday:"long", day:"2-digit", month:"long", year:"numeric"});
+}
+
+function renderLista(id, lista, tipo){
+    const el = document.getElementById(id);
+    if(!lista.length){
+        el.innerHTML = '<div class="vazio">Sem registos.</div>';
+        return;
+    }
+
+    el.innerHTML = lista.map(function(item){
+        let detalhe = "";
+        if(tipo === "agenda") detalhe = formatarData(item.data) + (item.hora ? " · " + item.hora : "");
+        if(tipo === "pendente") detalhe = (item.data ? "Até " + formatarData(item.data) : "Sem data");
+        if(tipo === "ausencia") detalhe = formatarData(item.data) + (item.dataFim ? " → " + formatarData(item.dataFim) : "");
+
+        return `<div class="painel-item tipo-${tipo}">
+            <div class="painel-item-main">
+                <strong>${escapePainel(item.titulo)}</strong>
+                <small>${escapePainel(detalhe)}${item.nome ? " · " + escapePainel(item.nome) : ""}${item.notas ? " · " + escapePainel(item.notas) : ""}</small>
+            </div>
+            <div class="acoes">
+                <button title="Apagar" onclick="apagarRegistoPainel(${item.id})"><i class="fa fa-trash"></i></button>
+            </div>
+        </div>`;
+    }).join("");
+}
+
+function mostrarFormularioPainel(tipo){
+    const f = document.getElementById("painelFormulario");
+    let titulo = tipo === "agenda" ? "Novo compromisso" : tipo === "pendente" ? "Novo pendente" : "Nova ausência";
+
+    let campos = "";
+    if(tipo === "agenda"){
+        campos = `
+            <div class="painel-form">
+                <input id="pfTitulo" class="full" placeholder="Ex.: Reunião com a equipa">
+                <input id="pfData" type="date">
+                <input id="pfHora" type="time">
+                <input id="pfNotas" class="full" placeholder="Notas (opcional)">
+                <div class="painel-form-actions">
+                    <button class="btn-cancelar" onclick="cancelarFormularioPainel()">Cancelar</button>
+                    <button class="btn-guardar" onclick="adicionarRegistoPainel('${tipo}')">Guardar</button>
+                </div>
+            </div>`;
+    } else if(tipo === "pendente"){
+        campos = `
+            <div class="painel-form">
+                <input id="pfTitulo" class="full" placeholder="Ex.: Validar volumes PTC">
+                <input id="pfData" type="date">
+                <input id="pfNotas" class="full" placeholder="Notas (opcional)">
+                <div class="painel-form-actions">
+                    <button class="btn-cancelar" onclick="cancelarFormularioPainel()">Cancelar</button>
+                    <button class="btn-guardar" onclick="adicionarRegistoPainel('${tipo}')">Guardar</button>
+                </div>
+            </div>`;
+    } else {
+        campos = `
+            <div class="painel-form">
+                <input id="pfTitulo" class="full" placeholder="Nome da pessoa">
+                <input id="pfData" type="date">
+                <input id="pfDataFim" type="date">
+                <input id="pfNotas" class="full" placeholder="Motivo / notas (opcional)">
+                <div class="painel-form-actions">
+                    <button class="btn-cancelar" onclick="cancelarFormularioPainel()">Cancelar</button>
+                    <button class="btn-guardar" onclick="adicionarRegistoPainel('${tipo}')">Guardar</button>
+                </div>
+            </div>`;
+    }
+
+    f.innerHTML = `<h3 style="font-size:15px;margin-bottom:12px;color:#263238">${titulo}</h3>` + campos;
+}
+
+function adicionarRegistoPainel(tipo){
+    const titulo = document.getElementById("pfTitulo").value.trim();
+    const data = document.getElementById("pfData").value;
+    if(!titulo || !data){
+        alert("Preenche pelo menos a descrição/nome e a data.");
+        return;
+    }
+
+    painelRegistos.push({
+        id: Date.now(),
+        tipo: tipo,
+        titulo: titulo,
+        data: data,
+        hora: document.getElementById("pfHora") ? document.getElementById("pfHora").value : "",
+        dataFim: document.getElementById("pfDataFim") ? document.getElementById("pfDataFim").value : "",
+        notas: document.getElementById("pfNotas") ? document.getElementById("pfNotas").value.trim() : ""
+    });
+
+    guardarPainel();
+    cancelarFormularioPainel();
+    renderPainel();
+}
+
+function apagarRegistoPainel(id){
+    if(confirm("Queres apagar este registo?")){
+        painelRegistos = painelRegistos.filter(x => x.id !== id);
+        guardarPainel();
+        renderPainel();
+    }
+}
+
+function cancelarFormularioPainel(){
+    document.getElementById("painelFormulario").innerHTML =
+        '<div class="vazio">Escolhe uma das opções para adicionar um registo ao teu painel.</div>';
+}
+
 document.addEventListener("DOMContentLoaded",function(){
-    abrirAba("multicare");
+    abrirAba("painel");
+    renderPainel();
 });
 
 </script>
