@@ -1,3 +1,4 @@
+
 <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -5236,4 +5237,23 @@ if(
     }
 
 }
-        </script></body></html>
+        </script>
+<!-- INICIALIZAÇÃO AUTOMÁTICA DO DASHBOARD -->
+<script>
+window.addEventListener("load", function () {
+    setTimeout(async function () {
+        try {
+            if (typeof carregarCardsDashboard === "function") {
+                await carregarCardsDashboard();
+            }
+            if (typeof carregarGraficoProducao === "function") {
+                await carregarGraficoProducao();
+            }
+        } catch (e) {
+            console.error("Erro ao inicializar o Dashboard:", e);
+        }
+    }, 150);
+});
+</script>
+
+</body></html>
