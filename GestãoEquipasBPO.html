@@ -391,9 +391,12 @@ function escapePainel(txt){
 }
 
 function renderPainel(){
-    const agenda = painelRegistos.filter(x => x.tipo === "agenda").sort((a,b) => (a.data+" "+a.hora).localeCompare(b.data+" "+b.hora));
+    const agenda = painelRegistos.filter(x => x.tipo === "agenda").sort((a,b) => (a.data+" "+(a.hora||"")).localeCompare(b.data+" "+(b.hora||"")));
     const pendentes = painelRegistos.filter(x => x.tipo === "pendente").sort((a,b) => a.data.localeCompare(b.data));
-    const ausencias = painelRegistos.filter(x => x.tipo === "ausencia").sort((a,b) => a.data.localeCompare(b.data));
+    const ausencias = painelRegistos.filter(x => x.tipo === "ausencia").sort((a,b) => {
+        const d = a.data.localeCompare(b.data);
+        return d !== 0 ? d : (a.dataFim || a.data).localeCompare(b.dataFim || b.data);
+    });
 
     document.getElementById("totalAgenda").textContent = agenda.length;
     document.getElementById("totalPendentes").textContent = pendentes.length;
@@ -524,3 +527,4 @@ document.addEventListener("DOMContentLoaded",function(){
 
 </body>
 </html>
+
