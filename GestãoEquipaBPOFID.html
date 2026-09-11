@@ -492,15 +492,13 @@ canvas{
 
         <div class="content">
             <div class="panel">
-                <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:10px;">
-                    <h3 style="margin:0;">Produção por Hora</h3>
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div id="msgAtualizarRelatorios" style="font-size:12px;white-space:nowrap;"></div>
-                        <button type="button" onclick="atualizarRelatorios()" title="Atualizar dados" style="display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #d8ddd8;border-radius:7px;background:#fff;color:#2E7D32;font-weight:600;font-size:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);">
-                            <i class="fa fa-rotate"></i> Atualizar
-                        </button>
-                    </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+                    <h3 style="margin-bottom:0;">Produção por Hora</h3>
+                    <button type="button" onclick="atualizarRelatorios()" style="padding:9px 15px;font-size:13px;">
+                        <i class="fa fa-database"></i> Atualizar Relatórios
+                    </button>
                 </div>
+                <div id="msgAtualizarRelatorios" style="margin-top:10px;font-size:13px;"></div>
                 <canvas id="graficoProducao"></canvas>
             </div>
         </div>
@@ -1200,6 +1198,7 @@ canvas{
 </div>
 
 
+
 <div id="dadosMes" style="display:none;padding:25px;">
 
     <div class="panel">
@@ -1414,7 +1413,7 @@ function mostrarPlaneamento(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("planeamentoMes").style.display = "block";
@@ -1499,7 +1498,7 @@ function mostrarPlataformas(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("plataformas").style.display="block";
@@ -1737,7 +1736,7 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("forcarRegistos").style.display="block";
@@ -1762,7 +1761,7 @@ function mostrarAlertas(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("alertas").style.display = "block";
@@ -1789,7 +1788,7 @@ function mostrarEliminarRegistos(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("eliminarRegistos").style.display="block";
@@ -1837,7 +1836,7 @@ function mostrarLogins(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("logins").style.display = "block";
@@ -2276,7 +2275,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-    document.getElementById("forcarSQL").style.display = "none";
+    
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("planeamentoDia").style.display = "block";
@@ -3349,7 +3348,7 @@ function mostrarDashboard(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-        document.getElementById("forcarSQL").style.display = "none";
+        
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
 carregarGraficoProducao();
@@ -3376,7 +3375,7 @@ function mostrarRelatorios(){
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     document.getElementById("eliminarRegistos").style.display="none";
-        document.getElementById("forcarSQL").style.display = "none";
+        
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
     document.getElementById("relatorios").style.display = "block";
@@ -5102,6 +5101,9 @@ async function carregarFicheiroPlaneamento(){
 
 function mostrarCarregarPlaneamento(){ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
 
+function mostrarForcarSQL(){
+    mostrarDashboard();
+}
 async function atualizarRelatorios(){
 
     const msg = document.getElementById("msgAtualizarRelatorios");
@@ -5142,9 +5144,15 @@ async function atualizarRelatorios(){
 
         await guardarProducaoDia(null, hoje);
 
-        // Atualizar imediatamente os indicadores e gráficos da Dashboard.
-        await carregarGraficoProducao();
-        await carregarCardsDashboard();
+        // Atualizar imediatamente todos os relatórios que usam as tabelas
+        // calculadas pelo SQL, sem obrigar a fechar/reabrir a página.
+        await Promise.allSettled([
+            carregarRelatorioProducao(),
+            carregarRelatorioOcupacao(),
+            carregarRelatorioTempos(),
+            carregarGraficoProducao(),
+            carregarCardsDashboard()
+        ]);
 
         // Se a aba Dados do Mês estiver aberta, atualiza imediatamente a tabela.
         const dadosMes = document.getElementById("dadosMes");
@@ -5153,13 +5161,10 @@ async function atualizarRelatorios(){
         }
 
         msg.style.color = "green";
-        msg.innerText = "✓ Dados atualizados com sucesso.";
-
-        // Esconder a mensagem automaticamente após alguns segundos.
-        clearTimeout(window._msgAtualizarRelatoriosTimer);
-        window._msgAtualizarRelatoriosTimer = setTimeout(() => {
+        msg.innerText = "✓ Relatórios atualizados com sucesso.";
+        setTimeout(() => {
             msg.innerText = "";
-        }, 3000);
+        }, 4000);
 
     }catch(erro){
 
@@ -5168,10 +5173,7 @@ async function atualizarRelatorios(){
         msg.style.color = "red";
         msg.innerText =
             "✗ Erro: " + erro.message;
-
-        // Também limpar a mensagem de erro automaticamente.
-        clearTimeout(window._msgAtualizarRelatoriosTimer);
-        window._msgAtualizarRelatoriosTimer = setTimeout(() => {
+        setTimeout(() => {
             msg.innerText = "";
         }, 5000);
 
@@ -5499,4 +5501,3 @@ if(
 
 }
         </script></body></html>
-
