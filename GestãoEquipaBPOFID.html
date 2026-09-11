@@ -457,10 +457,6 @@ canvas{
         <i class="fa fa-trash"></i> Eliminar Registos
     </a>
 
-    <a onclick="mostrarForcarSQL()">
-        <i class="fa fa-database"></i> Forçar SQL
-    </a>
-
     <a onclick="mostrarRetificarProducao()">
         <i class="fa fa-pen-to-square"></i> Retificar Produção
     </a>
@@ -496,7 +492,15 @@ canvas{
 
         <div class="content">
             <div class="panel">
-                <h3>Produção por Hora</h3>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:10px;">
+                    <h3 style="margin:0;">Produção por Hora</h3>
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div id="msgAtualizarRelatorios" style="font-size:12px;white-space:nowrap;"></div>
+                        <button type="button" onclick="atualizarRelatorios()" title="Atualizar dados" style="display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid #d8ddd8;border-radius:7px;background:#fff;color:#2E7D32;font-weight:600;font-size:12px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06);">
+                            <i class="fa fa-rotate"></i> Atualizar
+                        </button>
+                    </div>
+                </div>
                 <canvas id="graficoProducao"></canvas>
             </div>
         </div>
@@ -1195,30 +1199,6 @@ canvas{
 
 </div>
 
-<div id="forcarSQL" style="display:none;">
-
-    <div class="panel">
-
-        <h3>
-            <i class="fa fa-database"></i>
-            Forçar SQL
-        </h3>
-
-        <p style="margin:15px 0;color:#666;">
-            Atualiza os relatórios a partir dos dados existentes.
-        </p>
-
-        <button type="button" onclick="atualizarRelatorios()">
-            🔄 Atualizar Relatórios
-        </button>
-
-        <div id="msgAtualizarRelatorios"
-             style="margin-top:12px;">
-        </div>
-
-    </div>
-
-</div>
 
 <div id="dadosMes" style="display:none;padding:25px;">
 
@@ -5122,17 +5102,6 @@ async function carregarFicheiroPlaneamento(){
 
 function mostrarCarregarPlaneamento(){ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
 
-function mostrarForcarSQL(){
-
-    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
-    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
-
-    document.querySelectorAll(".main > div").forEach(el => {
-        el.style.display = "none";
-    });
-
-    document.getElementById("forcarSQL").style.display = "block";
-}
 async function atualizarRelatorios(){
 
     const msg = document.getElementById("msgAtualizarRelatorios");
@@ -5173,6 +5142,10 @@ async function atualizarRelatorios(){
 
         await guardarProducaoDia(null, hoje);
 
+        // Atualizar imediatamente os indicadores e gráficos da Dashboard.
+        await carregarGraficoProducao();
+        await carregarCardsDashboard();
+
         // Se a aba Dados do Mês estiver aberta, atualiza imediatamente a tabela.
         const dadosMes = document.getElementById("dadosMes");
         if(dadosMes && dadosMes.style.display !== "none"){
@@ -5180,7 +5153,13 @@ async function atualizarRelatorios(){
         }
 
         msg.style.color = "green";
-        msg.innerText = "✓ Relatórios e histórico da produção atualizados com sucesso.";
+        msg.innerText = "✓ Dados atualizados com sucesso.";
+
+        // Esconder a mensagem automaticamente após alguns segundos.
+        clearTimeout(window._msgAtualizarRelatoriosTimer);
+        window._msgAtualizarRelatoriosTimer = setTimeout(() => {
+            msg.innerText = "";
+        }, 3000);
 
     }catch(erro){
 
@@ -5189,6 +5168,12 @@ async function atualizarRelatorios(){
         msg.style.color = "red";
         msg.innerText =
             "✗ Erro: " + erro.message;
+
+        // Também limpar a mensagem de erro automaticamente.
+        clearTimeout(window._msgAtualizarRelatoriosTimer);
+        window._msgAtualizarRelatoriosTimer = setTimeout(() => {
+            msg.innerText = "";
+        }, 5000);
 
     }
 }
@@ -5514,3 +5499,4 @@ if(
 
 }
         </script></body></html>
+
