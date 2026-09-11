@@ -452,12 +452,7 @@ canvas{
 </a>
 
 <div id="menuAdministracao" style="display:none;padding-left:20px;">
-
-    <a onclick="mostrarEliminarRegistos()">
-        <i class="fa fa-trash"></i> Eliminar Registos
-    </a>
-
-    <a onclick="mostrarRetificarProducao()">
+<a onclick="mostrarRetificarProducao()">
         <i class="fa fa-pen-to-square"></i> Retificar Produção
     </a>
 
@@ -733,6 +728,7 @@ canvas{
                     <th>Início</th>
                     <th>Fim</th>
                     <th>Duração</th>
+                    <th>Ações</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -1144,60 +1140,6 @@ canvas{
 
 </div>
 
-<div id="eliminarRegistos" style="display:none;padding:25px;">
-
-    <div class="panel">
-
-        <h3>Eliminar Registos</h3>
-
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-
-            <input type="date" id="fDataEliminar">
-
-            <input type="text" id="fNomeEliminar" placeholder="Nome">
-
-            <select id="fTipoEliminar">
-                <option value="">Todos os tipos</option>
-                <option value="login">Login</option>
-                <option value="logout">Logout</option>
-                <option value="pausa1">Pausa1</option>
-                <option value="pausa2">Pausa2</option>
-                <option value="refeicao">Refeição</option>
-            </select>
-
-            <button onclick="carregarEliminarRegistos()">
-                <i class="fa fa-search"></i> Pesquisar
-            </button>
-
-            <button onclick="carregarEliminarRegistos()">
-                <i class="fa fa-rotate-right"></i> Atualizar
-            </button>
-
-        </div>
-
-        <table id="tblEliminarRegistos" style="width:100%;border-collapse:collapse;">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>User</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
-                    <th>Início</th>
-                    <th>Fim</th>
-                    <th>Duração</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-
-            <tbody></tbody>
-
-        </table>
-
-    </div>
-
-</div>
-
-
 
 <div id="dadosMes" style="display:none;padding:25px;">
 
@@ -1412,7 +1354,6 @@ function mostrarPlaneamento(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1497,7 +1438,6 @@ function mostrarPlataformas(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1507,72 +1447,6 @@ function mostrarPlataformas(){
 
 }
 
-
-async function carregarEliminarRegistos(){
-
-    let url = `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=id,data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`;
-
-    const data = document.getElementById("fDataEliminar").value;
-    const nome = document.getElementById("fNomeEliminar").value;
-    const tipo = document.getElementById("fTipoEliminar").value;
-
-
-    if(data){
-        url += `&data=eq.${data}`;
-    }
-
-    if(nome){
-        url += `&nome=ilike.*${nome}*`;
-    }
-
-    if(tipo){
-        url += `&tipo=eq.${tipo}`;
-    }
-
-
-    const resposta = await fetch(url,{
-        headers:{
-            apikey:SUPABASE_API_KEY,
-            Authorization:`Bearer ${SUPABASE_API_KEY}`
-        }
-    });
-
-
-    const dados = await resposta.json();
-console.log("DADOS DOS ALERTAS:", dados);
-
-    const tbody = document.querySelector("#tblEliminarRegistos tbody");
-
-    tbody.innerHTML="";
-
-
-    dados.forEach(r=>{
-
-        tbody.innerHTML += `
-
-        <tr>
-
-            <td>${r.data ?? ""}</td>
-            <td>${r.user ?? ""}</td>
-            <td>${r.nome ?? ""}</td>
-            <td>${r.tipo ?? ""}</td>
-            <td>${r.inicio ? r.inicio.replace("T"," ").substring(0,19) : ""}</td>
-            <td>${r.fim ? r.fim.replace("T"," ").substring(0,19) : ""}</td>
-            <td>${r.duracao ?? ""}</td>
-
-            <td>
-                <button onclick="eliminarRegisto(${r.id})">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </td>
-
-        </tr>
-
-        `;
-
-    });
-
-}
 
 async function eliminarRegisto(id){
 
@@ -1597,7 +1471,8 @@ async function eliminarRegisto(id){
 
         alert("Registo eliminado.");
 
-        carregarEliminarRegistos();
+        dadosLoginsBase = null;
+        carregarLogins();
 
     }else{
 
@@ -1735,7 +1610,6 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1760,7 +1634,6 @@ function mostrarAlertas(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1770,32 +1643,6 @@ function mostrarAlertas(){
 
 }
 
-function mostrarEliminarRegistos(){
-
-    // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
-    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
-
-    document.getElementById("dashboard").style.display="none";
-    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
-    document.getElementById("plataformas").style.display="none";
-    document.getElementById("planeamentoMes").style.display="none";
-    document.getElementById("planeamentoDia").style.display="none";
-    document.getElementById("logins").style.display="none";
-    document.getElementById("relatorios").style.display="none";
-    document.getElementById("resumoDia").style.display="none";
-    document.getElementById("relatorioProducao").style.display="none";
-    document.getElementById("relatorioOcupacao").style.display="none";
-    document.getElementById("relatorioTempos").style.display="none";
-    document.getElementById("alertas").style.display="none";
-    document.getElementById("forcarRegistos").style.display="none";
-    
-    if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
-
-    document.getElementById("eliminarRegistos").style.display="block";
-
-    carregarEliminarRegistos();
-
-}
 function abrirRelatorioOcupacao(){
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
@@ -1835,7 +1682,6 @@ function mostrarLogins(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1845,7 +1691,7 @@ function mostrarLogins(){
     // quando o utilizador aplicar pelo menos um filtro.
     const tbody = document.querySelector("#tblLogins tbody");
     if(tbody && !tbody.dataset.inicializado){
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#777;">
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#777;">
             <i class="fa fa-filter"></i> Aplique pelo menos um filtro e clique em Pesquisar.
         </td></tr>`;
         tbody.dataset.inicializado = "1";
@@ -2274,7 +2120,6 @@ function mostrarPlaneamentoDia(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -3347,7 +3192,6 @@ function mostrarDashboard(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
         
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -3374,7 +3218,6 @@ function mostrarRelatorios(){
     document.getElementById("relatorioTempos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
-    document.getElementById("eliminarRegistos").style.display="none";
         
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -3580,7 +3423,7 @@ async function obterDadosLogins(){
     }
 
     const resposta = await fetch(
-        `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`,
+        `${SUPABASE_URL}/rest/v1/BPO_registosNSS?select=id,data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.desc`,
         {
             headers:{
                 apikey:SUPABASE_API_KEY,
@@ -3612,7 +3455,7 @@ async function carregarLogins(){
         // A consulta só é feita quando pelo menos um filtro foi preenchido.
         if(!data && !tipo && !user && !nome){
             const tbody = document.querySelector("#tblLogins tbody");
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:30px;color:#777;">
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:30px;color:#777;">
                 <i class="fa fa-filter"></i> Aplique pelo menos um filtro e clique em Pesquisar.
             </td></tr>`;
             return;
@@ -3672,7 +3515,7 @@ async function carregarLogins(){
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align:center;padding:20px;color:#777;">
+                    <td colspan="8" style="text-align:center;padding:20px;color:#777;">
                         Não foram encontrados registos para os filtros selecionados.
                     </td>
                 </tr>
@@ -3692,6 +3535,11 @@ async function carregarLogins(){
                     <td>${formatarHora(registo.inicio)}</td>
                     <td>${formatarHora(registo.fim)}</td>
                     <td>${formatarDuracao(registo.duracao)}</td>
+                    <td>
+                        <button type="button" onclick="eliminarRegisto(${registo.id})" title="Eliminar registo" style="padding:6px 10px;font-size:12px;">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </td>
                 </tr>
             `;
         });
@@ -5501,3 +5349,4 @@ if(
 
 }
         </script></body></html>
+
