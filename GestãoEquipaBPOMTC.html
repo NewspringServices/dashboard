@@ -1128,6 +1128,9 @@ canvas{
                 <label>Área</label><br>
                 <select id="fAreaDadosMes" onchange="carregarDadosMes()">
                     <option value="">Todas as áreas</option>
+                    <option value="Reembolsos - Grupo/Corporate">Reembolsos - Grupo/Corporate</option>
+                    <option value="Reembolsos - Individuais/Standard">Reembolsos - Individuais/Standard</option>
+                    <option value="Lote Pendente">Lote Pendente</option>
                 </select>
             </div>
 
@@ -2411,7 +2414,12 @@ async function carregarDadosMes(){
 
 function limparFiltrosDadosMes(){
 
+    // Limpar Área
     document.getElementById("fAreaDadosMes").value = "";
+
+    // Limpar Dia (opcional)
+    const inputData = document.getElementById("fDataDadosMes");
+    if(inputData) inputData.value = "";
 
     carregarDadosMes();
 
