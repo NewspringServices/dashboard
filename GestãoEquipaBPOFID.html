@@ -1,3 +1,4 @@
+
 <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -484,6 +485,12 @@ canvas{
             <div class="card" onclick="abrirListaDashboard('ausencias')" style="cursor:pointer;" title="Clique para ver a lista">
                 <h3>Ausências</h3>
                 <h1 id="cardSemPresenca">0</h1>
+                <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
+            </div>
+
+            <div class="card" onclick="abrirListaDashboard('offline')" style="cursor:pointer;" title="Clique para ver a lista">
+                <h3>Offline</h3>
+                <h1 id="cardOffline">0</h1>
                 <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
             </div>
         </div>
@@ -2546,10 +2553,19 @@ async function carregarCardsDashboard(){
     const pessoasOperacionais = Object.values(ultimoEstado)
         .filter(r => r.tipo.includes("login"));
 
+    const pessoasOffline = Object.values(ultimoEstado)
+        .filter(r => r.tipo.includes("logout"));
+
     const operacionais = pessoasOperacionais.length;
+    const offline = pessoasOffline.length;
 
     // Guardar as listas para os cards.
     window.listaDashboardOperacionais = pessoasOperacionais
+        .map(r => r.nome || r.user)
+        .filter(Boolean)
+        .sort((a,b) => a.localeCompare(b, "pt"));
+
+    window.listaDashboardOffline = pessoasOffline
         .map(r => r.nome || r.user)
         .filter(Boolean)
         .sort((a,b) => a.localeCompare(b, "pt"));
@@ -2623,6 +2639,7 @@ async function carregarCardsDashboard(){
 
     document.getElementById("cardOperacionais").innerText = operacionais;
     document.getElementById("cardSemPresenca").innerText = semPresenca;
+    document.getElementById("cardOffline").innerText = offline;
 }
 
 
@@ -2644,6 +2661,9 @@ function abrirListaDashboard(tipo){
     if(tipo === "operacionais"){
         titulo.innerHTML = '<i class="fa fa-users"></i> Operacionais';
         lista = window.listaDashboardOperacionais || [];
+    }else if(tipo === "offline"){
+        titulo.innerHTML = '<i class="fa fa-user-clock"></i> Offline';
+        lista = window.listaDashboardOffline || [];
     }else{
         titulo.innerHTML = '<i class="fa fa-user-clock"></i> Ausências';
         lista = window.listaDashboardAusencias || [];
