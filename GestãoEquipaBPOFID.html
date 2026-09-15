@@ -475,14 +475,16 @@ canvas{
     <div id="dashboard">
 
         <div class="cards">
-            <div class="card">
+            <div class="card" onclick="abrirListaDashboard('operacionais')" style="cursor:pointer;" title="Clique para ver a lista">
                 <h3>Operacionais</h3>
                 <h1 id="cardOperacionais">0</h1>
+                <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
             </div>
 
-            <div class="card">
+            <div class="card" onclick="abrirListaDashboard('ausencias')" style="cursor:pointer;" title="Clique para ver a lista">
                 <h3>Ausências</h3>
                 <h1 id="cardSemPresenca">0</h1>
+                <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
             </div>
         </div>
 
@@ -524,6 +526,22 @@ canvas{
     </div>
 
 
+
+<!-- MODAL LISTAS DASHBOARD -->
+    <div id="modalListaDashboard"
+         onclick="if(event.target===this) fecharListaDashboard()"
+         style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:white;width:min(420px,100%);max-height:80vh;border-radius:16px;box-shadow:0 15px 45px rgba(0,0,0,.22);overflow:hidden;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #eee;">
+                <h3 id="tituloModalListaDashboard" style="margin:0;color:#2E7D32;">Lista</h3>
+                <button type="button" onclick="fecharListaDashboard()"
+                        style="background:none;color:#555;font-size:22px;padding:2px 8px;box-shadow:none;transform:none;">
+                    <i class="fa fa-xmark"></i>
+                </button>
+            </div>
+            <div id="conteudoModalListaDashboard" style="padding:18px 20px;max-height:60vh;overflow-y:auto;"></div>
+        </div>
+    </div>
 
 <div id="plataformas" style="display:none;padding:25px;">
 
@@ -2441,7 +2459,8 @@ async function carregarCardsDashboard(){
         ),
 
         fetch(
-`${SUPABASE_URL}/rest/v1/bpo_resumo_producao?data=eq.${hoje}&select=tarefafinalizada,total_documentos,total_tarefas`,            {
+            `${SUPABASE_URL}/rest/v1/bpo_resumo_producao?data=eq.${hoje}&select=tarefafinalizada,total_documentos,total_tarefas`,
+            {
                 headers:{
                     apikey:SUPABASE_API_KEY,
                     Authorization:`Bearer ${SUPABASE_API_KEY}`
@@ -2450,7 +2469,7 @@ async function carregarCardsDashboard(){
         ),
 
         fetch(
-           `${SUPABASE_URL}/rest/v1/planeamento?data=eq.${hoje}&select=user,nome,estado`,
+            `${SUPABASE_URL}/rest/v1/planeamento?data=eq.${hoje}&select=user,nome,estado`,
             {
                 headers:{
                     apikey:SUPABASE_API_KEY,
@@ -2467,69 +2486,78 @@ async function carregarCardsDashboard(){
 
     guardarProducaoDia(producao, hoje);
 
-    // SEM PRESENÇA
-const usersTrabalham = new Set(
-    planeamento
-        .filter(p => (p.estado || "").toLowerCase().includes("trabalha"))
-        .map(p => (p.user || "").trim().toLowerCase())
+    // ----------------------------
+    // AUSÊNCIAS: PLANEADOS PARA TRABALHAR SEM LOGIN/LOGOUT
+    // ----------------------------
+
+    const pessoasQueTrabalham = new Map();
+
+    planeamento.forEach(p => {
+        const estado = (p.estado || "").toLowerCase().trim();
+        const user = (p.user || "").trim().toLowerCase();
+
+        if(estado.includes("trabalha") && user){
+            pessoasQueTrabalham.set(user, {
+                user: p.user,
+                nome: p.nome || p.user
+            });
+        }
+    });
+
+    const usersComRegisto = new Set(
+        registos
+            .filter(r => {
+                const tipo = (r.tipo || "").toLowerCase();
+                return tipo.includes("login") || tipo.includes("logout");
+            })
+            .map(r => (r.user || "").trim().toLowerCase())
+            .filter(Boolean)
+    );
+
+    const pessoasSemPresenca = [...pessoasQueTrabalham.values()]
+        .filter(p => !usersComRegisto.has(p.user.trim().toLowerCase()));
+
+    const semPresenca = pessoasSemPresenca.length;
+
+    // ----------------------------
+    // OPERACIONAIS: ÚLTIMO EVENTO = LOGIN
+    // ----------------------------
+
+    const ultimoEstado = {};
+
+    registos.forEach(r => {
+
+        if(!r.user || !r.inicio)
+            return;
+
+        const tipo = (r.tipo || "").toLowerCase();
+
+        if(tipo.includes("login") || tipo.includes("logout")){
+            ultimoEstado[r.user] = {
+                user: r.user,
+                nome: r.nome || r.user,
+                tipo: tipo,
+                inicio: r.inicio
+            };
+        }
+
+    });
+
+    const pessoasOperacionais = Object.values(ultimoEstado)
+        .filter(r => r.tipo.includes("login"));
+
+    const operacionais = pessoasOperacionais.length;
+
+    // Guardar as listas para os cards.
+    window.listaDashboardOperacionais = pessoasOperacionais
+        .map(r => r.nome || r.user)
         .filter(Boolean)
-);
+        .sort((a,b) => a.localeCompare(b, "pt"));
 
-const usersComRegisto = new Set(
-    registos
-        .filter(r => {
-            const tipo = (r.tipo || "").toLowerCase();
-            return tipo.includes("login") || tipo.includes("logout");
-        })
-        .map(r => (r.user || "").trim().toLowerCase())
+    window.listaDashboardAusencias = pessoasSemPresenca
+        .map(p => p.nome || p.user)
         .filter(Boolean)
-);
-
-const semPresenca = [...usersTrabalham]
-    .filter(user => !usersComRegisto.has(user))
-    .length;
-// ----------------------------
-// OPERACIONAIS E LOGOUTS
-// ----------------------------
-
-const ultimoEstado = {};
-
-registos.forEach(r => {
-
-    if(!r.user || !r.inicio)
-        return;
-
-    const tipo = (r.tipo || "").toLowerCase();
-
-    // Guardamos sempre o último evento de cada user
-    if(
-        tipo.includes("login") ||
-        tipo.includes("logout")
-    ){
-        ultimoEstado[r.user] = {
-            tipo: tipo,
-            inicio: r.inicio
-        };
-    }
-
-});
-
-let operacionais = 0;
-let logouts = 0;
-
-Object.values(ultimoEstado).forEach(r => {
-
-    // Último evento foi Login
-    if(r.tipo.includes("login")){
-        operacionais++;
-    }
-
-    // Último evento foi Logout
-    else if(r.tipo.includes("logout")){
-        logouts++;
-    }
-
-});
+        .sort((a,b) => a.localeCompare(b, "pt"));
 
     // ----------------------------
     // PRODUÇÃO
@@ -2553,60 +2581,108 @@ Object.values(ultimoEstado).forEach(r => {
 
     });
 
-   // ----------------------------
-
-
     // ----------------------------
     // ALERTAS
     // ----------------------------
-// ----------------------------
-// ALERTAS = TRABALHA MAS SEM LOGIN NEM LOGOUT
-// ----------------------------
 
-const nomesTrabalham = new Set();
+    const nomesTrabalham = new Set();
 
-planeamento.forEach(r => {
+    planeamento.forEach(r => {
 
-    const estado = (r.estado || "").toLowerCase().trim();
+        const estado = (r.estado || "").toLowerCase().trim();
 
-    if(estado.includes("trabalha") && r.nome){
-        nomesTrabalham.add(r.nome.trim());
-    }
+        if(estado.includes("trabalha") && r.nome){
+            nomesTrabalham.add(r.nome.trim());
+        }
 
-});
+    });
 
-const nomesComPresenca = new Set();
+    const nomesComPresenca = new Set();
 
-registos.forEach(r => {
+    registos.forEach(r => {
 
-    if(!r.nome)
-        return;
+        if(!r.nome)
+            return;
 
-    const tipo = (r.tipo || "").toLowerCase();
+        const tipo = (r.tipo || "").toLowerCase();
 
-    if(
-        tipo.includes("login") ||
-        tipo.includes("logout")
-    ){
-        nomesComPresenca.add(r.nome.trim());
-    }
+        if(tipo.includes("login") || tipo.includes("logout")){
+            nomesComPresenca.add(r.nome.trim());
+        }
 
-});
+    });
 
-const pessoasSemPresenca = [...nomesTrabalham]
-    .filter(nome => !nomesComPresenca.has(nome));
+    const pessoasSemPresencaPorNome = [...nomesTrabalham]
+        .filter(nome => !nomesComPresenca.has(nome));
 
-const alertas = pessoasSemPresenca.length;
+    const alertas = pessoasSemPresencaPorNome.length;
 
+    // ----------------------------
+    // ATUALIZAR CARDS
+    // ----------------------------
 
-// ----------------------------
-// ATUALIZAR CARDS
-// ----------------------------
-
-document.getElementById("cardOperacionais").innerText = operacionais;
-document.getElementById("cardSemPresenca").innerText = semPresenca;
+    document.getElementById("cardOperacionais").innerText = operacionais;
+    document.getElementById("cardSemPresenca").innerText = semPresenca;
 }
 
+
+// ----------------------------
+// LISTAS DOS CARDS DO DASHBOARD
+// ----------------------------
+
+function abrirListaDashboard(tipo){
+
+    const modal = document.getElementById("modalListaDashboard");
+    const titulo = document.getElementById("tituloModalListaDashboard");
+    const conteudo = document.getElementById("conteudoModalListaDashboard");
+
+    if(!modal || !titulo || !conteudo)
+        return;
+
+    let lista = [];
+
+    if(tipo === "operacionais"){
+        titulo.innerHTML = '<i class="fa fa-users"></i> Operacionais';
+        lista = window.listaDashboardOperacionais || [];
+    }else{
+        titulo.innerHTML = '<i class="fa fa-user-clock"></i> Ausências';
+        lista = window.listaDashboardAusencias || [];
+    }
+
+    if(!lista.length){
+        conteudo.innerHTML = `
+            <div style="text-align:center;padding:25px 10px;color:#777;">
+                <i class="fa fa-circle-check" style="font-size:28px;margin-bottom:10px;"></i>
+                <div>Nenhum nome para apresentar.</div>
+            </div>
+        `;
+    }else{
+        conteudo.innerHTML = lista.map((nome, index) => `
+            <div style="display:flex;align-items:center;gap:12px;padding:11px 5px;border-bottom:1px solid #eee;font-size:14px;">
+                <span style="width:28px;height:28px;border-radius:50%;background:#E8F5E9;color:#2E7D32;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none;">
+                    ${index + 1}
+                </span>
+                <span>${escaparHTML(nome)}</span>
+            </div>
+        `).join("");
+    }
+
+    modal.style.display = "flex";
+}
+
+function fecharListaDashboard(){
+
+    const modal = document.getElementById("modalListaDashboard");
+
+    if(modal)
+        modal.style.display = "none";
+}
+
+document.addEventListener("keydown", function(e){
+    if(e.key === "Escape"){
+        fecharListaDashboard();
+    }
+});
 
 async function carregarRelatorioTempos(){
 
