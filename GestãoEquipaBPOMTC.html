@@ -486,6 +486,12 @@ canvas{
                 <h1 id="cardSemPresenca">0</h1>
                 <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
             </div>
+
+            <div class="card" onclick="abrirListaDashboard('offline')" style="cursor:pointer;" title="Clique para ver a lista">
+                <h3>Offline</h3>
+                <h1 id="cardOffline">0</h1>
+                <div style="font-size:11px;color:#777;margin-top:8px;">Clique para ver a lista</div>
+            </div>
         </div>
 
         <div class="content">
@@ -2602,16 +2608,18 @@ registos.forEach(r => {
         tipo.includes("login") ||
         tipo.includes("logout")
     ){
-        ultimoEstado[r.user] = {
+        const userKey = r.user.trim().toLowerCase();
+        ultimoEstado[userKey] = {
             tipo: tipo,
-            inicio: r.inicio
+            inicio: r.inicio,
+            nome: (r.nome || '').trim()
         };
     }
 
 });
 
 let operacionais = 0;
-let logouts = 0;
+let offline = 0;
 
 Object.values(ultimoEstado).forEach(r => {
 
@@ -2622,7 +2630,7 @@ Object.values(ultimoEstado).forEach(r => {
 
     // Último evento foi Logout
     else if(r.tipo.includes("logout")){
-        logouts++;
+        offline++;
     }
 
 });
@@ -2704,12 +2712,18 @@ planeamento.forEach(p => {
 
 window.listaDashboardOperacionais = Object.keys(ultimoEstado)
     .filter(user => ultimoEstado[user].tipo.includes("login"))
-    .map(user => mapaNomesPorUser[user] || user)
+    .map(user => ultimoEstado[user].nome || mapaNomesPorUser[user] || user)
     .filter(Boolean)
     .sort((a,b) => a.localeCompare(b, "pt"));
 
 window.listaDashboardAusencias = [...nomesTrabalham]
     .filter(nome => !nomesComPresenca.has(nome))
+    .sort((a,b) => a.localeCompare(b, "pt"));
+
+window.listaDashboardOffline = Object.keys(ultimoEstado)
+    .filter(user => ultimoEstado[user].tipo.includes("logout"))
+    .map(user => ultimoEstado[user].nome || mapaNomesPorUser[user] || user)
+    .filter(Boolean)
     .sort((a,b) => a.localeCompare(b, "pt"));
 
 // ----------------------------
@@ -2718,6 +2732,7 @@ window.listaDashboardAusencias = [...nomesTrabalham]
 
 document.getElementById("cardOperacionais").innerText = operacionais;
 document.getElementById("cardSemPresenca").innerText = semPresenca;
+    document.getElementById("cardOffline").innerText = offline;
 }
 
 
@@ -2731,11 +2746,15 @@ function abrirListaDashboard(tipo){
 
     const lista = tipo === "operacionais"
         ? (window.listaDashboardOperacionais || [])
-        : (window.listaDashboardAusencias || []);
+        : tipo === "offline"
+            ? (window.listaDashboardOffline || [])
+            : (window.listaDashboardAusencias || []);
 
     titulo.innerText = tipo === "operacionais"
         ? "Operacionais"
-        : "Ausências";
+        : tipo === "offline"
+            ? "Offline"
+            : "Ausências";
 
     if(!lista.length){
         conteudo.innerHTML = `
