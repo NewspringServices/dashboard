@@ -475,6 +475,13 @@ canvas{
 
     <div id="dashboard">
 
+        <div style="display:flex;justify-content:flex-end;padding:0 25px 5px;">
+            <button type="button" onclick="atualizarPresencasDashboard()" id="btnAtualizarPresencas"
+                    style="padding:9px 15px;font-size:13px;">
+                <i class="fa fa-sync"></i> Atualizar presenças
+            </button>
+        </div>
+
         <div class="cards">
             <div class="card" onclick="abrirListaDashboard('operacionais')" style="cursor:pointer;" title="Clique para ver a lista">
                 <h3>Operacionais</h3>
@@ -737,7 +744,7 @@ canvas{
         <i class="fa fa-eraser"></i> Limpar
     </button>
 
-    <button onclick="carregarLogins()">
+    <button type="button" onclick="atualizarLogins()">
         <i class="fa fa-rotate-right"></i> Atualizar
     </button>
 <button onclick="exportarLoginsExcel()">
@@ -761,6 +768,57 @@ canvas{
             <tbody></tbody>
         </table>
 
+    </div>
+</div>
+
+<!-- MODAL EDITAR REGISTO DE LOGIN -->
+<div id="modalEditarLogin"
+     onclick="if(event.target===this) fecharEditarLogin()"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;width:min(520px,100%);border-radius:16px;box-shadow:0 15px 45px rgba(0,0,0,.22);overflow:hidden;">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #eee;">
+            <h3 style="margin:0;color:#2E7D32;"><i class="fa fa-pen-to-square"></i> Editar registo</h3>
+            <button type="button" onclick="fecharEditarLogin()"
+                    style="background:none;color:#555;font-size:22px;padding:2px 8px;box-shadow:none;transform:none;">
+                <i class="fa fa-xmark"></i>
+            </button>
+        </div>
+
+        <div style="padding:20px;">
+            <div id="editarLoginInfo"
+                 style="background:#f7f9f7;border:1px solid #e5e8e5;border-radius:10px;padding:12px;margin-bottom:18px;font-size:13px;">
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+                <div>
+                    <label><strong>Início</strong></label><br>
+                    <input type="time" id="editarLoginInicio" step="1" style="width:100%;">
+                </div>
+
+                <div>
+                    <label><strong>Fim</strong></label><br>
+                    <input type="time" id="editarLoginFim" step="1" style="width:100%;">
+                </div>
+
+                <div style="grid-column:1/-1;">
+                    <label><strong>Duração</strong> <span style="font-size:11px;color:#777;">(HH:MM:SS)</span></label><br>
+                    <input type="text" id="editarLoginDuracao" placeholder="00:15:00"
+                           maxlength="8" style="width:100%;">
+                </div>
+            </div>
+
+            <div id="msgEditarLogin" style="margin-top:14px;min-height:20px;font-size:13px;font-weight:600;"></div>
+
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:15px;">
+                <button type="button" onclick="fecharEditarLogin()"
+                        style="background:#eee;color:#444;">
+                    Cancelar
+                </button>
+                <button type="button" onclick="guardarEditarLogin()">
+                    <i class="fa fa-floppy-disk"></i> Guardar alterações
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -2644,6 +2702,36 @@ async function carregarCardsDashboard(){
 
 
 // ----------------------------
+// ATUALIZAR APENAS PRESENÇAS
+// ----------------------------
+
+async function atualizarPresencasDashboard(){
+
+    const btn = document.getElementById("btnAtualizarPresencas");
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    try{
+        // Recarrega os dados do Supabase e atualiza apenas:
+        // Operacionais, Ausências e Offline.
+        await carregarCardsDashboard();
+
+    }catch(erro){
+        console.error("Erro ao atualizar presenças:", erro);
+        alert("Não foi possível atualizar as presenças.");
+    }finally{
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-sync"></i> Atualizar presenças';
+        }
+    }
+}
+
+
+// ----------------------------
 // LISTAS DOS CARDS DO DASHBOARD
 // ----------------------------
 
@@ -3558,6 +3646,276 @@ async function obterDadosLogins(){
     return dadosLoginsBase;
 }
 
+async function atualizarLogins(){
+
+    const btn = document.querySelector('#logins button[onclick="atualizarLogins()"]');
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    try{
+        // Limpa a cache para obrigar a nova leitura do Supabase.
+        dadosLoginsBase = null;
+        await carregarLogins();
+    }catch(e){
+        console.error("Erro ao atualizar Logins:", e);
+        alert("Ocorreu um erro ao atualizar os Logins.\\n\\n" + e.message);
+    }finally{
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-rotate-right"></i> Atualizar';
+        }
+    }
+}
+
+let registoLoginEmEdicao = null;
+
+function formatarHoraInput(dataHora){
+    if(!dataHora) return "";
+    const texto = String(dataHora);
+    if(texto.includes("T")) return texto.split("T")[1].substring(0,8);
+    if(texto.length >= 8) return texto.substring(0,8);
+    return texto;
+}
+
+function horasParaDuracaoTexto(horas){
+    if(horas == null || horas === "") return "";
+    const totalSegundos = Math.max(0, Math.round(Number(horas) * 3600));
+    const h = String(Math.floor(totalSegundos / 3600)).padStart(2,"0");
+    const m = String(Math.floor((totalSegundos % 3600) / 60)).padStart(2,"0");
+    const sec = String(totalSegundos % 60).padStart(2,"0");
+    return `${h}:${m}:${sec}`;
+}
+
+function duracaoTextoParaHoras(texto){
+    if(!texto) return null;
+
+    const valor = String(texto).trim();
+
+    // Também aceita duração em horas decimais.
+    if(/^\d+([.,]\d+)?$/.test(valor)){
+        return Number(valor.replace(",","."));
+    }
+
+    const partes = valor.split(":");
+    if(partes.length !== 3) return NaN;
+
+    const h = Number(partes[0]);
+    const m = Number(partes[1]);
+    const s = Number(partes[2]);
+
+    if(!Number.isFinite(h) || !Number.isFinite(m) || !Number.isFinite(s) ||
+       m < 0 || m > 59 || s < 0 || s > 59 || h < 0){
+        return NaN;
+    }
+
+    return h + (m / 60) + (s / 3600);
+}
+
+function horaParaSegundos(hora){
+    if(!hora) return null;
+    const p = hora.split(":").map(Number);
+    if(p.length < 2 || p.some(n => !Number.isFinite(n))) return null;
+    return (p[0] * 3600) + (p[1] * 60) + (p[2] || 0);
+}
+
+function segundosParaHora(total){
+    total = Math.max(0, Math.round(total));
+    const h = String(Math.floor(total / 3600) % 24).padStart(2,"0");
+    const m = String(Math.floor((total % 3600) / 60)).padStart(2,"0");
+    const s = String(total % 60).padStart(2,"0");
+    return `${h}:${m}:${s}`;
+}
+
+function atualizarDuracaoPeloInicioFim(){
+    const inicio = document.getElementById("editarLoginInicio").value;
+    const fim = document.getElementById("editarLoginFim").value;
+    const campoDuracao = document.getElementById("editarLoginDuracao");
+
+    const ini = horaParaSegundos(inicio);
+    const fin = horaParaSegundos(fim);
+
+    if(ini == null || fin == null) return;
+
+    // Permite atravessar a meia-noite.
+    let segundos = fin - ini;
+    if(segundos < 0) segundos += 24 * 3600;
+
+    campoDuracao.value = segundosParaHora(segundos);
+}
+
+function atualizarFimPelaDuracao(){
+    const inicio = document.getElementById("editarLoginInicio").value;
+    const duracaoTexto = document.getElementById("editarLoginDuracao").value;
+
+    const ini = horaParaSegundos(inicio);
+    const horas = duracaoTextoParaHoras(duracaoTexto);
+
+    if(ini == null || horas == null || !Number.isFinite(horas) || horas < 0) return;
+
+    const segundos = Math.round(horas * 3600);
+    document.getElementById("editarLoginFim").value =
+        segundosParaHora(ini + segundos);
+}
+
+function abrirEditarLogin(id){
+    const registo = (dadosLoginsBase || []).find(r => Number(r.id) === Number(id));
+
+    if(!registo){
+        alert("Não foi possível encontrar o registo para editar.");
+        return;
+    }
+
+    registoLoginEmEdicao = registo;
+
+    document.getElementById("editarLoginInfo").innerHTML = `
+        <strong>${escaparHTML(registo.nome || "")}</strong>
+        <span style="color:#777;"> · ${escaparHTML(registo.user || "")}</span><br>
+        <span style="color:#666;">${escaparHTML(registo.data || "")} · ${escaparHTML(registo.tipo || "")}</span>
+    `;
+
+    document.getElementById("editarLoginInicio").value = formatarHoraInput(registo.inicio);
+    document.getElementById("editarLoginFim").value = formatarHoraInput(registo.fim);
+    document.getElementById("editarLoginDuracao").value = horasParaDuracaoTexto(registo.duracao);
+
+    document.getElementById("msgEditarLogin").innerText = "";
+    document.getElementById("msgEditarLogin").style.color = "";
+
+    document.getElementById("modalEditarLogin").style.display = "flex";
+}
+
+function fecharEditarLogin(){
+    document.getElementById("modalEditarLogin").style.display = "none";
+    registoLoginEmEdicao = null;
+}
+
+async function guardarEditarLogin(){
+    if(!registoLoginEmEdicao) return;
+
+    const inicioHora = document.getElementById("editarLoginInicio").value;
+    const fimHora = document.getElementById("editarLoginFim").value;
+    const duracaoTexto = document.getElementById("editarLoginDuracao").value.trim();
+    const msg = document.getElementById("msgEditarLogin");
+    const btn = document.querySelector('#modalEditarLogin button[onclick="guardarEditarLogin()"]');
+
+    if(!inicioHora){
+        msg.style.color = "#c62828";
+        msg.innerText = "Preenche a hora de início.";
+        return;
+    }
+
+    if(duracaoTexto && !Number.isFinite(duracaoTextoParaHoras(duracaoTexto))){
+        msg.style.color = "#c62828";
+        msg.innerText = "A duração deve estar no formato HH:MM:SS.";
+        return;
+    }
+
+    let duracaoHoras = duracaoTexto
+        ? duracaoTextoParaHoras(duracaoTexto)
+        : null;
+
+    // Se houver início e fim, a duração fica coerente com os horários.
+    if(inicioHora && fimHora){
+        let segundos = horaParaSegundos(fimHora) - horaParaSegundos(inicioHora);
+        if(segundos < 0) segundos += 24 * 3600;
+        duracaoHoras = segundos / 3600;
+    }
+
+    const inicio = `${registoLoginEmEdicao.data}T${inicioHora}`;
+    const fim = fimHora ? `${registoLoginEmEdicao.data}T${fimHora}` : null;
+
+    const payload = {
+        inicio,
+        fim,
+        duracao: duracaoHoras == null ? null : Number(duracaoHoras.toFixed(6))
+    };
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A guardar...';
+    }
+
+    try{
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/BPO_registosNSS?id=eq.${registoLoginEmEdicao.id}`,
+            {
+                method:"PATCH",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json",
+                    "Prefer":"return=representation"
+                },
+                body:JSON.stringify(payload)
+            }
+        );
+
+        const texto = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(texto || "Não foi possível guardar as alterações.");
+        }
+
+        const atualizado = texto ? JSON.parse(texto) : null;
+
+        // Atualiza a cache local para a alteração aparecer imediatamente.
+        const indice = (dadosLoginsBase || []).findIndex(
+            r => Number(r.id) === Number(registoLoginEmEdicao.id)
+        );
+
+        if(indice >= 0){
+            dadosLoginsBase[indice] = {
+                ...dadosLoginsBase[indice],
+                inicio,
+                fim,
+                duracao: payload.duracao
+            };
+
+            if(Array.isArray(atualizado) && atualizado[0]){
+                dadosLoginsBase[indice] = {
+                    ...dadosLoginsBase[indice],
+                    ...atualizado[0]
+                };
+            }
+        }
+
+        msg.style.color = "#2E7D32";
+        msg.innerText = "✔ Alterações guardadas com sucesso.";
+
+        await carregarLogins();
+
+        setTimeout(() => fecharEditarLogin(), 500);
+
+    }catch(e){
+        console.error("Erro ao editar registo:", e);
+        msg.style.color = "#c62828";
+        msg.innerText = "Erro ao guardar: " + e.message;
+    }finally{
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-floppy-disk"></i> Guardar alterações';
+        }
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const inicio = document.getElementById("editarLoginInicio");
+    const fim = document.getElementById("editarLoginFim");
+    const duracao = document.getElementById("editarLoginDuracao");
+
+    if(inicio && fim){
+        inicio.addEventListener("change", atualizarDuracaoPeloInicioFim);
+        fim.addEventListener("change", atualizarDuracaoPeloInicioFim);
+    }
+
+    if(duracao){
+        duracao.addEventListener("change", atualizarFimPelaDuracao);
+        duracao.addEventListener("blur", atualizarFimPelaDuracao);
+    }
+});
+
 async function carregarLogins(){
 
     try{
@@ -3651,7 +4009,12 @@ async function carregarLogins(){
                     <td>${formatarHora(registo.fim)}</td>
                     <td>${formatarDuracao(registo.duracao)}</td>
                     <td>
-                        <button type="button" onclick="eliminarRegisto(${registo.id})" title="Eliminar registo" style="padding:6px 10px;font-size:12px;">
+                        <button type="button" onclick="abrirEditarLogin(${registo.id})" title="Editar horários e duração"
+                                style="padding:6px 10px;font-size:12px;">
+                            <i class="fa fa-pen-to-square"></i>
+                        </button>
+                        <button type="button" onclick="eliminarRegisto(${registo.id})" title="Eliminar registo"
+                                style="padding:6px 10px;font-size:12px;background:#c62828;">
                             <i class="fa fa-trash"></i>
                         </button>
                     </td>
