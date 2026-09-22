@@ -474,6 +474,13 @@ canvas{
 
     <div id="dashboard">
 
+        <div style="display:flex;justify-content:flex-end;padding:0 25px 5px;">
+            <button type="button" onclick="atualizarOperacionais()" id="btnAtualizarOperacionais"
+                    style="padding:9px 15px;font-size:13px;">
+                <i class="fa fa-sync"></i> Atualizar operacionais
+            </button>
+        </div>
+
         <div class="cards">
             <div class="card" onclick="abrirListaDashboard('operacionais')" style="cursor:pointer;" title="Clique para ver a lista">
                 <h3>Operacionais</h3>
@@ -735,7 +742,7 @@ canvas{
         <i class="fa fa-eraser"></i> Limpar
     </button>
 
-    <button onclick="carregarLogins()">
+    <button type="button" onclick="atualizarLogins()">
         <i class="fa fa-rotate-right"></i> Atualizar
     </button>
 <button onclick="exportarLoginsExcel()">
@@ -1307,6 +1314,28 @@ canvas{
 </div>
 
 
+
+<div id="modalEditarLogin" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;width:min(520px,100%);border-radius:16px;box-shadow:0 15px 45px rgba(0,0,0,.22);overflow:hidden;">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:1px solid #eee;">
+      <h3 style="margin:0;color:#2E7D32;"><i class="fa fa-pen-to-square"></i> Editar Login</h3>
+      <button type="button" onclick="fecharEditarLogin()" style="background:none;color:#555;font-size:22px;padding:2px 8px;box-shadow:none;transform:none;"><i class="fa fa-xmark"></i></button>
+    </div>
+    <div style="padding:20px;">
+      <div id="editarLoginInfo" style="font-size:13px;color:#666;margin-bottom:18px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+        <div id="campoEditarLoginInicio"><label>Início</label><br><input type="time" id="editarLoginInicio" step="1" style="width:100%;margin-top:6px;"></div>
+        <div id="campoEditarLoginFim"><label>Fim</label><br><input type="time" id="editarLoginFim" step="1" style="width:100%;margin-top:6px;"></div>
+      </div>
+      <div id="campoEditarLoginDuracao" style="margin-top:15px;"><label>Duração</label><br><input type="text" id="editarLoginDuracao" maxlength="8" placeholder="00:00:00" style="width:100%;margin-top:6px;"></div>
+      <div id="editarLoginMsg" style="font-size:12px;color:#777;margin-top:8px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px;">
+        <button type="button" onclick="fecharEditarLogin()" style="background:#eee;color:#555;box-shadow:none;">Cancelar</button>
+        <button type="button" id="btnGuardarEditarLogin" onclick="guardarEditarLogin()"><i class="fa fa-floppy-disk"></i> Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 function limparFiltrosPlaneamentoDia(){
     document.getElementById('fDataPlaneamentoDia').value = '';
@@ -2524,6 +2553,125 @@ function mostrarDadosMes(){
     carregarDadosMes();
 }
 
+async function atualizarOperacionais(){
+
+    const btn = document.getElementById("btnAtualizarOperacionais");
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    try{
+
+        const hoje = new Date().toISOString().slice(0,10);
+
+        const [registosReq, planeamentoReq] = await Promise.all([
+
+            fetch(
+                `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?data=eq.${hoje}&select=user,nome,tipo,inicio&order=inicio.asc`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    },
+                    cache:"no-store"
+                }
+            ),
+
+            fetch(
+                `${SUPABASE_URL}/rest/v1/MTCplaneamento?data=eq.${hoje}&select=user,nome,estado`,
+                {
+                    headers:{
+                        apikey:SUPABASE_API_KEY,
+                        Authorization:`Bearer ${SUPABASE_API_KEY}`
+                    },
+                    cache:"no-store"
+                }
+            )
+
+        ]);
+
+        if(!registosReq.ok) throw new Error(await registosReq.text());
+        if(!planeamentoReq.ok) throw new Error(await planeamentoReq.text());
+
+        const registos = await registosReq.json();
+        const planeamento = await planeamentoReq.json();
+
+        const usersTrabalham = new Set(
+            planeamento
+                .filter(p => (p.estado || "").toLowerCase().includes("trabalha"))
+                .map(p => (p.user || "").trim().toLowerCase())
+                .filter(Boolean)
+        );
+
+        const usersComRegisto = new Set(
+            registos
+                .filter(r => {
+                    const tipo = (r.tipo || "").toLowerCase();
+                    return tipo.includes("login") || tipo.includes("logout");
+                })
+                .map(r => (r.user || "").trim().toLowerCase())
+                .filter(Boolean)
+        );
+
+        const semPresenca = [...usersTrabalham]
+            .filter(user => !usersComRegisto.has(user))
+            .length;
+
+        const ultimoEstado = {};
+
+        registos.forEach(r => {
+
+            if(!r.user || !r.inicio) return;
+
+            const tipo = (r.tipo || "").toLowerCase();
+
+            if(tipo.includes("login") || tipo.includes("logout")){
+
+                const userKey = r.user.trim().toLowerCase();
+
+                ultimoEstado[userKey] = {
+                    tipo: tipo,
+                    inicio: r.inicio,
+                    nome: (r.nome || "").trim()
+                };
+
+            }
+
+        });
+
+        const operacionais = Object.values(ultimoEstado)
+            .filter(r => r.tipo.includes("login"))
+            .length;
+
+        const offline = Object.values(ultimoEstado)
+            .filter(r => r.tipo.includes("logout"))
+            .length;
+
+        const cardOperacionais = document.getElementById("cardOperacionais");
+        const cardSemPresenca = document.getElementById("cardSemPresenca");
+        const cardOffline = document.getElementById("cardOffline");
+
+        if(cardOperacionais) cardOperacionais.innerText = operacionais;
+        if(cardSemPresenca) cardSemPresenca.innerText = semPresenca;
+        if(cardOffline) cardOffline.innerText = offline;
+
+    }catch(e){
+
+        console.error("Erro ao atualizar operacionais:", e);
+        alert("Ocorreu um erro ao atualizar os operacionais.\\n\\n" + e.message);
+
+    }finally{
+
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-sync"></i> Atualizar operacionais';
+        }
+
+    }
+}
+
 async function carregarCardsDashboard(){
 
     const hoje = new Date().toISOString().slice(0,10);
@@ -3564,6 +3712,222 @@ async function obterDadosLogins(){
     return dadosLoginsBase;
 }
 
+function formatarHoraInput(valor){
+    if(!valor) return "";
+    const s = String(valor);
+    if(s.includes("T")) return s.split("T")[1].substring(0,8);
+    return s.substring(0,8);
+}
+
+function horaParaSegundos(hora){
+    if(!hora) return null;
+    const p = String(hora).split(":").map(Number);
+    if(p.length < 2 || p.some(Number.isNaN)) return null;
+    return (p[0] || 0) * 3600 + (p[1] || 0) * 60 + (p[2] || 0);
+}
+
+function segundosParaHora(total){
+    total = Math.max(0, Math.round(Number(total) || 0));
+    const h = String(Math.floor(total / 3600)).padStart(2,"0");
+    const m = String(Math.floor((total % 3600) / 60)).padStart(2,"0");
+    const s = String(total % 60).padStart(2,"0");
+    return `${h}:${m}:${s}`;
+}
+
+function duracaoTextoParaSegundos(valor){
+    if(!valor) return null;
+    const p = String(valor).trim().split(":").map(Number);
+    if(p.length !== 3 || p.some(Number.isNaN)) return null;
+    if(p[0] < 0 || p[1] < 0 || p[1] > 59 || p[2] < 0 || p[2] > 59) return null;
+    return p[0] * 3600 + p[1] * 60 + p[2];
+}
+
+function duracaoEmHoras(segundos){
+    return Math.round((Number(segundos) / 3600) * 1000000) / 1000000;
+}
+
+function atualizarDuracaoPeloInicioFim(){
+    const inicio = horaParaSegundos(document.getElementById("editarLoginInicio").value);
+    const fim = horaParaSegundos(document.getElementById("editarLoginFim").value);
+    if(inicio === null || fim === null) return;
+
+    let diferenca = fim - inicio;
+    if(diferenca < 0) diferenca += 24 * 3600;
+    document.getElementById("editarLoginDuracao").value = segundosParaHora(diferenca);
+}
+
+function abrirEditarLogin(id){
+    const registo = (Array.isArray(dadosLoginsBase) ? dadosLoginsBase : []).find(r => Number(r.id) === Number(id));
+    if(!registo){
+        alert("Não foi possível localizar o registo para editar.");
+        return;
+    }
+
+    window.loginEmEdicaoId = Number(id);
+    window.loginEmEdicaoTipo = String(registo.tipo || "").toLowerCase();
+
+    document.getElementById("editarLoginInfo").innerHTML = `<strong>${registo.nome || ""}</strong> · ${registo.data || ""} · ${registo.tipo || ""}`;
+    document.getElementById("editarLoginInicio").value = formatarHoraInput(registo.inicio);
+    document.getElementById("editarLoginFim").value = formatarHoraInput(registo.fim);
+    document.getElementById("editarLoginDuracao").value = registo.duracao == null || registo.duracao === "" ? "" : segundosParaHora(Number(registo.duracao) * 3600);
+
+    const campoInicio = document.getElementById("campoEditarLoginInicio");
+    const campoFim = document.getElementById("campoEditarLoginFim");
+    const campoDuracao = document.getElementById("campoEditarLoginDuracao");
+
+    // Num registo de Login só se altera o início; num Logout só se altera o fim.
+    if(window.loginEmEdicaoTipo === "login"){
+        campoInicio.style.display = "block";
+        campoFim.style.display = "none";
+        campoDuracao.style.display = "none";
+        document.getElementById("editarLoginMsg").textContent = "Altere apenas a hora de Login.";
+    }else if(window.loginEmEdicaoTipo === "logout"){
+        campoInicio.style.display = "none";
+        campoFim.style.display = "block";
+        campoDuracao.style.display = "none";
+        document.getElementById("editarLoginMsg").textContent = "Altere apenas a hora de Logout.";
+    }else{
+        campoInicio.style.display = "block";
+        campoFim.style.display = "block";
+        campoDuracao.style.display = "block";
+        document.getElementById("editarLoginMsg").textContent = "Altere Início/Fim para recalcular a duração, ou ajuste apenas a duração.";
+    }
+
+    document.getElementById("modalEditarLogin").style.display = "flex";
+}
+
+function fecharEditarLogin(){
+    document.getElementById("modalEditarLogin").style.display = "none";
+    window.loginEmEdicaoId = null;
+    window.loginEmEdicaoTipo = null;
+}
+
+async function guardarEditarLogin(){
+    const id = Number(window.loginEmEdicaoId);
+    if(!id) return;
+
+    const registoAtual = (Array.isArray(dadosLoginsBase) ? dadosLoginsBase : []).find(r => Number(r.id) === id) || {};
+    const tipo = String(window.loginEmEdicaoTipo || registoAtual.tipo || "").toLowerCase();
+    let inicio = document.getElementById("editarLoginInicio").value || null;
+    let fim = document.getElementById("editarLoginFim").value || null;
+    let duracaoSegundos = null;
+
+    // Login: alterar apenas o início e manter o fim/duração existentes.
+    if(tipo === "login"){
+        fim = registoAtual.fim || null;
+        inicio = inicio || null;
+        if(!inicio){
+            alert("Preencha a hora de Login.");
+            return;
+        }
+    // Logout: alterar apenas o fim e manter o início/duração existentes.
+    }else if(tipo === "logout"){
+        inicio = registoAtual.inicio || null;
+        fim = fim || null;
+        if(!fim){
+            alert("Preencha a hora de Logout.");
+            return;
+        }
+    }else{
+        const duracaoTexto = document.getElementById("editarLoginDuracao").value.trim();
+        if(inicio && fim){
+            const inicioSeg = horaParaSegundos(inicio);
+            const fimSeg = horaParaSegundos(fim);
+            if(inicioSeg === null || fimSeg === null){
+                alert("Verifique as horas de Início e Fim.");
+                return;
+            }
+            duracaoSegundos = fimSeg - inicioSeg;
+            if(duracaoSegundos < 0) duracaoSegundos += 24 * 3600;
+        }else if(duracaoTexto){
+            duracaoSegundos = duracaoTextoParaSegundos(duracaoTexto);
+            if(duracaoSegundos === null){
+                alert("A duração deve estar no formato HH:MM:SS.");
+                return;
+            }
+        }
+
+        if((inicio || fim) && (!inicio || !fim)){
+            alert("Preencha Início e Fim, ou deixe ambos vazios.");
+            return;
+        }
+    }
+
+    // Para Login/Logout não mexemos na duração existente.
+    if(tipo === "login" || tipo === "logout"){
+        duracaoSegundos = registoAtual.duracao == null || registoAtual.duracao === "" ? null : Number(registoAtual.duracao) * 3600;
+    }
+
+    const payload = {
+        inicio: inicio,
+        fim: fim,
+        duracao: duracaoSegundos === null ? null : duracaoEmHoras(duracaoSegundos)
+    };
+
+    const btn = document.getElementById("btnGuardarEditarLogin");
+    if(btn){ btn.disabled = true; btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A guardar...'; }
+
+    try{
+        const resposta = await fetch(`${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?id=eq.${id}`, {
+            method:"PATCH",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                "Content-Type":"application/json",
+                Prefer:"return=representation"
+            },
+            body:JSON.stringify(payload)
+        });
+
+        const resultado = await resposta.text();
+        if(!resposta.ok){
+            throw new Error(resultado || "Erro ao atualizar o registo no Supabase.");
+        }
+
+        if(Array.isArray(dadosLoginsBase)){
+            const registo = dadosLoginsBase.find(r => Number(r.id) === id);
+            if(registo){
+                registo.inicio = inicio;
+                registo.fim = fim;
+                registo.duracao = payload.duracao;
+            }
+        }
+
+        fecharEditarLogin();
+        await carregarLogins();
+        alert(`${tipo === "logout" ? "Logout" : "Login"} atualizado com sucesso.`);
+    }catch(e){
+        console.error("Erro ao guardar edição do Login:", e);
+        alert("Ocorreu um erro ao guardar o registo.\n\n" + e.message);
+    }finally{
+        if(btn){ btn.disabled = false; btn.innerHTML = '<i class="fa fa-floppy-disk"></i> Guardar'; }
+    }
+}
+
+async function atualizarLogins(){
+
+    const btn = document.querySelector('#logins button[onclick="atualizarLogins()"]');
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    try{
+        // Limpa a cache para obrigar uma nova leitura do Supabase.
+        dadosLoginsBase = null;
+        await carregarLogins();
+    }catch(e){
+        console.error("Erro ao atualizar Logins:", e);
+        alert("Ocorreu um erro ao atualizar os Logins.\\n\\n" + e.message);
+    }finally{
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-rotate-right"></i> Atualizar';
+        }
+    }
+}
+
 async function carregarLogins(){
 
     try{
@@ -3656,8 +4020,11 @@ async function carregarLogins(){
                     <td>${formatarHora(registo.inicio)}</td>
                     <td>${formatarHora(registo.fim)}</td>
                     <td>${formatarDuracao(registo.duracao)}</td>
-                    <td>
-                        <button onclick="eliminarRegisto(${registo.id})" title="Eliminar registo">
+                    <td style="white-space:nowrap;">
+                        <button onclick="abrirEditarLogin(${registo.id})" title="Editar registo" style="margin-right:5px;">
+                            <i class="fa fa-pen"></i>
+                        </button>
+                        <button onclick="eliminarRegisto(${registo.id})" title="Eliminar registo" style="background:#dc2626;color:white;border:1px solid #dc2626;border-radius:4px;padding:6px 9px;cursor:pointer;">
                             <i class="fa fa-trash"></i>
                         </button>
                     </td>
