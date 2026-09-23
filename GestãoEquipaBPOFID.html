@@ -1,4 +1,3 @@
-
 <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -447,6 +446,10 @@ canvas{
     <i class="fa fa-stopwatch"></i> Tempos Médios
 </a>
 
+    <a onclick="abrirRelatorioTemposInativos()">
+        <i class="fa fa-user-clock"></i> Tempos Inativos
+    </a>
+
 </div>
 <a onclick="toggleAdministracao()">
     <i class="fa fa-gear"></i> Administração
@@ -460,6 +463,10 @@ canvas{
 
     <a onclick="mostrarDadosMes()">
         <i class="fa fa-calendar-days"></i> Dados do Mês
+    </a>
+
+    <a onclick="mostrarInatividadesMes()">
+        <i class="fa fa-user-clock"></i> Inatividades do Mês
     </a>
 
     <a onclick="mostrarCarregarPlaneamento()">
@@ -841,6 +848,11 @@ canvas{
 
   
 
+        <div class="card" onclick="abrirRelatorioTemposInativos()" style="cursor:pointer;">
+            <h3><i class="fa fa-user-clock"></i> Tempos Inativos</h3>
+            <p>Registo dos períodos de inatividade por colaborador.</p>
+        </div>
+
         <div class="card" onclick="abrirRelatorioAlertas()" style="cursor:pointer;">
             <h3><i class="fa fa-triangle-exclamation"></i> Alertas</h3>
             <p>Relatório de alertas.</p>
@@ -1110,6 +1122,26 @@ canvas{
 
 </div>
 
+<div id="relatorioTemposInativos" style="display:none;padding:25px;">
+<div class="panel">
+<h3>Tempos Inativos</h3>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+<div><label>Data</label><br><input type="date" id="fDataTemposInativos"></div>
+<div><label>Colaborador</label><br><input type="text" id="fColaboradorTemposInativos" placeholder="Nome"></div>
+<button onclick="carregarRelatorioTemposInativos()"><i class="fa fa-search"></i> Pesquisar</button>
+<button onclick="limparFiltrosTemposInativos()"><i class="fa fa-eraser"></i> Limpar</button>
+<button onclick="carregarRelatorioTemposInativos()"><i class="fa fa-rotate-right"></i> Atualizar</button>
+<button onclick="exportarRelatorioTemposInativosExcel()"><i class="fa fa-file-excel"></i> Exportar Excel</button>
+</div>
+<div style="overflow-x:auto;">
+<table id="tblRelatorioTemposInativos" style="width:100%;border-collapse:collapse;min-width:900px;">
+<thead><tr><th>Colaborador</th><th>Data</th><th>Início</th><th>Fim</th><th>Duração</th><th>Observação</th></tr></thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+
 <div id="alertas" style="display:none;padding:25px;">
 
     <div class="panel">
@@ -1299,6 +1331,49 @@ canvas{
 
 </div>
 
+<div id="inatividadesMes" style="display:none;padding:25px;">
+    <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:15px;flex-wrap:wrap;">
+            <div>
+                <h3><i class="fa fa-user-clock"></i> Inatividades do Mês</h3>
+                <div style="font-size:12px;color:#777;margin-top:4px;">Tempo inativo por dia e colaborador, excluindo Pausa 1, Pausa 2 e Refeição.</div>
+            </div>
+            <div>
+                <label>Mês</label><br>
+                <input type="month" id="fMesInatividades" onchange="carregarInatividadesMes()">
+            </div>
+            <div>
+                <label>Dia (opcional)</label><br>
+                <input type="date" id="fDataInatividades" onchange="carregarInatividadesMes()">
+            </div>
+            <div>
+                <label>Colaborador (opcional)</label><br>
+                <input type="text" id="fColaboradorInatividades" placeholder="Nome" oninput="carregarInatividadesMes()">
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button type="button" onclick="carregarInatividadesMes()"><i class="fa fa-sync"></i> Atualizar</button>
+                <button type="button" onclick="limparFiltrosInatividadesMes()"><i class="fa fa-eraser"></i> Limpar</button>
+                <button type="button" onclick="exportarInatividadesMesExcel()"><i class="fa fa-file-excel"></i> Exportar Excel</button>
+            </div>
+        </div>
+
+        <div id="cardsInatividadesMes" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:15px;margin:20px 0;"></div>
+
+        <div style="overflow-x:auto;">
+            <table id="tblInatividadesMes" style="width:100%;border-collapse:collapse;min-width:650px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Colaborador</th>
+                        <th>Tempo Inativo</th>
+                    </tr>
+                </thead>
+                <tbody id="tblInatividadesMesBody"></tbody>
+            </table>
+        </div>
+        <div id="msgInatividadesMes" style="margin-top:15px;color:#777;font-size:12px;"></div>
+    </div>
+</div>
 
 <div id="carregarPlaneamentoAdmin" style="display:none;padding:25px;">
     <div class="panel">
@@ -1435,6 +1510,8 @@ const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 
 function mostrarPlaneamento(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1449,6 +1526,7 @@ function mostrarPlaneamento(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
@@ -1533,6 +1611,7 @@ function mostrarPlataformas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
@@ -1691,6 +1770,8 @@ function limparFiltroPlataformas(){
 }
 
 function mostrarForcarRegistos(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1706,6 +1787,7 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1715,6 +1797,8 @@ function mostrarForcarRegistos(){
 }
 
 function mostrarAlertas(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1730,6 +1814,7 @@ function mostrarAlertas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
     if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1741,6 +1826,8 @@ function mostrarAlertas(){
 }
 
 function abrirRelatorioOcupacao(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -1754,6 +1841,7 @@ function abrirRelatorioOcupacao(){
     document.getElementById("resumoDia").style.display="none";
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
 
 
@@ -1777,6 +1865,7 @@ function mostrarLogins(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
@@ -2201,6 +2290,8 @@ function togglePlaneamento(){
 }
 
 function mostrarPlaneamentoDia(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -2215,6 +2306,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
@@ -2228,6 +2320,8 @@ function mostrarPlaneamentoDia(){
 
 
 function abrirRelatorioTempos(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -2240,6 +2334,8 @@ document.getElementById("planeamentoMes").style.display="none";
     document.getElementById("resumoDia").style.display="none";
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    document.getElementById("relatorios").style.display="none";
 
     document.getElementById("relatorioTempos").style.display="block";
 
@@ -2491,6 +2587,135 @@ function exportarDadosMesExcel(){
 
 }
 
+
+
+function normalizarNomeInatividade(valor){
+    return String(valor || "").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+
+function segundosDuracaoInatividade(valor){
+    if(valor === null || valor === undefined || valor === "") return 0;
+    if(typeof valor === "number") return valor > 100 ? valor : valor * 3600;
+    const s=String(valor).trim();
+    if(/^\d+(\.\d+)?$/.test(s)){ const n=Number(s); return n > 100 ? n : n*3600; }
+    const m=s.match(/^(\d+):([0-5]\d):([0-5]\d)$/);
+    if(m) return Number(m[1])*3600+Number(m[2])*60+Number(m[3]);
+    return 0;
+}
+
+function instanteInatividade(data, hora){
+    if(!data || !hora) return null;
+    const h=String(hora).includes("T") ? String(hora).split("T")[1] : String(hora);
+    const d=new Date(`${data}T${h.substring(0,8)}`);
+    return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function segundosFormatadosInatividade(segundos){
+    segundos=Math.max(0,Math.round(segundos||0));
+    const h=String(Math.floor(segundos/3600)).padStart(2,"0");
+    const m=String(Math.floor((segundos%3600)/60)).padStart(2,"0");
+    const s=String(segundos%60).padStart(2,"0");
+    return `${h}:${m}:${s}`;
+}
+
+function intervaloSemPausas(inicio,fim,pausas){
+    if(!inicio || !fim || fim<=inicio) return 0;
+    let partes=[{inicio:inicio.getTime(),fim:fim.getTime()}];
+    pausas.forEach(p=>{
+        const pi=p.inicio.getTime(), pf=p.fim.getTime();
+        const novas=[];
+        partes.forEach(x=>{
+            if(pf<=x.inicio || pi>=x.fim){ novas.push(x); return; }
+            if(pi>x.inicio) novas.push({inicio:x.inicio,fim:Math.min(pi,x.fim)});
+            if(pf<x.fim) novas.push({inicio:Math.max(pf,x.inicio),fim:x.fim});
+        });
+        partes=novas;
+    });
+    return partes.reduce((total,x)=>total+Math.max(0,x.fim-x.inicio)/1000,0);
+}
+
+async function carregarInatividadesMes(){
+    const tbody=document.getElementById("tblInatividadesMesBody");
+    const msg=document.getElementById("msgInatividadesMes");
+    if(!tbody) return;
+    tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:20px;color:#777;">A carregar...</td></tr>`;
+    try{
+        const hoje=new Date().toISOString().slice(0,10);
+        const mes=document.getElementById("fMesInatividades").value || hoje.slice(0,7);
+        document.getElementById("fMesInatividades").value=mes;
+        const dia=(document.getElementById("fDataInatividades").value||"").trim();
+        const colaborador=(document.getElementById("fColaboradorInatividades").value||"").trim();
+        const [ano,mm]=mes.split("-").map(Number);
+        const inicioMes=`${mes}-01`;
+        const proximoMes=mm===12?`${ano+1}-01-01`:`${ano}-${String(mm+1).padStart(2,"0")}-01`;
+        const fetchPaginas=async(base)=>{let todos=[],offset=0;while(true){const r=await fetch(`${SUPABASE_URL}/rest/v1/${base}&limit=1000&offset=${offset}`,{headers:{apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`},cache:"no-store"});if(!r.ok)throw new Error(await r.text());const p=await r.json();todos.push(...p);if(p.length<1000)break;offset+=1000;}return todos;};
+        const inativos=await fetchPaginas(`tempos_inativos?select=colaborador,data,inicio,fim,duracao&data=gte.${inicioMes}&data=lt.${proximoMes}&order=data.asc,inicio.asc`);
+        const registos=await fetchPaginas(`BPO_registosNSS?select=user,nome,tipo,inicio,duracao&data=gte.${inicioMes}&data=lt.${proximoMes}&order=inicio.asc`);
+        const pausas={};
+        registos.forEach(r=>{
+            const tipo=normalizarNomeInatividade(r.tipo);
+            if(!(tipo.includes("pausa1")||tipo.includes("pausa2")||tipo.includes("refeicao"))) return;
+            const data=(r.inicio||"").split("T")[0];
+            const ini=instanteInatividade(data,r.inicio);
+            if(!ini) return;
+            const dur=segundosDuracaoInatividade(r.duracao);
+            if(dur<=0) return;
+            const chave=`${data}|${normalizarNomeInatividade(r.nome||r.user)}`;
+            (pausas[chave] ||= []).push({inicio:ini,fim:new Date(ini.getTime()+dur*1000)});
+        });
+        const grupos={};
+        inativos.forEach(r=>{
+            if(!r.data || !r.colaborador) return;
+            if(dia && r.data!==dia) return;
+            if(colaborador && !normalizarNomeInatividade(r.colaborador).includes(normalizarNomeInatividade(colaborador))) return;
+            const ini=instanteInatividade(r.data,r.inicio);
+            const fim=instanteInatividade(r.data,r.fim);
+            let segundos=0;
+            if(ini && fim && fim>ini){
+                segundos=intervaloSemPausas(ini,fim,pausas[`${r.data}|${normalizarNomeInatividade(r.colaborador)}`]||[]);
+            }else{
+                segundos=segundosDuracaoInatividade(r.duracao);
+            }
+            const chave=`${r.data}|${r.colaborador}`;
+            if(!grupos[chave]) grupos[chave]={data:r.data,colaborador:r.colaborador,segundos:0};
+            grupos[chave].segundos+=segundos;
+        });
+        const resultados=Object.values(grupos).sort((a,b)=>a.data.localeCompare(b.data)||a.colaborador.localeCompare(b.colaborador));
+        const total=resultados.reduce((a,r)=>a+r.segundos,0);
+        const pessoas=new Set(resultados.map(r=>r.colaborador)).size;
+        document.getElementById("cardsInatividadesMes").innerHTML=`<div class="card"><h3>Tempo Inativo</h3><h1>${segundosFormatadosInatividade(total)}</h1></div><div class="card"><h3>Colaboradores</h3><h1>${pessoas}</h1></div><div class="card"><h3>Registos Dia/Colaborador</h3><h1>${resultados.length}</h1></div>`;
+        if(!resultados.length){tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:20px;color:#999;">Não existem registos de inatividade para os filtros selecionados.</td></tr>`;msg.textContent="";return;}
+        tbody.innerHTML=resultados.map(r=>`<tr><td>${r.data}</td><td>${r.colaborador}</td><td>${segundosFormatadosInatividade(r.segundos)}</td></tr>`).join("");
+        msg.textContent="O tempo apresentado exclui os períodos registados como Pausa 1, Pausa 2 e Refeição.";
+    }catch(e){
+        console.error("Erro ao carregar inatividades do mês:",e);
+        tbody.innerHTML=`<tr><td colspan="3" style="text-align:center;padding:20px;color:#c62828;">Erro ao carregar as inatividades do mês.</td></tr>`;
+        msg.textContent=e.message||"";
+    }
+}
+
+function mostrarInatividadesMes(){
+    document.querySelectorAll(".main > div").forEach(el=>el.style.display="none");
+    document.getElementById("inatividadesMes").style.display="block";
+    const input=document.getElementById("fMesInatividades");
+    if(!input.value) input.value=new Date().toISOString().slice(0,7);
+    carregarInatividadesMes();
+}
+
+function limparFiltrosInatividadesMes(){
+    document.getElementById("fMesInatividades").value=new Date().toISOString().slice(0,7);
+    document.getElementById("fDataInatividades").value="";
+    document.getElementById("fColaboradorInatividades").value="";
+    carregarInatividadesMes();
+}
+
+function exportarInatividadesMesExcel(){
+    const tabela=document.getElementById("tblInatividadesMes");
+    if(!tabela)return;
+    const wb=XLSX.utils.table_to_book(tabela,{sheet:"Inatividades Mês"});
+    const mes=document.getElementById("fMesInatividades").value||"mes";
+    XLSX.writeFile(wb,`Inatividades_Mes_${mes}.xlsx`);
+}
 
 function mostrarDadosMes(){
     document.querySelectorAll(".main > div").forEach(el => {
@@ -3243,6 +3468,8 @@ async function carregarRelatorioOcupacao(){
 }
 
 function abrirRelatorioProducao(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -3379,6 +3606,8 @@ function isLogout(t){
 }
 
 function mostrarDashboard(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -3393,6 +3622,7 @@ function mostrarDashboard(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
         
@@ -3419,6 +3649,7 @@ function mostrarRelatorios(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
         
@@ -4812,6 +5043,8 @@ function exportarLoginsExcel(){
 }
 
 function mostrarRetificarProducao(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
 
     // Garantir que o separador Dados do Mês fica oculto ao mudar de aba.
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
@@ -5425,7 +5658,9 @@ async function carregarFicheiroPlaneamento(){
     }
 }
 
-function mostrarCarregarPlaneamento(){ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
+function mostrarCarregarPlaneamento(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+ document.querySelectorAll(".main > div").forEach(el=>el.style.display="none"); document.getElementById("carregarPlaneamentoAdmin").style.display="block"; }
 
 function mostrarForcarSQL(){
     mostrarDashboard();
@@ -5505,6 +5740,100 @@ async function atualizarRelatorios(){
 
     }
 }
+async function carregarRelatorioTemposInativos(){
+
+    const tbody = document.querySelector("#tblRelatorioTemposInativos tbody");
+    if(!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#777;">A carregar...</td></tr>`;
+
+    try{
+
+        const fData = (document.getElementById("fDataTemposInativos")?.value || "").trim();
+        const fColaborador = (document.getElementById("fColaboradorTemposInativos")?.value || "").trim();
+
+        let url = `${SUPABASE_URL}/rest/v1/tempos_inativos?select=colaborador,data,inicio,fim,duracao,observacao&order=data.desc,inicio.desc&limit=1000`;
+
+        if(fData){
+            url += `&data=eq.${encodeURIComponent(fData)}`;
+        }
+
+        if(fColaborador){
+            url += `&colaborador=ilike.*${encodeURIComponent(fColaborador)}*`;
+        }
+
+        const resposta = await fetch(url,{
+            method:"GET",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            },
+            cache:"no-store"
+        });
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(typeof dados === "object" ? JSON.stringify(dados) : String(dados));
+        }
+
+        if(!Array.isArray(dados) || dados.length === 0){
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#777;">Não existem registos de tempos inativos para os filtros selecionados.</td></tr>`;
+            return;
+        }
+
+        const escaparHTML = (valor) => String(valor ?? "")
+            .replace(/&/g,"&amp;")
+            .replace(/</g,"&lt;")
+            .replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;")
+            .replace(/'/g,"&#039;");
+
+        const formatarData = (valor) => {
+            if(!valor) return "";
+            const texto = String(valor);
+            return texto.includes("T") ? texto.split("T")[0] : texto;
+        };
+
+        const formatarHora = (valor) => {
+            if(!valor) return "";
+            const texto = String(valor);
+            if(texto.includes("T")) return texto.split("T")[1].substring(0,8);
+            return texto;
+        };
+
+        tbody.innerHTML = dados.map(r => `
+            <tr>
+                <td>${escaparHTML(r.colaborador)}</td>
+                <td>${escaparHTML(formatarData(r.data))}</td>
+                <td>${escaparHTML(formatarHora(r.inicio))}</td>
+                <td>${escaparHTML(formatarHora(r.fim))}</td>
+                <td>${escaparHTML(r.duracao)}</td>
+                <td>${escaparHTML(r.observacao)}</td>
+            </tr>
+        `).join("");
+
+    }catch(e){
+
+        console.error("Erro ao carregar tempos_inativos:",e);
+
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#c62828;">Erro ao carregar os tempos inativos. Verifica a tabela tempos_inativos e os nomes das colunas.</td></tr>`;
+
+    }
+
+}
+
+function limparFiltrosTemposInativos(){document.getElementById("fDataTemposInativos").value="";document.getElementById("fColaboradorTemposInativos").value="";carregarRelatorioTemposInativos();}
+function abrirRelatorioTemposInativos(){
+    if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
+
+    if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
+    ["dashboard","plataformas","planeamentoMes","planeamentoDia","logins","relatorios","resumoDia","relatorioProducao","relatorioOcupacao","relatorioTempos","alertas","forcarRegistos","retificarProducao"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
+    document.getElementById("relatorioTemposInativos").style.display="block";
+    carregarRelatorioTemposInativos();
+}
+function exportarRelatorioTemposInativosExcel(){const tabela=document.getElementById("tblRelatorioTemposInativos");if(!tabela)return;const wb=XLSX.utils.table_to_book(tabela,{sheet:"Tempos Inativos"});XLSX.writeFile(wb,"Tempos_Inativos.xlsx");}
+
 async function carregarAlertas(){
 
     try{
@@ -5838,4 +6167,7 @@ window.addEventListener("load", function () {
 </script>
 
 </body></html>
+
+
+
 
