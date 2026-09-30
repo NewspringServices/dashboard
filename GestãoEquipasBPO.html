@@ -40,7 +40,7 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .qualidade-box>i{font-size:42px;color:var(--verde);margin-bottom:15px}
 .qualidade-box h2{color:var(--verde);margin-bottom:8px}
 .qualidade-box p{color:#666;margin-bottom:28px}
-.qualidade-opcoes{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.qualidade-opcoes{display:grid;grid-template-columns:1fr;gap:18px}
 .qualidade-opcoes button{border:none;border-radius:14px;padding:25px 15px;background:linear-gradient(135deg,#43A047,#2E7D32);color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:.25s}
 .qualidade-opcoes button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(46,125,50,.25)}
 .qualidade-opcoes button i{font-size:30px}
@@ -230,11 +230,6 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
                         <i class="fa fa-building"></i>
                         <span>BPO Fidelidade</span>
                     </button>
-
-                    <button onclick="abrirQualidadeArea('multicare')">
-                        <i class="fa fa-chart-line"></i>
-                        <span>BPO Multicare</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -242,11 +237,6 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
         <iframe id="iframeQualidadeFID"
                 src=""
                 title="Qualidade BPO Fidelidade"
-                style="display:none"></iframe>
-
-        <iframe id="iframeQualidadeMTC"
-                src=""
-                title="Qualidade BPO Multicare"
                 style="display:none"></iframe>
     </div>
 
@@ -333,20 +323,12 @@ function abrirQualidadeArea(area){
 
     const selecao = document.getElementById("selecaoQualidade");
     const fid = document.getElementById("iframeQualidadeFID");
-    const mtc = document.getElementById("iframeQualidadeMTC");
-
     fid.style.display = "none";
-    mtc.style.display = "none";
     selecao.style.display = "none";
 
     if(area === "fidelidade"){
         fid.src = "QualidadeBPOFID.html";
         fid.style.display = "block";
-    }
-
-    if(area === "multicare"){
-        mtc.src = "QualidadeBPOMTC.html";
-        mtc.style.display = "block";
     }
 }
 
