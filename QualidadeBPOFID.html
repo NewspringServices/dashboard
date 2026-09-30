@@ -23,7 +23,7 @@
 </div><div class="menu"><a class="active" onclick="tab('dashboard',this)"><i class="fa fa-house"></i> Dashboard</a><a onclick="tab('dadosMes',this)"><i class="fa fa-chart-column"></i> Dados do Mês</a><a onclick="tab('nova',this)"><i class="fa fa-clipboard-check"></i> Nova Monitorização</a><a onclick="tab('historico',this)"><i class="fa fa-list"></i> Monitorizações</a><a onclick="tab('config',this)"><i class="fa fa-gear"></i> Configuração</a></div></div>
 <div class="main"><div class="top"><h2>Dashboard de Qualidade</h2><div id="clock"></div></div>
 <section id="dashboard"><div class="cards"><div class="card"><h3>Qualidade Global</h3><h1 id="gq">100%</h1></div><div class="card"><h3>Monitorizações</h3><h1 id="gm">0</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="gc">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="ga">0</h1></div></div><div class="content"><div class="panel"><h3 id="objetivoTitulo">Acompanhamento do Objetivo Mensal</h3><p class="small" style="margin-bottom:14px">Objetivo: 30 monitorizações por colaborador · 36 colaboradores · 1.080 monitorizações no total.</p><div class="cards" style="padding:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))"><div class="card"><h3>Objetivo</h3><h1 id="objTotal">1080</h1></div><div class="card"><h3>Monitorizadas</h3><h1 id="objFeitas">0</h1></div><div class="card"><h3>Em falta</h3><h1 id="objFalta">1080</h1></div></div><div class="bar"><div id="objFill" class="fill"></div></div><div class="table-wrap" style="margin-top:20px"><table><thead><tr><th>Colaborador</th><th>Objetivo</th><th>Monitorizadas</th><th>Em falta</th><th>Execução</th></tr></thead><tbody id="objetivoBody"></tbody></table></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade</th></tr></thead><tbody id="eqBody"></tbody></table></div></div></div></section>
-<section id="dadosMes" class="hidden"><div class="content"><div class="panel"><h3>Dados do Mês</h3><div class="grid"><div class="field"><label>Mês</label><select id="mesDados" onchange="renderDadosMes()"></select></div><div class="field"><label>Ano</label><select id="anoDados" onchange="renderDadosMes()"></select></div></div></div><div class="cards"><div class="card"><h3>Monitorizações</h3><h1 id="dmMonitorizacoes">0</h1></div><div class="card"><h3>Qualidade Média</h3><h1 id="dmQualidade">0%</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="dmColaboradores">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="dmAbaixo90">0</h1></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmEquipaBody"></tbody></table></div></div><div class="panel"><h3>Ranking de Colaboradores</h3><div class="table-wrap"><table><thead><tr><th>Pos.</th><th>Colaborador</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmRankingBody"></tbody></table></div></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin-bottom:0">Monitorizações do Mês</h3><button type="button" onclick="exportDadosMes()"><i class="fa fa-file-export"></i> Exportar Dados do Mês</button></div><div class="table-wrap" style="margin-top:18px"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Equipa</th><th>Tarefa</th><th>GAMA/Processo</th><th>Qualidade</th></tr></thead><tbody id="dmMonitorizacoesBody"></tbody></table></div></div></div></section><section id="nova" class="hidden"><div class="content"><div class="panel"><h3>Dados da Monitorização</h3><div class="grid"><div class="field"><label>Colaborador</label><select id="colaborador"><option value="">Selecionar colaborador</option></select></div><div class="field"><label>Equipa</label><select id="equipa"><option value="">Selecionar equipa</option><option>Automóvel</option><option>Ocorrências</option><option>Saúde</option></select></div><div class="field"><label>Tarefa Monitorizada</label><select id="tarefa"><option value="">Selecionar equipa primeiro</option></select></div><div class="field"><label>Data Monitorização</label><input id="dataMonitorizacao" type="date"></div>
+<section id="dadosMes" class="hidden"><div class="content"><div class="panel"><h3>Dados do Mês</h3><div class="grid"><div class="field"><label>Mês</label><select id="mesDados" onchange="renderDadosMes()"></select></div><div class="field"><label>Ano</label><select id="anoDados" onchange="renderDadosMes()"></select></div></div></div><div class="cards"><div class="card"><h3>Monitorizações</h3><h1 id="dmMonitorizacoes">0</h1></div><div class="card"><h3>Qualidade Média</h3><h1 id="dmQualidade">0%</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="dmColaboradores">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="dmAbaixo90">0</h1></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmEquipaBody"></tbody></table></div></div><div class="panel"><h3>Ranking de Colaboradores</h3><div class="table-wrap"><table><thead><tr><th>Pos.</th><th>Colaborador</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmRankingBody"></tbody></table></div></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin-bottom:0">Monitorizações do Mês</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" onclick="exportDadosMesGlobal()"><i class="fa fa-file-export"></i> Exportar Global</button><button type="button" onclick="exportDadosMesEquipa()"><i class="fa fa-users"></i> Exportar por Equipa</button><button type="button" onclick="exportDadosMes()"><i class="fa fa-file-export"></i> Exportar Monitorizações</button></div></div><div class="table-wrap" style="margin-top:18px"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Equipa</th><th>Tarefa</th><th>GAMA/Processo</th><th>Qualidade</th></tr></thead><tbody id="dmMonitorizacoesBody"></tbody></table></div></div></div></section><section id="nova" class="hidden"><div class="content"><div class="panel"><h3>Dados da Monitorização</h3><div class="grid"><div class="field"><label>Colaborador</label><select id="colaborador"><option value="">Selecionar colaborador</option></select></div><div class="field"><label>Equipa</label><select id="equipa"><option value="">Selecionar equipa</option><option>Automóvel</option><option>Ocorrências</option><option>Saúde</option></select></div><div class="field"><label>Tarefa Monitorizada</label><select id="tarefa"><option value="">Selecionar equipa primeiro</option></select></div><div class="field"><label>Data Monitorização</label><input id="dataMonitorizacao" type="date"></div>
 <div class="field"><label>Data Tratamento Tarefa</label><input id="dataTarefa" type="date"></div></div></div><div class="panel" style="margin-top:16px;margin-bottom:16px;background:#f7f9f7;border:1px solid #e5e8e5">
 <p class="small"><b>Ponderação:</b> critérios informativos têm 0% e não reduzem a qualidade. Os restantes critérios são calculados sobre o total dos seus pesos.</p>
 </div><div id="painelCriterios" class="panel hidden"><h3>Critérios de Qualidade</h3><div class="field" style="margin-bottom:16px"><label>Número de GAMA/Processo</label><input id="gama" placeholder="N.º GAMA / Processo"></div><div id="criterios"></div><div class="resultado"><div class="result"><span class="small">Qualidade</span><strong id="qual">100%</strong></div><div class="result"><span class="small">Avaliados</span><strong id="avaliados">0</strong></div><div class="result"><span class="small">Falhas</span><strong id="falhas">0</strong></div><div class="result"><span class="small">Informativos</span><strong id="infos">0</strong></div></div><div class="bar"><div id="fill" class="fill"></div></div><div class="actions"><button class="secondary" onclick="limpar()">Limpar</button><button onclick="guardar()"><i class="fa fa-save"></i> Guardar Monitorização</button></div></div></div></section>
@@ -226,7 +226,59 @@ function dadosMesRows(){
  return data().filter(r=>{const d=dadosMesDate(r);return d&&d.getMonth()+1===m&&d.getFullYear()===y}).sort((a,b)=>b.id-a.id)
 }
 function renderDadosMes(){initDadosMes();const rows=dadosMesRows(),avg=rows.length?rows.reduce((s,r)=>s+(+r.qualidade||0),0)/rows.length:0;document.getElementById('dmMonitorizacoes').textContent=rows.length;document.getElementById('dmQualidade').textContent=avg.toFixed(1)+'%';document.getElementById('dmColaboradores').textContent=new Set(rows.map(r=>r.colaborador)).size;document.getElementById('dmAbaixo90').textContent=rows.filter(r=>(+r.qualidade||0)<90).length;document.getElementById('dmEquipaBody').innerHTML=['Automóvel','Ocorrências','Saúde'].map(e=>{const x=rows.filter(r=>r.equipa===e),a=x.length?x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${esc(e)}</td><td>${x.length}</td><td>${x.length?a.toFixed(1)+'%':'—'}</td><td>${x.filter(r=>(+r.qualidade||0)<90).length}</td></tr>`}).join('');const mp={};rows.forEach(r=>(mp[r.colaborador]??=[]).push(r));const rank=Object.entries(mp).map(([n,x])=>({n,c:x.length,a:x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length,b:x.filter(r=>(+r.qualidade||0)<90).length})).sort((a,b)=>b.a-a.a);document.getElementById('dmRankingBody').innerHTML=rank.length?rank.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.n)}</td><td>${r.c}</td><td><span class="badge ${r.a>=90?'good':r.a>=75?'mid':'bad'}">${r.a.toFixed(1)}%</span></td><td>${r.b}</td></tr>`).join(''):'<tr><td colspan="5">Sem dados para o mês selecionado.</td></tr>';document.getElementById('dmMonitorizacoesBody').innerHTML=rows.length?rows.map(r=>{const d=dadosMesDate(r)?.toLocaleDateString('pt-PT')||'';return `<tr><td>${esc(d)}</td><td>${esc(r.colaborador)}</td><td>${esc(r.equipa)}</td><td>${esc(r.tarefa)}</td><td>${esc(r.gama)}</td><td><span class="badge ${r.qualidade>=90?'good':r.qualidade>=75?'mid':'bad'}">${(+r.qualidade||0).toFixed(1)}%</span></td></tr>`}).join(''):'<tr><td colspan="6">Sem monitorizações no mês selecionado.</td></tr>'}
-function exportDadosMes(){const rows=dadosMesRows();if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,csv=[['Data','Colaborador','Equipa','Tarefa','GAMA/Processo','Qualidade']];rows.forEach(r=>csv.push([r.dataMonitorizacao||r.data||'',r.colaborador||'',r.equipa||'',r.tarefa||'',r.gama||'',(+r.qualidade||0).toFixed(2)+'%']));const b=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Dados_do_Mes.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function exportDadosMesGlobal(){
+ const rows=dadosMesRows();
+ if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
+ const m=document.getElementById('mesDados').value;
+ const y=document.getElementById('anoDados').value;
+ const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+ const avg=rows.reduce((s,r)=>s+(+r.qualidade||0),0)/rows.length;
+ const abaixo=rows.filter(r=>(+r.qualidade||0)<90).length;
+ const colaboradores=new Set(rows.map(r=>r.colaborador)).size;
+ const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+ const csv=[
+   ['DADOS GLOBAIS DO MÊS'],
+   ['Mês',meses[+m-1]||m],
+   ['Ano',y],
+   [],
+   ['Indicador','Valor'],
+   ['Monitorizações',rows.length],
+   ['Qualidade Média',avg.toFixed(2)+'%'],
+   ['Colaboradores',colaboradores],
+   ['Abaixo de 90%',abaixo]
+ ];
+ const blob=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Dados_Globais_${y}_${String(m).padStart(2,'0')}.csv`;a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportDadosMesEquipa(){
+ const rows=dadosMesRows();
+ if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
+ const m=document.getElementById('mesDados').value;
+ const y=document.getElementById('anoDados').value;
+ const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+ const equipas=['Automóvel','Ocorrências','Saúde'];
+ const csv=[['Equipa','Monitorizações','Qualidade Média','Abaixo de 90%']];
+ equipas.forEach(e=>{
+   const x=rows.filter(r=>r.equipa===e);
+   const avg=x.length?x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length:0;
+   const abaixo=x.filter(r=>(+r.qualidade||0)<90).length;
+   csv.push([e,x.length,x.length?avg.toFixed(2)+'%':'—',abaixo]);
+ });
+ const blob=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Dados_por_Equipa_${y}_${String(m).padStart(2,'0')}.csv`;a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportDadosMes(){
+ const rows=dadosMesRows();
+ if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
+ const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+ const csv=[['Data','Colaborador','Equipa','Tarefa','GAMA/Processo','Qualidade']];
+ rows.forEach(r=>csv.push([r.dataMonitorizacao||r.data||'',r.colaborador||'',r.equipa||'',r.tarefa||'',r.gama||'',(+r.qualidade||0).toFixed(2)+'%']));
+ const b=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Dados_do_Mes.csv';a.click();
+ setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
 function renderHistorico(){let fc=document.getElementById('fc').value,fe=document.getElementById('fe').value,fq=parseFloat(document.getElementById('fq').value),rows=data().filter(r=>(!fc||r.colaborador===fc)&&(!fe||r.equipa===fe)&&(!fq||r.qualidade>=fq)).sort((a,b)=>b.id-a.id);document.getElementById('hist').innerHTML=rows.map(r=>`<tr><td>${r.dataMonitorizacao?new Date(r.dataMonitorizacao+'T00:00:00').toLocaleDateString('pt-PT'):new Date(r.data).toLocaleDateString('pt-PT')}</td><td>${r.dataTarefa?new Date(r.dataTarefa+'T00:00:00').toLocaleDateString('pt-PT'):''}</td><td>${r.colaborador}</td><td>${r.equipa}</td><td>${r.tarefa}</td><td>${r.gama}</td><td><span class="badge ${r.qualidade>=90?'good':r.qualidade>=75?'mid':'bad'}">${r.qualidade.toFixed(1)}%</span></td><td><button onclick="detail(${r.id})">Ver</button></td></tr>`).join('')||'<tr><td colspan="8">Sem monitorizações.</td></tr>'} 
 
 function esc(v){
@@ -341,9 +393,10 @@ function atualizar(id){
       e=document.getElementById('equipa').value,
       t=document.getElementById('tarefa').value,
       g=document.getElementById('gama').value.trim(),
+      ty=document.getElementById('tipo').value,
       dt=document.getElementById('dataTarefa').value;
 
-  if(!c||!e||!t||!dt)return alert('Preenche todos os dados iniciais.');
+  if(!c||!e||!t||!ty||!dt)return alert('Preenche todos os dados iniciais.');
   if(!g)return alert('Preenche o Número de GAMA/Processo.');
 
   let cs=criteria();
@@ -366,18 +419,20 @@ function atualizar(id){
   let i=d.findIndex(x=>x.id===id);
   if(i<0)return;
 
+  /* Preserva integralmente as datas e restantes campos já existentes.
+     Apenas os campos editáveis são substituídos. */
   let original=edicaoOriginal || d[i];
 
   d[i]={
     ...original,
     id:original.id,
     data:original.data,
-    dataMonitorizacao:original.dataMonitorizacao || '',
-    dataTarefa:original.dataTarefa || dt,
+    dataTarefa:original.dataTarefa || '',
     colaborador:c,
     equipa:e,
     tarefa:t,
     gama:g,
+    tipo:ty,
     qualidade:+(total?Math.max(0,(total-perdido)/total*100):100).toFixed(2),
     respostas:{...resp},
     observacoes:obs,
@@ -387,12 +442,12 @@ function atualizar(id){
 
   save(d);
   alert('Monitorização atualizada.');
-  edicaoOriginal=null;
   limpar();
   dash();
-  tab('historico',document.querySelector('.menu a:nth-child(4)'));
+  tab('historico',document.querySelector('.menu a:nth-child(3)'));
   renderHistorico();
   detail(id);
+  edicaoOriginal=null;
 }
 
 function deleteDetail(){
