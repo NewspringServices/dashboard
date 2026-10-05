@@ -4218,9 +4218,11 @@ async function carregarResumoDia(){
         // Os registos de Login/Logout/Pausas vêm da mesma fonte
         // já utilizada pela aba Logins. A tabela de Planeamento
         // continua a ser consultada apenas para obter o estado.
+        const dataFiltro = document.getElementById("fDataResumo")?.value || new Date().toISOString().slice(0,10);
+
         const [registosReq, planeamentoReq] = await Promise.all([
             fetch(
-                `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?select=data,user,nome,tipo,inicio,fim,duracao&order=data.desc,inicio.asc`,
+                `${SUPABASE_URL}/rest/v1/MTCBPO_registosNSS?data=eq.${encodeURIComponent(dataFiltro)}&select=data,user,nome,tipo,inicio,fim,duracao&order=inicio.asc`,
                 {
                     headers:{
                         apikey:SUPABASE_API_KEY,
@@ -4244,13 +4246,11 @@ async function carregarResumoDia(){
         const planeamento = await planeamentoReq.json();
 
         if(!registosReq.ok){
-            console.error("Erro Registos MTC:", registos);
-            return;
+            throw new Error("Erro ao carregar os registos: " + (registos?.message || registos?.details || JSON.stringify(registos)));
         }
 
         if(!planeamentoReq.ok){
-            console.error("Erro Planeamento:", planeamento);
-            return;
+            throw new Error("Erro ao carregar o planeamento: " + (planeamento?.message || planeamento?.details || JSON.stringify(planeamento)));
         }
 
         const resumo = {};
@@ -4329,7 +4329,7 @@ async function carregarResumoDia(){
         const tbody = document.getElementById("tblResumoDiaBody");
         tbody.innerHTML = "";
 
-        const fData = document.getElementById("fDataResumo").value.toLowerCase();
+        const fData = (document.getElementById("fDataResumo").value || dataFiltro).toLowerCase();
         const fUser = document.getElementById("fUserResumo").value.toLowerCase();
         const fNome = document.getElementById("fNomeResumo").value.toLowerCase();
         const fEstado = document.getElementById("fEstadoResumo").value.toLowerCase();
