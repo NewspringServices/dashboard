@@ -1534,6 +1534,8 @@ function mostrarPlaneamento(){
 
     document.getElementById("planeamentoMes").style.display = "block";
 
+    // Ao abrir o Planeamento Mês, começar pelo mês atual.
+    // O utilizador pode continuar a usar Data para pesquisar um dia específico.
     carregarPlaneamento();
 }
 document.getElementById("planeamentoMes").style.display="none";
@@ -3669,17 +3671,44 @@ function limparFiltros() {
 }
 async function carregarPlaneamento() {
 
+    const tbody = document.querySelector("#tblPlaneamento tbody");
+
     try {
 
-        let url = `${SUPABASE_URL}/rest/v1/planeamento?select=data,user,nome,estado`;
-
+        // O Planeamento Mês passa a carregar apenas o mês selecionado.
+        // Isto evita consultar e desenhar todo o histórico da tabela.
         const data = document.getElementById("fData").value;
         const user = document.getElementById("fUser").value.trim();
         const nome = document.getElementById("fNome").value.trim();
         const estado = document.getElementById("fEstado").value.trim();
 
-        if (data)
-            url += `&data=eq.${data}`;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;padding:20px;color:#777;">
+                    <i class="fa fa-spinner fa-spin"></i> A carregar planeamento...
+                </td>
+            </tr>
+        `;
+
+        let url = `${SUPABASE_URL}/rest/v1/planeamento?select=data,user,nome,estado`;
+
+        if (data) {
+            // Pesquisa por um dia específico.
+            url += `&data=eq.${encodeURIComponent(data)}`;
+        } else {
+            // Sem dia específico, limitar ao mês atual.
+            // O separador chama-se "Planeamento Mês", por isso não é necessário
+            // trazer anos de histórico de uma só vez.
+            const hoje = new Date();
+            const ano = hoje.getFullYear();
+            const mes = hoje.getMonth();
+
+            const inicioMes = `${ano}-${String(mes + 1).padStart(2, "0")}-01`;
+            const ultimoDia = new Date(ano, mes + 1, 0).getDate();
+            const fimMes = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+
+            url += `&data=gte.${inicioMes}&data=lte.${fimMes}`;
+        }
 
         if (user)
             url += `&user=ilike.*${encodeURIComponent(user)}*`;
@@ -3690,76 +3719,107 @@ async function carregarPlaneamento() {
         if (estado)
             url += `&estado=ilike.*${encodeURIComponent(estado)}*`;
 
-        url += "&order=data.desc";
+        url += "&order=data.desc&limit=2000";
 
         const resposta = await fetch(url, {
             headers: {
                 apikey: SUPABASE_API_KEY,
                 Authorization: `Bearer ${SUPABASE_API_KEY}`
-            }
+            },
+            cache: "no-store"
         });
 
         const dados = await resposta.json();
 
         if (!resposta.ok) {
-            console.log(dados);
+            console.error("Erro Planeamento:", dados);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:20px;color:#c62828;">
+                        Erro ao carregar o Planeamento.
+                    </td>
+                </tr>
+            `;
             return;
         }
 
-const tbody = document.querySelector("#tblPlaneamento tbody");
+        if (!Array.isArray(dados) || dados.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align:center;padding:20px;color:#777;">
+                        Não existem registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
 
-tbody.innerHTML = "";
+        const opcoesEstadoBase = [
+            "Trabalha",
+            "Baixa",
+            "Férias",
+            "Licença",
+            "Dispensa"
+        ];
 
-dados.forEach(registo => {
+        // Construir o HTML todo de uma vez é bastante mais rápido
+        // do que fazer innerHTML += em cada registo.
+        tbody.innerHTML = dados.map(registo => {
 
-    const dataPlaneamento = String(registo.data ?? "");
-    const userPlaneamento = String(registo.user ?? "");
-    const nomePlaneamento = String(registo.nome ?? "");
-    const estadoAtual = String(registo.estado ?? "");
+            const dataPlaneamento = String(registo.data ?? "");
+            const userPlaneamento = String(registo.user ?? "");
+            const nomePlaneamento = String(registo.nome ?? "");
+            const estadoAtual = String(registo.estado ?? "");
 
-    const opcoesEstado = [
-        "Trabalha",
-        "Baixa",
-        "Férias",
-        "Licença",
-        "Dispensa"
-    ];
+            const opcoesEstado = [...opcoesEstadoBase];
 
-    if (estadoAtual && !opcoesEstado.some(op => op.toLowerCase() === estadoAtual.toLowerCase())) {
-        opcoesEstado.unshift(estadoAtual);
-    }
+            if (
+                estadoAtual &&
+                !opcoesEstado.some(op => op.toLowerCase() === estadoAtual.toLowerCase())
+            ) {
+                opcoesEstado.unshift(estadoAtual);
+            }
 
-    const opcoesHTML = opcoesEstado.map(opcao => `
-        <option value="${escaparHTML(opcao)}" ${opcao.toLowerCase() === estadoAtual.toLowerCase() ? "selected" : ""}>
-            ${escaparHTML(opcao)}
-        </option>
-    `).join("");
+            const opcoesHTML = opcoesEstado.map(opcao => `
+                <option value="${escaparHTML(opcao)}"
+                    ${opcao.toLowerCase() === estadoAtual.toLowerCase() ? "selected" : ""}>
+                    ${escaparHTML(opcao)}
+                </option>
+            `).join("");
 
-    tbody.innerHTML += `
-        <tr>
-            <td>${escaparHTML(dataPlaneamento)}</td>
-            <td>${escaparHTML(userPlaneamento)}</td>
-            <td>${escaparHTML(nomePlaneamento)}</td>
-            <td>
-                <select
-                    class="estado-planeamento"
-                    style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;min-width:130px;"
-                    data-data="${escaparHTML(dataPlaneamento)}"
-                    data-user="${escaparHTML(userPlaneamento)}"
-                    data-nome="${escaparHTML(nomePlaneamento)}"
-                    data-estado-anterior="${escaparHTML(estadoAtual)}"
-                    onchange="atualizarEstadoPlaneamento(this)"
-                >
-                    ${opcoesHTML}
-                </select>
-            </td>
-        </tr>
-    `;
-
-});
+            return `
+                <tr>
+                    <td>${escaparHTML(dataPlaneamento)}</td>
+                    <td>${escaparHTML(userPlaneamento)}</td>
+                    <td>${escaparHTML(nomePlaneamento)}</td>
+                    <td>
+                        <select
+                            class="estado-planeamento"
+                            style="padding:6px 10px;border:1px solid #ccc;border-radius:6px;min-width:130px;"
+                            data-data="${escaparHTML(dataPlaneamento)}"
+                            data-user="${escaparHTML(userPlaneamento)}"
+                            data-nome="${escaparHTML(nomePlaneamento)}"
+                            data-estado-anterior="${escaparHTML(estadoAtual)}"
+                            onchange="atualizarEstadoPlaneamento(this)"
+                        >
+                            ${opcoesHTML}
+                        </select>
+                    </td>
+                </tr>
+            `;
+        }).join("");
 
     } catch (e) {
-        console.error(e);
+
+        console.error("Erro ao carregar Planeamento:", e);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="4" style="text-align:center;padding:20px;color:#c62828;">
+                    Erro ao carregar o Planeamento.
+                </td>
+            </tr>
+        `;
     }
 
 }
@@ -4813,8 +4873,12 @@ const fimDate = new Date(now.replace("T", " "));
     msg.style.color="green";
     msg.innerText=`✔ ${tipo} registado com sucesso`;
 
-
-
+    // Depois de submeter com sucesso, limpar TODOS os campos
+    // para evitar que o próximo registo fique com dados anteriores.
+    document.getElementById("forceDate").value = "";
+    document.getElementById("forceHora").value = "";
+    document.getElementById("nomeSelect").value = "";
+    document.getElementById("tipoSelect").value = "login";
 
 }catch(err){
 
@@ -4824,8 +4888,6 @@ const fimDate = new Date(now.replace("T", " "));
     msg.innerText=err.message;
 
 }
-
-    document.getElementById("nomeSelect").value="";
 
     setTimeout(()=>{
         msg.innerText="";
