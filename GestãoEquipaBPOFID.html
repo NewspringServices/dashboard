@@ -1130,7 +1130,7 @@ canvas{
 <div><label>Colaborador</label><br><input type="text" id="fColaboradorTemposInativos" placeholder="Nome"></div>
 <button onclick="carregarRelatorioTemposInativos()"><i class="fa fa-search"></i> Pesquisar</button>
 <button onclick="limparFiltrosTemposInativos()"><i class="fa fa-eraser"></i> Limpar</button>
-<button onclick="carregarRelatorioTemposInativos()"><i class="fa fa-rotate-right"></i> Atualizar</button>
+<button onclick="atualizarTemposInativos()"><i class="fa fa-rotate-right"></i> Atualizar</button>
 <button onclick="exportarRelatorioTemposInativosExcel()"><i class="fa fa-file-excel"></i> Exportar Excel</button>
 </div>
 <div style="overflow-x:auto;">
@@ -5740,6 +5740,47 @@ async function atualizarRelatorios(){
 
     }
 }
+async function atualizarTemposInativos(){
+    const btn = document.querySelector('#relatorioTemposInativos button[onclick="atualizarTemposInativos()"]');
+    const textoOriginal = btn ? btn.innerHTML : '';
+
+    try{
+        if(btn){
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+        }
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/atualizar_tempos_inativos`,
+            {
+                method:"POST",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({})
+            }
+        );
+
+        const texto = await resposta.text();
+        if(!resposta.ok){
+            throw new Error(texto || `Erro HTTP ${resposta.status}`);
+        }
+
+        await carregarRelatorioTemposInativos();
+
+    }catch(e){
+        console.error("Erro ao atualizar tempos inativos:", e);
+        alert("Erro ao atualizar tempos inativos: " + (e.message || e));
+    }finally{
+        if(btn){
+            btn.disabled = false;
+            btn.innerHTML = textoOriginal || '<i class="fa fa-rotate-right"></i> Atualizar';
+        }
+    }
+}
+
 async function carregarRelatorioTemposInativos(){
 
     const tbody = document.querySelector("#tblRelatorioTemposInativos tbody");
@@ -5748,11 +5789,10 @@ async function carregarRelatorioTemposInativos(){
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#777;">A carregar...</td></tr>`;
 
     try{
-
         const fData = (document.getElementById("fDataTemposInativos")?.value || "").trim();
         const fColaborador = (document.getElementById("fColaboradorTemposInativos")?.value || "").trim();
 
-        let url = `${SUPABASE_URL}/rest/v1/tempos_inativos?select=colaborador,data,inicio,fim,duracao,observacao&order=data.desc,inicio.desc&limit=1000`;
+        let url = `${SUPABASE_URL}/rest/v1/Tempos%20Inativos?select=data,colaborador,inicio_inatividade,fim_inatividade,duracao,observacao&order=data.desc,inicio_inatividade.desc&limit=1000`;
 
         if(fData){
             url += `&data=eq.${encodeURIComponent(fData)}`;
@@ -5806,21 +5846,17 @@ async function carregarRelatorioTemposInativos(){
             <tr>
                 <td>${escaparHTML(r.colaborador)}</td>
                 <td>${escaparHTML(formatarData(r.data))}</td>
-                <td>${escaparHTML(formatarHora(r.inicio))}</td>
-                <td>${escaparHTML(formatarHora(r.fim))}</td>
+                <td>${escaparHTML(formatarHora(r.inicio_inatividade))}</td>
+                <td>${escaparHTML(formatarHora(r.fim_inatividade))}</td>
                 <td>${escaparHTML(r.duracao)}</td>
                 <td>${escaparHTML(r.observacao)}</td>
             </tr>
         `).join("");
 
     }catch(e){
-
-        console.error("Erro ao carregar tempos_inativos:",e);
-
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#c62828;">Erro ao carregar os tempos inativos. Verifica a tabela tempos_inativos e os nomes das colunas.</td></tr>`;
-
+        console.error("Erro ao carregar Tempos Inativos:",e);
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:25px;color:#c62828;">Erro ao carregar a tabela Tempos Inativos. Verifica a tabela e os nomes das colunas.</td></tr>`;
     }
-
 }
 
 function limparFiltrosTemposInativos(){document.getElementById("fDataTemposInativos").value="";document.getElementById("fColaboradorTemposInativos").value="";carregarRelatorioTemposInativos();}
@@ -6167,7 +6203,5 @@ window.addEventListener("load", function () {
 </script>
 
 </body></html>
-
-
 
 
