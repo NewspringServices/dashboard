@@ -447,6 +447,9 @@ canvas{
 <a onclick="abrirRelatorioTemposInativos()">
     <i class="fa fa-user-clock"></i> Tempos Inativos
 </a>
+<a onclick="abrirRelatorioPrimeiraTarefa()">
+    <i class="fa fa-list-check"></i> 1.ª Tarefa Dia
+</a>
 
 </div>
 <a onclick="toggleAdministracao()">
@@ -791,6 +794,11 @@ canvas{
 
   
 
+        <div class="card" onclick="abrirRelatorioPrimeiraTarefa()" style="cursor:pointer;">
+            <h3><i class="fa fa-list-check"></i> 1.ª Tarefa Dia</h3>
+            <p>Primeiro login e primeira tarefa do dia.</p>
+        </div>
+
         <div class="card" onclick="abrirRelatorioAlertas()" style="cursor:pointer;">
             <h3><i class="fa fa-triangle-exclamation"></i> Alertas</h3>
             <p>Relatório de alertas.</p>
@@ -1123,6 +1131,24 @@ canvas{
 
 </div>
 
+<div id="relatorioPrimeiraTarefa" style="display:none;padding:25px;">
+<div class="panel">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+<h3 style="margin-bottom:0;"><i class="fa fa-list-check"></i> 1.ª Tarefa Dia</h3>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+<button type="button" id="btnAtualizarPrimeiraTarefa" onclick="atualizarPrimeiraTarefa()"><i class="fa fa-rotate-right"></i> Atualizar</button>
+<button type="button" onclick="exportarRelatorioPrimeiraTarefaExcel()"><i class="fa fa-file-excel"></i> Exportar Excel</button>
+</div></div>
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:20px 0;">
+<div><label>Data</label><br><input type="date" id="fDataPrimeiraTarefa"></div>
+<div><label>Nome</label><br><input type="text" id="fNomePrimeiraTarefa" placeholder="Nome"></div>
+<button type="button" onclick="carregarRelatorioPrimeiraTarefa()"><i class="fa fa-search"></i> Pesquisar</button>
+<button type="button" onclick="limparFiltrosPrimeiraTarefa()"><i class="fa fa-eraser"></i> Limpar</button>
+</div>
+<div id="msgPrimeiraTarefa" style="margin-bottom:15px;font-size:12px;font-weight:600;color:#666;"></div>
+<div style="overflow-x:auto;"><table id="tblRelatorioPrimeiraTarefa" style="width:100%;border-collapse:collapse;min-width:950px;">
+<thead><tr><th>Data</th><th>Nome</th><th>Primeiro Login</th><th>Primeira Tarefa</th><th>Diferença</th><th>Observações</th></tr></thead><tbody></tbody></table></div>
+</div></div>
 <div id="alertas" style="display:none;padding:25px;">
 
     <div class="panel">
@@ -1439,6 +1465,7 @@ function mostrarPlaneamento(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1523,6 +1550,7 @@ function mostrarPlataformas(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1664,6 +1692,7 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1688,6 +1717,7 @@ function mostrarAlertas(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1712,6 +1742,7 @@ function abrirRelatorioOcupacao(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
 
 
@@ -1736,6 +1767,7 @@ function mostrarLogins(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -2174,6 +2206,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -2186,6 +2219,25 @@ if(document.getElementById("retificarProducao")) document.getElementById("retifi
 
 
 
+function abrirRelatorioPrimeiraTarefa(){
+    ["dashboard","plataformas","planeamentoMes","planeamentoDia","logins","relatorios","resumoDia","relatorioProducao","relatorioOcupacao","relatorioTempos","relatorioTemposInativos","alertas","forcarRegistos","retificarProducao"].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display="none";});
+    document.getElementById("relatorioPrimeiraTarefa").style.display="block";
+    carregarRelatorioPrimeiraTarefa();
+}
+function limparFiltrosPrimeiraTarefa(){document.getElementById("fDataPrimeiraTarefa").value="";document.getElementById("fNomePrimeiraTarefa").value="";carregarRelatorioPrimeiraTarefa();}
+function fmtHoraPT(v){if(!v)return "";const t=String(v);return t.includes("T")?t.split("T")[1].substring(0,8):t.substring(0,8);}
+function fmtDataPT(v){if(!v)return "";const t=String(v);return t.includes("T")?t.split("T")[0]:t;}
+async function carregarRelatorioPrimeiraTarefa(){
+ const tbody=document.querySelector("#tblRelatorioPrimeiraTarefa tbody"),msg=document.getElementById("msgPrimeiraTarefa");if(!tbody)return;
+ msg.style.color="#666";msg.innerText="A carregar 1.ª Tarefa Dia...";tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:25px;color:#777;">A carregar...</td></tr>';
+ try{const d=document.getElementById("fDataPrimeiraTarefa").value.trim(),n=document.getElementById("fNomePrimeiraTarefa").value.trim();let url=`${SUPABASE_URL}/rest/v1/MTCBPO_1a_tarefa_dia?select=data,nome,primeiro_login,primeira_tarefa,diferenca,observacoes`;if(d)url+=`&data=eq.${encodeURIComponent(d)}`;if(n)url+=`&nome=ilike.${encodeURIComponent(`*${n}*`)}`;url+="&order=data.desc,nome.asc&limit=5000";
+ const r=await fetch(url,{headers:{apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`},cache:"no-store"}),dados=await r.json();if(!r.ok)throw new Error(dados?.message||dados?.hint||JSON.stringify(dados));tbody.innerHTML="";
+ if(!dados.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;padding:25px;color:#777;">Não foram encontrados registos.</td></tr>';msg.innerText="0 registos encontrados.";return;}
+ dados.forEach((x,i)=>{const tr=document.createElement("tr"),id="obsPT_"+i;tr.innerHTML=`<td>${escaparHTML(fmtDataPT(x.data))}</td><td>${escaparHTML(x.nome??"")}</td><td>${escaparHTML(fmtHoraPT(x.primeiro_login))}</td><td>${escaparHTML(fmtHoraPT(x.primeira_tarefa))}</td><td>${escaparHTML(x.diferenca??"")}</td><td><div style="display:flex;gap:8px"><input id="${id}" value="${String(x.observacoes??"").replace(/&/g,"&amp;").replace(/\"/g,"&quot;").replace(/</g,"&lt;")}" placeholder="Observação..." style="width:100%;height:36px"><button type="button" onclick='guardarObservacaoPrimeiraTarefa(${JSON.stringify(fmtDataPT(x.data))},${JSON.stringify(x.nome??"")},document.getElementById("${id}").value,this)' style="padding:8px 10px"><i class="fa fa-floppy-disk"></i></button></div></td>`;tbody.appendChild(tr);});msg.style.color="#2E7D32";msg.innerText=`${dados.length} registo(s) encontrado(s).`;
+ }catch(e){tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;padding:25px;color:#c62828;">Erro ao carregar: ${escaparHTML(e.message||e)}</td></tr>`;msg.style.color="#c62828";msg.innerText="Erro ao carregar o relatório.";}}
+async function guardarObservacaoPrimeiraTarefa(data,nome,observacoes,btn){if(btn){btn.disabled=true;}try{const r=await fetch(`${SUPABASE_URL}/rest/v1/MTCBPO_1a_tarefa_dia?data=eq.${encodeURIComponent(data)}&nome=eq.${encodeURIComponent(nome)}`,{method:"PATCH",headers:{apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`,"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({observacoes:observacoes||null})});if(!r.ok)throw new Error(await r.text());document.getElementById("msgPrimeiraTarefa").innerText="✓ Observação guardada com sucesso.";}catch(e){document.getElementById("msgPrimeiraTarefa").innerText="✗ Erro ao guardar observação: "+(e.message||e);}finally{if(btn)btn.disabled=false;}}
+async function atualizarPrimeiraTarefa(){const b=document.getElementById("btnAtualizarPrimeiraTarefa"),m=document.getElementById("msgPrimeiraTarefa");if(b)b.disabled=true;m.innerText="A atualizar 1.ª Tarefa Dia...";try{const r=await fetch(`${SUPABASE_URL}/rest/v1/rpc/atualizar_1a_tarefa_dia`,{method:"POST",headers:{apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`,"Content-Type":"application/json"},body:"{}"});if(!r.ok)throw new Error(await r.text());await carregarRelatorioPrimeiraTarefa();m.style.color="#2E7D32";m.innerText="✓ 1.ª Tarefa Dia atualizada com sucesso.";}catch(e){m.style.color="#c62828";m.innerText="✗ Erro ao atualizar: "+(e.message||e);}finally{if(b)b.disabled=false;}}
+function exportarRelatorioPrimeiraTarefaExcel(){const t=document.getElementById("tblRelatorioPrimeiraTarefa");if(!t)return;const wb=XLSX.utils.table_to_book(t,{sheet:"1.ª Tarefa Dia"});XLSX.writeFile(wb,"1a_Tarefa_Dia_MTCBPO.xlsx");}
 function abrirRelatorioTemposInativos(){
 
     if(document.getElementById("dadosMes"))
@@ -3779,6 +3831,7 @@ function mostrarDashboard(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -3805,6 +3858,7 @@ function mostrarRelatorios(){
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
+    if(document.getElementById("relatorioPrimeiraTarefa")) document.getElementById("relatorioPrimeiraTarefa").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
