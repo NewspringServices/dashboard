@@ -1,3 +1,4 @@
+
 <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -450,6 +451,10 @@ canvas{
         <i class="fa fa-user-clock"></i> Tempos Inativos
     </a>
 
+    <a onclick="abrirRelatorio1aTarefaDia()">
+        <i class="fa fa-stopwatch"></i> 1ª Tarefa Dia
+    </a>
+
 </div>
 <a onclick="toggleAdministracao()">
     <i class="fa fa-gear"></i> Administração
@@ -853,6 +858,11 @@ canvas{
             <p>Registo dos períodos de inatividade por colaborador.</p>
         </div>
 
+        <div class="card" onclick="abrirRelatorio1aTarefaDia()" style="cursor:pointer;">
+            <h3><i class="fa fa-stopwatch"></i> 1ª Tarefa Dia</h3>
+            <p>Primeiro login, primeira tarefa e diferença por colaborador.</p>
+        </div>
+
         <div class="card" onclick="abrirRelatorioAlertas()" style="cursor:pointer;">
             <h3><i class="fa fa-triangle-exclamation"></i> Alertas</h3>
             <p>Relatório de alertas.</p>
@@ -1140,6 +1150,64 @@ canvas{
 </table>
 </div>
 </div>
+</div>
+
+<div id="relatorio1aTarefaDia" style="display:none;padding:25px;">
+    <div class="panel">
+
+        <h3><i class="fa fa-stopwatch"></i> 1ª Tarefa Dia</h3>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="fData1aTarefaDia">
+            </div>
+
+            <div>
+                <label>Nome</label><br>
+                <input type="text" id="fNome1aTarefaDia" placeholder="Nome">
+            </div>
+
+            <button type="button" onclick="carregarRelatorio1aTarefaDia()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button type="button" onclick="limparFiltros1aTarefaDia()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+
+            <button type="button" id="btnAtualizar1aTarefaDia" onclick="atualizar1aTarefaDia()">
+                <i class="fa fa-rotate-right"></i> Atualizar
+            </button>
+
+            <button type="button" onclick="exportarRelatorio1aTarefaDiaExcel()">
+                <i class="fa fa-file-excel"></i> Exportar Excel
+            </button>
+
+        </div>
+
+        <div id="msgRelatorio1aTarefaDia"
+             style="margin-bottom:12px;font-size:13px;color:#777;"></div>
+
+        <div style="overflow-x:auto;">
+            <table id="tblRelatorio1aTarefaDia"
+                   style="width:100%;border-collapse:collapse;min-width:950px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Nome</th>
+                        <th>Primeiro Login</th>
+                        <th>Primeira Tarefa</th>
+                        <th>Diferença</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
 </div>
 
 <div id="alertas" style="display:none;padding:25px;">
@@ -1526,6 +1594,7 @@ function mostrarPlaneamento(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -1613,6 +1682,7 @@ function mostrarPlataformas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -1789,6 +1859,7 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     
@@ -1816,6 +1887,7 @@ function mostrarAlertas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
     
@@ -1843,6 +1915,7 @@ function abrirRelatorioOcupacao(){
     document.getElementById("resumoDia").style.display="none";
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
 
@@ -1867,6 +1940,7 @@ function mostrarLogins(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -2308,6 +2382,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -3624,6 +3699,7 @@ function mostrarDashboard(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -3651,6 +3727,7 @@ function mostrarRelatorios(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorio1aTarefaDia")) document.getElementById("relatorio1aTarefaDia").style.display="none";
     if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
@@ -4464,7 +4541,7 @@ async function carregarGraficoProducao(){
 
 const CHAVE_OBSERVACOES_RESUMO = "bpo_resumo_dia_observacoes";
 
-function obterObservacoesResumo(){
+function obterobservacoesResumo(){
     try{
         return JSON.parse(localStorage.getItem(CHAVE_OBSERVACOES_RESUMO) || "{}");
     }catch(e){
@@ -4474,7 +4551,7 @@ function obterObservacoesResumo(){
 }
 
 function obterObservacaoResumo(data, user){
-    const observacoes = obterObservacoesResumo();
+    const observacoes = obterobservacoesResumo();
     return observacoes[`${data}_${user}`] || "";
 }
 
@@ -4482,7 +4559,7 @@ function guardarObservacaoResumo(input){
     const chave = decodeURIComponent(input.dataset.chave || "");
     if(!chave) return;
 
-    const observacoes = obterObservacoesResumo();
+    const observacoes = obterobservacoesResumo();
     observacoes[chave] = input.value;
     localStorage.setItem(CHAVE_OBSERVACOES_RESUMO, JSON.stringify(observacoes));
 }
@@ -5926,7 +6003,7 @@ function abrirRelatorioTemposInativos(){
     if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
 
     if(document.getElementById("dadosMes")) document.getElementById("dadosMes").style.display="none";
-    ["dashboard","plataformas","planeamentoMes","planeamentoDia","logins","relatorios","resumoDia","relatorioProducao","relatorioOcupacao","relatorioTempos","alertas","forcarRegistos","retificarProducao"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
+    ["dashboard","plataformas","planeamentoMes","planeamentoDia","logins","relatorios","resumoDia","relatorioProducao","relatorioOcupacao","relatorioTempos","relatorio1aTarefaDia","alertas","forcarRegistos","retificarProducao"].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display="none";});
     document.getElementById("relatorioTemposInativos").style.display="block";
     carregarRelatorioTemposInativos();
 }
@@ -6253,7 +6330,434 @@ if(
     }
 
 }
-        </script>
+        
+// ============================================================
+// RELATÓRIO: 1ª TAREFA DIA
+// Espelha a tabela BPO_1a_tarefa_dia
+// Campos: data / nome / primeiro_login / primeira_tarefa / diferenca / observacoes
+// ============================================================
+
+function abrirRelatorio1aTarefaDia(){
+
+    if(document.getElementById("dadosMes"))
+        document.getElementById("dadosMes").style.display="none";
+
+    [
+        "dashboard",
+        "plataformas",
+        "planeamentoMes",
+        "planeamentoDia",
+        "logins",
+        "relatorios",
+        "resumoDia",
+        "relatorioProducao",
+        "relatorioOcupacao",
+        "relatorioTempos",
+        "relatorioTemposInativos",
+        "alertas",
+        "forcarRegistos",
+        "retificarProducao",
+        "dadosMes",
+        "inatividadesMes",
+        "carregarPlaneamentoAdmin"
+    ].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.style.display = "none";
+    });
+
+    const relatorio = document.getElementById("relatorio1aTarefaDia");
+    if(relatorio) relatorio.style.display = "block";
+
+    carregarRelatorio1aTarefaDia();
+}
+
+function limparFiltros1aTarefaDia(){
+
+    const data = document.getElementById("fData1aTarefaDia");
+    const nome = document.getElementById("fNome1aTarefaDia");
+
+    if(data) data.value = "";
+    if(nome) nome.value = "";
+
+    carregarRelatorio1aTarefaDia();
+}
+
+function formatarValor1aTarefaDia(valor){
+
+    if(valor === null || valor === undefined)
+        return "";
+
+    return String(valor);
+}
+
+async function atualizar1aTarefaDia(){
+
+    const btn = document.getElementById("btnAtualizar1aTarefaDia");
+    const msg = document.getElementById("msgRelatorio1aTarefaDia");
+    const textoOriginal = btn ? btn.innerHTML : "";
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    if(msg){
+        msg.style.color = "#777";
+        msg.textContent = "A atualizar a 1ª Tarefa Dia...";
+    }
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/atualizar_1a_tarefa_dia_bpo`,
+            {
+                method: "POST",
+                headers: {
+                    apikey: SUPABASE_API_KEY,
+                    Authorization: `Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: "{}"
+            }
+        );
+
+        const texto = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(texto || `Erro HTTP ${resposta.status}`);
+        }
+
+        if(btn){
+            btn.innerHTML = '<i class="fa fa-check"></i> Atualizado';
+        }
+
+        if(msg){
+            msg.style.color = "#2E7D32";
+            msg.textContent = "Dados atualizados com sucesso.";
+        }
+
+        await carregarRelatorio1aTarefaDia();
+
+    }catch(e){
+
+        console.error("Erro ao atualizar 1ª Tarefa Dia:", e);
+
+        if(msg){
+            msg.style.color = "#b00020";
+            msg.textContent = "Erro ao atualizar a 1ª Tarefa Dia.";
+        }
+
+        alert("Não foi possível atualizar a 1ª Tarefa Dia.\n\n" + e.message);
+
+    }finally{
+
+        if(btn){
+            setTimeout(() => {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }, 1200);
+        }
+    }
+}
+
+async function carregarRelatorio1aTarefaDia(){
+
+    const tbody = document.querySelector("#tblRelatorio1aTarefaDia tbody");
+    const msg = document.getElementById("msgRelatorio1aTarefaDia");
+
+    if(!tbody) return;
+
+    const data = (document.getElementById("fData1aTarefaDia")?.value || "").trim();
+    const nome = (document.getElementById("fNome1aTarefaDia")?.value || "").trim();
+
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                <i class="fa fa-spinner fa-spin"></i> A carregar...
+            </td>
+        </tr>
+    `;
+
+    if(msg){
+        msg.style.color = "#777";
+        msg.textContent = "A carregar dados da tabela BPO_1a_tarefa_dia...";
+    }
+
+    try{
+
+        let url =
+            `${SUPABASE_URL}/rest/v1/BPO_1a_tarefa_dia` +
+            `?select=data,nome,primeiro_login,primeira_tarefa,diferenca,observacoes`;
+
+        if(data){
+            url += `&data=eq.${encodeURIComponent(data)}`;
+        }
+
+        if(nome){
+            url += `&nome=ilike.${encodeURIComponent(`*${nome}*`)}`;
+        }
+
+        url += "&order=data.desc,nome.asc";
+
+        const resposta = await fetch(url,{
+            method:"GET",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                "Accept":"application/json"
+            },
+            cache:"no-store"
+        });
+
+        const dados = await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(
+                dados?.message ||
+                dados?.hint ||
+                JSON.stringify(dados)
+            );
+        }
+
+        if(!Array.isArray(dados) || !dados.length){
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                        Não existem registos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            if(msg){
+                msg.style.color = "#777";
+                msg.textContent = "0 registos encontrados.";
+            }
+
+            return;
+        }
+
+        tbody.innerHTML = dados.map(r => {
+
+            const dataRegisto = formatarValor1aTarefaDia(r.data);
+            const nomeRegisto = formatarValor1aTarefaDia(r.nome);
+            const observacao = formatarValor1aTarefaDia(r.observacoes);
+
+            return `
+                <tr>
+                    <td>${escaparHTML(dataRegisto)}</td>
+                    <td>${escaparHTML(nomeRegisto)}</td>
+                    <td>${escaparHTML(formatarValor1aTarefaDia(r.primeiro_login))}</td>
+                    <td>${escaparHTML(formatarValor1aTarefaDia(r.primeira_tarefa))}</td>
+                    <td>${escaparHTML(formatarValor1aTarefaDia(r.diferenca))}</td>
+                    <td style="min-width:330px;">
+                        <div style="display:flex;gap:7px;align-items:center;">
+                            <input
+                                type="text"
+                                value="${escaparHTML(observacao)}"
+                                data-data="${escaparHTML(dataRegisto)}"
+                                data-nome="${escaparHTML(nomeRegisto)}"
+                                placeholder="Escrever observação..."
+                                style="width:100%;height:36px;font-size:13px;"
+                                onkeydown="if(event.key==='Enter'){event.preventDefault();guardarObservacao1aTarefa(this);}"
+                            >
+                            <button
+                                type="button"
+                                onclick="guardarObservacao1aTarefa(this)"
+                                title="Guardar observação"
+                                style="padding:8px 11px;white-space:nowrap;">
+                                <i class="fa fa-floppy-disk"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+        }).join("");
+
+        if(msg){
+            msg.style.color = "#2E7D32";
+            msg.textContent = `${dados.length} registo(s) encontrado(s).`;
+        }
+
+    }catch(e){
+
+        console.error("Erro ao carregar 1ª Tarefa Dia:",e);
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="text-align:center;padding:25px;color:#b00020;">
+                    Erro ao carregar o relatório: ${escaparHTML(e.message)}
+                </td>
+            </tr>
+        `;
+
+        if(msg){
+            msg.style.color = "#b00020";
+            msg.textContent = "Erro ao carregar o relatório.";
+        }
+    }
+}
+
+async function guardarObservacao1aTarefa(elemento){
+
+    const input = elemento?.tagName === "INPUT"
+        ? elemento
+        : elemento?.parentElement?.querySelector("input");
+
+    if(!input) return;
+
+    const data = input.dataset.data || "";
+    const nome = input.dataset.nome || "";
+    const observacao = input.value;
+
+    if(!data || !nome){
+        alert("Não foi possível identificar a data e o nome do registo.");
+        return;
+    }
+
+    const botao = elemento?.tagName === "BUTTON"
+        ? elemento
+        : input.parentElement?.querySelector("button");
+
+    const textoOriginal = botao ? botao.innerHTML : "";
+
+    if(botao){
+        botao.disabled = true;
+        botao.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+    }
+
+    try{
+
+        /*
+         * A tabela BPO_1a_tarefa_dia não é alterada estruturalmente.
+         * A observação é gravada diretamente na coluna existente "observacoes".
+         * Não é utilizado id/id_registo.
+         */
+        const url =
+            `${SUPABASE_URL}/rest/v1/BPO_1a_tarefa_dia` +
+            `?data=eq.${encodeURIComponent(data)}` +
+            `&nome=eq.${encodeURIComponent(nome)}`;
+
+        const resposta = await fetch(url,{
+            method:"PATCH",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                "Content-Type":"application/json",
+                "Prefer":"return=minimal"
+            },
+            body:JSON.stringify({
+                observacoes: observacao
+            })
+        });
+
+        const texto = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(texto || `Erro HTTP ${resposta.status}`);
+        }
+
+        if(botao){
+            botao.innerHTML = '<i class="fa fa-check"></i>';
+            botao.title = "Guardado";
+        }
+
+        setTimeout(() => {
+            if(botao){
+                botao.innerHTML = textoOriginal;
+                botao.title = "Guardar observação";
+                botao.disabled = false;
+            }
+        },1200);
+
+    }catch(e){
+
+        console.error("Erro ao guardar observacoes:",e);
+
+        if(botao){
+            botao.innerHTML = textoOriginal;
+            botao.disabled = false;
+        }
+
+        alert("Não foi possível guardar a observação.\n\n" + e.message);
+    }
+}
+
+function exportarRelatorio1aTarefaDiaExcel(){
+
+    const tabela = document.getElementById("tblRelatorio1aTarefaDia");
+
+    if(!tabela){
+        alert("Não existe tabela para exportar.");
+        return;
+    }
+
+    const linhas = [];
+
+    const cabecalhos = Array.from(
+        tabela.querySelectorAll("thead th")
+    ).map(th => th.innerText.trim());
+
+    linhas.push(cabecalhos);
+
+    tabela.querySelectorAll("tbody tr").forEach(tr => {
+
+        const celulas = Array.from(tr.querySelectorAll("td"));
+
+        if(!celulas.length) return;
+
+        const linha = celulas.map(td => {
+
+            const input = td.querySelector("input");
+
+            return input
+                ? input.value.trim()
+                : td.innerText.trim();
+
+        });
+
+        linhas.push(linha);
+    });
+
+    if(linhas.length <= 1){
+        alert("Não existem dados para exportar.");
+        return;
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(linhas);
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+        wb,
+        ws,
+        "1ª Tarefa Dia"
+    );
+
+    const data = document.getElementById("fData1aTarefaDia")?.value || "";
+
+    let nomeFicheiro;
+
+    if(data){
+
+        nomeFicheiro = `1a_Tarefa_Dia_${data}.xlsx`;
+
+    }else{
+
+        const hoje = new Date();
+
+        const dia = String(hoje.getDate()).padStart(2,"0");
+        const mes = String(hoje.getMonth()+1).padStart(2,"0");
+        const ano = hoje.getFullYear();
+
+        nomeFicheiro =
+            `BPOFID_1a_Tarefa_Dia_${ano}-${mes}-${dia}.xlsx`;
+    }
+
+    XLSX.writeFile(wb,nomeFicheiro);
+}
+
+</script>
 <script>
 window.addEventListener("load", function () {
     setTimeout(function () {
