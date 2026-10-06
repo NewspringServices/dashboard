@@ -444,6 +444,9 @@ canvas{
 <a onclick="abrirRelatorioTempos()">
     <i class="fa fa-stopwatch"></i> Tempos Médios
 </a>
+<a onclick="abrirRelatorioTemposInativos()">
+    <i class="fa fa-user-clock"></i> Tempos Inativos
+</a>
 
 </div>
 <a onclick="toggleAdministracao()">
@@ -793,6 +796,11 @@ canvas{
             <p>Relatório de alertas.</p>
         </div>
 
+        <div class="card" onclick="abrirRelatorioTemposInativos()" style="cursor:pointer;">
+            <h3><i class="fa fa-user-clock"></i> Tempos Inativos</h3>
+            <p>Tempos de inatividade por colaborador.</p>
+        </div>
+
         <div class="card" onclick="abrirRelatorioFerias()" style="cursor:pointer;">
             <h3><i class="fa fa-umbrella-beach"></i> Férias</h3>
             <p>Relatório de férias.</p>
@@ -1043,6 +1051,73 @@ canvas{
             <tbody></tbody>
 
         </table>
+
+    </div>
+
+</div>
+
+
+<div id="relatorioTemposInativos" style="display:none;padding:25px;">
+
+    <div class="panel">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;">
+            <h3 style="margin-bottom:0;">
+                <i class="fa fa-user-clock"></i> Tempos Inativos
+            </h3>
+
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                <button type="button" id="btnAtualizarTemposInativos"
+                        onclick="atualizarTemposInativos()">
+                    <i class="fa fa-rotate-right"></i> Atualizar
+                </button>
+
+                <button type="button" onclick="exportarRelatorioTemposInativosExcel()">
+                    <i class="fa fa-file-excel"></i> Exportar Excel
+                </button>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin:20px 0;">
+
+            <div>
+                <label>Data</label><br>
+                <input type="date" id="fDataTemposInativos">
+            </div>
+
+            <div>
+                <label>Colaborador</label><br>
+                <input type="text" id="fColaboradorTemposInativos" placeholder="Nome">
+            </div>
+
+            <button type="button" onclick="carregarRelatorioTemposInativos()">
+                <i class="fa fa-search"></i> Pesquisar
+            </button>
+
+            <button type="button" onclick="limparFiltrosTemposInativos()">
+                <i class="fa fa-eraser"></i> Limpar
+            </button>
+        </div>
+
+        <div id="msgTemposInativos"
+             style="margin-bottom:15px;font-size:12px;font-weight:600;color:#666;"></div>
+
+        <div style="overflow-x:auto;">
+            <table id="tblRelatorioTemposInativos"
+                   style="width:100%;border-collapse:collapse;min-width:850px;">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Colaborador</th>
+                        <th>Início Inatividade</th>
+                        <th>Fim Inatividade</th>
+                        <th>Duração</th>
+                        <th>Observação</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
 
     </div>
 
@@ -1363,6 +1438,7 @@ function mostrarPlaneamento(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1446,6 +1522,7 @@ function mostrarPlataformas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -1586,6 +1663,7 @@ function mostrarForcarRegistos(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1609,6 +1687,7 @@ function mostrarAlertas(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
 
@@ -1632,6 +1711,7 @@ function abrirRelatorioOcupacao(){
     document.getElementById("resumoDia").style.display="none";
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
 
 
@@ -1655,6 +1735,7 @@ function mostrarLogins(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -2092,6 +2173,7 @@ function mostrarPlaneamentoDia(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -2102,6 +2184,261 @@ if(document.getElementById("retificarProducao")) document.getElementById("retifi
 
 }
 
+
+
+function abrirRelatorioTemposInativos(){
+
+    if(document.getElementById("dadosMes"))
+        document.getElementById("dadosMes").style.display="none";
+
+    document.getElementById("dashboard").style.display="none";
+    document.getElementById("plataformas").style.display="none";
+    document.getElementById("planeamentoMes").style.display="none";
+    document.getElementById("planeamentoDia").style.display="none";
+    document.getElementById("logins").style.display="none";
+    document.getElementById("relatorios").style.display="none";
+    document.getElementById("resumoDia").style.display="none";
+    document.getElementById("relatorioProducao").style.display="none";
+    document.getElementById("relatorioOcupacao").style.display="none";
+    document.getElementById("relatorioTempos").style.display="none";
+    document.getElementById("alertas").style.display="none";
+    document.getElementById("forcarRegistos").style.display="none";
+
+    if(document.getElementById("retificarProducao"))
+        document.getElementById("retificarProducao").style.display="none";
+
+    document.getElementById("relatorioTemposInativos").style.display="block";
+
+    carregarRelatorioTemposInativos();
+}
+
+function limparFiltrosTemposInativos(){
+
+    document.getElementById("fDataTemposInativos").value="";
+    document.getElementById("fColaboradorTemposInativos").value="";
+
+    carregarRelatorioTemposInativos();
+}
+
+function formatarHoraTemposInativos(valor){
+
+    if(!valor) return "";
+
+    const texto=String(valor);
+
+    if(texto.includes("T"))
+        return texto.split("T")[1].substring(0,8);
+
+    return texto.substring(0,8);
+}
+
+function formatarDataTemposInativos(valor){
+
+    if(!valor) return "";
+
+    const texto=String(valor);
+
+    if(texto.includes("T"))
+        return texto.split("T")[0];
+
+    return texto;
+}
+
+async function carregarRelatorioTemposInativos(){
+
+    const tbody=document.querySelector("#tblRelatorioTemposInativos tbody");
+    const msg=document.getElementById("msgTemposInativos");
+
+    if(!tbody) return;
+
+    msg.style.color="#666";
+    msg.innerText="A carregar tempos inativos...";
+
+    tbody.innerHTML=`
+        <tr>
+            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                A carregar...
+            </td>
+        </tr>
+    `;
+
+    try{
+
+        const fData=document.getElementById("fDataTemposInativos").value.trim();
+        const fColaborador=document
+            .getElementById("fColaboradorTemposInativos")
+            .value.trim();
+
+        let url=
+            `${SUPABASE_URL}/rest/v1/MTCBPO_Tempos Inativos`+
+            `?select=data,colaborador,inicio_inatividade,fim_inatividade,duracao,observacao`;
+
+        if(fData)
+            url+=`&data=eq.${encodeURIComponent(fData)}`;
+
+        if(fColaborador)
+            url+=`&colaborador=ilike.${encodeURIComponent(`*${fColaborador}*`)}`;
+
+        url+="&order=data.desc,inicio_inatividade.desc&limit=5000";
+
+        const resposta=await fetch(url,{
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`
+            },
+            cache:"no-store"
+        });
+
+        const dados=await resposta.json();
+
+        if(!resposta.ok){
+            throw new Error(
+                dados?.message ||
+                dados?.hint ||
+                JSON.stringify(dados)
+            );
+        }
+
+        tbody.innerHTML="";
+
+        if(!Array.isArray(dados) || !dados.length){
+
+            tbody.innerHTML=`
+                <tr>
+                    <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                        Não foram encontrados tempos inativos para os filtros selecionados.
+                    </td>
+                </tr>
+            `;
+
+            msg.style.color="#777";
+            msg.innerText="0 registos encontrados.";
+            return;
+        }
+
+        dados.forEach(r=>{
+
+            const tr=document.createElement("tr");
+
+            tr.innerHTML=`
+                <td>${escaparHTML(formatarDataTemposInativos(r.data))}</td>
+                <td>${escaparHTML(r.colaborador ?? "")}</td>
+                <td>${escaparHTML(formatarHoraTemposInativos(r.inicio_inatividade))}</td>
+                <td>${escaparHTML(formatarHoraTemposInativos(r.fim_inatividade))}</td>
+                <td>${escaparHTML(r.duracao ?? "")}</td>
+                <td>${escaparHTML(r.observacao ?? "")}</td>
+            `;
+
+            tbody.appendChild(tr);
+        });
+
+        msg.style.color="#2E7D32";
+        msg.innerText=`${dados.length} registo(s) encontrado(s).`;
+
+    }catch(e){
+
+        console.error("Erro ao carregar Tempos Inativos:",e);
+
+        tbody.innerHTML=`
+            <tr>
+                <td colspan="6" style="text-align:center;padding:25px;color:#c62828;">
+                    Erro ao carregar os Tempos Inativos:
+                    ${escaparHTML(e.message || e)}
+                </td>
+            </tr>
+        `;
+
+        msg.style.color="#c62828";
+        msg.innerText="Erro ao carregar o relatório.";
+    }
+}
+
+async function atualizarTemposInativos(){
+
+    const btn=document.getElementById("btnAtualizarTemposInativos");
+    const msg=document.getElementById("msgTemposInativos");
+
+    if(btn){
+        btn.disabled=true;
+        btn.innerHTML='<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    msg.style.color="#666";
+    msg.innerText="A atualizar tempos inativos...";
+
+    try{
+
+        const resposta=await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/atualizar_tempos_inativos_mtcbpo`,
+            {
+                method:"POST",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({})
+            }
+        );
+
+        const texto=await resposta.text();
+
+        if(!resposta.ok)
+            throw new Error(texto || `Erro HTTP ${resposta.status}`);
+
+        await carregarRelatorioTemposInativos();
+
+        msg.style.color="#2E7D32";
+        msg.innerText="✓ Tempos inativos atualizados com sucesso.";
+
+    }catch(e){
+
+        console.error("Erro ao atualizar Tempos Inativos:",e);
+
+        msg.style.color="#c62828";
+        msg.innerText="✗ Erro ao atualizar: "+(e.message || e);
+
+    }finally{
+
+        if(btn){
+            btn.disabled=false;
+            btn.innerHTML='<i class="fa fa-rotate-right"></i> Atualizar';
+        }
+    }
+}
+
+function exportarRelatorioTemposInativosExcel(){
+
+    const tabela=document.getElementById("tblRelatorioTemposInativos");
+
+    if(!tabela){
+        alert("Não existe tabela para exportar.");
+        return;
+    }
+
+    const wb=XLSX.utils.table_to_book(tabela,{
+        sheet:"Tempos Inativos"
+    });
+
+    const data=document.getElementById("fDataTemposInativos").value;
+
+    let nome;
+
+    if(data){
+        nome=`Tempos_Inativos_${data}.xlsx`;
+    }else{
+
+        const hoje=new Date();
+
+        const dia=String(hoje.getDate()).padStart(2,"0");
+        const mes=String(hoje.getMonth()+1).padStart(2,"0");
+        const ano=hoje.getFullYear();
+
+        nome=`BPOMTC_Tempos_Inativos_${ano}-${mes}-${dia}.xlsx`;
+    }
+
+    XLSX.writeFile(wb,nome);
+}
 
 function abrirRelatorioTempos(){
 
@@ -3441,6 +3778,7 @@ function mostrarDashboard(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -3466,6 +3804,7 @@ function mostrarRelatorios(){
     document.getElementById("relatorioProducao").style.display="none";
     document.getElementById("relatorioOcupacao").style.display="none";
     document.getElementById("relatorioTempos").style.display="none";
+    if(document.getElementById("relatorioTemposInativos")) document.getElementById("relatorioTemposInativos").style.display="none";
     document.getElementById("alertas").style.display="none";
     document.getElementById("forcarRegistos").style.display="none";
 if(document.getElementById("retificarProducao")) document.getElementById("retificarProducao").style.display = "none";
@@ -5370,6 +5709,7 @@ async function atualizarRelatorios(){
             carregarRelatorioProducao(),
             carregarRelatorioOcupacao(),
             carregarRelatorioTempos(),
+            carregarRelatorioTemposInativos(),
             carregarGraficoProducao(),
             carregarCardsDashboard()
         ]);
