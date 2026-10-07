@@ -19,13 +19,11 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
 .conteudo{width:100%;min-height:calc(100vh - 70px)}
 .aba{display:none;width:100%;min-height:calc(100vh - 70px)}
 .aba.active{display:block}
-#abaMulticare,
 #abaFidelidade,
 #abaQualidade{
     background:white;
 }
 
-#abaMulticare iframe,
 #abaFidelidade iframe,
 #abaQualidade iframe{
     width:100%;
@@ -128,10 +126,6 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
             <i class="fa fa-house"></i> Meu Painel
         </button>
 
-        <button id="tabMulticare" class="tab" onclick="abrirAba('multicare')">
-            <i class="fa fa-chart-line"></i> BPO Multicare
-        </button>
-
         <button id="tabFidelidade" class="tab" onclick="abrirAba('fidelidade')">
             <i class="fa fa-building"></i> BPO Fidelidade
         </button>
@@ -209,11 +203,6 @@ body{background:var(--cinza);color:var(--texto);min-height:100vh}
     </div>
 </div>
 
-<div id="abaMulticare" class="aba">
-    <iframe src="GestãoEquipaBPOMTC.html"
-            title="Gestão Equipa BPO Multicare"></iframe>
-</div>
-
     <div id="abaFidelidade" class="aba">
         <iframe src="GestãoEquipaBPOFID.html" title="Gestão Equipa BPO Fidelidade"></iframe>
     </div>
@@ -269,14 +258,12 @@ function abrirAba(aba){
 
     const abas = [
         document.getElementById("abaPainel"),
-        document.getElementById("abaMulticare"),
         document.getElementById("abaFidelidade"),
         document.getElementById("abaQualidade")
     ];
 
     const tabs = [
         document.getElementById("tabPainel"),
-        document.getElementById("tabMulticare"),
         document.getElementById("tabFidelidade"),
         document.getElementById("tabQualidade")
     ];
@@ -287,11 +274,6 @@ function abrirAba(aba){
     if(aba === "painel"){
         document.getElementById("abaPainel").classList.add("active");
         document.getElementById("tabPainel").classList.add("active");
-    }
-
-    if(aba === "multicare"){
-        document.getElementById("abaMulticare").classList.add("active");
-        document.getElementById("tabMulticare").classList.add("active");
     }
 
     if(aba === "fidelidade"){
