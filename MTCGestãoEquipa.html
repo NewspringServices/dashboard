@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestão Equipa BPO</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif}
+:root{--verde:#2E7D32;--verde2:#43A047;--verde3:#66BB6A;--verdeClaro:#E8F5E9;--branco:#fff;--cinza:#f4f7f6;--texto:#263238}
+body{background:var(--cinza);color:var(--texto);min-height:100vh}
+.topbar{height:70px;background:linear-gradient(135deg,#2E7D32,#1B5E20);display:flex;align-items:center;padding:0 25px;box-shadow:0 4px 15px rgba(0,0,0,.15);position:relative;z-index:1000}
+.logo{color:white;font-size:21px;font-weight:700;margin-right:40px;white-space:nowrap}
+.tabs{display:flex;height:100%;align-items:center;gap:8px}
+.tab{height:44px;padding:0 25px;border:none;border-radius:9px;background:rgba(255,255,255,.12);color:white;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:9px;transition:.25s;box-shadow:none}
+.tab:hover{background:rgba(255,255,255,.22);transform:none;box-shadow:none}
+.tab.active{background:white;color:var(--verde);box-shadow:0 3px 10px rgba(0,0,0,.15)}
+.conteudo{width:100%;min-height:calc(100vh - 70px)}
+.aba{display:none;width:100%;min-height:calc(100vh - 70px)}
+.aba.active{display:block}
+#abaMulticare,
+#abaQualidade{
+    background:white;
+}
+
+#abaMulticare iframe,
+#abaQualidade iframe{
+    width:100%;
+    height:calc(100vh - 70px);
+    border:none;
+    display:block;
+}px}
+#abaQualidade{background:white}
+#abaQualidade iframe{width:100%;height:calc(100vh - 70px);border:none;display:block}
+.qualidade-selecao{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:30px}
+.qualidade-box{background:#fff;border-radius:18px;padding:40px;max-width:620px;width:100%;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,.09)}
+.qualidade-box>i{font-size:42px;color:var(--verde);margin-bottom:15px}
+.qualidade-box h2{color:var(--verde);margin-bottom:8px}
+.qualidade-box p{color:#666;margin-bottom:28px}
+.qualidade-opcoes{display:grid;grid-template-columns:1fr;gap:18px}
+.qualidade-opcoes button{border:none;border-radius:14px;padding:25px 15px;background:linear-gradient(135deg,#43A047,#2E7D32);color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:.25s}
+.qualidade-opcoes button:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(46,125,50,.25)}
+.qualidade-opcoes button i{font-size:30px}
+@media(max-width:600px){.qualidade-opcoes{grid-template-columns:1fr}}
+
+
+/* PASSWORD */
+.password-modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:5000}
+.password-modal.show{display:flex}
+.password-box{width:min(400px,92vw);background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:0 15px 45px rgba(0,0,0,.25)}
+.password-box i{font-size:34px;color:var(--verde);margin-bottom:12px}
+.password-box h3{color:var(--verde);margin-bottom:8px}
+.password-box p{color:#666;margin-bottom:18px}
+.password-box input{width:100%;height:44px;border:1px solid #d0d7de;border-radius:9px;padding:0 12px;font-size:14px;outline:none}
+.password-box input:focus{border-color:var(--verde2);box-shadow:0 0 0 3px rgba(67,160,71,.15)}
+.password-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:15px}
+.password-actions button{border:none;border-radius:9px;padding:10px 18px;background:linear-gradient(135deg,#43A047,#2E7D32);color:white;font-weight:600;cursor:pointer}
+.password-actions button.cancelar{background:#78909c}
+.password-error{color:#c62828;font-size:13px;margin-top:12px;min-height:18px}
+
+@media(max-width:700px){
+.topbar{padding:10px;height:auto;min-height:70px;flex-wrap:wrap;gap:10px}
+.logo{width:100%;margin-right:0;text-align:center}
+.tabs{width:100%;justify-content:center;height:50px}
+.tab{padding:0 15px;font-size:13px}
+#abaFidelidade iframe,#abaQualidade iframe{height:calc(100vh - 120px)}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+    <div class="logo">
+        <i class="fa fa-users"></i>
+        Gestão Equipa BPO
+    </div>
+
+    <div class="tabs">
+
+        <button id="tabMulticare" class="tab active" onclick="abrirAba('multicare')">
+            <i class="fa fa-chart-line"></i> BPO Multicare
+        </button>
+
+        <button id="tabQualidade" class="tab" onclick="abrirQualidade()">
+            <i class="fa fa-shield-halved"></i> Qualidade
+        </button>
+    </div>
+</div>
+
+<div class="conteudo">
+<div id="abaMulticare" class="aba">
+    <iframe src="GestãoEquipaBPOMTC.html"
+            title="Gestão Equipa BPO Multicare"></iframe>
+</div>
+<div id="abaQualidade" class="aba">
+        <div id="selecaoQualidade" class="qualidade-selecao">
+            <div class="qualidade-box">
+                <i class="fa fa-shield-halved"></i>
+                <h2>Qualidade</h2>
+                <p>Seleciona a área que pretendes consultar.</p>
+
+                <div class="qualidade-opcoes">
+                    <button onclick="abrirQualidadeArea('fidelidade')">
+                        <i class="fa fa-building"></i>
+                        <span>BPO Multicare</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <iframe id="iframeQualidadeFID"
+                src=""
+                title="Qualidade BPO Multicare"
+                style="display:none"></iframe>
+    </div>
+
+</div>
+
+<!-- JANELA DA PASSWORD -->
+<div id="modalPassword" class="password-modal">
+    <div class="password-box">
+        <i class="fa fa-lock"></i>
+        <h3>Acesso à Qualidade</h3>
+        <p>Introduz a palavra-passe para aceder a esta área.</p>
+
+        <input id="passwordQualidade"
+               type="password"
+               placeholder="Palavra-passe"
+               onkeydown="if(event.key==='Enter') validarPassword()">
+
+        <div class="password-actions">
+            <button class="cancelar" onclick="fecharPassword()">Cancelar</button>
+            <button onclick="validarPassword()">Entrar</button>
+        </div>
+
+        <div id="passwordErro" class="password-error"></div>
+    </div>
+</div>
+
+<script>
+
+function abrirAba(aba){
+
+    const abas = [
+        document.getElementById("abaMulticare"),
+        document.getElementById("abaQualidade")
+    ];
+
+    const tabs = [
+        document.getElementById("tabMulticare"),
+        document.getElementById("tabQualidade")
+    ];
+
+    abas.forEach(x => x.classList.remove("active"));
+    tabs.forEach(x => x.classList.remove("active"));
+
+    if(aba === "multicare"){
+        document.getElementById("abaMulticare").classList.add("active");
+        document.getElementById("tabMulticare").classList.add("active");
+    }
+
+    if(aba === "qualidade"){
+        document.getElementById("abaQualidade").classList.add("active");
+        document.getElementById("tabQualidade").classList.add("active");
+    }
+}
+
+function abrirQualidade(){
+    document.getElementById("passwordQualidade").value = "";
+    document.getElementById("passwordErro").textContent = "";
+    document.getElementById("modalPassword").classList.add("show");
+
+    setTimeout(function(){
+        document.getElementById("passwordQualidade").focus();
+    },100);
+}
+
+function fecharPassword(){
+    document.getElementById("modalPassword").classList.remove("show");
+}
+
+function abrirQualidadeArea(area){
+
+    const selecao = document.getElementById("selecaoQualidade");
+    const fid = document.getElementById("iframeQualidadeFID");
+    fid.style.display = "none";
+    selecao.style.display = "none";
+
+    if(area === "fidelidade"){
+        fid.src = "QualidadeBPOMTC.html";
+        fid.style.display = "block";
+    }
+}
+
+function validarPassword(){
+
+    const password = document.getElementById("passwordQualidade").value;
+
+    /* PASSWORD DA ÁREA QUALIDADE */
+    const PASSWORD_QUALIDADE = "BPO*2026";
+
+    if(password === PASSWORD_QUALIDADE){
+
+        fecharPassword();
+        abrirAba("qualidade");
+
+    }else{
+
+        document.getElementById("passwordErro").textContent =
+            "Palavra-passe incorreta.";
+
+        document.getElementById("passwordQualidade").focus();
+    }
+}
+
+document.addEventListener("DOMContentLoaded",function(){
+    abrirAba("multicare");
+});
+
+</script>
+
+</body>
+</html>
+
