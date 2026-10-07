@@ -1,5 +1,5 @@
 
-<!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
+           <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -1032,7 +1032,7 @@ canvas{
         <i class="fa fa-eraser"></i> Limpar
     </button>
 
-    <button onclick="carregarRelatorioOcupacao()">
+    <button type="button" id="btnAtualizarOcupacao" onclick="atualizarOcupacao()">
         <i class="fa fa-rotate-right"></i> Atualizar
     </button>
     <button onclick="exportarRelatorioOcupacaoExcel()">
@@ -1040,10 +1040,6 @@ canvas{
 </button>
 
 </div>
-        <button onclick="carregarRelatorioOcupacao()">
-            Atualizar
-        </button>
-
         <br><br>
 
         <table id="tblRelatorioOcupacao" style="width:100%;border-collapse:collapse;">
@@ -3483,6 +3479,61 @@ async function carregarRelatorioTempos(){
 
     }
 
+}
+
+
+async function atualizarOcupacao(){
+
+    const btn = document.getElementById("btnAtualizarOcupacao");
+    const textoOriginal = btn ? btn.innerHTML : "";
+
+    if(btn){
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> A atualizar...';
+    }
+
+    try{
+
+        const resposta = await fetch(
+            `${SUPABASE_URL}/rest/v1/rpc/atualizar_resumo_ocupacao`,
+            {
+                method:"POST",
+                headers:{
+                    apikey:SUPABASE_API_KEY,
+                    Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({})
+            }
+        );
+
+        const texto = await resposta.text();
+
+        if(!resposta.ok){
+            throw new Error(texto || `Erro HTTP ${resposta.status}`);
+        }
+
+        await carregarRelatorioOcupacao();
+
+        if(btn){
+            btn.innerHTML = '<i class="fa fa-check"></i> Atualizado';
+        }
+
+    }catch(e){
+
+        console.error("Erro ao atualizar ocupação:", e);
+        alert("Erro ao atualizar a Taxa de Ocupação:\n\n" + (e.message || e));
+
+    }finally{
+
+        if(btn){
+            setTimeout(() => {
+                btn.innerHTML = textoOriginal || '<i class="fa fa-rotate-right"></i> Atualizar';
+                btn.disabled = false;
+            }, 1200);
+        }
+
+    }
 }
 
 
