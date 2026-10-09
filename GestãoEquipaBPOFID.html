@@ -1,5 +1,7 @@
 
            
+          
+           
            <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -1524,6 +1526,10 @@ canvas{
                 <i class="fa fa-eraser"></i> Limpar
             </button>
 
+            <button type="button" onclick="exportarRetificarProducaoExcel()">
+                <i class="fa fa-file-excel"></i> Exportar Excel
+            </button>
+
         </div>
 
         <div id="msgRetificarProducao"
@@ -1538,13 +1544,13 @@ canvas{
 
                 <thead>
                     <tr>
-                        <th>Data</th><th>Colaborador</th><th>Tarefa Finalizada</th><th>Processo GAMA</th><th>Documentos</th><th>Ação</th>
+                        <th>Data</th><th>Colaborador</th><th>Início</th><th>Fim</th><th>Tempo</th><th>Tarefa Finalizada</th><th>Processo GAMA</th><th>Documentos</th><th>Ação</th>
                     </tr>
                 </thead>
 
                 <tbody id="tblRetificarProducaoBody">
                     <tr>
-                        <td colspan="6"
+                        <td colspan="9"
                             style="text-align:center;padding:25px;color:#777;">
                             Nenhuma pesquisa efetuada.
                         </td>
@@ -5252,7 +5258,7 @@ function mostrarRetificarProducao(){
     if(!tbody.children.length){
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                <td colspan="9" style="text-align:center;padding:25px;color:#777;">
                     Aplique pelo menos um filtro para pesquisar.
                 </td>
             </tr>
@@ -5274,7 +5280,7 @@ function limparFiltrosRetificarProducao(){
 
     document.getElementById("tblRetificarProducaoBody").innerHTML = `
         <tr>
-            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+            <td colspan="9" style="text-align:center;padding:25px;color:#777;">
                 Nenhuma pesquisa efetuada.
             </td>
         </tr>
@@ -5352,7 +5358,7 @@ async function pesquisarRetificarProducao(){
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                <td colspan="9" style="text-align:center;padding:25px;color:#777;">
                     Nenhum filtro aplicado.
                 </td>
             </tr>
@@ -5366,7 +5372,7 @@ async function pesquisarRetificarProducao(){
     msg.innerText = "A pesquisar apenas os registos filtrados...";
     tbody.innerHTML = `
         <tr>
-            <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+            <td colspan="9" style="text-align:center;padding:25px;color:#777;">
                 A pesquisar...
             </td>
         </tr>
@@ -5383,7 +5389,7 @@ async function pesquisarRetificarProducao(){
          */
         let url =
             `${SUPABASE_URL}/rest/v1/BPO_dadosprodução` +
-            `?select=id,data,colaborador,tarefaFinalizada,processoGama,Documentos`;
+            `?select=id,data,colaborador,inicio,fim,tempo,tarefaFinalizada,processoGama,Documentos`;
 
         if(data){
 
@@ -5443,7 +5449,7 @@ async function pesquisarRetificarProducao(){
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" style="text-align:center;padding:25px;color:#777;">
+                    <td colspan="9" style="text-align:center;padding:25px;color:#777;">
                         Não existem registos para os filtros selecionados.
                     </td>
                 </tr>
@@ -5461,6 +5467,9 @@ async function pesquisarRetificarProducao(){
                 <tr data-id="${escaparHTML(registo.id)}">
                     <td>${escaparHTML(registo.data)}</td>
                     <td>${escaparHTML(registo.colaborador || "")}</td>
+                    <td>${escaparHTML(registo.inicio ?? "")}</td>
+                    <td>${escaparHTML(registo.fim ?? "")}</td>
+                    <td>${escaparHTML(registo.tempo ?? "")}</td>
 
                     <td>
                         <input
@@ -5519,7 +5528,7 @@ async function pesquisarRetificarProducao(){
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align:center;padding:25px;color:#b00020;">
+                <td colspan="9" style="text-align:center;padding:25px;color:#b00020;">
                     Ocorreu um erro ao pesquisar os registos.
                 </td>
             </tr>
@@ -5529,6 +5538,55 @@ async function pesquisarRetificarProducao(){
 
 }
 
+
+
+function exportarRetificarProducaoExcel(){
+    const tbody = document.getElementById("tblRetificarProducaoBody");
+    if(!tbody){
+        alert("Não foi encontrada a tabela para exportar.");
+        return;
+    }
+
+    const linhas = Array.from(tbody.querySelectorAll("tr[data-id]"));
+    if(!linhas.length){
+        alert("Não existem registos para exportar. Primeiro, efetue uma pesquisa.");
+        return;
+    }
+
+    const dados = [[
+        "Data", "Colaborador", "Início", "Fim", "Tempo",
+        "Tarefa Finalizada", "Processo GAMA", "Documentos"
+    ]];
+
+    linhas.forEach(linha => {
+        const celulas = linha.querySelectorAll("td");
+        dados.push([
+            celulas[0]?.innerText.trim() || "",
+            celulas[1]?.innerText.trim() || "",
+            celulas[2]?.innerText.trim() || "",
+            celulas[3]?.innerText.trim() || "",
+            celulas[4]?.innerText.trim() || "",
+            linha.querySelector(".edit-tarefaFinalizada")?.value ?? celulas[5]?.innerText.trim() ?? "",
+            celulas[6]?.innerText.trim() || "",
+            linha.querySelector(".edit-Documentos")?.value ?? celulas[7]?.innerText.trim() ?? ""
+        ]);
+    });
+
+    if(typeof XLSX === "undefined"){
+        alert("A funcionalidade de exportação Excel não está disponível.");
+        return;
+    }
+
+    const folha = XLSX.utils.aoa_to_sheet(dados);
+    folha["!cols"] = [
+        {wch:12}, {wch:24}, {wch:12}, {wch:12}, {wch:12},
+        {wch:30}, {wch:24}, {wch:18}
+    ];
+    const livro = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(livro, folha, "Retificar Producao");
+    const dataHoje = new Date().toISOString().slice(0,10);
+    XLSX.writeFile(livro, `Retificar_Producao_${dataHoje}.xlsx`);
+}
 
 
 async function eliminarRetificacaoProducao(id, botao){
@@ -6932,6 +6990,3 @@ window.addEventListener("load", function () {
 </script>
 
 </body></html>
-
-
-
