@@ -23,7 +23,7 @@
 </div><div class="menu"><a class="active" onclick="tab('dashboard',this)"><i class="fa fa-house"></i> Dashboard</a><a onclick="tab('dadosMes',this)"><i class="fa fa-chart-column"></i> Dados do Mês</a><a onclick="tab('nova',this)"><i class="fa fa-clipboard-check"></i> Nova Monitorização</a><a onclick="tab('historico',this)"><i class="fa fa-list"></i> Monitorizações</a><a onclick="tab('config',this)"><i class="fa fa-gear"></i> Configuração</a></div></div>
 <div class="main"><div class="top"><h2>Dashboard de Qualidade</h2><div id="clock"></div></div>
 <section id="dashboard"><div class="cards"><div class="card"><h3>Qualidade Global</h3><h1 id="gq">100%</h1></div><div class="card"><h3>Monitorizações</h3><h1 id="gm">0</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="gc">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="ga">0</h1></div></div><div class="content"><div class="panel"><h3 id="objetivoTitulo">Acompanhamento do Objetivo Mensal</h3><p class="small" style="margin-bottom:14px">Objetivo: 30 monitorizações por colaborador · 36 colaboradores · 1.080 monitorizações no total.</p><div class="cards" style="padding:0;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))"><div class="card"><h3>Objetivo</h3><h1 id="objTotal">1080</h1></div><div class="card"><h3>Monitorizadas</h3><h1 id="objFeitas">0</h1></div><div class="card"><h3>Em falta</h3><h1 id="objFalta">1080</h1></div></div><div class="bar"><div id="objFill" class="fill"></div></div><div class="table-wrap" style="margin-top:20px"><table><thead><tr><th>Colaborador</th><th>Objetivo</th><th>Monitorizadas</th><th>Em falta</th><th>Execução</th></tr></thead><tbody id="objetivoBody"></tbody></table></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade</th></tr></thead><tbody id="eqBody"></tbody></table></div></div></div></section>
-<section id="dadosMes" class="hidden"><div class="content"><div class="panel"><h3>Dados do Mês</h3><div class="grid"><div class="field"><label>Mês</label><select id="mesDados" onchange="renderDadosMes()"></select></div><div class="field"><label>Ano</label><select id="anoDados" onchange="renderDadosMes()"></select></div></div></div><div class="cards"><div class="card"><h3>Monitorizações</h3><h1 id="dmMonitorizacoes">0</h1></div><div class="card"><h3>Qualidade Média</h3><h1 id="dmQualidade">0%</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="dmColaboradores">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="dmAbaixo90">0</h1></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmEquipaBody"></tbody></table></div></div><div class="panel"><h3>Ranking de Colaboradores</h3><div class="table-wrap"><table><thead><tr><th>Pos.</th><th>Colaborador</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmRankingBody"></tbody></table></div></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="margin-bottom:0">Monitorizações do Mês</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" onclick="exportDadosMesGlobal()"><i class="fa fa-file-export"></i> Exportar Global</button><button type="button" onclick="exportDadosMesEquipa()"><i class="fa fa-users"></i> Exportar por Equipa</button><button type="button" onclick="exportDadosMes()"><i class="fa fa-file-export"></i> Exportar Monitorizações</button></div></div><div class="table-wrap" style="margin-top:18px"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Equipa</th><th>Tarefa</th><th>GAMA/Processo</th><th>Qualidade</th></tr></thead><tbody id="dmMonitorizacoesBody"></tbody></table></div></div></div></section><section id="nova" class="hidden"><div class="content"><div class="panel"><h3>Dados da Monitorização</h3><div class="grid"><div class="field"><label>Colaborador</label><select id="colaborador"><option value="">Selecionar colaborador</option></select></div><div class="field"><label>Equipa</label><select id="equipa"><option value="">Selecionar equipa</option><option>Automóvel</option><option>Ocorrências</option><option>Saúde</option></select></div><div class="field"><label>Tarefa Monitorizada</label><select id="tarefa"><option value="">Selecionar equipa primeiro</option></select></div><div class="field"><label>Data Monitorização</label><input id="dataMonitorizacao" type="date"></div>
+<section id="dadosMes" class="hidden"><div class="content"><div class="panel"><h3>Dados do Mês</h3><div class="grid"><div class="field"><label>Mês</label><select id="mesDados" onchange="renderDadosMes()"></select></div><div class="field"><label>Ano</label><select id="anoDados" onchange="renderDadosMes()"></select></div></div></div><div class="cards"><div class="card"><h3>Monitorizações</h3><h1 id="dmMonitorizacoes">0</h1></div><div class="card"><h3>Qualidade Média</h3><h1 id="dmQualidade">0%</h1></div><div class="card"><h3>Colaboradores</h3><h1 id="dmColaboradores">0</h1></div><div class="card"><h3>Abaixo de 90%</h3><h1 id="dmAbaixo90">0</h1></div></div><div class="panel"><h3>Resumo por Equipa</h3><div class="table-wrap"><table><thead><tr><th>Equipa</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmEquipaBody"></tbody></table></div></div><div class="panel"><h3>Ranking de Colaboradores</h3><div class="table-wrap"><table><thead><tr><th>Pos.</th><th>Colaborador</th><th>Monitorizações</th><th>Qualidade Média</th><th>Abaixo de 90%</th></tr></thead><tbody id="dmRankingBody"></tbody></table></div></div><div class="panel"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin-bottom:0">Monitorizações do Mês</h3><button type="button" onclick="exportDadosMes()"><i class="fa fa-file-export"></i> Exportar Dados do Mês</button></div><div class="table-wrap" style="margin-top:18px"><table><thead><tr><th>Data</th><th>Colaborador</th><th>Equipa</th><th>Tarefa</th><th>GAMA/Processo</th><th>Qualidade</th></tr></thead><tbody id="dmMonitorizacoesBody"></tbody></table></div></div></div></section><section id="nova" class="hidden"><div class="content"><div class="panel"><h3>Dados da Monitorização</h3><div class="grid"><div class="field"><label>Colaborador</label><select id="colaborador"><option value="">Selecionar colaborador</option></select></div><div class="field"><label>Equipa</label><select id="equipa"><option value="">Selecionar equipa</option><option>Automóvel</option><option>Ocorrências</option><option>Saúde</option></select></div><div class="field"><label>Tarefa Monitorizada</label><select id="tarefa"><option value="">Selecionar equipa primeiro</option></select></div><div class="field"><label>Data Monitorização</label><input id="dataMonitorizacao" type="date"></div>
 <div class="field"><label>Data Tratamento Tarefa</label><input id="dataTarefa" type="date"></div></div></div><div class="panel" style="margin-top:16px;margin-bottom:16px;background:#f7f9f7;border:1px solid #e5e8e5">
 <p class="small"><b>Ponderação:</b> critérios informativos têm 0% e não reduzem a qualidade. Os restantes critérios são calculados sobre o total dos seus pesos.</p>
 </div><div id="painelCriterios" class="panel hidden"><h3>Critérios de Qualidade</h3><div class="field" style="margin-bottom:16px"><label>Número de GAMA/Processo</label><input id="gama" placeholder="N.º GAMA / Processo"></div><div id="criterios"></div><div class="resultado"><div class="result"><span class="small">Qualidade</span><strong id="qual">100%</strong></div><div class="result"><span class="small">Avaliados</span><strong id="avaliados">0</strong></div><div class="result"><span class="small">Falhas</span><strong id="falhas">0</strong></div><div class="result"><span class="small">Informativos</span><strong id="infos">0</strong></div></div><div class="bar"><div id="fill" class="fill"></div></div><div class="actions"><button class="secondary" onclick="limpar()">Limpar</button><button onclick="guardar()"><i class="fa fa-save"></i> Guardar Monitorização</button></div></div></div></section>
@@ -59,16 +59,7 @@
 <hr style="margin:20px 0;border:0;border-top:1px solid #eee">
 <hr style="margin:20px 0;border:0;border-top:1px solid #eee"></div></div></section>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
-const SUPABASE_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_API_KEY);
-let APP_DATA = [];
-let APP_COLS = [];
-let APP_USERS_NOMES = [];
-let APP_READY = false;
-
 const TASKS={'Automóvel':['Aberturas','Indexações'],'Saúde':['Reembolsos Multicare'],'Ocorrências':['Acidentes trabalho','PETS','Acidentes Pessoais','DNP','DNE']};
 const C={
   abertura:[['apolice','Apólice Válida',20,'nao'],['acidente','Tipo de Acidente selecionado Correto?',20,'nao'],['ts','Matrícula Correta de TS inserida',20,'nao'],['terceiro','Matrícula Correta de Terceiro inserida',20,'nao','na'],['docs','Número de Documentos Totais na Tarefa',0,'info'],['catalogacao','Documentos Mal Catalogados?',20,'sim']],
@@ -88,69 +79,33 @@ const C={
   generic:[['qualidade','Critério de Qualidade',100]]
 };
 let resp={};
-function data(){return APP_DATA}
-async function save(d){
-  APP_DATA = Array.isArray(d) ? d : [];
-  const rows = APP_DATA.map(r=>({
-    id:r.id,
-    data:r.data || new Date().toISOString(),
-    data_monitorizacao:r.dataMonitorizacao,
-    data_tarefa:r.dataTarefa || null,
-    colaborador:r.colaborador,
-    equipa:r.equipa,
-    tarefa:r.tarefa,
-    gama:r.gama,
-    qualidade:r.qualidade,
-    respostas:r.respostas || {},
-    observacoes:r.observacoes || {},
-    criterios:r.criterios || [],
-    documentos:r.documentos || ''
-  }));
-  const {data:dbRows,error:readErr}=await sb.from('qualidade_monitorizacoes').select('id');
-  if(readErr){console.error(readErr); alert('Erro ao consultar o Supabase: '+readErr.message); return false;}
-  const wanted=new Set(rows.map(r=>String(r.id)));
-  const removeIds=(dbRows||[]).filter(r=>!wanted.has(String(r.id))).map(r=>r.id);
-  if(removeIds.length){
-    const {error}=await sb.from('qualidade_monitorizacoes').delete().in('id',removeIds);
-    if(error){console.error(error); alert('Erro ao eliminar no Supabase: '+error.message); return false;}
-  }
-  if(rows.length){
-    const {error}=await sb.from('qualidade_monitorizacoes').upsert(rows,{onConflict:'id'});
-    if(error){console.error(error); alert('Erro ao gravar no Supabase: '+error.message); return false;}
-  }
-  return true;
-}
-function cols(){return APP_COLS}
-async function saveCols(c){
-  APP_COLS=Array.isArray(c)?c:[];
-  const {error:delErr}=await sb.from('qualidade_colaboradores').delete().neq('id',0);
-  if(delErr){console.error(delErr);return false;}
-  if(APP_COLS.length){
-    const {error}=await sb.from('qualidade_colaboradores').insert(APP_COLS.map(nome=>({nome})));
-    if(error){console.error(error);return false;}
-  }
-  return true;
-}
+function data(){return JSON.parse(localStorage.getItem('qualidade_v1')||'[]')}function save(d){localStorage.setItem('qualidade_v1',JSON.stringify(d))}function cols(){return JSON.parse(localStorage.getItem('qualidade_cols_v2')||'["Ana Catarina Oliveira Mendonça Barão","Ana Karina Spencer Martins","Ana Sofia Pinheiro Garabito","André Miguel Marques Tavares","Andreia Sofia Figueiredo Grilo","Bruno César Nogueira Manaças","Carina Ourives Lavado","Carla Alexandra Duarte Reis","Carla Mariza Dias Trindade","Carolina Adelaide Viegas Gomes Padeiro","Cintia Maisa Gomes Carlos","Délcia Filomena Emílio Mpengo","Delson da Silva Carvalho","Eunice Rosalina Moiane Machatine Chiau","Fábio Rúben de Abreu Assunção","Gilda Maria Infante Anjos","Gisela Cristina Cidade Cabeca Ingles","Jessica Silva Nogueira Manacas","Joana de Almeida Figueiras","Joana Emanuela Lenho da Costa Sousa","Joel Quissama Mundjanga","Madalena Farinha de Carvalho e Sousa Góis","Marcos Felipe Bastos Moura","Marta Sofia da Conceição Fernandes","Mónica Sofia Pereira Valente","Nádia Filipa Contins Cunha Oliveira","Orlanda Leizi Gomes Francisco","Patrícia Alexandra Viegas André","Rachel Alvarez dos Santos Coelho","Renan dos Santos Bezerra","Sandra Isabel Domingues Facão","Sandra Maria Moreira Bento","Sara Banú Chotumiã","Sofia Isabel Martins Cruz Mendes Ferreira","Susana Carina Marques Bordalo","Vera Lúcia Centeio dos Santos Freitas"]')}function saveCols(c){localStorage.setItem('qualidade_cols_v2',JSON.stringify(c))}
 function tab(id,el){document.querySelectorAll('section').forEach(x=>x.classList.add('hidden'));document.getElementById(id).classList.remove('hidden');document.querySelectorAll('.menu a').forEach(x=>x.classList.remove('active'));if(el)el.classList.add('active');if(id==='dashboard')dash();if(id==='dadosMes'){initDadosMes();renderDadosMes()}if(id==='historico')renderHistorico();if(id==='config'){renderCols();const p=document.getElementById('pesquisarUsers');if(p)p.value='';renderUsersNomes()}}
 function fillCols(){let c=cols();let s=document.getElementById('colaborador');s.innerHTML='<option value="">Selecionar colaborador</option>'+c.map(x=>`<option>${x}</option>`).join('');let f=document.getElementById('fc');f.innerHTML='<option value="">Todos</option>'+c.map(x=>`<option>${x}</option>`).join('')}
-function renderCols(){fillCols()}
-async function addCol(){
-  const input=document.getElementById('novo');
-  if(!input)return;
-  const n=input.value.trim();
-  if(!n)return alert('Escreve o nome do colaborador.');
-  if(APP_COLS.some(x=>x.trim().toLowerCase()===n.toLowerCase()))return alert('Esse colaborador já existe.');
-  APP_COLS.push(n);
-  await saveCols(APP_COLS);
-  input.value='';
-  fillCols();
+function renderCols(){fillCols();document.getElementById('cols').innerHTML=cols().map((x,i)=>`<div style="display:flex;justify-content:space-between;padding:10px;border-bottom:1px solid #eee"><span>${x}</span><button class="danger" onclick="delCol(${i})">Remover</button></div>`).join('')}
+function addCol(){
+let input=document.getElementById('novo');
+let n=input.value.trim();
+if(!n){alert('Escreve o nome do colaborador.');input.focus();return}
+let c=cols();
+if(c.some(x=>x.trim().toLowerCase()===n.toLowerCase())){
+alert('Esse colaborador já existe.');
+input.focus();
+return;
 }
-async function delCol(i){
-  if(i<0||i>=APP_COLS.length)return;
-  if(!confirm('Remover o colaborador "'+APP_COLS[i]+'"?'))return;
-  APP_COLS.splice(i,1);
-  await saveCols(APP_COLS);
-  fillCols();
+c.push(n);
+saveCols(c);
+input.value='';
+renderCols();
+input.focus();
+}
+function delCol(i){
+let c=cols();
+if(i<0||i>=c.length)return;
+if(!confirm('Remover o colaborador "'+c[i]+'"?'))return;
+c.splice(i,1);
+saveCols(c);
+renderCols();
 }
 function criteria(){let t=document.getElementById('tarefa').value;let e=document.getElementById('equipa').value;if(e==='Automóvel'&&t==='Aberturas')return C.abertura;if(e==='Automóvel'&&t==='Indexações')return C.indexacao;if(e==='Ocorrências')return C.ocorrencias;if(e==='Saúde')return C.saude;return C.generic}
 function tarefas(){let e=document.getElementById('equipa').value,s=document.getElementById('tarefa');s.innerHTML='<option value="">Selecionar tarefa</option>'+(TASKS[e]||[]).map(x=>`<option>${x}</option>`).join('');renderCriteria()}
@@ -160,7 +115,7 @@ if(c[3]==='info')return `<div class="criterio"><div class="criterio-top"><b>${c[
 return `<div class="criterio"><div class="criterio-top"><b>${c[1]}</b><span class="peso">${c[2]}% · penaliza se ${c[3]==='sim'?'Sim':'Não'}</span></div><div class="ops"><button id="s_${c[0]}" onclick="answer('${c[0]}','sim')">Sim</button><button id="n_${c[0]}" onclick="answer('${c[0]}','nao')">Não</button>${c[4]==='na'?`<button id="na_${c[0]}" class="secondary" onclick="answer('${c[0]}','na')">N/A</button>`:''}</div>${c[3]?`<div id="o_${c[0]}" class="obs"><label class="small">Observações</label><textarea id="ot_${c[0]}" placeholder="Indicar a informação relevante..."></textarea></div>`:''}</div>`}).join('');calc()}
 function answer(id,v){resp[id]=v;document.getElementById('s_'+id)?.classList.toggle('selected',v==='sim');document.getElementById('n_'+id)?.classList.toggle('selected',v==='nao');document.getElementById('na_'+id)?.classList.toggle('selected',v==='na');let c=criteria().find(x=>x[0]===id);if(c&&c[3]&&c[3]!=='info')document.getElementById('o_'+id)?.classList.toggle('show',v===c[3]);calc()}
 function calc(){let cs=criteria(),peso=0,perdido=0,av=0,fail=0,info=0;cs.forEach(c=>{if(c[3]==='info'){info++;return}peso+=c[2];if(resp[c[0]]){av++;if(resp[c[0]]===c[3]){perdido+=c[2];fail++}}});let q=peso?Math.max(0,(peso-perdido)/peso*100):100;document.getElementById('qual').textContent=q.toFixed(1)+'%';document.getElementById('avaliados').textContent=av;document.getElementById('falhas').textContent=fail;document.getElementById('infos').textContent=info;document.getElementById('fill').style.width=q+'%'}
-async function guardar(){let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dm=document.getElementById('dataMonitorizacao').value,dt=edicaoOriginal?.dataTarefa || document.getElementById('dataTarefa').value;if(!c||!e||!t||!dm||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(x[3]&&resp[x[0]]===x[3]&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1])}let total=cs.filter(x=>x[3]!=='info').reduce((a,x)=>a+x[2],0),perdido=cs.filter(x=>x[3]!=='info'&&resp[x[0]]===x[3]).reduce((a,x)=>a+x[2],0);let obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});let d=data();d.push({id:Date.now(),data:new Date().toISOString(),dataMonitorizacao:dm,colaborador:c,equipa:e,tarefa:t,gama:g,dataTarefa:dt,qualidade:+(total?Math.max(0,(total-perdido)/total*100):100).toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value||''});if(await save(d)){alert('Monitorização guardada.');limpar();dash();tab('historico',document.querySelector('.menu a:nth-child(4)'));renderHistorico();}}
+function guardar(){let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dm=document.getElementById('dataMonitorizacao').value,dt=edicaoOriginal?.dataTarefa || document.getElementById('dataTarefa').value;if(!c||!e||!t||!dm||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(x[3]&&resp[x[0]]===x[3]&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1])}let total=cs.filter(x=>x[3]!=='info').reduce((a,x)=>a+x[2],0),perdido=cs.filter(x=>x[3]!=='info'&&resp[x[0]]===x[3]).reduce((a,x)=>a+x[2],0);let obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});let d=data();d.push({id:Date.now(),data:new Date().toISOString(),dataMonitorizacao:dm,colaborador:c,equipa:e,tarefa:t,gama:g,dataTarefa:dt,qualidade:+(total?Math.max(0,(total-perdido)/total*100):100).toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value||''});save(d);alert('Monitorização guardada.');limpar();dash();tab('historico')}
 function limpar(){
   document.getElementById('dataMonitorizacao').disabled=false;
   document.getElementById('dataTarefa').disabled=false;let hoje=new Date().toISOString().slice(0,10);
@@ -187,34 +142,27 @@ const DEFAULT_USERS_NOMES = [
 ["EX10891","Sara Banú Chotumiã"],["EX10888","Sofia Isabel Martins Cruz Mendes Ferreira"],
 ["EX10886","Susana Carina Marques Bordalo"],["EX11561","Vera Lúcia Centeio dos Santos Freitas"]
 ];
-function getUsersNomes(){return APP_USERS_NOMES}
-async function saveUsersNomes(a){
-  APP_USERS_NOMES=Array.isArray(a)?a:[];
-  const {error:delErr}=await sb.from('qualidade_users_nomes').delete().neq('id',0);
-  if(delErr){console.error(delErr);alert('Erro ao atualizar User/Nome: '+delErr.message);return false;}
-  if(APP_USERS_NOMES.length){
-    const {error}=await sb.from('qualidade_users_nomes').insert(APP_USERS_NOMES.map(x=>({user:x.user,nome:x.nome})));
-    if(error){console.error(error);alert('Erro ao gravar User/Nome: '+error.message);return false;}
-  }
-  return true;
+function getUsersNomes(){
+  const k='qualidade_users_nomes_v1', saved=localStorage.getItem(k);
+  if(saved){try{return JSON.parse(saved)}catch(e){}}
+  const a=DEFAULT_USERS_NOMES.map(x=>({user:x[0],nome:x[1]}));
+  localStorage.setItem(k,JSON.stringify(a)); return a;
 }
-async function addUserNome(){
+function saveUsersNomes(a){localStorage.setItem('qualidade_users_nomes_v1',JSON.stringify(a));}
+function addUserNome(){
   const u=document.getElementById('cfgUser').value.trim().toUpperCase();
   const n=document.getElementById('cfgNome').value.trim();
   if(!u||!n)return alert('Preenche o User e o Nome.');
-  if(APP_USERS_NOMES.some(x=>x.user.toLowerCase()===u.toLowerCase()))return alert('Esse User já existe na lista.');
-  APP_USERS_NOMES.push({user:u,nome:n});
-  if(await saveUsersNomes(APP_USERS_NOMES)){
-    document.getElementById('cfgUser').value='';
-    document.getElementById('cfgNome').value='';
-    renderUsersNomes();
-  }
+  const a=getUsersNomes();
+  if(a.some(x=>x.user.toLowerCase()===u.toLowerCase())){document.getElementById('pesquisarUsers').value=u;renderUsersNomes();return alert('Esse User já existe na lista.');}
+  a.push({user:u,nome:n}); saveUsersNomes(a);
+  document.getElementById('cfgUser').value=''; document.getElementById('cfgNome').value='';
+  renderUsersNomes();
 }
-async function removeUserNome(i){
-  if(!APP_USERS_NOMES[i])return;
+function removeUserNome(i){
+  const a=getUsersNomes(); if(!a[i])return;
   if(!confirm('Eliminar esta associação User/Nome?'))return;
-  APP_USERS_NOMES.splice(i,1);
-  if(await saveUsersNomes(APP_USERS_NOMES))renderUsersNomes();
+  a.splice(i,1); saveUsersNomes(a); renderUsersNomes();
 }
 function renderUsersNomes(){
   const el=document.getElementById('usersNomes');
@@ -223,11 +171,15 @@ function renderUsersNomes(){
   const pesquisa=(document.getElementById('pesquisarUsers')?.value||'').trim().toLowerCase();
   const filtrados=a.map((x,i)=>({x,i})).filter(({x})=>{
     if(!pesquisa)return true;
-    return String(x.user).toLowerCase().includes(pesquisa)||String(x.nome).toLowerCase().includes(pesquisa);
+    return String(x.user).toLowerCase().includes(pesquisa) ||
+           String(x.nome).toLowerCase().includes(pesquisa);
   });
+
   el.innerHTML='<div class="table-wrap"><table><thead><tr><th>User</th><th>Nome</th><th></th></tr></thead><tbody>'+
-    (filtrados.length?filtrados.map(({x,i})=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join(''):
-    '<tr><td colspan="3" class="small" style="text-align:center;padding:18px">Nenhum User ou Nome encontrado.</td></tr>')+
+    (filtrados.length
+      ? filtrados.map(({x,i})=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join('')
+      : '<tr><td colspan="3" class="small" style="text-align:center;padding:18px">Nenhum User ou Nome encontrado.</td></tr>'
+    )+
     '</tbody></table></div>';
 }
 function exportMonitorizacoes(){
@@ -274,59 +226,7 @@ function dadosMesRows(){
  return data().filter(r=>{const d=dadosMesDate(r);return d&&d.getMonth()+1===m&&d.getFullYear()===y}).sort((a,b)=>b.id-a.id)
 }
 function renderDadosMes(){initDadosMes();const rows=dadosMesRows(),avg=rows.length?rows.reduce((s,r)=>s+(+r.qualidade||0),0)/rows.length:0;document.getElementById('dmMonitorizacoes').textContent=rows.length;document.getElementById('dmQualidade').textContent=avg.toFixed(1)+'%';document.getElementById('dmColaboradores').textContent=new Set(rows.map(r=>r.colaborador)).size;document.getElementById('dmAbaixo90').textContent=rows.filter(r=>(+r.qualidade||0)<90).length;document.getElementById('dmEquipaBody').innerHTML=['Automóvel','Ocorrências','Saúde'].map(e=>{const x=rows.filter(r=>r.equipa===e),a=x.length?x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${esc(e)}</td><td>${x.length}</td><td>${x.length?a.toFixed(1)+'%':'—'}</td><td>${x.filter(r=>(+r.qualidade||0)<90).length}</td></tr>`}).join('');const mp={};rows.forEach(r=>(mp[r.colaborador]??=[]).push(r));const rank=Object.entries(mp).map(([n,x])=>({n,c:x.length,a:x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length,b:x.filter(r=>(+r.qualidade||0)<90).length})).sort((a,b)=>b.a-a.a);document.getElementById('dmRankingBody').innerHTML=rank.length?rank.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.n)}</td><td>${r.c}</td><td><span class="badge ${r.a>=90?'good':r.a>=75?'mid':'bad'}">${r.a.toFixed(1)}%</span></td><td>${r.b}</td></tr>`).join(''):'<tr><td colspan="5">Sem dados para o mês selecionado.</td></tr>';document.getElementById('dmMonitorizacoesBody').innerHTML=rows.length?rows.map(r=>{const d=dadosMesDate(r)?.toLocaleDateString('pt-PT')||'';return `<tr><td>${esc(d)}</td><td>${esc(r.colaborador)}</td><td>${esc(r.equipa)}</td><td>${esc(r.tarefa)}</td><td>${esc(r.gama)}</td><td><span class="badge ${r.qualidade>=90?'good':r.qualidade>=75?'mid':'bad'}">${(+r.qualidade||0).toFixed(1)}%</span></td></tr>`}).join(''):'<tr><td colspan="6">Sem monitorizações no mês selecionado.</td></tr>'}
-function exportDadosMesGlobal(){
- const rows=dadosMesRows();
- if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
- const m=document.getElementById('mesDados').value;
- const y=document.getElementById('anoDados').value;
- const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
- const avg=rows.reduce((s,r)=>s+(+r.qualidade||0),0)/rows.length;
- const abaixo=rows.filter(r=>(+r.qualidade||0)<90).length;
- const colaboradores=new Set(rows.map(r=>r.colaborador)).size;
- const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
- const csv=[
-   ['DADOS GLOBAIS DO MÊS'],
-   ['Mês',meses[+m-1]||m],
-   ['Ano',y],
-   [],
-   ['Indicador','Valor'],
-   ['Monitorizações',rows.length],
-   ['Qualidade Média',avg.toFixed(2)+'%'],
-   ['Colaboradores',colaboradores],
-   ['Abaixo de 90%',abaixo]
- ];
- const blob=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Dados_Globais_${y}_${String(m).padStart(2,'0')}.csv`;a.click();
- setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-function exportDadosMesEquipa(){
- const rows=dadosMesRows();
- if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
- const m=document.getElementById('mesDados').value;
- const y=document.getElementById('anoDados').value;
- const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
- const equipas=['Automóvel','Ocorrências','Saúde'];
- const csv=[['Equipa','Monitorizações','Qualidade Média','Abaixo de 90%']];
- equipas.forEach(e=>{
-   const x=rows.filter(r=>r.equipa===e);
-   const avg=x.length?x.reduce((s,r)=>s+(+r.qualidade||0),0)/x.length:0;
-   const abaixo=x.filter(r=>(+r.qualidade||0)<90).length;
-   csv.push([e,x.length,x.length?avg.toFixed(2)+'%':'—',abaixo]);
- });
- const blob=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`Dados_por_Equipa_${y}_${String(m).padStart(2,'0')}.csv`;a.click();
- setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
-function exportDadosMes(){
- const rows=dadosMesRows();
- if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');
- const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
- const csv=[['Data','Colaborador','Equipa','Tarefa','GAMA/Processo','Qualidade']];
- rows.forEach(r=>csv.push([r.dataMonitorizacao||r.data||'',r.colaborador||'',r.equipa||'',r.tarefa||'',r.gama||'',(+r.qualidade||0).toFixed(2)+'%']));
- const b=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'});
- const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Dados_do_Mes.csv';a.click();
- setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
+function exportDadosMes(){const rows=dadosMesRows();if(!rows.length)return alert('Não existem monitorizações no mês selecionado para exportar.');const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,csv=[['Data','Colaborador','Equipa','Tarefa','GAMA/Processo','Qualidade']];rows.forEach(r=>csv.push([r.dataMonitorizacao||r.data||'',r.colaborador||'',r.equipa||'',r.tarefa||'',r.gama||'',(+r.qualidade||0).toFixed(2)+'%']));const b=new Blob(['\uFEFF'+csv.map(r=>r.map(q).join(';')).join('\r\n')],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Dados_do_Mes.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function renderHistorico(){let fc=document.getElementById('fc').value,fe=document.getElementById('fe').value,fq=parseFloat(document.getElementById('fq').value),rows=data().filter(r=>(!fc||r.colaborador===fc)&&(!fe||r.equipa===fe)&&(!fq||r.qualidade>=fq)).sort((a,b)=>b.id-a.id);document.getElementById('hist').innerHTML=rows.map(r=>`<tr><td>${r.dataMonitorizacao?new Date(r.dataMonitorizacao+'T00:00:00').toLocaleDateString('pt-PT'):new Date(r.data).toLocaleDateString('pt-PT')}</td><td>${r.dataTarefa?new Date(r.dataTarefa+'T00:00:00').toLocaleDateString('pt-PT'):''}</td><td>${r.colaborador}</td><td>${r.equipa}</td><td>${r.tarefa}</td><td>${r.gama}</td><td><span class="badge ${r.qualidade>=90?'good':r.qualidade>=75?'mid':'bad'}">${r.qualidade.toFixed(1)}%</span></td><td><button onclick="detail(${r.id})">Ver</button></td></tr>`).join('')||'<tr><td colspan="8">Sem monitorizações.</td></tr>'} 
 
 function esc(v){
@@ -436,14 +336,16 @@ function editDetail(){
     <button onclick="atualizar(${id})"><i class="fa fa-save"></i> Guardar alterações</button>`;
 }
 
-async function atualizar(id){
+function atualizar(id){
   let c=document.getElementById('colaborador').value,
       e=document.getElementById('equipa').value,
       t=document.getElementById('tarefa').value,
       g=document.getElementById('gama').value.trim(),
       dt=document.getElementById('dataTarefa').value;
+
   if(!c||!e||!t||!dt)return alert('Preenche todos os dados iniciais.');
   if(!g)return alert('Preenche o Número de GAMA/Processo.');
+
   let cs=criteria();
   for(let x of cs){
     if(x[3]==='info')continue;
@@ -451,60 +353,62 @@ async function atualizar(id){
     if(x[3]&&resp[x[0]]===x[3]&&!document.getElementById('ot_'+x[0])?.value.trim())
       return alert('Preenche as observações de: '+x[1]);
   }
+
   let total=cs.filter(x=>x[3]!=='info').reduce((a,x)=>a+x[2],0);
   let perdido=cs.filter(x=>x[3]!=='info'&&resp[x[0]]===x[3]).reduce((a,x)=>a+x[2],0);
   let obs={};
-  cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});
-  let d=data(), i=d.findIndex(x=>String(x.id)===String(id));
-  if(i<0)return alert('Monitorização não encontrada.');
-  let original=edicaoOriginal||d[i];
-  d[i]={...original,id:original.id,data:original.data,dataTarefa:original.dataTarefa||dt,
-    colaborador:c,equipa:e,tarefa:t,gama:g,qualidade:+(total?Math.max(0,(total-perdido)/total*100):100).toFixed(2),
-    respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value??original.documentos??''};
-  if(await save(d)){
-    alert('Monitorização atualizada.');
-    limpar();dash();tab('historico',document.querySelector('.menu a:nth-child(4)'));renderHistorico();detail(id);edicaoOriginal=null;
-  }
+  cs.forEach(x=>{
+    let o=document.getElementById('ot_'+x[0]);
+    if(o?.value.trim())obs[x[0]]=o.value.trim();
+  });
+
+  let d=data();
+  let i=d.findIndex(x=>x.id===id);
+  if(i<0)return;
+
+  let original=edicaoOriginal || d[i];
+
+  d[i]={
+    ...original,
+    id:original.id,
+    data:original.data,
+    dataMonitorizacao:original.dataMonitorizacao || '',
+    dataTarefa:original.dataTarefa || dt,
+    colaborador:c,
+    equipa:e,
+    tarefa:t,
+    gama:g,
+    qualidade:+(total?Math.max(0,(total-perdido)/total*100):100).toFixed(2),
+    respostas:{...resp},
+    observacoes:obs,
+    criterios:cs,
+    documentos:document.getElementById('r_docs')?.value ?? original.documentos ?? ''
+  };
+
+  save(d);
+  alert('Monitorização atualizada.');
+  edicaoOriginal=null;
+  limpar();
+  dash();
+  tab('historico',document.querySelector('.menu a:nth-child(4)'));
+  renderHistorico();
+  detail(id);
 }
-async function deleteDetail(){
-  let id=detalheAtualId, d=data();
-  let r=d.find(x=>String(x.id)===String(id));
+
+function deleteDetail(){
+  let id=detalheAtualId;
+  let d=data();
+  let r=d.find(x=>x.id===id);
   if(!r)return;
   if(!confirm('Tem a certeza que pretende eliminar esta monitorização?'))return;
-  const novo=d.filter(x=>String(x.id)!==String(id));
-  if(await save(novo)){closeDetail();renderHistorico();dash();alert('Monitorização eliminada.');}
+  save(d.filter(x=>x.id!==id));
+  closeDetail();
+  renderHistorico();
+  dash();
+  alert('Monitorização eliminada.');
 }
-function dash(){const all=data(),now=new Date(),y=now.getFullYear(),m=now.getMonth();const monthly=all.filter(r=>{const raw=r.dataMonitorizacao;if(!raw)return false;const dt=new Date(String(raw).substring(0,10)+'T00:00:00');return !isNaN(dt.getTime())&&dt.getFullYear()===y&&dt.getMonth()===m});document.getElementById('gm').textContent=monthly.length;document.getElementById('gc').textContent=new Set(monthly.map(x=>x.colaborador)).size;document.getElementById('ga').textContent=monthly.filter(x=>(+x.qualidade||0)<90).length;document.getElementById('gq').textContent=(monthly.length?monthly.reduce((a,x)=>a+(+x.qualidade||0),0)/monthly.length:100).toFixed(1)+'%';let es=['Automóvel','Ocorrências','Saúde'];document.getElementById('eqBody').innerHTML=es.map(e=>{let x=monthly.filter(r=>r.equipa===e),q=x.length?x.reduce((a,r)=>a+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${e}</td><td>${x.length}</td><td>${x.length?q.toFixed(1)+'%':'—'}</td></tr>`}).join('');const roster=cols(),goalEach=30,totalGoal=roster.length*goalEach,done=monthly.length,missing=Math.max(0,totalGoal-done),pct=totalGoal?Math.min(100,done/totalGoal*100):0;document.getElementById('objetivoTitulo').textContent='Acompanhamento do Objetivo Mensal — '+now.toLocaleDateString('pt-PT',{month:'long',year:'numeric'});document.getElementById('objTotal').textContent=totalGoal;document.getElementById('objFeitas').textContent=done;document.getElementById('objFalta').textContent=missing;document.getElementById('objFill').style.width=pct+'%';document.getElementById('objetivoBody').innerHTML=roster.map(n=>{const count=monthly.filter(r=>r.colaborador===n).length,rem=Math.max(0,goalEach-count),pc=Math.min(100,count/goalEach*100);return `<tr><td>${esc(n)}</td><td>${goalEach}</td><td>${count}</td><td>${rem}</td><td><span class="badge ${count>=goalEach?'good':count>0?'mid':'bad'}">${pc.toFixed(0)}%</span></td></tr>`}).join('')}
-document.getElementById('equipa').addEventListener('change',tarefas);
-document.getElementById('tarefa').addEventListener('change',renderCriteria);
-function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}
-setInterval(clock,1000);clock();
 
-async function initApp(){
-  try{
-    const [m,c,u]=await Promise.all([
-      sb.from('qualidade_monitorizacoes').select('*').order('id',{ascending:false}),
-      sb.from('qualidade_colaboradores').select('nome').order('nome'),
-      sb.from('qualidade_users_nomes').select('user,nome').order('nome')
-    ]);
-    if(m.error)throw m.error;
-    if(c.error)throw c.error;
-    if(u.error)throw u.error;
-    APP_DATA=(m.data||[]).map(r=>({
-      id:r.id,data:r.data,dataMonitorizacao:r.data_monitorizacao,dataTarefa:r.data_tarefa,
-      colaborador:r.colaborador,equipa:r.equipa,tarefa:r.tarefa,gama:r.gama,qualidade:+r.qualidade,
-      respostas:r.respostas||{},observacoes:r.observacoes||{},criterios:r.criterios||[],documentos:r.documentos||''
-    }));
-    APP_COLS=(c.data||[]).map(x=>x.nome);
-    APP_USERS_NOMES=(u.data||[]).map(x=>({user:x.user,nome:x.nome}));
-    APP_READY=true;
-    fillCols();initDadosMes();dash();renderUsersNomes();
-    document.getElementById('dataMonitorizacao').value=new Date().toISOString().slice(0,10);
-  }catch(err){
-    console.error(err);
-    alert('Não foi possível ligar ao Supabase. Confirma se executaste o SQL.\\n\\n'+(err.message||err));
-  }
-}
-window.addEventListener('error',e=>console.error('Erro JavaScript:',e.error||e.message));
-initApp();
+function dash(){const all=data(),now=new Date(),y=now.getFullYear(),m=now.getMonth();const monthly=all.filter(r=>{const raw=r.dataMonitorizacao;if(!raw)return false;const dt=new Date(String(raw).substring(0,10)+'T00:00:00');return !isNaN(dt.getTime())&&dt.getFullYear()===y&&dt.getMonth()===m});document.getElementById('gm').textContent=monthly.length;document.getElementById('gc').textContent=new Set(monthly.map(x=>x.colaborador)).size;document.getElementById('ga').textContent=monthly.filter(x=>(+x.qualidade||0)<90).length;document.getElementById('gq').textContent=(monthly.length?monthly.reduce((a,x)=>a+(+x.qualidade||0),0)/monthly.length:100).toFixed(1)+'%';let es=['Automóvel','Ocorrências','Saúde'];document.getElementById('eqBody').innerHTML=es.map(e=>{let x=monthly.filter(r=>r.equipa===e),q=x.length?x.reduce((a,r)=>a+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${e}</td><td>${x.length}</td><td>${x.length?q.toFixed(1)+'%':'—'}</td></tr>`}).join('');const roster=cols(),goalEach=30,totalGoal=roster.length*goalEach,done=monthly.length,missing=Math.max(0,totalGoal-done),pct=totalGoal?Math.min(100,done/totalGoal*100):0;document.getElementById('objetivoTitulo').textContent='Acompanhamento do Objetivo Mensal — '+now.toLocaleDateString('pt-PT',{month:'long',year:'numeric'});document.getElementById('objTotal').textContent=totalGoal;document.getElementById('objFeitas').textContent=done;document.getElementById('objFalta').textContent=missing;document.getElementById('objFill').style.width=pct+'%';document.getElementById('objetivoBody').innerHTML=roster.map(n=>{const count=monthly.filter(r=>r.colaborador===n).length,rem=Math.max(0,goalEach-count),pc=Math.min(100,count/goalEach*100);return `<tr><td>${esc(n)}</td><td>${goalEach}</td><td>${count}</td><td>${rem}</td><td><span class="badge ${count>=goalEach?'good':count>0?'mid':'bad'}">${pc.toFixed(0)}%</span></td></tr>`}).join('')}
+document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();initDadosMes();dash();renderUsersNomes();
 </script></body></html>
+
