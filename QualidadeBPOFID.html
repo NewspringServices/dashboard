@@ -60,6 +60,20 @@
 <hr style="margin:20px 0;border:0;border-top:1px solid #eee"></div></div></section>
 </div>
 <script>
+// CONFIGURAÇÃO SUPABASE: substituir pelos dados do projeto (Project URL e publishable/anon key).
+const SUPABASE_URL = 'https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+const SUPABASE_TABLE = 'monitorizacoes';
+function supabaseConfigurado(){return /^https:\/\/[a-zA-Z0-9-]+\.supabase\.co$/.test(SUPABASE_URL) && SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.startsWith('COLOCA_AQUI');}
+function sbHeaders(extra={}){return {apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json',...extra};}
+function fromDb(r){return {id:Number(r.id),data:r.data||r.created_at||new Date().toISOString(),dataMonitorizacao:r.data_monitorizacao||'',dataTarefa:r.data_tarefa||'',colaborador:r.colaborador||'',equipa:r.equipa||'',tarefa:r.tarefa||'',gama:r.gama||'',tipo:r.tipo||'',qualidade:Number(r.qualidade??100),respostas:r.respostas||{},observacoes:r.observacoes||{},criterios:r.criterios||[],documentos:r.documentos||''};}
+function toDb(r){return {data:r.data||new Date().toISOString(),data_monitorizacao:r.dataMonitorizacao||null,data_tarefa:r.dataTarefa||null,colaborador:r.colaborador||null,equipa:r.equipa||null,tarefa:r.tarefa||null,gama:r.gama||null,tipo:r.tipo||null,qualidade:Number(r.qualidade??0),respostas:r.respostas||{},observacoes:r.observacoes||{},criterios:r.criterios||[],documentos:String(r.documentos??'')};}
+async function sbRequest(path,options={}){if(!supabaseConfigurado())throw new Error('Configura primeiro o SUPABASE_URL e a SUPABASE_ANON_KEY no início do HTML.');const response=await fetch(SUPABASE_URL+'/rest/v1/'+path,{...options,headers:sbHeaders(options.headers||{})});if(!response.ok){let msg='';try{msg=await response.text()}catch(e){}throw new Error('Supabase ('+response.status+'): '+(msg||response.statusText));}if(response.status===204)return null;const text=await response.text();return text?JSON.parse(text):null;}
+async function sbLoad(){const rows=await sbRequest(SUPABASE_TABLE+'?select=*&order=id.desc');return (rows||[]).map(fromDb);}
+async function sbInsert(r){const rows=await sbRequest(SUPABASE_TABLE+'?select=*',{method:'POST',headers:{Prefer:'return=representation'},body:JSON.stringify(toDb(r))});if(!rows||!rows.length)throw new Error('A Supabase não devolveu o registo criado.');return fromDb(rows[0]);}
+async function sbUpdate(r){const rows=await sbRequest(SUPABASE_TABLE+'?id=eq.'+encodeURIComponent(r.id)+'&select=*',{method:'PATCH',headers:{Prefer:'return=representation'},body:JSON.stringify(toDb(r))});if(!rows||!rows.length)throw new Error('Não foi encontrado o registo para atualizar na Supabase.');return fromDb(rows[0]);}
+async function sbDelete(id){await sbRequest(SUPABASE_TABLE+'?id=eq.'+encodeURIComponent(id),{method:'DELETE'});}
+async function carregarSupabase(){if(!supabaseConfigurado()){console.info('Supabase ainda não configurada; a aplicação utiliza o armazenamento local.');return;}try{const rows=await sbLoad();save(rows);dash();renderHistorico();initDadosMes();renderDadosMes();console.info('Monitorizações carregadas da Supabase:',rows.length);}catch(err){console.error(err);alert('Não foi possível carregar as monitorizações da Supabase.\n\n'+err.message);}}
 const TASKS={'Automóvel':['Aberturas','Indexações'],'Saúde':['Reembolsos Multicare'],'Ocorrências':['Acidentes trabalho','PETS','Acidentes Pessoais','DNP','DNE']};
 const C={
   abertura:[['apolice','Apólice Válida',20,'nao'],['acidente','Tipo de Acidente selecionado Correto?',20,'nao'],['ts','Matrícula Correta de TS inserida',20,'nao'],['terceiro','Matrícula Correta de Terceiro inserida',20,'nao','na'],['docs','Número de Documentos Totais na Tarefa',0,'info'],['catalogacao','Documentos Mal Catalogados?',20,'sim']],
@@ -117,7 +131,7 @@ function isPenalty(c,cs=criteria(),answers=resp){if(c[3]==='info')return false;i
 function qualityResult(cs=criteria(),answers=resp){let peso=0,perdido=0,av=0,fail=0,info=0;cs.forEach(c=>{if(c[3]==='info'){info++;return}peso+=c[2];if(answers[c[0]])av++;if(isPenalty(c,cs,answers)){perdido+=c[2];fail++}});return {qualidade:peso?Math.max(0,(peso-perdido)/peso*100):100,avaliados:av,falhas:fail,infos:info}}
 function answer(id,v){resp[id]=v;document.getElementById('s_'+id)?.classList.toggle('selected',v==='sim');document.getElementById('n_'+id)?.classList.toggle('selected',v==='nao');document.getElementById('na_'+id)?.classList.toggle('selected',v==='na');let cs=criteria(),c=cs.find(x=>x[0]===id);if(c&&c[3]&&c[3]!=='info')document.getElementById('o_'+id)?.classList.toggle('show',isPenalty(c,cs,resp));if(cs.some(x=>x[0]==='sinistro')){let sin=cs.find(x=>x[0]==='sinistro');document.getElementById('o_sinistro')?.classList.toggle('show',isPenalty(sin,cs,resp))}calc()}
 function calc(){let r=qualityResult();document.getElementById('qual').textContent=r.qualidade.toFixed(1)+'%';document.getElementById('avaliados').textContent=r.avaliados;document.getElementById('falhas').textContent=r.falhas;document.getElementById('infos').textContent=r.infos;document.getElementById('fill').style.width=r.qualidade+'%'}
-function guardar(){let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dm=document.getElementById('dataMonitorizacao').value,dt=edicaoOriginal?.dataTarefa || document.getElementById('dataTarefa').value;if(!c||!e||!t||!dm||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(isPenalty(x,cs,resp)&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1])}let resultado=qualityResult(cs,resp);let obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});let d=data();d.push({id:Date.now(),data:new Date().toISOString(),dataMonitorizacao:dm,colaborador:c,equipa:e,tarefa:t,gama:g,dataTarefa:dt,qualidade:+resultado.qualidade.toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value||''});save(d);alert('Monitorização guardada.');limpar();dash();tab('historico')}
+async function guardar(){let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dm=document.getElementById('dataMonitorizacao').value,dt=edicaoOriginal?.dataTarefa || document.getElementById('dataTarefa').value;if(!c||!e||!t||!dm||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(isPenalty(x,cs,resp)&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1])}let resultado=qualityResult(cs,resp);let obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});let record={data:new Date().toISOString(),dataMonitorizacao:dm,colaborador:c,equipa:e,tarefa:t,gama:g,dataTarefa:dt,qualidade:+resultado.qualidade.toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value||''};try{if(supabaseConfigurado()){record=await sbInsert(record);}else{record.id=Date.now();alert('A monitorização será guardada apenas neste navegador, porque ainda falta configurar a ligação à Supabase no início do HTML.');}}catch(err){console.error(err);return alert('Não foi possível guardar a monitorização na Supabase.\n\n'+err.message)}let d=data();d.push(record);save(d);alert(supabaseConfigurado()?'Monitorização guardada na Supabase.':'Monitorização guardada localmente.');limpar();dash();tab('historico')}
 function limpar(){
   document.getElementById('dataMonitorizacao').disabled=false;
   document.getElementById('dataTarefa').disabled=false;let hoje=new Date().toISOString().slice(0,10);
@@ -338,80 +352,20 @@ function editDetail(){
     <button onclick="atualizar(${id})"><i class="fa fa-save"></i> Guardar alterações</button>`;
 }
 
-function atualizar(id){
-  let c=document.getElementById('colaborador').value,
-      e=document.getElementById('equipa').value,
-      t=document.getElementById('tarefa').value,
-      g=document.getElementById('gama').value.trim(),
-      dt=document.getElementById('dataTarefa').value;
-
-  if(!c||!e||!t||!dt)return alert('Preenche todos os dados iniciais.');
-  if(!g)return alert('Preenche o Número de GAMA/Processo.');
-
-  let cs=criteria();
-  for(let x of cs){
-    if(x[3]==='info')continue;
-    if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);
-    if(isPenalty(x,cs,resp)&&!document.getElementById('ot_'+x[0])?.value.trim())
-      return alert('Preenche as observações de: '+x[1]);
-  }
-
-  let resultado=qualityResult(cs,resp);
-  let obs={};
-  cs.forEach(x=>{
-    let o=document.getElementById('ot_'+x[0]);
-    if(o?.value.trim())obs[x[0]]=o.value.trim();
-  });
-
-  let d=data();
-  let i=d.findIndex(x=>x.id===id);
-  if(i<0)return;
-
-  let original=edicaoOriginal || d[i];
-
-  d[i]={
-    ...original,
-    id:original.id,
-    data:original.data,
-    dataMonitorizacao:original.dataMonitorizacao || '',
-    dataTarefa:original.dataTarefa || dt,
-    colaborador:c,
-    equipa:e,
-    tarefa:t,
-    gama:g,
-    qualidade:+resultado.qualidade.toFixed(2),
-    respostas:{...resp},
-    observacoes:obs,
-    criterios:cs,
-    documentos:document.getElementById('r_docs')?.value ?? original.documentos ?? ''
-  };
-
-  save(d);
-  alert('Monitorização atualizada.');
-  edicaoOriginal=null;
-  limpar();
-  dash();
-  tab('historico',document.querySelector('.menu a:nth-child(4)'));
-  renderHistorico();
-  detail(id);
+async function atualizar(id){
+  let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dt=document.getElementById('dataTarefa').value;
+  if(!c||!e||!t||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');
+  let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(isPenalty(x,cs,resp)&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1]);}
+  let resultado=qualityResult(cs,resp),obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});
+  let d=data(),i=d.findIndex(x=>x.id===id);if(i<0)return;let original=edicaoOriginal||d[i];
+  let updated={...original,id:original.id,data:original.data,dataMonitorizacao:original.dataMonitorizacao||'',dataTarefa:original.dataTarefa||dt,colaborador:c,equipa:e,tarefa:t,gama:g,qualidade:+resultado.qualidade.toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value??original.documentos??''};
+  try{if(supabaseConfigurado())updated=await sbUpdate(updated);}catch(err){console.error(err);return alert('Não foi possível atualizar a monitorização na Supabase.\n\n'+err.message)}
+  d[i]=updated;save(d);alert(supabaseConfigurado()?'Monitorização atualizada na Supabase.':'Monitorização atualizada localmente.');edicaoOriginal=null;limpar();dash();tab('historico',document.querySelector('.menu a:nth-child(4)'));renderHistorico();detail(id);
 }
 
-function deleteDetail(){
-  let id=detalheAtualId;
-  let d=data();
-  let r=d.find(x=>x.id===id);
-  if(!r)return;
-  if(!confirm('Tem a certeza que pretende eliminar esta monitorização?'))return;
-  save(d.filter(x=>x.id!==id));
-  closeDetail();
-  renderHistorico();
-  dash();
-  alert('Monitorização eliminada.');
-}
+async function deleteDetail(){let id=detalheAtualId,d=data(),r=d.find(x=>x.id===id);if(!r)return;if(!confirm('Tem a certeza que pretende eliminar esta monitorização?'))return;try{if(supabaseConfigurado())await sbDelete(id);}catch(err){console.error(err);return alert('Não foi possível eliminar a monitorização na Supabase.\n\n'+err.message)}save(d.filter(x=>x.id!==id));closeDetail();renderHistorico();dash();alert(supabaseConfigurado()?'Monitorização eliminada da Supabase.':'Monitorização eliminada localmente.');}
 
 function dash(){const all=data(),now=new Date(),y=now.getFullYear(),m=now.getMonth();const monthly=all.filter(r=>{const raw=r.dataMonitorizacao;if(!raw)return false;const dt=new Date(String(raw).substring(0,10)+'T00:00:00');return !isNaN(dt.getTime())&&dt.getFullYear()===y&&dt.getMonth()===m});document.getElementById('gm').textContent=monthly.length;document.getElementById('gc').textContent=new Set(monthly.map(x=>x.colaborador)).size;document.getElementById('ga').textContent=monthly.filter(x=>(+x.qualidade||0)<90).length;document.getElementById('gq').textContent=(monthly.length?monthly.reduce((a,x)=>a+(+x.qualidade||0),0)/monthly.length:100).toFixed(1)+'%';let es=['Automóvel','Ocorrências','Saúde'];document.getElementById('eqBody').innerHTML=es.map(e=>{let x=monthly.filter(r=>r.equipa===e),q=x.length?x.reduce((a,r)=>a+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${e}</td><td>${x.length}</td><td>${x.length?q.toFixed(1)+'%':'—'}</td></tr>`}).join('');const roster=cols(),goalEach=30,totalGoal=roster.length*goalEach,done=monthly.length,missing=Math.max(0,totalGoal-done),pct=totalGoal?Math.min(100,done/totalGoal*100):0;document.getElementById('objetivoTitulo').textContent='Acompanhamento do Objetivo Mensal — '+now.toLocaleDateString('pt-PT',{month:'long',year:'numeric'});document.getElementById('objTotal').textContent=totalGoal;document.getElementById('objFeitas').textContent=done;document.getElementById('objFalta').textContent=missing;document.getElementById('objFill').style.width=pct+'%';document.getElementById('objetivoBody').innerHTML=roster.map(n=>{const count=monthly.filter(r=>r.colaborador===n).length,rem=Math.max(0,goalEach-count),pc=Math.min(100,count/goalEach*100);return `<tr><td>${esc(n)}</td><td>${goalEach}</td><td>${count}</td><td>${rem}</td><td><span class="badge ${count>=goalEach?'good':count>0?'mid':'bad'}">${pc.toFixed(0)}%</span></td></tr>`}).join('')}
-document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();initDadosMes();dash();renderUsersNomes();
+document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();initDadosMes();dash();renderUsersNomes();carregarSupabase();
 </script></body></html>
-
-
 
