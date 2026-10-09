@@ -1,4 +1,5 @@
 
+           
            <!DOCTYPE html><html lang="pt"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Supervisor Dashboard</title>
@@ -1075,7 +1076,8 @@ canvas{
 
     <div>
         <label>Colaborador</label><br>
-        <input type="text" id="fColaboradorTempos" placeholder="Nome">
+        <input type="text" id="fColaboradorTempos" list="listaColaboradoresTemposMedios" placeholder="Pesquisar colaborador" autocomplete="off">
+        <datalist id="listaColaboradoresTemposMedios"></datalist>
     </div>
 
     <button onclick="carregarRelatorioTempos()">
@@ -1094,10 +1096,6 @@ canvas{
 </button>
 
 </div> 
-
-        <button onclick="carregarRelatorioTempos()">
-            Atualizar
-        </button>
 
         <br><br>
 
@@ -1133,7 +1131,8 @@ canvas{
 <h3>Tempos Inativos</h3>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:20px;">
 <div><label>Data</label><br><input type="date" id="fDataTemposInativos"></div>
-<div><label>Colaborador</label><br><input type="text" id="fColaboradorTemposInativos" placeholder="Nome"></div>
+<div><label>Colaborador</label><br><input type="text" id="fColaboradorTemposInativos" list="listaColaboradoresTemposInativos" placeholder="Pesquisar colaborador" autocomplete="off"><datalist id="listaColaboradoresTemposInativos"></datalist></div>
+<div><label>Alerta</label><br><input type="text" id="fAlertaTemposInativos" placeholder="Pesquisar alerta"></div>
 <button onclick="carregarRelatorioTemposInativos()"><i class="fa fa-search"></i> Pesquisar</button>
 <button onclick="limparFiltrosTemposInativos()"><i class="fa fa-eraser"></i> Limpar</button>
 <button onclick="atualizarTemposInativos()"><i class="fa fa-rotate-right"></i> Atualizar</button>
@@ -3092,6 +3091,7 @@ document.addEventListener("keydown", function(e){
 
 async function carregarRelatorioTempos(){
 
+    prepararListaColaboradoresTemposInativos();
     const tbody = document.querySelector("#tblRelatorioTempos tbody");
 
     try{
@@ -5971,6 +5971,57 @@ async function atualizarTemposInativos(){
     }
 }
 
+const colaboradoresTemposInativos = [
+    "Ana Catarina Oliveira Mendonça Barão",
+    "Ana Karina Spencer Martins",
+    "Ana Sofia Pinheiro Garabito",
+    "André Miguel Marques Tavares",
+    "Andreia Sofia Figueiredo Grilo",
+    "Bruno César Nogueira Manaças",
+    "Carina Ourives Lavado",
+    "Carla Alexandra Duarte Reis",
+    "Carla Mariza Dias Trindade",
+    "Carolina Adelaide Viegas Gomes Padeiro",
+    "Cintia Maisa Gomes Carlos",
+    "Délcia Filomena Emílio Mpengo",
+    "Delson da Silva Carvalho",
+    "Eunice Rosalina Moiane Machatine Chiau",
+    "Fábio Rúben de Abreu Assunção",
+    "Gilda Maria Infante Anjos",
+    "Inês Duarte Marques Rodrigues Heitor Ferreira",
+    "Jessica Silva Nogueira Manacas",
+    "Joana de Almeida Figueiras",
+    "Joana Emanuela Lenho da Costa Sousa",
+    "Joel Quissama Mundjanga",
+    "Madalena Farinha de Carvalho e Sousa Góis",
+    "Marcos Felipe Bastos Moura",
+    "Marta Sofia da Conceição Fernandes",
+    "Mónica Sofia Pereira Valente",
+    "Nádia Filipa Contins Cunha Oliveira",
+    "Orlanda Leizi Gomes Francisco",
+    "Patrícia Alexandra Viegas André",
+    "Rachel Alvarez dos Santos Coelho",
+    "Renan dos Santos Bezerra",
+    "Sandra Isabel Domingues Facão",
+    "Sandra Maria Moreira Bento",
+    "Sara Banú Chotumiã",
+    "Sofia Isabel Martins Cruz Mendes Ferreira",
+    "Susana Carina Marques Bordalo",
+    "Vera Lúcia Centeio dos Santos Freitas"
+];
+function prepararListaColaboradoresTemposInativos(){
+    const listas = [
+        document.getElementById("listaColaboradoresTemposInativos"),
+        document.getElementById("listaColaboradoresTemposMedios")
+    ].filter(Boolean);
+    const escapar = valor => String(valor).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    const nomesOrdenados = [...colaboradoresTemposInativos].sort((a,b)=>a.localeCompare(b,"pt-PT",{sensitivity:"base"}));
+    listas.forEach(lista => {
+        if(lista.dataset.preparada === "1") return;
+        lista.innerHTML = nomesOrdenados.map(nome=>`<option value="${escapar(nome)}"></option>`).join("");
+        lista.dataset.preparada = "1";
+    });
+}
 async function carregarRelatorioTemposInativos(){
 
     const tbody = document.querySelector("#tblRelatorioTemposInativos tbody");
@@ -5980,9 +6031,11 @@ async function carregarRelatorioTemposInativos(){
 
     try{
         const fData = (document.getElementById("fDataTemposInativos")?.value || "").trim();
+        prepararListaColaboradoresTemposInativos();
         const fColaborador = (document.getElementById("fColaboradorTemposInativos")?.value || "").trim();
+        const fAlerta = (document.getElementById("fAlertaTemposInativos")?.value || "").trim();
 
-        let url = `${SUPABASE_URL}/rest/v1/Tempos%20Inativos?select=data,colaborador,inicio_inatividade,fim_inatividade,duracao,observacao&order=data.desc,inicio_inatividade.desc&limit=1000`;
+        let url = `${SUPABASE_URL}/rest/v1/Tempos%20Inativos?select=id,data,colaborador,inicio_inatividade,fim_inatividade,duracao,observacao&order=data.desc,inicio_inatividade.desc&limit=1000`;
 
         if(fData){
             url += `&data=eq.${encodeURIComponent(fData)}`;
@@ -5990,6 +6043,9 @@ async function carregarRelatorioTemposInativos(){
 
         if(fColaborador){
             url += `&colaborador=ilike.*${encodeURIComponent(fColaborador)}*`;
+        }
+        if(fAlerta){
+            url += `&observacao=ilike.*${encodeURIComponent(fAlerta)}*`;
         }
 
         const resposta = await fetch(url,{
@@ -6033,13 +6089,25 @@ async function carregarRelatorioTemposInativos(){
         };
 
         tbody.innerHTML = dados.map(r => `
-            <tr>
+            <tr data-inativo-id="${escaparHTML(r.id)}">
                 <td>${escaparHTML(r.colaborador)}</td>
                 <td>${escaparHTML(formatarData(r.data))}</td>
                 <td>${escaparHTML(formatarHora(r.inicio_inatividade))}</td>
                 <td>${escaparHTML(formatarHora(r.fim_inatividade))}</td>
                 <td>${escaparHTML(r.duracao)}</td>
-                <td>${escaparHTML(r.observacao)}</td>
+                <td style="min-width:300px;">
+                    <input type="text"
+                        class="alertaTempoInativo"
+                        data-id="${escaparHTML(r.id)}"
+                        value="${escaparHTML(r.observacao || "")}" 
+                        data-valor-guardado="${escaparHTML(r.observacao || "")}" 
+                        placeholder="Alerta existente — acrescentar informação..."
+                        aria-label="Editar alerta de ${escaparHTML(r.colaborador)}"
+                        oninput="agendarGuardarAlertaInativo(this)"
+                        onblur="guardarAlertaInativo(this)"
+                        style="width:100%;min-width:280px;height:36px;font-size:12px;">
+                    <div class="estadoAlertaInativo" style="font-size:11px;color:#777;margin-top:3px;"></div>
+                </td>
             </tr>
         `).join("");
 
@@ -6049,7 +6117,51 @@ async function carregarRelatorioTemposInativos(){
     }
 }
 
-function limparFiltrosTemposInativos(){document.getElementById("fDataTemposInativos").value="";document.getElementById("fColaboradorTemposInativos").value="";carregarRelatorioTemposInativos();}
+// Guarda automaticamente o alerta/observação na própria tabela Tempos Inativos.
+const temporizadoresAlertaInativo = new WeakMap();
+function agendarGuardarAlertaInativo(input){
+    const estado = input.parentElement.querySelector(".estadoAlertaInativo");
+    if(estado){ estado.style.color="#777"; estado.textContent="A guardar automaticamente..."; }
+    const anterior = temporizadoresAlertaInativo.get(input);
+    if(anterior) clearTimeout(anterior);
+    temporizadoresAlertaInativo.set(input, setTimeout(() => guardarAlertaInativo(input), 700));
+}
+async function guardarAlertaInativo(input){
+    if(!input || input.dataset.guardando === "1") return;
+    const id = input.dataset.id;
+    if(!id || id === "undefined" || id === "null"){
+        const estado = input.parentElement.querySelector(".estadoAlertaInativo");
+        if(estado){ estado.style.color="#c62828"; estado.textContent="Este registo não tem ID; não foi possível guardar."; }
+        return;
+    }
+    const valor = input.value;
+    if(input.dataset.valorGuardado === valor) return;
+    input.dataset.guardando = "1";
+    const estado = input.parentElement.querySelector(".estadoAlertaInativo");
+    try{
+        const resposta = await fetch(`${SUPABASE_URL}/rest/v1/Tempos%20Inativos?id=eq.${encodeURIComponent(id)}`,{
+            method:"PATCH",
+            headers:{
+                apikey:SUPABASE_API_KEY,
+                Authorization:`Bearer ${SUPABASE_API_KEY}`,
+                "Content-Type":"application/json",
+                Prefer:"return=minimal"
+            },
+            body:JSON.stringify({observacao:valor})
+        });
+        const texto = await resposta.text();
+        if(!resposta.ok) throw new Error(texto || `Erro HTTP ${resposta.status}`);
+        input.dataset.valorGuardado = valor;
+        if(estado){ estado.style.color="#2E7D32"; estado.textContent="Guardado automaticamente"; }
+    }catch(e){
+        console.error("Erro ao guardar alerta de tempo inativo:", e);
+        if(estado){ estado.style.color="#c62828"; estado.textContent="Erro ao guardar. Sai do campo e tenta novamente."; }
+    }finally{
+        input.dataset.guardando = "0";
+    }
+}
+
+function limparFiltrosTemposInativos(){document.getElementById("fDataTemposInativos").value="";document.getElementById("fColaboradorTemposInativos").value="";document.getElementById("fAlertaTemposInativos").value="";carregarRelatorioTemposInativos();}
 function abrirRelatorioTemposInativos(){
     if(document.getElementById("inatividadesMes")) document.getElementById("inatividadesMes").style.display="none";
 
@@ -6820,5 +6932,6 @@ window.addEventListener("load", function () {
 </script>
 
 </body></html>
+
 
 
