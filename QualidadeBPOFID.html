@@ -306,7 +306,7 @@ function editDetail(){
 
   let dataMonitorizacaoInput=document.getElementById('dataMonitorizacao');
   dataMonitorizacaoInput.value=(r.dataMonitorizacao || (r.data ? String(r.data).substring(0,10) : '')).substring(0,10);
-  dataMonitorizacaoInput.disabled=true;
+  dataMonitorizacaoInput.disabled=false;
 
   document.getElementById('colaborador').value=r.colaborador||'';
   document.getElementById('equipa').value=r.equipa||'';
@@ -323,14 +323,14 @@ function editDetail(){
     dataTarefaInput.value='';
     dataTarefaInput.removeAttribute('value');
   }
-  dataTarefaInput.disabled=true;
+  dataTarefaInput.disabled=false;
   renderCriteria();
   document.getElementById('gama').value=r.gama||'';
   /* Reaplica a data da tarefa depois de renderizar o formulário. */
   if(r.dataTarefa){
     let dtEdit=document.getElementById('dataTarefa');
     dtEdit.value=String(r.dataTarefa).substring(0,10);
-    dtEdit.disabled=true;
+    dtEdit.disabled=false;
   }
 
   resp={...(r.respostas||{})};
@@ -354,12 +354,12 @@ function editDetail(){
 }
 
 async function atualizar(id){
-  let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dt=document.getElementById('dataTarefa').value;
-  if(!c||!e||!t||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');
+  let c=document.getElementById('colaborador').value,e=document.getElementById('equipa').value,t=document.getElementById('tarefa').value,g=document.getElementById('gama').value.trim(),dm=document.getElementById('dataMonitorizacao').value,dt=document.getElementById('dataTarefa').value;
+  if(!c||!e||!t||!dm||!dt)return alert('Preenche todos os dados iniciais.');if(!g)return alert('Preenche o Número de GAMA/Processo.');
   let cs=criteria();for(let x of cs){if(x[3]==='info')continue;if(!resp[x[0]])return alert('Responde ao critério: '+x[1]);if(isPenalty(x,cs,resp)&&!document.getElementById('ot_'+x[0])?.value.trim())return alert('Preenche as observações de: '+x[1]);}
   let resultado=qualityResult(cs,resp),obs={};cs.forEach(x=>{let o=document.getElementById('ot_'+x[0]);if(o?.value.trim())obs[x[0]]=o.value.trim()});
   let d=data(),i=d.findIndex(x=>x.id===id);if(i<0)return;let original=edicaoOriginal||d[i];
-  let updated={...original,id:original.id,data:original.data,dataMonitorizacao:original.dataMonitorizacao||'',dataTarefa:original.dataTarefa||dt,colaborador:c,equipa:e,tarefa:t,gama:g,qualidade:+resultado.qualidade.toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value??original.documentos??''};
+  let updated={...original,id:original.id,data:original.data,dataMonitorizacao:dm,dataTarefa:dt,colaborador:c,equipa:e,tarefa:t,gama:g,qualidade:+resultado.qualidade.toFixed(2),respostas:{...resp},observacoes:obs,criterios:cs,documentos:document.getElementById('r_docs')?.value??original.documentos??''};
   try{if(supabaseConfigurado())updated=await sbUpdate(updated);}catch(err){console.error(err);return alert('Não foi possível atualizar a monitorização na Supabase.\n\n'+err.message)}
   d[i]=updated;save(d);alert(supabaseConfigurado()?'Monitorização atualizada na Supabase.':'Monitorização atualizada localmente.');edicaoOriginal=null;limpar();dash();tab('historico',document.querySelector('.menu a:nth-child(4)'));renderHistorico();detail(id);
 }
@@ -404,4 +404,6 @@ function limparFiltrosObjetivo(){
 function dash(){const all=data(),now=new Date(),y=now.getFullYear(),m=now.getMonth();const monthly=all.filter(r=>{const raw=r.dataMonitorizacao;if(!raw)return false;const dt=new Date(String(raw).substring(0,10)+'T00:00:00');return !isNaN(dt.getTime())&&dt.getFullYear()===y&&dt.getMonth()===m});document.getElementById('gm').textContent=monthly.length;document.getElementById('gc').textContent=new Set(monthly.map(x=>x.colaborador)).size;document.getElementById('ga').textContent=monthly.filter(x=>(+x.qualidade||0)<90).length;document.getElementById('gq').textContent=formatPercent(monthly.length?monthly.reduce((a,x)=>a+(+x.qualidade||0),0)/monthly.length:100);let es=['Automóvel','Ocorrências','Saúde'];document.getElementById('eqBody').innerHTML=es.map(e=>{let x=monthly.filter(r=>r.equipa===e),q=x.length?x.reduce((a,r)=>a+(+r.qualidade||0),0)/x.length:0;return `<tr><td>${e}</td><td>${x.length}</td><td>${x.length?formatPercent(q):'—'}</td></tr>`}).join('');const roster=cols(),goalEach=30,totalGoal=roster.length*goalEach,done=monthly.length,missing=Math.max(0,totalGoal-done),pct=totalGoal?Math.min(100,done/totalGoal*100):0;document.getElementById('objetivoTitulo').textContent='Acompanhamento do Objetivo Mensal — '+now.toLocaleDateString('pt-PT',{month:'long',year:'numeric'});document.getElementById('objTotal').textContent=totalGoal;document.getElementById('objFeitas').textContent=done;document.getElementById('objFalta').textContent=missing;document.getElementById('objFill').style.width=pct+'%';document.getElementById('objetivoBody').innerHTML=roster.map(n=>{const count=monthly.filter(r=>r.colaborador===n).length,rem=Math.max(0,goalEach-count),pc=Math.min(100,count/goalEach*100);return `<tr><td>${esc(n)}</td><td>${goalEach}</td><td>${count}</td><td>${rem}</td><td><span class="badge ${count>=goalEach?'good':count>0?'mid':'bad'}">${pc.toFixed(0)}%</span></td></tr>`}).join('');filtrarObjetivo()}
 document.getElementById('equipa').addEventListener('change',tarefas);document.getElementById('tarefa').addEventListener('change',renderCriteria);function clock(){document.getElementById('clock').textContent=new Date().toLocaleString('pt-PT')}setInterval(clock,1000);clock();fillCols();initDadosMes();dash();renderUsersNomes();carregarSupabase();
 </script></body></html>
+
+
 
