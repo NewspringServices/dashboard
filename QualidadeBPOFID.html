@@ -228,7 +228,7 @@ function renderUsersNomes(){
 
   el.innerHTML='<div class="table-wrap"><table><thead><tr><th>User</th><th>Nome</th><th>Situação</th><th></th></tr></thead><tbody>'+
     (filtrados.length
-      ? filtrados.map(({x,i})=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><span class="badge ${(x.status==='ausente')?'mid':'good'}">${(x.status==='ausente')?'Ausente':'Ativo'}</span> <button class="secondary" onclick="toggleUserStatus(${i})">${(x.status==='ausente')?'Reativar':'Marcar ausente'}</button> <button type="button" data-nome="${esc(x.nome)}" onclick="iniciarRegistoErroSistema(this.dataset.nome)">Registar erro de sistema</button></td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join('')
+        ? filtrados.map(({x,i})=>`<tr><td>${esc(x.user)}</td><td>${esc(x.nome)}</td><td><span class="badge ${(x.status==='ausente')?'mid':'good'}">${(x.status==='ausente')?'Ausente':'Ativo'}</span> <button class="secondary" onclick="toggleUserStatus(${i})">${(x.status==='ausente')?'Reativar':'Marcar ausente'}</button> <button type="button" data-nome="${esc(x.nome)}" onclick="iniciarRegistoErroSistema(this.dataset.nome)">Motivo de Não Auditável</button></td><td><button class="danger" onclick="removeUserNome(${i})">Eliminar</button></td></tr>`).join('')
       : '<tr><td colspan="3" class="small" style="text-align:center;padding:18px">Nenhum User ou Nome encontrado.</td></tr>'
     )+
     '</tbody></table></div>';
