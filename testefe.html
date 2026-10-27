@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Gestão de Férias</title>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+:root{--verde:#2E7D32;--verde-claro:#E8F5E9;--amarelo:#E9C46A;--amarelo-claro:#FFF8E5;--vermelho:#C62828;--vermelho-claro:#FFEBEE;--fundo:#F7F8F9;--borda:#E1E5E8;--texto:#263238;--cinza:#6B7280}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:var(--fundo);color:var(--texto)}.app{display:flex;min-height:100vh}.sidebar{width:270px;background:#fff;border-right:1px solid var(--borda);padding:28px 18px;position:fixed;top:0;bottom:0}.brand-heading{font-size:21px;font-weight:800;color:var(--verde);padding:5px 12px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}.logo{display:block;max-width:190px;max-height:78px;width:auto;height:auto;object-fit:contain;object-position:left center;margin:0 0 2px}.menu-title{font-size:11px;color:#9AA0A6;text-transform:uppercase;font-weight:700;padding:0 12px 8px}.menu-item{width:100%;border:0;background:transparent;text-align:left;padding:13px 14px;margin-bottom:6px;border-radius:9px;color:#59636E;font-size:14px;font-weight:600;cursor:pointer}.menu-item:hover{background:#F4F6F5}.menu-item.active{background:var(--verde-claro);color:var(--verde)}.main{margin-left:270px;width:calc(100% - 270px);padding:30px 34px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}h1{margin:0 0 5px;font-size:27px}.subtitle{color:var(--cinza);font-size:14px}.month-controls{display:flex;align-items:center;gap:10px}.month-controls button{width:38px;height:38px;border:1px solid var(--borda);background:#fff;border-radius:9px;cursor:pointer;font-size:18px}.month-name{min-width:150px;text-align:center;font-weight:700}.page{display:none}.page.active{display:block}.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.filter{border:1px solid var(--borda);background:#fff;padding:8px 15px;border-radius:20px;cursor:pointer;font-size:12px}.filter.active{background:var(--verde-claro);color:var(--verde);border-color:var(--verde);font-weight:700}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:15px 18px}.stat-label{color:var(--cinza);font-size:12px;margin-bottom:7px}.stat-value{font-size:24px;font-weight:800}.stat-value.green{color:var(--verde)}.map-card{background:#fff;border:1px solid var(--borda);border-radius:12px;overflow:hidden}.map-header{padding:14px 18px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;gap:15px}.map-title{font-size:15px;font-weight:700}.legend{display:flex;gap:18px;color:var(--cinza);font-size:12px}.legend-item{display:flex;align-items:center;gap:6px}.legend-box{width:11px;height:11px;border-radius:3px}.legend-submetido{background:var(--amarelo)}.legend-aprovado{background:var(--verde)}.legend-rejeitado{background:var(--vermelho)}.table-scroll{overflow:auto}.calendar{min-width:1900px;display:grid}.cell{min-height:55px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;display:flex;align-items:center;justify-content:center;font-size:11px;background:#fff}.header-cell{min-height:60px;background:#FAFAFA;flex-direction:column;gap:3px;font-weight:700;position:sticky;top:0;z-index:5}.name-cell{justify-content:flex-start;padding:0 15px;font-size:13px;font-weight:600;position:sticky;left:0;z-index:4;background:#fff}.corner{position:sticky;left:0;top:0;z-index:10;justify-content:flex-start;padding-left:15px}.weekend{background:#F3F4F5}.today{background:var(--verde-claro)!important;color:var(--verde)}.day-number{font-size:13px}.day-name{font-size:9px;color:#858C93;text-transform:uppercase}.periodo{height:42px;margin:0 1px;width:calc(100% - 2px);cursor:pointer;font-size:10px;font-weight:700;transition:.15s;position:relative;z-index:2}.periodo:hover{filter:brightness(.96);box-shadow:0 0 0 2px rgba(46,125,50,.18)}.periodo.submetido{background:var(--amarelo);color:#604900}.periodo.aprovado{background:var(--verde);color:#fff}.periodo.rejeitado{background:var(--vermelho);color:#fff}.periodo.inicio{border-radius:8px 0 0 8px}.periodo.fim{border-radius:0 8px 8px 0}.periodo.unico{border-radius:8px}.estado-dia{font-size:9px;margin-top:2px;opacity:.9}.modal-overlay{display:none;position:fixed;inset:0;background:rgba(25,32,35,.42);z-index:100;align-items:center;justify-content:center;padding:20px}.modal-overlay.show{display:flex}.modal{width:min(500px,100%);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}.modal-top{padding:20px 22px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center}.modal-top h2{margin:0;font-size:18px}.close{border:0;background:#F3F4F5;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px}.modal-body{padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.info{background:#F8F9FA;border-radius:9px;padding:12px}.info small{display:block;color:var(--cinza);font-size:11px;margin-bottom:5px}.info strong{font-size:13px}.estado{margin-top:14px;padding:12px;border-radius:9px;font-size:13px;font-weight:700}.estado.submetido{background:var(--amarelo-claro);color:#604900}.estado.aprovado{background:var(--verde-claro);color:var(--verde)}.estado.rejeitado{background:var(--vermelho-claro);color:var(--vermelho)}.modal-actions{padding:16px 22px;border-top:1px solid var(--borda);display:flex;justify-content:flex-end;gap:8px}.btn{border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}.btn-submeter{background:#EEF1F2;color:#455A64}.btn-rejeitar{background:var(--vermelho);color:#fff}.btn-aprovar{background:var(--verde);color:#fff}.btn:hover{filter:brightness(.95)}.empty{padding:35px;text-align:center;color:var(--cinza);font-size:13px}
+.admin-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.admin-tab{border:1px solid var(--borda);background:#fff;padding:9px 15px;border-radius:20px;cursor:pointer;font-size:12px}.admin-tab.active{background:var(--verde-claro);color:var(--verde);border-color:var(--verde);font-weight:700}.admin-panel{display:none}.admin-panel.active{display:block}.admin-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.admin-card{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:20px;margin-bottom:16px}.admin-card h3{margin:0 0 7px;font-size:16px}.admin-card p{margin:0 0 15px;color:var(--cinza);font-size:13px;line-height:1.5}.upload-zone{border:1px dashed #B9C2C7;border-radius:10px;padding:22px;text-align:center;background:#FAFBFB}.upload-zone input{margin:12px auto 0;display:block}.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.field{border:1px solid var(--borda);background:#fff;border-radius:8px;padding:9px 11px;font-size:13px}.btn-primary{background:var(--verde);color:#fff}.btn-secondary{background:#EEF1F2;color:#455A64}.btn-danger{background:var(--vermelho);color:#fff}.admin-table{width:100%;border-collapse:collapse;font-size:12px}.admin-table th,.admin-table td{padding:10px 11px;border-bottom:1px solid #EDF0F2;text-align:left}.admin-table th{background:#FAFAFA;font-size:11px;color:#66707A}.btn-eliminar-pedido{background:var(--vermelho);color:#fff;white-space:nowrap;padding:8px 10px;font-size:11px}.num{text-align:right!important}.pill-ok{color:var(--verde);font-weight:800}.pill-warn{color:#8A6200;font-weight:800}.pill-bad{color:var(--vermelho);font-weight:800}.progress{height:8px;background:#EEF1F2;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--verde)}.note{font-size:11px;color:var(--cinza);margin-top:10px}.password-wrap{display:flex;gap:8px;max-width:400px}.password-wrap input{flex:1}.toast{position:fixed;right:22px;bottom:22px;background:#263238;color:#fff;padding:12px 15px;border-radius:9px;font-size:12px;z-index:300;display:none;box-shadow:0 10px 30px rgba(0,0,0,.18)}.toast.show{display:block}.success{background:var(--verde)}.error{background:var(--vermelho)}
+.cota-dia{display:block;font-size:9px;line-height:1.15;font-weight:800;color:#245a45;margin-top:3px;white-space:nowrap}.pedidos-dia{display:block;font-size:9px;line-height:1.15;font-weight:700;color:#4B5563;white-space:nowrap}.cota-dia.sem-cota{color:#9AA3AA;font-weight:500}.header-cell{height:78px!important;min-height:78px!important;overflow:visible}
+@media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px);padding:20px}.stats{grid-template-columns:repeat(2,1fr)}.info-grid{grid-template-columns:1fr}.admin-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand-heading"><img src="./logo.png" class="logo" alt="" aria-hidden="true" onerror="this.style.display='none'"><span>MAPA DE FÉRIAS</span></div>
+  <div class="menu-title">Gestão</div>
+  <button class="menu-item active" id="menuSubmetidos" onclick="abrirPagina('submetidos')">Submissão de Pedidos</button>
+  <button class="menu-item" id="menuAprovados" onclick="abrirPagina('aprovados')">Férias Aprovadas</button>
+  <div class="menu-title" style="margin-top:18px">Gestão Supervisor</div>
+  <button class="menu-item" id="menuSupervisorControlo" onclick="abrirPagina('supervisor','controlo')">Controlo de Submissões</button>
+  <div class="menu-title" style="margin-top:18px">Administração</div>
+  <button class="menu-item" id="menuAdmin" onclick="abrirPagina('admin')">Administração</button>
+</aside>
+
+<main class="main">
+<div class="header">
+  <div><h1 id="tituloPagina">Submissão de Pedidos</h1><div class="subtitle">Gestão e acompanhamento das férias da equipa</div></div>
+  <div class="month-controls" id="monthControls"><button onclick="mudarMes(-1)">‹</button><div class="month-name" id="mesAtual"></div><button onclick="mudarMes(1)">›</button></div>
+</div>
+
+<section class="page active" id="paginaSubmetidos">
+  <div class="filters" id="filtrosTipos"></div>
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Colaboradores</div><div class="stat-value" id="totalColaboradores">0</div></div>
+    <div class="stat"><div class="stat-label">Pedidos no mês</div><div class="stat-value green" id="totalPedidos">0</div></div>
+    <div class="stat"><div class="stat-label">Dias pedidos</div><div class="stat-value" id="totalDias">0</div></div>
+    <div class="stat"><div class="stat-label">Por decidir</div><div class="stat-value" id="totalPendentes">0</div></div>
+  </div>
+  <div class="map-card"><div class="map-header"><div class="map-title">Pedidos submetidos</div><div class="legend"><div class="legend-item"><span class="legend-box legend-submetido"></span>Submetido</div><div class="legend-item"><span class="legend-box legend-aprovado"></span>Aprovado</div><div class="legend-item"><span class="legend-box legend-rejeitado"></span>Rejeitado</div></div></div><div class="table-scroll"><div class="calendar" id="mapaSubmetidos"></div></div></div>
+</section>
+
+<section class="page" id="paginaAprovados">
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Colaboradores</div><div class="stat-value" id="apColab">0</div></div>
+    <div class="stat"><div class="stat-label">Dias aprovados no mês</div><div class="stat-value green" id="aprovadosTotal">0</div></div>
+    <div class="stat"><div class="stat-label">Dias de férias</div><div class="stat-value" id="aprovadosDias">0</div></div>
+    <div class="stat"><div class="stat-label">Estado</div><div class="stat-value" style="font-size:16px">Aprovadas</div></div>
+  </div>
+  <div class="map-card"><div class="map-header"><div class="map-title">Férias aprovadas</div><div class="legend"><div class="legend-item"><span class="legend-box legend-aprovado"></span>Aprovada por dia</div></div></div><div class="table-scroll"><div class="calendar" id="mapaAprovados"></div></div></div>
+</section>
+
+
+<section class="page" id="paginaSupervisor">
+  <div class="admin-tabs">
+    <button class="admin-tab active" id="supervisorTabControlo" onclick="abrirSupervisorTab('controlo')">Controlo de Submissões</button>
+    <button class="admin-tab" id="supervisorTabPedidos" onclick="abrirSupervisorTab('pedidos')">Gestão de pedidos</button>
+  </div>
+  <div class="admin-panel" id="adminControlo">
+    <div class="admin-card">
+      <h3>Controlo Submissões</h3>
+      <p>Compara os dias autorizados para cada tipologia com os dias que o colaborador já submeteu. <b>Faltam</b> = dias autorizados − dias já submetidos.</p>
+      <div class="toolbar">
+        <button class="filter active" id="ctrlTodos" onclick="filtrarControlo('TODOS',this)">Todos</button>
+        <button class="filter" onclick="filtrarControlo('2026',this)">2026</button>
+        <button class="filter" onclick="filtrarControlo('2027',this)">2027</button>
+        <button class="btn btn-secondary" onclick="carregarControlo()">Atualizar</button>
+      </div>
+      <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat"><div class="stat-label">Dias autorizados</div><div class="stat-value green" id="ctrlAut">0</div></div>
+        <div class="stat"><div class="stat-label">Dias já submetidos</div><div class="stat-value" id="ctrlSub">0</div></div>
+        <div class="stat"><div class="stat-label">Dias em falta</div><div class="stat-value" id="ctrlFalta">0</div></div>
+      </div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th>Tipo</th><th class="num">Autorizados</th><th class="num">Já submeteu</th><th class="num">Faltam</th><th style="min-width:150px">Progresso</th></tr></thead><tbody id="tabelaControlo"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="admin-panel" id="adminPedidos">
+    <div class="admin-card">
+      <h3>Gestão de pedidos submetidos</h3>
+      <p>Esta lista espelha os registos da tabela <b>fid_SNAT</b>. Eliminar um pedido remove definitivamente a linha original do Supabase; depois de atualizar, deixa de aparecer nas submissões, nas férias aprovadas e nas restantes contagens.</p>
+      <div class="toolbar">
+        <input class="field" id="pesquisaPedidosSNAT" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
+        <button class="btn btn-secondary" onclick="carregarGestaoPedidos()">Atualizar lista</button>
+      </div>
+      <div class="note" id="contagemPedidosSNAT">A carregar registos...</div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>ID</th><th>Nome</th><th>Tipo de dias</th><th>Data de início</th><th>Data de fim</th><th class="num">Total de dias</th><th>Ação</th></tr></thead><tbody id="tabelaGestaoPedidos"><tr><td colspan="7" class="empty">A carregar registos da fid_SNAT...</td></tr></tbody></table></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="paginaAdmin">
+  <div class="admin-tabs">
+    <button class="admin-tab active" id="adminTabDias" onclick="abrirAdminTab('dias')">Dias autorizados</button>
+    <button class="admin-tab" id="adminTabCotas" onclick="abrirAdminTab('cotas')">Cotas de férias</button>
+    <button class="admin-tab" id="adminTabExtracao" onclick="abrirAdminTab('extracao')">Extração</button>
+  </div>
+
+  <div class="admin-panel active" id="adminDias">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3>Carregar dias autorizados</h3>
+        <p>Carrega um Excel com <b>Nome</b> e as colunas <b>FT26 - X Dias</b>, <b>FE26 - X Dias</b>, <b>FP27 - X Dias</b> e <b>FE27 - X Dias</b>. Os dados são gravados/atualizados diretamente no Supabase.</p>
+        <div class="upload-zone">
+          <div><b>Selecionar ficheiro Excel</b></div>
+          <input type="file" id="excelAutorizados" accept=".xlsx,.xls,.csv">
+          <div class="note">Se o mesmo colaborador for carregado novamente, os dias autorizados são atualizados.</div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-primary" onclick="carregarExcelAutorizados()">Carregar para o Supabase</button></div>
+      </div>
+      <div class="admin-card">
+        <h3>Resumo atual</h3>
+        <p>Últimos dados carregados na tabela de dias autorizados.</p>
+        <div class="stats" style="grid-template-columns:1fr 1fr;margin:0">
+          <div class="stat"><div class="stat-label">Colaboradores</div><div class="stat-value" id="autColab">0</div></div>
+          <div class="stat"><div class="stat-label">Dias autorizados</div><div class="stat-value green" id="autTotal">0</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-card">
+      <div class="map-header" style="padding:0 0 12px;border:0"><div class="map-title">Dias autorizados por colaborador</div><button class="btn btn-secondary" onclick="carregarAutorizados()">Atualizar</button></div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th class="num">Dias pendentes de 2026</th><th class="num">Dias autorizados de 2027</th><th class="num">Total</th></tr></thead><tbody id="tabelaAutorizados"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="admin-panel" id="adminCotas">
+    <div class="admin-grid">
+      <div class="admin-card">
+        <h3>Carregar cotas de férias</h3>
+        <p>Carrega o Excel com as colunas <b>Mês</b>, <b>Semana</b>, <b>Data de início</b>, <b>Data de fim</b> e <b>Cotas disponíveis</b>.</p>
+        <div class="upload-zone">
+          <div><b>Selecionar ficheiro Excel das cotas</b></div>
+          <input type="file" id="excelCotas" accept=".xlsx,.xls,.csv">
+          <div class="note">Se a mesma semana já existir (mesmas datas), a quota será atualizada.</div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-primary" onclick="carregarExcelCotas()">Carregar cotas para o Supabase</button></div>
+      </div>
+      <div class="admin-card">
+        <h3>Resumo das cotas</h3>
+        <p>Registos de cotas atualmente guardados.</p>
+        <div class="stats" style="grid-template-columns:1fr 1fr;margin:0">
+          <div class="stat"><div class="stat-label">Semanas configuradas</div><div class="stat-value" id="cotasSemanas">0</div></div>
+          <div class="stat"><div class="stat-label">Total de cotas semanais</div><div class="stat-value green" id="cotasTotal">0</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="admin-card">
+      <div class="map-header" style="padding:0 0 12px;border:0"><div class="map-title">Cotas carregadas</div><button class="btn btn-secondary" onclick="carregarCotas()">Atualizar</button></div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Mês</th><th>Semana</th><th>Data de início</th><th>Data de fim</th><th class="num">Cotas disponíveis</th></tr></thead><tbody id="tabelaCotas"></tbody></table></div>
+    </div>
+  </div>
+
+  <div class="admin-panel" id="adminExtracao">
+    <div class="admin-card">
+      <h3>Extração das férias aprovadas</h3>
+      <div class="password-wrap">
+        <input class="field" id="senhaExtracao" type="password" placeholder="Palavra-passe">
+        <button class="btn btn-primary" onclick="extrairAprovadas()">Extrair Excel</button>
+      </div>
+      <div class="note">Inclui apenas dias com estado <b>Aprovado</b>. Não altera os dados no Supabase.</div>
+    </div>
+  </div>
+
+
+</section>
+</main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="fecharModalFora(event)">
+<div class="modal"><div class="modal-top"><h2>Pedido de férias</h2><button class="close" onclick="fecharModal()">×</button></div>
+<div class="modal-body"><div class="info-grid"><div class="info"><small>Colaborador</small><strong id="mNome">—</strong></div><div class="info"><small>Tipo</small><strong id="mTipo">—</strong></div><div class="info"><small>Dia</small><strong id="mDia">—</strong></div><div class="info"><small>Período do pedido</small><strong id="mPeriodo">—</strong></div></div><div class="estado" id="mEstado">—</div></div>
+<div class="modal-actions"><button class="btn btn-submeter" id="btnSubmetido" onclick="alterarEstado('submetido')">Voltar a submetido</button><button class="btn btn-rejeitar" onclick="alterarEstado('rejeitado')">Rejeitar</button><button class="btn btn-aprovar" onclick="alterarEstado('aprovado')">Aprovar</button></div>
+</div></div>
+<div class="modal-overlay" id="adminPasswordOverlay" style="z-index:250" onclick="fecharGateAdminFora(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="adminPasswordTitle">
+    <div class="modal-top"><h2 id="adminPasswordTitle">Acesso à Administração</h2><button class="close" onclick="fecharGateAdmin()" aria-label="Fechar">×</button></div>
+    <div class="modal-body">
+      <p style="margin:0 0 14px;color:var(--cinza);font-size:13px">Introduz a palavra-passe para abrir as opções de administração.</p>
+      <div class="password-wrap"><input class="field" id="senhaAdmin" type="password" placeholder="Palavra-passe" autocomplete="current-password" style="max-width:none"></div>
+      <div id="erroSenhaAdmin" class="note" style="display:none;color:var(--vermelho);font-weight:700">Palavra-passe incorreta.</div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-secondary" onclick="fecharGateAdmin()">Cancelar</button><button class="btn btn-primary" onclick="validarSenhaAdmin()">Entrar</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL='https://bijndfsxrzjviwrdvwms.supabase.co';
+const SUPABASE_API_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
+const SUPABASE_TABLE='fid_SNAT';
+const ESTADOS_TABLE='fid_snat_estados';
+const AUT_TABLE='fid_teste';
+const TIPOS=['FT26','FE26','FP27','F27'];
+
+let colaboradores=[], autorizados=[], cotasSemanis=[], pedidosSNATAdmin=[], paginaAtual='submetidos', filtroTipo='TODOS', filtroControlo='TODOS', selecionado=null, adminAutenticado=false;
+let dataAtual=new Date(2026,9,1);
+const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const diasSemana=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+
+function headers(extra={}){return {apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`,...extra}}
+function iso(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
+function diasMes(y,m){return new Date(y,m+1,0).getDate()}
+function toast(msg,ok=true){const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(ok?'success':'error');setTimeout(()=>t.classList.remove('show'),3200)}
+function tipoNormalizado(v){
+  const n=String(v||'').trim().toLowerCase();
+  if(n==='ft26'||n==='f26')return 'FT26';
+  if(n==='fe26'||n==='f26 - x dias')return 'FE26';
+  if(n==='fp27'||n==='preferenciais')return 'FP27';
+  if(n==='fe27'||n==='não preferenciais'||n==='nao preferenciais')return 'FE27';
+  return String(v||'').trim().toUpperCase();
+}
+function mudarMes(n){dataAtual=new Date(dataAtual.getFullYear(),dataAtual.getMonth()+n,1);render()}
+function abrirPagina(p, supervisorTab='controlo'){
+  if(p==='admin'&&!adminAutenticado){abrirGateAdmin();return;}
+  paginaAtual=p;
+  ['submetidos','aprovados','supervisor','admin'].forEach(x=>{
+    const el=document.getElementById('pagina'+x.charAt(0).toUpperCase()+x.slice(1));
+    if(el)el.classList.toggle('active',p===x);
+  });
+  ['Submetidos','Aprovados','Admin','SupervisorControlo','SupervisorPedidos'].forEach(x=>{
+    const el=document.getElementById('menu'+x);
+    if(el)el.classList.toggle('active',
+      (x==='Submetidos'&&p==='submetidos')||
+      (x==='Aprovados'&&p==='aprovados')||
+      (x==='Admin'&&p==='admin')||
+      (x==='SupervisorControlo'&&p==='supervisor'&&supervisorTab==='controlo')||
+      (x==='SupervisorPedidos'&&p==='supervisor'&&supervisorTab==='pedidos'));
+  });
+  document.getElementById('tituloPagina').textContent=p==='submetidos'?'Submissão de Pedidos':p==='aprovados'?'Férias Aprovadas':p==='supervisor'?'Gestão Supervisor':'Administração';
+  document.getElementById('monthControls').style.visibility=(p==='submetidos'||p==='aprovados')?'visible':'hidden';
+  if(p==='admin'){
+    if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;
+    carregarAutorizados();carregarCotas();
+  }
+  if(p==='supervisor')abrirSupervisorTab(supervisorTab);
+  render();
+}
+function abrirAdminTab(tab){
+  ['dias','cotas','extracao'].forEach(x=>{
+    document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===tab);
+    document.getElementById('adminTab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===tab);
+  });
+  if(tab==='dias')carregarAutorizados();
+  if(tab==='cotas')carregarCotas();
+  if(tab==='extracao')if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;
+}
+function abrirSupervisorTab(tab){
+  ['controlo','pedidos'].forEach(x=>{
+    document.getElementById('admin'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===tab);
+    document.getElementById('supervisorTab'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('active',x===tab);
+  });
+  // Keep the matching sidebar item active when changing tabs inside Gestão Supervisor.
+  document.getElementById('menuSupervisorControlo').classList.toggle('active',tab==='controlo');
+  const menuPedidos=document.getElementById('menuSupervisorPedidos');
+  if(menuPedidos)menuPedidos.classList.toggle('active',tab==='pedidos');
+  if(tab==='controlo')carregarControlo();
+  if(tab==='pedidos')carregarGestaoPedidos();
+}
+function abrirGateAdmin(){
+  const o=document.getElementById('adminPasswordOverlay');
+  document.getElementById('senhaAdmin').value='';
+  document.getElementById('erroSenhaAdmin').style.display='none';
+  o.classList.add('show');
+  setTimeout(()=>document.getElementById('senhaAdmin').focus(),30);
+}
+function fecharGateAdmin(){document.getElementById('adminPasswordOverlay').classList.remove('show');document.getElementById('senhaAdmin').value='';}
+function fecharGateAdminFora(event){if(event.target===document.getElementById('adminPasswordOverlay'))fecharGateAdmin();}
+function validarSenhaAdmin(){
+  const campo=document.getElementById('senhaAdmin');
+  if(campo.value==='TRosa'){
+    adminAutenticado=true;
+    fecharGateAdmin();
+    abrirPagina('admin');
+  }else{
+    document.getElementById('erroSenhaAdmin').style.display='block';
+    campo.select();campo.focus();
+  }
+}
+function filtrarTipo(t,b){filtroTipo=t;document.querySelectorAll('#filtrosTipos .filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
+function visivel(p){return filtroTipo==='TODOS'||p.tipo===filtroTipo}
+function pedidoNoDia(c,data){return c.pedidos.find(p=>visivel(p)&&data>=p.inicio&&data<=p.fim)}
+function normalizarDataCota(v){
+  if(!v)return '';
+  const s=String(v).trim();
+  const isoMatch=s.match(/^(\d{4}-\d{2}-\d{2})/);if(isoMatch)return isoMatch[1];
+  const ptMatch=s.match(/^(\d{1,2})[\/. -](\d{1,2})[\/. -](\d{4})$/);if(ptMatch)return `${ptMatch[3]}-${ptMatch[2].padStart(2,'0')}-${ptMatch[1].padStart(2,'0')}`;
+  return '';
+}
+function cotaNoDia(data){
+  const alvo=normalizarDataCota(data);
+  if(!alvo)return null;
+  // Primeiro tenta a correspondência exata por data, incluindo o ano.
+  const exata=cotasSemanis.find(x=>{
+    const inicio=normalizarDataCota(x.data_inicio),fim=normalizarDataCota(x.data_fim);
+    return inicio&&fim&&alvo>=inicio&&alvo<=fim;
+  });
+  if(exata)return exata;
+  // Se as cotas foram carregadas para um ano diferente, reutiliza a semana
+  // correspondente do mesmo mês/dia, sem alterar os pedidos nem os dados guardados.
+  const [,anoAlvo,mesAlvo,diaAlvo]=alvo.match(/^(\d{4})-(\d{2})-(\d{2})$/)||[];
+  if(!anoAlvo||!mesAlvo||!diaAlvo)return null;
+  const chave=mesAlvo+'-'+diaAlvo;
+  return cotasSemanis.find(x=>{
+    const inicio=normalizarDataCota(x.data_inicio),fim=normalizarDataCota(x.data_fim);
+    if(!inicio||!fim)return false;
+    const ini=inicio.slice(5),fin=fim.slice(5);
+    // Intervalos normais e intervalos que atravessam o fim do ano.
+    return ini<=fin ? chave>=ini&&chave<=fin : chave>=ini||chave<=fin;
+  })||null;
+}
+function mapearPedido(row,index){
+  const inicio=String(row.data_inicio||'').slice(0,10),fim=String(row.data_fim||'').slice(0,10);
+  if(!row.nome||!inicio||!fim)return null;
+  return {id:row.id??`snat-${index}`,nome:String(row.nome||'').trim(),tipo:tipoNormalizado(row.tipo_dias),inicio,fim,totalDias:Number(row.total_dias)||0,estado:'submetido',estadosDia:{}};
+}
+async function carregarDadosSupabase(){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=nome.asc,data_inicio.asc`,{headers:headers({Accept:'application/json'})});
+    if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
+    const rows=await r.json();
+    const mapa=new Map();
+    rows.forEach((row,i)=>{const p=mapearPedido(row,i);if(!p)return;if(!mapa.has(row.nome))mapa.set(row.nome,{id:row.nome,nome:row.nome,pedidos:[]});mapa.get(row.nome).pedidos.push(p)});
+    colaboradores=[...mapa.values()];
+    await carregarEstadosPersistidos();
+    document.getElementById('totalColaboradores').textContent=colaboradores.length;document.getElementById('apColab').textContent=colaboradores.length;render();
+    return true;
+  }catch(err){console.error(err);mostrarErro(`Não foi possível carregar os dados. ${err.message}`);return false}
+}
+async function carregarEstadosPersistidos(){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${ESTADOS_TABLE}?select=pedido_id,nome,data,estado,updated_at&order=updated_at.asc`,{headers:headers({Accept:'application/json'})});
+  if(!r.ok)throw new Error(`Não foi possível ler ${ESTADOS_TABLE} (erro ${r.status}). Confirma as permissões de leitura da tabela.`);
+  const estados=await r.json();
+  const porId=new Map();
+  colaboradores.forEach(c=>c.pedidos.forEach(p=>porId.set(String(p.id),p)));
+
+  // Compatibilidade com versões anteriores: só tratamos como alteração em bloco
+  // um lote que cubra vários dias de um pedido. Um pedido de um único dia nunca
+  // pode ser descartado como lote antigo, pois essa linha é o estado válido do dia.
+  const grupos=new Map();
+  estados.forEach(e=>{
+    const id=String(e.pedido_id);
+    if(!grupos.has(id))grupos.set(id,[]);
+    grupos.get(id).push(e);
+  });
+
+  grupos.forEach((lista,id)=>{
+    const pedido=porId.get(id);
+    if(!pedido)return;
+    const datasEsperadas=[];
+    const inicio=new Date(pedido.inicio+'T00:00:00');
+    const fim=new Date(pedido.fim+'T00:00:00');
+    for(let d=new Date(inicio);d<=fim;d.setDate(d.getDate()+1)){
+      datasEsperadas.push(iso(d.getFullYear(),d.getMonth(),d.getDate()));
+    }
+
+    const datasIgnoradas=new Set();
+    const porLote=new Map();
+    lista.forEach(e=>{
+      const chave=`${e.updated_at||''}|${e.estado}`;
+      if(!porLote.has(chave))porLote.set(chave,[]);
+      porLote.get(chave).push(e);
+    });
+    porLote.forEach(lote=>{
+      const datasLote=new Set(lote.map(e=>String(e.data||'').slice(0,10)));
+      if(datasEsperadas.length>1 && datasLote.size===datasEsperadas.length && datasEsperadas.every(data=>datasLote.has(data))){
+        lote.forEach(e=>datasIgnoradas.add(`${String(e.data||'').slice(0,10)}|${e.updated_at||''}|${e.estado}`));
+      }
+    });
+
+    // Aplica apenas o estado guardado para cada data individual.
+    lista.sort((a,b)=>String(a.updated_at||'').localeCompare(String(b.updated_at||'')));
+    lista.forEach(e=>{
+      const data=String(e.data||'').slice(0,10);
+      if(!data || !datasEsperadas.includes(data))return;
+      if(datasIgnoradas.has(`${data}|${e.updated_at||''}|${e.estado}`))return;
+      if(!['submetido','aprovado','rejeitado'].includes(e.estado))return;
+      if(!pedido.estadosDia)pedido.estadosDia={};
+      pedido.estadosDia[data]=e.estado;
+    });
+  });
+}
+async function guardarEstadoPersistido(p,data,estado){
+  if(!data || data<p.inicio || data>p.fim)throw new Error('A data selecionada não pertence ao período deste pedido.');
+  const registo={pedido_id:String(p.id),nome:String(p.nome||selecionado?.c?.nome||'').trim(),data,estado,updated_at:new Date().toISOString()};
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${ESTADOS_TABLE}?on_conflict=pedido_id,data`,{method:'POST',headers:headers({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(registo)});
+  if(!r.ok)throw new Error(`Não foi possível guardar o estado (erro ${r.status}): ${await r.text()}`);
+}
+function mostrarErro(msg){let el=document.getElementById('erroSupabase');if(!el){el=document.createElement('div');el.id='erroSupabase';el.style.cssText='margin-bottom:14px;padding:10px 13px;border-radius:9px;background:#FFEBEE;color:#C62828;font-size:12px;font-weight:600';document.querySelector('#paginaSubmetidos').prepend(el)}el.textContent=msg;el.style.display='block'}
+function criarMapa(){
+  const el=paginaAtual==='submetidos'?document.getElementById('mapaSubmetidos'):document.getElementById('mapaAprovados');if(!el)return;el.innerHTML='';
+  const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),total=diasMes(y,m);el.style.gridTemplateColumns=`230px repeat(${total},64px)`;
+  const corner=document.createElement('div');corner.className='cell header-cell corner';corner.textContent='Colaborador';el.appendChild(corner);
+  const hoje=iso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
+  for(let d=1;d<=total;d++){
+    const data=iso(y,m,d),dt=new Date(y,m,d),c=document.createElement('div');
+    c.className='cell header-cell';
+    if(dt.getDay()===0||dt.getDay()===6)c.classList.add('weekend');
+    if(data===hoje)c.classList.add('today');
+    const cota=cotaNoDia(data);
+    let pedidosDia=0;
+    colaboradores.forEach(col=>col.pedidos.forEach(p=>{
+      if(!visivel(p)||data<p.inicio||data>p.fim)return;
+      if(paginaAtual==='submetidos')pedidosDia++;
+      else if(((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='aprovado')pedidosDia++;
+    }));
+    c.innerHTML=`<span class="day-number">${d}</span><span class="day-name">${diasSemana[dt.getDay()]}</span>${cota?`<span class="cota-dia" title="Semana ${esc(cota.semana)}: ${num(cota.cotas_disponiveis)} cotas disponíveis">Cota: ${num(cota.cotas_disponiveis)}</span>`:'<span class="cota-dia sem-cota">Cota: —</span>'}<span class="pedidos-dia">Pedidos: ${pedidosDia}</span>`;
+    el.appendChild(c);
+  }
+  colaboradores.forEach(c=>{const nome=document.createElement('div');nome.className='cell name-cell';nome.textContent=c.nome;el.appendChild(nome);for(let d=1;d<=total;d++){const data=iso(y,m,d),dt=new Date(y,m,d),p=pedidoNoDia(c,data),cel=document.createElement('div');cel.className='cell';if(dt.getDay()===0||dt.getDay()===6)cel.classList.add('weekend');if(p){const estado=(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido';if(paginaAtual==='submetidos'||estado==='aprovado'){cel.classList.remove('weekend');cel.classList.add('periodo',['aprovado','rejeitado'].includes(estado)?estado:'submetido');if(data===p.inicio)cel.classList.add('inicio');if(data===p.fim)cel.classList.add('fim');if(p.inicio===p.fim)cel.classList.add('unico');cel.innerHTML=`<div>${p.tipo}<div class="estado-dia">${estado==='submetido'?'Submetido':estado==='aprovado'?'Aprovado':'Rejeitado'}</div></div>`;cel.title=`${c.nome} | ${p.tipo} | ${data}`;cel.onclick=()=>abrirModal(c,p,data)}}el.appendChild(cel)}})
+}
+async function abrirModal(c,p,data){
+  selecionado={c,p,data};document.getElementById('mNome').textContent=c.nome;document.getElementById('mTipo').textContent=p.tipo;document.getElementById('mDia').textContent=data.split('-').reverse().join('/');document.getElementById('mPeriodo').textContent=`${p.inicio.split('-').reverse().join('/')} a ${p.fim.split('-').reverse().join('/')} (${p.totalDias} dias)`;
+  const estadoDia=(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido';const e=document.getElementById('mEstado');e.textContent=estadoDia==='submetido'?'Submetido':estadoDia==='aprovado'?'Aprovado':'Rejeitado';e.className='estado '+estadoDia;document.getElementById('btnSubmetido').style.display=estadoDia==='submetido'?'none':'block';document.getElementById('modalOverlay').classList.add('show');
+}
+function fecharModal(){document.getElementById('modalOverlay').classList.remove('show');selecionado=null}
+function fecharModalFora(e){if(e.target.id==='modalOverlay')fecharModal()}
+async function alterarEstado(novo){
+  if(!selecionado)return;
+  const {p,data}=selecionado;
+  document.querySelectorAll('.modal-actions .btn').forEach(b=>b.disabled=true);
+  try{
+    await guardarEstadoPersistido(p,data,novo);
+    if(!p.estadosDia)p.estadosDia={};
+    p.estadosDia[data]=novo;
+    fecharModal();
+    render();
+    toast(novo==='aprovado'?'Dia aprovado e guardado no Supabase.':novo==='rejeitado'?'Dia rejeitado e guardado no Supabase.':'Dia voltou a submetido e foi guardado no Supabase.');
+  }catch(err){console.error(err);toast(`Não foi possível guardar no Supabase. ${err.message}`,false)}
+  finally{document.querySelectorAll('.modal-actions .btn').forEach(b=>b.disabled=false)}
+}
+function atualizarStats(){
+  let pedidos=0,dias=0,pend=0,apDias=0;const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),inicioMes=new Date(y,m,1),fimMes=new Date(y,m,diasMes(y,m));
+  colaboradores.forEach(c=>c.pedidos.forEach(p=>{if(!visivel(p))return;const a=new Date(p.inicio+'T00:00:00'),b=new Date(p.fim+'T00:00:00');if(b<inicioMes||a>fimMes)return;if(paginaAtual==='submetidos'){pedidos++;const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){dias++;const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='submetido')pend++}}else{const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='aprovado')apDias++}}}));
+  if(paginaAtual==='submetidos'){document.getElementById('totalPedidos').textContent=pedidos;document.getElementById('totalDias').textContent=dias;document.getElementById('totalPendentes').textContent=pend}else{document.getElementById('aprovadosTotal').textContent=apDias;document.getElementById('aprovadosDias').textContent=apDias}
+}
+function render(){document.getElementById('mesAtual').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;criarMapa();atualizarStats()}
+function criarFiltros(){document.getElementById('filtrosTipos').innerHTML=`<button class="filter active" onclick="filtrarTipo('TODOS',this)">Todos</button>${TIPOS.map(t=>`<button class="filter" onclick="filtrarTipo('${t}',this)">${t}</button>`).join('')}`}
+
+function normalizarCabecalho(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
+function obterColuna(obj,tipos){const keys=Object.keys(obj);for(const k of keys){const nk=normalizarCabecalho(k);if(tipos.includes(nk))return obj[k]}return ''}
+function num(v){if(v===null||v===undefined||v==='')return 0;const n=Number(String(v).replace(',','.').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?Math.max(0,Math.round(n)):0}
+function linhaAutorizada(row){
+  const nome=String(obterColuna(row,['nome','colaborador','colaboradora','name'])).trim();if(!nome)return null;
+  return {
+    nome,
+    dias_pendentes_2026:num(obterColuna(row,['diaspendentesde2026','diaspendentes2026','diaspendentes','pendentes2026'])),
+    dias_autorizados_2027:num(obterColuna(row,['diasautorizadosde2027','diasautorizados2027','diasautorizados','autorizados2027']))
+  };
+}
+async function carregarExcelAutorizados(){
+  const file=document.getElementById('excelAutorizados').files[0];if(!file){toast('Seleciona primeiro o Excel.',false);return}
+  try{
+    const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:''}),dados=rows.map(linhaAutorizada).filter(Boolean);
+    if(!dados.length)throw new Error('Não encontrei linhas válidas. Confirma os cabeçalhos: Nome, Dias pendentes de 2026 e Dias autorizados de 2027.');
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?on_conflict=nome`,{method:'POST',headers:headers({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(dados.map(x=>({...x,updated_at:new Date().toISOString()})))});
+    if(!r.ok)throw new Error(await r.text());
+    toast(`${dados.length} colaboradores carregados no Supabase.`);await carregarAutorizados();await carregarControlo();
+  }catch(e){console.error(e);toast('Erro no carregamento: '+e.message,false)}
+}
+const COTAS_TABLE='fid_cotas_ferias_teste';
+function dataCota(v){
+  if(v instanceof Date && !isNaN(v)) return `${v.getFullYear()}-${String(v.getMonth()+1).padStart(2,'0')}-${String(v.getDate()).padStart(2,'0')}`;
+  if(typeof v==='number' && Number.isFinite(v)){const d=XLSX.SSF.parse_date_code(v);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}
+  const s=String(v??'').trim(); if(!s)return '';
+  let m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/); if(m)return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  m=s.match(/^(\d{1,2})[\/. -](\d{1,2})[\/. -](\d{4})$/); if(m)return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  if(/^\d+(\.\d+)?$/.test(s)){const n=Number(s);if(n>20000&&n<80000){const d=XLSX.SSF.parse_date_code(n);if(d)return `${d.y}-${String(d.m).padStart(2,'0')}-${String(d.d).padStart(2,'0')}`;}}
+  return '';
+}
+function linhaCota(row){
+  const mes=String(obterColuna(row,['mes','mês'])).trim();
+  const semana=String(obterColuna(row,['semana','nsemana','numerodasemana'])).trim();
+  const inicio=dataCota(obterColuna(row,['datadeinicio','datainicio','inicio']));
+  const fim=dataCota(obterColuna(row,['datadefim','datafim','fim']));
+  const cotaRaw=obterColuna(row,['cotasdisponiveis','cotadisponivel','cotas','cota']);
+  if(!inicio||!fim||cotaRaw===''||cotaRaw===null||cotaRaw===undefined)return null;
+  const cota=Number(String(cotaRaw).replace(',','.'));
+  if(!Number.isInteger(cota)||cota<0)throw new Error(`Quota inválida na semana ${semana||'(sem número)'}.`);
+  if(fim<inicio)throw new Error(`A data de fim é anterior à data de início na semana ${semana||'(sem número)'}.`);
+  return {mes:mes||inicio.slice(0,7),semana:semana||inicio,data_inicio:inicio,data_fim:fim,cotas_disponiveis:cota};
+}
+async function carregarExcelCotas(){
+  const file=document.getElementById('excelCotas').files[0];if(!file){toast('Seleciona primeiro o Excel das cotas.',false);return}
+  try{
+    if(typeof XLSX==='undefined')throw new Error('A biblioteca Excel não carregou.');
+    const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:'array',cellDates:true}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:''}),dados=rows.map(linhaCota).filter(Boolean);
+    if(!dados.length)throw new Error('Não encontrei linhas válidas. Confirma os cabeçalhos: Mês, Semana, Data de início, Data de fim e Cotas disponíveis.');
+    const unicas=new Map();for(const d of dados)unicas.set(`${d.data_inicio}|${d.data_fim}`,d);
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${COTAS_TABLE}?on_conflict=data_inicio,data_fim`,{method:'POST',headers:headers({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify([...unicas.values()])});
+    if(!r.ok)throw new Error(await r.text());
+    toast(`${unicas.size} semanas de cotas carregadas/atualizadas.`);await carregarCotas();document.getElementById('excelCotas').value='';
+  }catch(e){console.error(e);toast('Erro ao carregar cotas: '+e.message,false)}
+}
+async function carregarCotas(){
+  const tbody=document.getElementById('tabelaCotas');if(!tbody)return;
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${COTAS_TABLE}?select=mes,semana,data_inicio,data_fim,cotas_disponiveis&order=data_inicio.asc`,{headers:headers({Accept:'application/json'})});
+    if(!r.ok)throw new Error(await r.text());const dados=await r.json();cotasSemanis=Array.isArray(dados)?dados:[];
+    tbody.innerHTML=dados.map(x=>`<tr><td>${esc(x.mes)}</td><td>${esc(x.semana)}</td><td>${esc(x.data_inicio)}</td><td>${esc(x.data_fim)}</td><td class="num"><b>${num(x.cotas_disponiveis)}</b></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Ainda não existem cotas carregadas.</td></tr>';
+    document.getElementById('cotasSemanas').textContent=dados.length;document.getElementById('cotasTotal').textContent=dados.reduce((s,x)=>s+num(x.cotas_disponiveis),0);render();
+  }catch(e){tbody.innerHTML=`<tr><td colspan="5" class="empty">Não foi possível ler ${COTAS_TABLE}: ${esc(e.message)}. Confirma as permissões RLS no Supabase.</td></tr>`;console.warn(e)}
+}
+async function carregarAutorizados(){
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,dias_pendentes_2026,dias_autorizados_2027&order=nome.asc`,{headers:headers({Accept:'application/json'})});if(!r.ok)throw new Error(await r.text());autorizados=await r.json();renderAutorizados()
+  }catch(e){document.getElementById('tabelaAutorizados').innerHTML=`<tr><td colspan="4" class="empty">Não foi possível carregar ${AUT_TABLE}. Verifica se a tabela foi criada no Supabase.</td></tr>`;console.warn(e)}
+}
+function renderAutorizados(){
+  let total=0;document.getElementById('tabelaAutorizados').innerHTML=autorizados.map(x=>{const a=num(x.dias_pendentes_2026),b=num(x.dias_autorizados_2027),t=a+b;total+=t;return `<tr><td>${esc(x.nome)}</td><td class="num">${a}</td><td class="num">${b}</td><td class="num"><b>${t}</b></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Sem dados carregados.</td></tr>';document.getElementById('autColab').textContent=autorizados.length;document.getElementById('autTotal').textContent=total
+}
+function formatarDataSNAT(v){
+  const s=String(v??'').slice(0,10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.split('-').reverse().join('/'):s||'—';
+}
+async function carregarGestaoPedidos(){
+  const tbody=document.getElementById('tabelaGestaoPedidos');
+  if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="7" class="empty">A carregar registos da fid_SNAT...</td></tr>';
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=id,nome,tipo_dias,data_inicio,data_fim,total_dias&order=data_inicio.asc,nome.asc`,{headers:headers({Accept:'application/json'})});
+    if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
+    const dados=await r.json();
+    pedidosSNATAdmin=Array.isArray(dados)?dados:[];
+    renderGestaoPedidos();
+  }catch(e){
+    console.error(e);
+    document.getElementById('contagemPedidosSNAT').textContent='Não foi possível carregar a tabela fid_SNAT.';
+    tbody.innerHTML=`<tr><td colspan="7" class="empty">Erro ao carregar fid_SNAT: ${esc(e.message)}. Confirma as permissões de leitura no Supabase.</td></tr>`;
+  }
+}
+function renderGestaoPedidos(){
+  const tbody=document.getElementById('tabelaGestaoPedidos');
+  if(!tbody)return;
+  const termo=String(document.getElementById('pesquisaPedidosSNAT')?.value||'').trim().toLocaleLowerCase('pt-PT');
+  const dados=pedidosSNATAdmin.filter(p=>!termo||[p.id,p.nome,p.tipo_dias,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+  const n=dados.length,total=pedidosSNATAdmin.length;
+  document.getElementById('contagemPedidosSNAT').textContent=termo?`${n} de ${total} registos encontrados.`:`${total} registos na tabela fid_SNAT.`;
+  tbody.innerHTML=dados.map(p=>`<tr>
+    <td>${esc(p.id)}</td><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td>
+    <td>${esc(formatarDataSNAT(p.data_inicio))}</td><td>${esc(formatarDataSNAT(p.data_fim))}</td>
+    <td class="num">${esc(p.total_dias)}</td>
+    <td><button type="button" class="btn btn-eliminar-pedido" data-pedido-id="${esc(p.id)}" data-pedido-nome="${esc(p.nome)}">Eliminar linha</button></td>
+  </tr>`).join('')||`<tr><td colspan="7" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
+}
+async function eliminarPedidoSNAT(id,nome){
+  const identificador=String(id??'').trim();
+  if(!identificador){toast('Este registo não tem um ID válido; não foi eliminado.',false);return;}
+  const confirmado=confirm(`ATENÇÃO: vais eliminar definitivamente o pedido de férias de ${nome||'(nome não disponível)'} (ID ${identificador}) da tabela fid_SNAT.\n\nEsta ação não pode ser anulada. O pedido deixará de aparecer nas submissões e nas férias aprovadas. Queres continuar?`);
+  if(!confirmado)return;
+  const botoes=document.querySelectorAll('#tabelaGestaoPedidos button[data-pedido-id]');
+  botoes.forEach(b=>{if(b.dataset.pedidoId===identificador)b.disabled=true;});
+  try{
+    const urlDelete=`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${encodeURIComponent(identificador)}`;
+    const r=await fetch(urlDelete,{method:'DELETE',headers:headers({Accept:'application/json',Prefer:'return=representation'})});
+    const resposta=await r.text();
+    if(!r.ok)throw new Error(`O Supabase recusou a eliminação (erro ${r.status}): ${resposta}. Confirma se existe uma política RLS que permita DELETE na tabela fid_SNAT.`);
+    let apagados=[];
+    try{apagados=resposta?JSON.parse(resposta):[]}catch{apagados=[]}
+    if(!Array.isArray(apagados)||apagados.length===0){
+      // Algumas configurações do PostgREST podem não devolver a representação do DELETE.
+      // Confirmamos consultando o ID: se já não existe, a eliminação foi concluída.
+      const verificar=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${encodeURIComponent(identificador)}&select=id`,{headers:headers({Accept:'application/json'})});
+      if(!verificar.ok)throw new Error(`O DELETE não devolveu linhas e não foi possível verificar o ID (erro ${verificar.status}). ${await verificar.text()}`);
+      const aindaExiste=await verificar.json();
+      if(Array.isArray(aindaExiste)&&aindaExiste.length>0){
+        throw new Error(`O pedido com ID ${identificador} continua na fid_SNAT. A API está a permitir a leitura, mas o DELETE não foi aplicado. Executa no SQL Editor o ficheiro SQL de permissões DELETE para fid_SNAT; confirma também GRANT DELETE e a política RLS para o papel anon.`);
+      }
+      // Se já não é visível pela API, atualiza a aplicação; estados órfãos serão limpos abaixo.
+    }
+    let avisoEstados='';
+    try{
+      const re=await fetch(`${SUPABASE_URL}/rest/v1/${ESTADOS_TABLE}?pedido_id=eq.${encodeURIComponent(identificador)}`,{method:'DELETE',headers:headers({Prefer:'return=minimal'})});
+      if(!re.ok)avisoEstados=' O pedido foi eliminado, mas não foi possível limpar os estados antigos associados.';
+    }catch{avisoEstados=' O pedido foi eliminado, mas não foi possível limpar os estados antigos associados.';}
+    await carregarDadosSupabase();
+    await carregarGestaoPedidos();
+    renderControlo();
+    if(avisoEstados)toast('Pedido eliminado da fid_SNAT.'+avisoEstados,false);
+    else toast(`Pedido de ${nome||'colaborador'} eliminado da fid_SNAT. Já não aparece nos restantes mapas.`);
+  }catch(e){
+    console.error(e);
+    toast(e.message||'Não foi possível eliminar o pedido.',false);
+    carregarGestaoPedidos();
+  }
+}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+
+function diasSubmetidosPorTipo(){
+  const out=new Map();
+  colaboradores.forEach(c=>c.pedidos.forEach(p=>{
+    if(!TIPOS.includes(p.tipo))return;
+    for(let d=new Date(p.inicio+'T00:00:00');d<=new Date(p.fim+'T00:00:00');d.setDate(d.getDate()+1)){
+      const data=iso(d.getFullYear(),d.getMonth(),d.getDate()),key=`${c.nome}|${p.tipo}|${data}`;
+      if(!out.has(key))out.set(key,{nome:c.nome,tipo:p.tipo,data,estado:(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido'});
+    }
+  }));
+  return [...out.values()];
+}
+function filtrarControlo(t,b){filtroControlo=t;document.querySelectorAll('#adminControlo .filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderControlo()}
+function carregarControlo(){renderControlo()}
+function renderControlo(){
+  const sub=diasSubmetidosPorTipo(), subMap=new Map();
+  sub.forEach(x=>{const ano=(x.tipo==='FT26'||x.tipo==='FE26')?'2026':((x.tipo==='FP27'||x.tipo==='FE27'||x.tipo==='F27')?'2027':null);if(!ano)return;const k=`${x.nome}|${ano}`;if(!subMap.has(k))subMap.set(k,new Set());subMap.get(k).add(x.data)});
+  let linhas=[],totAut=0,totSub=0;
+  autorizados.forEach(a=>['2026','2027'].forEach(ano=>{if(filtroControlo!=='TODOS'&&filtroControlo!==ano)return;const aut=num(ano==='2026'?a.dias_pendentes_2026:a.dias_autorizados_2027),s=subMap.get(`${a.nome}|${ano}`)?.size||0,falta=Math.max(0,aut-s);totAut+=aut;totSub+=s;linhas.push({nome:a.nome,tipo:ano,aut,s,falta,pct:aut?Math.min(100,Math.round(s/aut*100)):0})}));
+  document.getElementById('ctrlAut').textContent=totAut;document.getElementById('ctrlSub').textContent=totSub;document.getElementById('ctrlFalta').textContent=linhas.reduce((a,x)=>a+x.falta,0);
+  document.getElementById('tabelaControlo').innerHTML=linhas.map(x=>`<tr><td>${esc(x.nome)}</td><td>${x.tipo}</td><td class="num">${x.aut}</td><td class="num">${x.s}</td><td class="num ${x.falta===0?'pill-ok':'pill-warn'}">${x.falta}</td><td><div class="progress"><span style="width:${x.pct}%"></span></div><div class="note">${x.pct}%</div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sem dados.</td></tr>';
+}
+function obterMapaFeriasAprovadas(){
+  // A extração é sempre o ano civil completo do ano atualmente apresentado no mapa,
+  // independentemente do mês visível e das datas das cotas carregadas.
+  const anoExtracao = dataAtual.getFullYear();
+  const inicio = new Date(anoExtracao, 0, 1);
+  const mesesN = 12;
+  const fim = new Date(anoExtracao, 11, 31);
+  // Map: nome do colaborador -> Map(data -> códigos aprovados nesse dia)
+  const colaboradoresMapa = new Map();
+
+  colaboradores.forEach(c => c.pedidos.forEach(p => {
+    const a = new Date(p.inicio + 'T00:00:00');
+    const b = new Date(p.fim + 'T00:00:00');
+    const da = a < inicio ? new Date(inicio) : a;
+    const db = b > fim ? new Date(fim) : b;
+    if (da > db) return;
+
+    for (let d = new Date(da); d <= db; d.setDate(d.getDate() + 1)) {
+      const data = iso(d.getFullYear(), d.getMonth(), d.getDate());
+      const estado = String((p.estadosDia && p.estadosDia[data]) || p.estado || 'submetido').trim().toLowerCase();
+      if (estado !== 'aprovado') continue;
+      if (!colaboradoresMapa.has(c.nome)) colaboradoresMapa.set(c.nome, new Map());
+      const dias = colaboradoresMapa.get(c.nome);
+      if (!dias.has(data)) dias.set(data, new Set());
+      dias.get(data).add(p.tipo);
+    }
+  }));
+  return { inicio, mesesN, colaboradoresMapa };
+}
+
+function extrairAprovadas(){
+  try {
+    if(document.getElementById('senhaExtracao').value !== 'TRosa'){
+      toast('Palavra-passe incorreta.', false);
+      return;
+    }
+    if (typeof XLSX === 'undefined') throw new Error('A biblioteca Excel não carregou. Verifica a ligação à Internet e volta a abrir o ficheiro.');
+    // A extração usa exatamente os estados por dia que já estão carregados na aplicação e alimentam o mapa Férias Aprovadas.
+    // Não consulta novamente nenhuma tabela ao gerar o Excel nem tenta validar associações externas.
+    const { inicio, mesesN, colaboradoresMapa } = obterMapaFeriasAprovadas();
+    if(!colaboradoresMapa.size){
+      toast('O mapa de Férias Aprovadas não contém dias aprovados para o ano apresentado.', false);
+      return;
+    }
+
+    const cabecalhoMeses = ['Nome'];
+    const cabecalhoDias = [''];
+    const merges = [{s:{r:0,c:0},e:{r:1,c:0}}];
+    let col = 1;
+    for(let i=0; i<mesesN; i++){
+      const dt = new Date(inicio.getFullYear(), inicio.getMonth()+i, 1);
+      const total = diasMes(dt.getFullYear(), dt.getMonth());
+      const rotulo = `${meses[dt.getMonth()]} ${dt.getFullYear()}`;
+      const inicioBloco = col;
+      for(let dia=1; dia<=total; dia++){
+        cabecalhoMeses.push(rotulo);
+        cabecalhoDias.push(dia);
+        col++;
+      }
+      merges.push({s:{r:0,c:inicioBloco},e:{r:0,c:col-1}});
+    }
+
+    const dados = [cabecalhoMeses, cabecalhoDias];
+    [...colaboradoresMapa.keys()].sort((a,b)=>a.localeCompare(b,'pt-PT')).forEach(nome=>{
+      const linha=[nome];
+      const diasAprovados = colaboradoresMapa.get(nome);
+      for(let i=0; i<mesesN; i++){
+        const dt=new Date(inicio.getFullYear(),inicio.getMonth()+i,1);
+        for(let dia=1; dia<=diasMes(dt.getFullYear(),dt.getMonth()); dia++){
+          const data=iso(dt.getFullYear(),dt.getMonth(),dia);
+          const codigos = diasAprovados.get(data);
+          linha.push(codigos ? [...codigos].sort().join(' / ') : '');
+        }
+      }
+      dados.push(linha);
+    });
+
+    const ws=XLSX.utils.aoa_to_sheet(dados);
+    ws['!merges']=merges;
+    ws['!cols']=[{wch:28},...Array(col-1).fill({wch:7})];
+    ws['!freeze']={xSplit:1,ySplit:2};
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Mapa de Férias');
+    const ini=`${inicio.getFullYear()}-${String(inicio.getMonth()+1).padStart(2,'0')}`;
+    XLSX.writeFile(wb,`Mapa_Ferias_Aprovadas_${ini}_${mesesN}meses.xlsx`);
+    document.getElementById('senhaExtracao').value='';
+    toast(`Mapa exportado: ${colaboradoresMapa.size} colaboradores com férias aprovadas.`);
+  } catch (err) {
+    console.error(err);
+    toast('Não foi possível extrair o Excel: ' + (err && err.message ? err.message : err), false);
+  }
+}
+
+document.getElementById('senhaAdmin').addEventListener('keydown',event=>{if(event.key==='Enter')validarSenhaAdmin()});
+document.getElementById('pesquisaPedidosSNAT').addEventListener('input',renderGestaoPedidos);
+document.getElementById('tabelaGestaoPedidos').addEventListener('click',event=>{
+  const botao=event.target.closest('button[data-pedido-id]');
+  if(botao)eliminarPedidoSNAT(botao.dataset.pedidoId,botao.dataset.pedidoNome);
+});
+criarFiltros();render();carregarDadosSupabase();carregarAutorizados();carregarCotas();
+</script>
+</body>
+</html>
