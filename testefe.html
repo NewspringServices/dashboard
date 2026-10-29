@@ -6,10 +6,12 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{--verde:#2E7D32;--verde-claro:#E8F5E9;--amarelo:#E9C46A;--amarelo-claro:#FFF8E5;--vermelho:#C62828;--vermelho-claro:#FFEBEE;--fundo:#F7F8F9;--borda:#E1E5E8;--texto:#263238;--cinza:#6B7280}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:var(--fundo);color:var(--texto)}.app{display:flex;min-height:100vh}.sidebar{width:270px;background:#fff;border-right:1px solid var(--borda);padding:28px 18px;position:fixed;top:0;bottom:0}.brand-heading{font-size:21px;font-weight:800;color:var(--verde);padding:5px 12px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}.logo{display:block;max-width:190px;max-height:78px;width:auto;height:auto;object-fit:contain;object-position:left center;margin:0 0 2px}.menu-title{font-size:11px;color:#9AA0A6;text-transform:uppercase;font-weight:700;padding:0 12px 8px}.menu-item{width:100%;border:0;background:transparent;text-align:left;padding:13px 14px;margin-bottom:6px;border-radius:9px;color:#59636E;font-size:14px;font-weight:600;cursor:pointer}.menu-item:hover{background:#F4F6F5}.menu-item.active{background:var(--verde-claro);color:var(--verde)}.main{margin-left:270px;width:calc(100% - 270px);padding:30px 34px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}h1{margin:0 0 5px;font-size:27px}.subtitle{color:var(--cinza);font-size:14px}.month-controls{display:flex;align-items:center;gap:10px}.month-controls button{width:38px;height:38px;border:1px solid var(--borda);background:#fff;border-radius:9px;cursor:pointer;font-size:18px}.month-name{min-width:150px;text-align:center;font-weight:700}.page{display:none}.page.active{display:block}.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.filter{border:1px solid var(--borda);background:#fff;padding:8px 15px;border-radius:20px;cursor:pointer;font-size:12px}.filter.active{background:var(--verde-claro);color:var(--verde);border-color:var(--verde);font-weight:700}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:15px 18px}.stat-label{color:var(--cinza);font-size:12px;margin-bottom:7px}.stat-value{font-size:24px;font-weight:800}.stat-value.green{color:var(--verde)}.map-card{background:#fff;border:1px solid var(--borda);border-radius:12px;overflow:hidden}.map-header{padding:14px 18px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;gap:15px}.map-title{font-size:15px;font-weight:700}.legend{display:flex;gap:18px;color:var(--cinza);font-size:12px}.legend-item{display:flex;align-items:center;gap:6px}.legend-box{width:11px;height:11px;border-radius:3px}.legend-submetido{background:var(--amarelo)}.legend-aprovado{background:var(--verde)}.legend-rejeitado{background:var(--vermelho)}.table-scroll{overflow:auto}.calendar{min-width:1900px;display:grid}.cell{min-height:55px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;display:flex;align-items:center;justify-content:center;font-size:11px;background:#fff}.header-cell{min-height:60px;background:#FAFAFA;flex-direction:column;gap:3px;font-weight:700;position:sticky;top:0;z-index:5}.name-cell{justify-content:flex-start;padding:0 15px;font-size:13px;font-weight:600;position:sticky;left:0;z-index:4;background:#fff}.corner{position:sticky;left:0;top:0;z-index:10;justify-content:flex-start;padding-left:15px}.weekend{background:#F3F4F5}.today{background:var(--verde-claro)!important;color:var(--verde)}.day-number{font-size:13px}.day-name{font-size:9px;color:#858C93;text-transform:uppercase}.periodo{height:42px;margin:0 1px;width:calc(100% - 2px);cursor:pointer;font-size:10px;font-weight:700;transition:.15s;position:relative;z-index:2}.periodo:hover{filter:brightness(.96);box-shadow:0 0 0 2px rgba(46,125,50,.18)}.periodo.submetido{background:var(--amarelo);color:#604900}.periodo.aprovado{background:var(--verde);color:#fff}.periodo.rejeitado{background:var(--vermelho);color:#fff}.periodo.inicio{border-radius:8px 0 0 8px}.periodo.fim{border-radius:0 8px 8px 0}.periodo.unico{border-radius:8px}.estado-dia{font-size:9px;margin-top:2px;opacity:.9}.modal-overlay{display:none;position:fixed;inset:0;background:rgba(25,32,35,.42);z-index:100;align-items:center;justify-content:center;padding:20px}.modal-overlay.show{display:flex}.modal{width:min(500px,100%);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}.modal-top{padding:20px 22px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center}.modal-top h2{margin:0;font-size:18px}.close{border:0;background:#F3F4F5;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px}.modal-body{padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.info{background:#F8F9FA;border-radius:9px;padding:12px}.info small{display:block;color:var(--cinza);font-size:11px;margin-bottom:5px}.info strong{font-size:13px}.estado{margin-top:14px;padding:12px;border-radius:9px;font-size:13px;font-weight:700}.estado.submetido{background:var(--amarelo-claro);color:#604900}.estado.aprovado{background:var(--verde-claro);color:var(--verde)}.estado.rejeitado{background:var(--vermelho-claro);color:var(--vermelho)}.modal-actions{padding:16px 22px;border-top:1px solid var(--borda);display:flex;justify-content:flex-end;gap:8px}.btn{border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}.btn-submeter{background:#EEF1F2;color:#455A64}.btn-rejeitar{background:var(--vermelho);color:#fff}.btn-aprovar{background:var(--verde);color:#fff}.btn:hover{filter:brightness(.95)}.empty{padding:35px;text-align:center;color:var(--cinza);font-size:13px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Segoe UI,sans-serif;background:var(--fundo);color:var(--texto)}.app{display:flex;min-height:100vh}.sidebar{width:270px;background:#fff;border-right:1px solid var(--borda);padding:28px 18px;position:fixed;top:0;bottom:0}.brand-heading{font-size:21px;font-weight:800;color:var(--verde);padding:5px 12px 30px;display:flex;flex-direction:column;align-items:flex-start;gap:12px}.logo{display:block;max-width:190px;max-height:78px;width:auto;height:auto;object-fit:contain;object-position:left center;margin:0 0 2px}.menu-title{font-size:11px;color:#9AA0A6;text-transform:uppercase;font-weight:700;padding:0 12px 8px}.menu-item{width:100%;border:0;background:transparent;text-align:left;padding:13px 14px;margin-bottom:6px;border-radius:9px;color:#59636E;font-size:14px;font-weight:600;cursor:pointer}.menu-item:hover{background:#F4F6F5}.menu-item.active{background:var(--verde-claro);color:var(--verde)}.main{margin-left:270px;width:calc(100% - 270px);padding:30px 34px}.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}h1{margin:0 0 5px;font-size:27px}.subtitle{color:var(--cinza);font-size:14px}.month-controls{display:flex;align-items:center;gap:10px}.month-controls button{width:38px;height:38px;border:1px solid var(--borda);background:#fff;border-radius:9px;cursor:pointer;font-size:18px}.month-name{min-width:150px;text-align:center;font-weight:700}.page{display:none}.page.active{display:block}.filters{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.filter{border:1px solid var(--borda);background:#fff;padding:8px 15px;border-radius:20px;cursor:pointer;font-size:12px}.filter.active{background:var(--verde-claro);color:var(--verde);border-color:var(--verde);font-weight:700}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}.stat{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:15px 18px}.stat-label{color:var(--cinza);font-size:12px;margin-bottom:7px}.stat-value{font-size:24px;font-weight:800}.stat-value.green{color:var(--verde)}.map-card{background:#fff;border:1px solid var(--borda);border-radius:12px;overflow:hidden}.map-header{padding:14px 18px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center;gap:15px}.map-title{font-size:15px;font-weight:700}.legend{display:flex;gap:18px;color:var(--cinza);font-size:12px}.legend-item{display:flex;align-items:center;gap:6px}.legend-box{width:11px;height:11px;border-radius:3px}.legend-submetido{background:var(--amarelo)}.legend-aprovado{background:var(--verde)}.legend-rejeitado{background:var(--vermelho)}.table-scroll{overflow:auto}.calendar{min-width:1900px;display:grid}.cell{min-height:55px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;display:flex;align-items:center;justify-content:center;font-size:11px;background:#fff}.header-cell{min-height:60px;background:#FAFAFA;flex-direction:column;gap:3px;font-weight:700;position:sticky;top:0;z-index:5}.name-cell{justify-content:flex-start;padding:0 12px;font-size:12px;font-weight:600;position:sticky;left:0;z-index:4;background:#fff}.team-cell,.ch-cell{justify-content:flex-start;padding:0 10px;font-size:11px;position:sticky;background:#fff;color:#4B5563}.team-cell{left:220px;z-index:4;border-right:1px solid #DDE3E7}.ch-cell{left:360px;z-index:4;border-right:1px solid #DDE3E7}.header-cell.team-cell,.header-cell.ch-cell{background:#FAFAFA;z-index:6;font-weight:700;color:#374151}.corner{left:0;z-index:10}.nome-colaborador{display:block;min-width:0;line-height:1.15;overflow-wrap:anywhere}.corner{position:sticky;left:0;top:0;z-index:10;justify-content:flex-start;padding-left:15px}.weekend,.holiday{background:#E5E7EB!important;color:#59636E}.holiday .day-name,.weekend .day-name{color:#59636E}.today{background:var(--verde-claro)!important;color:var(--verde)}.day-number{font-size:13px}.day-name{font-size:9px;color:#858C93;text-transform:uppercase}.periodo{height:42px;margin:0 1px;width:calc(100% - 2px);cursor:pointer;font-size:10px;font-weight:700;transition:.15s;position:relative;z-index:2}.periodo:hover{filter:brightness(.96);box-shadow:0 0 0 2px rgba(46,125,50,.18)}.periodo.submetido{background:var(--amarelo);color:#604900}.periodo.aprovado{background:var(--verde);color:#fff}.periodo.rejeitado{background:var(--vermelho);color:#fff}.periodo.inicio{border-radius:8px 0 0 8px}.periodo.fim{border-radius:0 8px 8px 0}.periodo.unico{border-radius:8px}.estado-dia{font-size:9px;margin-top:2px;opacity:.9}.modal-overlay{display:none;position:fixed;inset:0;background:rgba(25,32,35,.42);z-index:100;align-items:center;justify-content:center;padding:20px}.modal-overlay.show{display:flex}.modal{width:min(500px,100%);background:#fff;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}.modal-top{padding:20px 22px;border-bottom:1px solid var(--borda);display:flex;justify-content:space-between;align-items:center}.modal-top h2{margin:0;font-size:18px}.close{border:0;background:#F3F4F5;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px}.modal-body{padding:22px}.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.info{background:#F8F9FA;border-radius:9px;padding:12px}.info small{display:block;color:var(--cinza);font-size:11px;margin-bottom:5px}.info strong{font-size:13px}.estado{margin-top:14px;padding:12px;border-radius:9px;font-size:13px;font-weight:700}.estado.submetido{background:var(--amarelo-claro);color:#604900}.estado.aprovado{background:var(--verde-claro);color:var(--verde)}.estado.rejeitado{background:var(--vermelho-claro);color:var(--vermelho)}.modal-actions{padding:16px 22px;border-top:1px solid var(--borda);display:flex;justify-content:flex-end;gap:8px}.btn{border:0;border-radius:8px;padding:10px 15px;font-weight:700;cursor:pointer}.btn-submeter{background:#EEF1F2;color:#455A64}.btn-rejeitar{background:var(--vermelho);color:#fff}.btn-aprovar{background:var(--verde);color:#fff}.btn:hover{filter:brightness(.95)}.empty{padding:35px;text-align:center;color:var(--cinza);font-size:13px}
 .admin-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}.admin-tab{border:1px solid var(--borda);background:#fff;padding:9px 15px;border-radius:20px;cursor:pointer;font-size:12px}.admin-tab.active{background:var(--verde-claro);color:var(--verde);border-color:var(--verde);font-weight:700}.admin-panel{display:none}.admin-panel.active{display:block}.admin-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}.admin-card{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:20px;margin-bottom:16px}.admin-card h3{margin:0 0 7px;font-size:16px}.admin-card p{margin:0 0 15px;color:var(--cinza);font-size:13px;line-height:1.5}.upload-zone{border:1px dashed #B9C2C7;border-radius:10px;padding:22px;text-align:center;background:#FAFBFB}.upload-zone input{margin:12px auto 0;display:block}.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.field{border:1px solid var(--borda);background:#fff;border-radius:8px;padding:9px 11px;font-size:13px}.btn-primary{background:var(--verde);color:#fff}.btn-secondary{background:#EEF1F2;color:#455A64}.btn-danger{background:var(--vermelho);color:#fff}.admin-table{width:100%;border-collapse:collapse;font-size:12px}.admin-table th,.admin-table td{padding:10px 11px;border-bottom:1px solid #EDF0F2;text-align:left}.admin-table th{background:#FAFAFA;font-size:11px;color:#66707A}.btn-eliminar-pedido{background:var(--vermelho);color:#fff;white-space:nowrap;padding:8px 10px;font-size:11px}.num{text-align:right!important}.pill-ok{color:var(--verde);font-weight:800}.pill-warn{color:#8A6200;font-weight:800}.pill-bad{color:var(--vermelho);font-weight:800}.progress{height:8px;background:#EEF1F2;border-radius:99px;overflow:hidden}.progress>span{display:block;height:100%;background:var(--verde)}.note{font-size:11px;color:var(--cinza);margin-top:10px}.password-wrap{display:flex;gap:8px;max-width:400px}.password-wrap input{flex:1}.toast{position:fixed;right:22px;bottom:22px;background:#263238;color:#fff;padding:12px 15px;border-radius:9px;font-size:12px;z-index:300;display:none;box-shadow:0 10px 30px rgba(0,0,0,.18)}.toast.show{display:block}.success{background:var(--verde)}.error{background:var(--vermelho)}
-.cota-dia{display:block;font-size:9px;line-height:1.15;font-weight:800;color:#245a45;margin-top:3px;white-space:nowrap}.pedidos-dia{display:block;font-size:9px;line-height:1.15;font-weight:700;color:#4B5563;white-space:nowrap}.cota-dia.sem-cota{color:#9AA3AA;font-weight:500}.header-cell{height:78px!important;min-height:78px!important;overflow:visible}
+.cota-dia{display:block;font-size:9px;line-height:1.15;font-weight:800;color:#245a45;margin-top:3px;white-space:nowrap}.pedidos-dia{display:block;font-size:9px;line-height:1.15;font-weight:700;color:#4B5563;white-space:nowrap}.cota-dia.sem-cota{color:#9AA3AA;font-weight:500}.header-cell{height:78px!important;min-height:78px!important;overflow:visible;justify-content:center!important;align-items:center!important}.header-cell.corner{justify-content:center!important;align-items:center!important;padding-left:0!important}
 @media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px);padding:20px}.stats{grid-template-columns:repeat(2,1fr)}.info-grid{grid-template-columns:1fr}.admin-grid{grid-template-columns:1fr}}
+
+.resumo-equipa-card{margin-bottom:16px}.resumo-legenda{font-size:12px;color:var(--cinza)}.resumo-equipa{display:grid;min-width:max-content;grid-auto-rows:minmax(36px,auto);font-size:11px}.resumo-cell{display:flex;align-items:center;justify-content:center;min-width:42px;padding:7px 5px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;background:#fff;text-align:center}.resumo-head{background:#FAFAFA;font-weight:700;position:sticky;top:0;z-index:2}.resumo-team{min-width:450px;width:450px;justify-content:flex-start;padding-left:14px;position:sticky;left:0;z-index:1;font-weight:700;background:#fff}.resumo-head.resumo-team{z-index:3;background:#FAFAFA}.resumo-numero{font-weight:700;color:#8A6200;background:#FFF8E1}.resumo-zero{color:#B0B7BD;background:#fff}.resumo-vazio{padding:18px;color:var(--cinza);font-size:12px}
 </style>
 </head>
 <body>
@@ -17,8 +19,8 @@
 <aside class="sidebar">
   <div class="brand-heading"><img src="./logo.png" class="logo" alt="" aria-hidden="true" onerror="this.style.display='none'"><span>MAPA DE FÉRIAS</span></div>
   <div class="menu-title">Gestão</div>
-  <button class="menu-item active" id="menuSubmetidos" onclick="abrirPagina('submetidos')">Submissão de Pedidos</button>
-  <button class="menu-item" id="menuAprovados" onclick="abrirPagina('aprovados')">Férias Aprovadas</button>
+  <button class="menu-item active" id="menuSubmetidos" onclick="abrirPagina('submetidos')">Mapa Pedidos de Férias</button>
+  <button class="menu-item" id="menuRejeitados" onclick="abrirPagina('rejeitados')">Pedidos Rejeitados</button>
   <div class="menu-title" style="margin-top:18px">Gestão Supervisor</div>
   <button class="menu-item" id="menuSupervisorControlo" onclick="abrirPagina('supervisor','controlo')">Controlo de Submissões</button>
   <div class="menu-title" style="margin-top:18px">Administração</div>
@@ -27,8 +29,8 @@
 
 <main class="main">
 <div class="header">
-  <div><h1 id="tituloPagina">Submissão de Pedidos</h1><div class="subtitle">Gestão e acompanhamento das férias da equipa</div></div>
-  <div class="month-controls" id="monthControls"><button onclick="mudarMes(-1)">‹</button><div class="month-name" id="mesAtual"></div><button onclick="mudarMes(1)">›</button></div>
+  <div><h1 id="tituloPagina">Mapa Pedidos de Férias</h1><div class="subtitle">Gestão e acompanhamento das férias da equipa</div></div>
+  <div class="month-controls" id="monthControls"><button id="mesAnterior" onclick="mudarMes(-1)">‹</button><div class="month-name" id="mesAtual"></div><button id="mesSeguinte" onclick="mudarMes(1)">›</button></div>
 </div>
 
 <section class="page active" id="paginaSubmetidos">
@@ -39,17 +41,22 @@
     <div class="stat"><div class="stat-label">Dias pedidos</div><div class="stat-value" id="totalDias">0</div></div>
     <div class="stat"><div class="stat-label">Por decidir</div><div class="stat-value" id="totalPendentes">0</div></div>
   </div>
-  <div class="map-card"><div class="map-header"><div class="map-title">Pedidos submetidos</div><div class="legend"><div class="legend-item"><span class="legend-box legend-submetido"></span>Submetido</div><div class="legend-item"><span class="legend-box legend-aprovado"></span>Aprovado</div><div class="legend-item"><span class="legend-box legend-rejeitado"></span>Rejeitado</div></div></div><div class="table-scroll"><div class="calendar" id="mapaSubmetidos"></div></div></div>
+  <div class="map-card resumo-equipa-card"><div class="map-header"><div class="map-title">Férias pedidas por equipa</div><div class="resumo-legenda">Número de pedidos submetidos por dia</div></div><div class="table-scroll" id="resumoFeriasScroll"><div id="resumoFeriasEquipa" class="resumo-equipa"></div></div></div>
+  <div class="map-card"><div class="map-header"><div class="map-title">Mapa Pedidos de Férias</div><div class="legend"><div class="legend-item"><span class="legend-box legend-submetido"></span>Submetido</div><div class="legend-item"><span class="legend-box legend-aprovado"></span>Aprovado</div><div class="legend-item"><span class="legend-box legend-rejeitado"></span>Rejeitado</div></div></div><div class="table-scroll" id="mapaSubmetidosScroll"><div class="calendar" id="mapaSubmetidos"></div></div></div>
 </section>
 
-<section class="page" id="paginaAprovados">
-  <div class="stats">
-    <div class="stat"><div class="stat-label">Colaboradores</div><div class="stat-value" id="apColab">0</div></div>
-    <div class="stat"><div class="stat-label">Dias aprovados no mês</div><div class="stat-value green" id="aprovadosTotal">0</div></div>
-    <div class="stat"><div class="stat-label">Dias de férias</div><div class="stat-value" id="aprovadosDias">0</div></div>
-    <div class="stat"><div class="stat-label">Estado</div><div class="stat-value" style="font-size:16px">Aprovadas</div></div>
+<section class="page" id="paginaRejeitados">
+  <div class="admin-card">
+    <h3>Pedidos Rejeitados</h3>
+    <p>Registo independente dos pedidos rejeitados. Esta lista é guardada numa tabela própria e mantém-se mesmo que o pedido seja eliminado da fid_SNAT.</p>
+    <div class="toolbar">
+      <input class="field" id="pesquisaRejeitados" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
+      <button class="btn btn-secondary" onclick="carregarPedidosRejeitados()">Atualizar lista</button>
+      <button class="btn btn-primary" onclick="exportarRejeitadosExcel()">Exportar rejeitados para Excel</button>
+    </div>
+    <div class="note" id="contagemRejeitados">A carregar pedidos rejeitados...</div>
+    <div class="table-scroll"><table class="admin-table"><thead><tr><th>ID do pedido</th><th>Nome</th><th>Tipo de dias</th><th>Dia rejeitado</th><th>Data de registo</th><th>Ação</th></tr></thead><tbody id="tabelaRejeitados"><tr><td colspan="6" class="empty">A carregar...</td></tr></tbody></table></div>
   </div>
-  <div class="map-card"><div class="map-header"><div class="map-title">Férias aprovadas</div><div class="legend"><div class="legend-item"><span class="legend-box legend-aprovado"></span>Aprovada por dia</div></div></div><div class="table-scroll"><div class="calendar" id="mapaAprovados"></div></div></div>
 </section>
 
 
@@ -63,6 +70,7 @@
       <h3>Controlo Submissões</h3>
       <p>Compara os dias autorizados para cada tipologia com os dias que o colaborador já submeteu. <b>Faltam</b> = dias autorizados − dias já submetidos.</p>
       <div class="toolbar">
+        <input class="field" id="pesquisaControlo" type="search" placeholder="Filtrar pelo nome do colaborador" oninput="renderControlo()" style="min-width:260px;flex:1">
         <button class="filter active" id="ctrlTodos" onclick="filtrarControlo('TODOS',this)">Todos</button>
         <button class="filter" onclick="filtrarControlo('2026',this)">2026</button>
         <button class="filter" onclick="filtrarControlo('2027',this)">2027</button>
@@ -80,7 +88,7 @@
   <div class="admin-panel" id="adminPedidos">
     <div class="admin-card">
       <h3>Gestão de pedidos submetidos</h3>
-      <p>Esta lista espelha os registos da tabela <b>fid_SNAT</b>. Eliminar um pedido remove definitivamente a linha original do Supabase; depois de atualizar, deixa de aparecer nas submissões, nas férias aprovadas e nas restantes contagens.</p>
+      <p>Esta lista espelha os registos da tabela <b>fid_SNAT</b>. Usa «Eliminar dia» para retirar apenas uma data do período e atualizar o total de dias. Se a data estiver no meio do período, o pedido será dividido para preservar os restantes dias.</p>
       <div class="toolbar">
         <input class="field" id="pesquisaPedidosSNAT" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
         <button class="btn btn-secondary" onclick="carregarGestaoPedidos()">Atualizar lista</button>
@@ -102,7 +110,7 @@
     <div class="admin-grid">
       <div class="admin-card">
         <h3>Carregar dias autorizados</h3>
-        <p>Carrega um Excel com <b>Nome</b> e as colunas <b>FT26 - X Dias</b>, <b>FE26 - X Dias</b>, <b>FP27 - X Dias</b> e <b>FE27 - X Dias</b>. Os dados são gravados/atualizados diretamente no Supabase.</p>
+        <p>Carrega um Excel com as colunas <b>Nome</b>, <b>Equipa</b>, <b>CH</b>, <b>Dias pendentes de 2026</b> e <b>Dias autorizados de 2027</b>. Os dados são gravados/atualizados diretamente no Supabase.</p>
         <div class="upload-zone">
           <div><b>Selecionar ficheiro Excel</b></div>
           <input type="file" id="excelAutorizados" accept=".xlsx,.xls,.csv">
@@ -121,7 +129,7 @@
     </div>
     <div class="admin-card">
       <div class="map-header" style="padding:0 0 12px;border:0"><div class="map-title">Dias autorizados por colaborador</div><button class="btn btn-secondary" onclick="carregarAutorizados()">Atualizar</button></div>
-      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th class="num">Dias pendentes de 2026</th><th class="num">Dias autorizados de 2027</th><th class="num">Total</th></tr></thead><tbody id="tabelaAutorizados"></tbody></table></div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th>Equipa</th><th>CH</th><th class="num">Dias pendentes de 2026</th><th class="num">Dias autorizados de 2027</th><th class="num">Total</th></tr></thead><tbody id="tabelaAutorizados"></tbody></table></div>
     </div>
   </div>
 
@@ -191,13 +199,17 @@ const SUPABASE_URL='https://bijndfsxrzjviwrdvwms.supabase.co';
 const SUPABASE_API_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJpam5kZnN4cnpqdml3cmR2d21zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA4NTA5NTIsImV4cCI6MjA2NjQyNjk1Mn0.EWaFInuqTaxvnjytb40DdnflEbBrbSYcViKLYc_kKBk';
 const SUPABASE_TABLE='fid_SNAT';
 const ESTADOS_TABLE='fid_snat_estados';
+const REJEITADOS_TABLE='fid_snat_rejeitados';
 const AUT_TABLE='fid_teste';
 const TIPOS=['FT26','FE26','FP27','F27'];
 
-let colaboradores=[], autorizados=[], cotasSemanis=[], pedidosSNATAdmin=[], paginaAtual='submetidos', filtroTipo='TODOS', filtroControlo='TODOS', selecionado=null, adminAutenticado=false;
-let dataAtual=new Date(2026,9,1);
+let colaboradores=[], autorizados=[], infoEquipaCH=[], cotasSemanis=[], pedidosSNATAdmin=[], pedidosRejeitados=[], diasRejeitados=new Set(), paginaAtual='submetidos', filtroTipo='TODOS', filtroControlo='TODOS', selecionado=null, adminAutenticado=false;
+let dataAtual=new Date(2027,0,1);
 const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const diasSemana=['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+// Feriados nacionais de Portugal em 2027. Os fins de semana são tratados à parte.
+const feriados2027=new Set(['2027-01-01','2027-03-26','2027-04-25','2027-05-01','2027-06-03','2027-06-10','2027-08-15','2027-10-05','2027-11-01','2027-12-01','2027-12-08','2027-12-25']);
+function diaCinza(data,dt){return dt.getDay()===0||dt.getDay()===6||feriados2027.has(data)}
 
 function headers(extra={}){return {apikey:SUPABASE_API_KEY,Authorization:`Bearer ${SUPABASE_API_KEY}`,...extra}}
 function iso(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
@@ -211,30 +223,31 @@ function tipoNormalizado(v){
   if(n==='fe27'||n==='não preferenciais'||n==='nao preferenciais')return 'FE27';
   return String(v||'').trim().toUpperCase();
 }
-function mudarMes(n){dataAtual=new Date(dataAtual.getFullYear(),dataAtual.getMonth()+n,1);render()}
+function mudarMes(n){const novo=new Date(dataAtual.getFullYear(),dataAtual.getMonth()+n,1);if(novo.getFullYear()!==2027)return;dataAtual=novo;render()}
 function abrirPagina(p, supervisorTab='controlo'){
   if(p==='admin'&&!adminAutenticado){abrirGateAdmin();return;}
   paginaAtual=p;
-  ['submetidos','aprovados','supervisor','admin'].forEach(x=>{
+  ['submetidos','rejeitados','supervisor','admin'].forEach(x=>{
     const el=document.getElementById('pagina'+x.charAt(0).toUpperCase()+x.slice(1));
     if(el)el.classList.toggle('active',p===x);
   });
-  ['Submetidos','Aprovados','Admin','SupervisorControlo','SupervisorPedidos'].forEach(x=>{
+  ['Submetidos','Rejeitados','Admin','SupervisorControlo','SupervisorPedidos'].forEach(x=>{
     const el=document.getElementById('menu'+x);
     if(el)el.classList.toggle('active',
       (x==='Submetidos'&&p==='submetidos')||
-      (x==='Aprovados'&&p==='aprovados')||
+      (x==='Rejeitados'&&p==='rejeitados')||
       (x==='Admin'&&p==='admin')||
       (x==='SupervisorControlo'&&p==='supervisor'&&supervisorTab==='controlo')||
       (x==='SupervisorPedidos'&&p==='supervisor'&&supervisorTab==='pedidos'));
   });
-  document.getElementById('tituloPagina').textContent=p==='submetidos'?'Submissão de Pedidos':p==='aprovados'?'Férias Aprovadas':p==='supervisor'?'Gestão Supervisor':'Administração';
-  document.getElementById('monthControls').style.visibility=(p==='submetidos'||p==='aprovados')?'visible':'hidden';
+  document.getElementById('tituloPagina').textContent=p==='submetidos'?'Mapa Pedidos de Férias':p==='rejeitados'?'Pedidos Rejeitados':p==='supervisor'?'Gestão Supervisor':'Administração';
+  document.getElementById('monthControls').style.visibility=(p==='submetidos')?'visible':'hidden';
   if(p==='admin'){
     if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;
     carregarAutorizados();carregarCotas();
   }
   if(p==='supervisor')abrirSupervisorTab(supervisorTab);
+  if(p==='rejeitados')carregarPedidosRejeitados();
   render();
 }
 function abrirAdminTab(tab){
@@ -280,7 +293,9 @@ function validarSenhaAdmin(){
 }
 function filtrarTipo(t,b){filtroTipo=t;document.querySelectorAll('#filtrosTipos .filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');render()}
 function visivel(p){return filtroTipo==='TODOS'||p.tipo===filtroTipo}
-function pedidoNoDia(c,data){return c.pedidos.find(p=>visivel(p)&&data>=p.inicio&&data<=p.fim)}
+function chaveDiaRejeitado(id,data){return `${String(id)}|${String(data).slice(0,10)}`}
+function diaRejeitado(p,data){return diasRejeitados.has(chaveDiaRejeitado(p.id,data))}
+function pedidoNoDia(c,data){return c.pedidos.find(p=>visivel(p)&&data>=p.inicio&&data<=p.fim&&!diaRejeitado(p,data))}
 function normalizarDataCota(v){
   if(!v)return '';
   const s=String(v).trim();
@@ -317,16 +332,49 @@ function mapearPedido(row,index){
 }
 async function carregarDadosSupabase(){
   try{
+    // A fonte principal dos pedidos é sempre fid_SNAT.
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=*&order=nome.asc,data_inicio.asc`,{headers:headers({Accept:'application/json'})});
-    if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
+    if(!r.ok)throw new Error(`Erro ao ler ${SUPABASE_TABLE} (${r.status}): ${await r.text()}`);
     const rows=await r.json();
+
+    // Informação complementar da equipa e carga horária, carregada do ficheiro de dias autorizados (fid_teste).
+    try{
+      const ri=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,equipa,ch&order=nome.asc`,{headers:headers({Accept:'application/json'})});
+      if(ri.ok){
+        const dadosInfo=await ri.json();
+        infoEquipaCH=Array.isArray(dadosInfo)?dadosInfo:[];
+      }else{
+        console.warn(`Não foi possível carregar Equipa/CH de ${AUT_TABLE}:`,await ri.text());
+      }
+    }catch(infoErr){console.warn('Não foi possível carregar a informação de Equipa/CH.',infoErr)}
+
+    // O histórico só serve para esconder do mapa os pedidos já rejeitados;
+    // uma falha ao ler o histórico nunca deve impedir a leitura de fid_SNAT.
+    diasRejeitados=new Set();
+    try{
+      const rh=await fetch(`${SUPABASE_URL}/rest/v1/${REJEITADOS_TABLE}?select=pedido_id,data_rejeitada`,{headers:headers({Accept:'application/json'})});
+      if(rh.ok){
+        const hist=await rh.json();
+        diasRejeitados=new Set((Array.isArray(hist)?hist:[]).map(x=>chaveDiaRejeitado(x.pedido_id,x.data_rejeitada)));
+      }else{
+        console.warn(`Não foi possível ler ${REJEITADOS_TABLE}; os pedidos continuam a ser carregados de ${SUPABASE_TABLE}.`,await rh.text());
+      }
+    }catch(histErr){console.warn(`Falha ao consultar ${REJEITADOS_TABLE}; mantida a leitura de ${SUPABASE_TABLE}.`,histErr)}
+
     const mapa=new Map();
-    rows.forEach((row,i)=>{const p=mapearPedido(row,i);if(!p)return;if(!mapa.has(row.nome))mapa.set(row.nome,{id:row.nome,nome:row.nome,pedidos:[]});mapa.get(row.nome).pedidos.push(p)});
+    rows.forEach((row,i)=>{
+      const p=mapearPedido(row,i);if(!p)return;
+      if(!mapa.has(row.nome))mapa.set(row.nome,{id:row.nome,nome:row.nome,pedidos:[]});
+      mapa.get(row.nome).pedidos.push(p);
+    });
     colaboradores=[...mapa.values()];
     await carregarEstadosPersistidos();
-    document.getElementById('totalColaboradores').textContent=colaboradores.length;document.getElementById('apColab').textContent=colaboradores.length;render();
+    const total=document.getElementById('totalColaboradores');if(total)total.textContent=colaboradores.length;
+    const apColab=document.getElementById('apColab');if(apColab)apColab.textContent=colaboradores.length;
+    const erro=document.getElementById('erroSupabase');if(erro)erro.style.display='none';
+    render();
     return true;
-  }catch(err){console.error(err);mostrarErro(`Não foi possível carregar os dados. ${err.message}`);return false}
+  }catch(err){console.error(err);mostrarErro(`Não foi possível carregar os dados de ${SUPABASE_TABLE}. ${err.message}`);return false}
 }
 async function carregarEstadosPersistidos(){
   const r=await fetch(`${SUPABASE_URL}/rest/v1/${ESTADOS_TABLE}?select=pedido_id,nome,data,estado,updated_at&order=updated_at.asc`,{headers:headers({Accept:'application/json'})});
@@ -388,15 +436,58 @@ async function guardarEstadoPersistido(p,data,estado){
   if(!r.ok)throw new Error(`Não foi possível guardar o estado (erro ${r.status}): ${await r.text()}`);
 }
 function mostrarErro(msg){let el=document.getElementById('erroSupabase');if(!el){el=document.createElement('div');el.id='erroSupabase';el.style.cssText='margin-bottom:14px;padding:10px 13px;border-radius:9px;background:#FFEBEE;color:#C62828;font-size:12px;font-weight:600';document.querySelector('#paginaSubmetidos').prepend(el)}el.textContent=msg;el.style.display='block'}
+function infoDoColaborador(nome){
+  const normalizarNome=v=>String(v||'').trim().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLowerCase().replace(/\\s+/g,' ');
+  return infoEquipaCH.find(x=>normalizarNome(x.nome)===normalizarNome(nome))||{};
+}
+function sincronizarScrollResumoMapa(){
+  const resumo=document.getElementById('resumoFeriasScroll');
+  const mapa=document.getElementById('mapaSubmetidosScroll');
+  if(!resumo||!mapa||resumo.dataset.syncAtivo==='1')return;
+  resumo.dataset.syncAtivo='1';mapa.dataset.syncAtivo='1';
+  let aSincronizar=false;
+  resumo.addEventListener('scroll',()=>{if(aSincronizar)return;aSincronizar=true;mapa.scrollLeft=resumo.scrollLeft;aSincronizar=false;},{passive:true});
+  mapa.addEventListener('scroll',()=>{if(aSincronizar)return;aSincronizar=true;resumo.scrollLeft=mapa.scrollLeft;aSincronizar=false;},{passive:true});
+}
+function renderResumoFeriasEquipa(){
+  const el=document.getElementById('resumoFeriasEquipa');if(!el)return;
+  const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),total=diasMes(y,m);
+  const porEquipa=new Map();
+  colaboradores.forEach(c=>{
+    const info=infoDoColaborador(c.nome),equipa=String(info.equipa||'').trim();
+    if(!equipa)return;
+    c.pedidos.forEach(p=>{
+      if(!visivel(p))return;
+      const inicio=p.inicio>iso(y,m,1)?p.inicio:iso(y,m,1),fim=p.fim<iso(y,m,total)?p.fim:iso(y,m,total);
+      if(fim<inicio)return;
+      for(let d=new Date(inicio+'T00:00:00');d<=new Date(fim+'T00:00:00');d.setDate(d.getDate()+1)){
+        const data=iso(d.getFullYear(),d.getMonth(),d.getDate());
+        if(diaRejeitado(p,data))continue;
+        const estado=(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido';
+        if(estado!=='submetido')continue;
+        if(!porEquipa.has(equipa))porEquipa.set(equipa,{});
+        porEquipa.get(equipa)[data]=(porEquipa.get(equipa)[data]||0)+1;
+      }
+    });
+  });
+  const equipas=[...porEquipa.keys()].sort((a,b)=>a.localeCompare(b,'pt-PT'));
+  if(!equipas.length){el.className='resumo-equipa';el.style.gridTemplateColumns='1fr';el.innerHTML='<div class="resumo-vazio">Ainda não existem férias submetidas por equipa neste mês.</div>';return;}
+  el.className='resumo-equipa';el.style.gridTemplateColumns=`450px repeat(${total},64px)`;el.innerHTML='';
+  const h=document.createElement('div');h.className='resumo-cell resumo-head resumo-team';h.textContent='Equipa';el.appendChild(h);
+  for(let d=1;d<=total;d++){const c=document.createElement('div');c.className='resumo-cell resumo-head';c.textContent=d;c.title=`${String(d).padStart(2,'0')}/${String(m+1).padStart(2,'0')}/${y}`;el.appendChild(c)}
+  equipas.forEach(equipa=>{const nome=document.createElement('div');nome.className='resumo-cell resumo-team';nome.textContent=equipa;el.appendChild(nome);for(let d=1;d<=total;d++){const data=iso(y,m,d),n=porEquipa.get(equipa)[data]||0,c=document.createElement('div');c.className='resumo-cell '+(n?'resumo-numero':'resumo-zero');c.textContent=n||'—';c.title=`${equipa} | ${data}: ${n} pedido(s) submetido(s)`;el.appendChild(c)}});
+}
 function criarMapa(){
-  const el=paginaAtual==='submetidos'?document.getElementById('mapaSubmetidos'):document.getElementById('mapaAprovados');if(!el)return;el.innerHTML='';
-  const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),total=diasMes(y,m);el.style.gridTemplateColumns=`230px repeat(${total},64px)`;
+  const el=document.getElementById('mapaSubmetidos');if(!el||paginaAtual!=='submetidos')return;el.innerHTML='';renderResumoFeriasEquipa();sincronizarScrollResumoMapa();
+  const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),total=diasMes(y,m);el.style.gridTemplateColumns=`220px 140px 90px repeat(${total},64px)`;
   const corner=document.createElement('div');corner.className='cell header-cell corner';corner.textContent='Colaborador';el.appendChild(corner);
+  const teamHeader=document.createElement('div');teamHeader.className='cell header-cell team-cell';teamHeader.textContent='Equipa';el.appendChild(teamHeader);
+  const chHeader=document.createElement('div');chHeader.className='cell header-cell ch-cell';chHeader.textContent='Carga horária';el.appendChild(chHeader);
   const hoje=iso(new Date().getFullYear(),new Date().getMonth(),new Date().getDate());
   for(let d=1;d<=total;d++){
     const data=iso(y,m,d),dt=new Date(y,m,d),c=document.createElement('div');
     c.className='cell header-cell';
-    if(dt.getDay()===0||dt.getDay()===6)c.classList.add('weekend');
+    if(diaCinza(data,dt)){c.classList.add(dt.getDay()===0||dt.getDay()===6?'weekend':'holiday');if(feriados2027.has(data))c.title='Feriado nacional';}
     if(data===hoje)c.classList.add('today');
     const cota=cotaNoDia(data);
     let pedidosDia=0;
@@ -408,7 +499,7 @@ function criarMapa(){
     c.innerHTML=`<span class="day-number">${d}</span><span class="day-name">${diasSemana[dt.getDay()]}</span>${cota?`<span class="cota-dia" title="Semana ${esc(cota.semana)}: ${num(cota.cotas_disponiveis)} cotas disponíveis">Cota: ${num(cota.cotas_disponiveis)}</span>`:'<span class="cota-dia sem-cota">Cota: —</span>'}<span class="pedidos-dia">Pedidos: ${pedidosDia}</span>`;
     el.appendChild(c);
   }
-  colaboradores.forEach(c=>{const nome=document.createElement('div');nome.className='cell name-cell';nome.textContent=c.nome;el.appendChild(nome);for(let d=1;d<=total;d++){const data=iso(y,m,d),dt=new Date(y,m,d),p=pedidoNoDia(c,data),cel=document.createElement('div');cel.className='cell';if(dt.getDay()===0||dt.getDay()===6)cel.classList.add('weekend');if(p){const estado=(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido';if(paginaAtual==='submetidos'||estado==='aprovado'){cel.classList.remove('weekend');cel.classList.add('periodo',['aprovado','rejeitado'].includes(estado)?estado:'submetido');if(data===p.inicio)cel.classList.add('inicio');if(data===p.fim)cel.classList.add('fim');if(p.inicio===p.fim)cel.classList.add('unico');cel.innerHTML=`<div>${p.tipo}<div class="estado-dia">${estado==='submetido'?'Submetido':estado==='aprovado'?'Aprovado':'Rejeitado'}</div></div>`;cel.title=`${c.nome} | ${p.tipo} | ${data}`;cel.onclick=()=>abrirModal(c,p,data)}}el.appendChild(cel)}})
+  colaboradores.forEach(c=>{const info=infoDoColaborador(c.nome);const equipa=String(info.equipa||'').trim();const ch=info.ch===null||info.ch===undefined||String(info.ch).trim()===''?'':String(info.ch).replace('.',',');const nome=document.createElement('div');nome.className='cell name-cell';nome.innerHTML=`<div class="nome-colaborador">${esc(c.nome)}</div>`;nome.title=c.nome;el.appendChild(nome);const team=document.createElement('div');team.className='cell team-cell';team.textContent=equipa||'—';team.title=equipa?`Equipa: ${equipa}`:'Equipa não indicada';el.appendChild(team);const carga=document.createElement('div');carga.className='cell ch-cell';carga.textContent=ch||'—';carga.title=ch?`Carga horária: ${ch}`:'Carga horária não indicada';el.appendChild(carga);for(let d=1;d<=total;d++){const data=iso(y,m,d),dt=new Date(y,m,d),p=pedidoNoDia(c,data),cel=document.createElement('div');cel.className='cell';if(diaCinza(data,dt)){cel.classList.add(dt.getDay()===0||dt.getDay()===6?'weekend':'holiday');if(feriados2027.has(data))cel.title='Feriado nacional';}if(p){const estado=(p.estadosDia&&p.estadosDia[data])||p.estado||'submetido';if(true){cel.classList.remove('weekend','holiday');cel.classList.add('periodo',['aprovado','rejeitado'].includes(estado)?estado:'submetido');if(data===p.inicio)cel.classList.add('inicio');if(data===p.fim)cel.classList.add('fim');if(p.inicio===p.fim)cel.classList.add('unico');cel.innerHTML=`<div>${p.tipo}<div class="estado-dia">${estado==='submetido'?'Submetido':estado==='aprovado'?'Aprovado':'Rejeitado'}</div></div>`;cel.title=`${c.nome} | ${p.tipo} | ${data}`;cel.onclick=()=>abrirModal(c,p,data)}}el.appendChild(cel)}})
 }
 async function abrirModal(c,p,data){
   selecionado={c,p,data};document.getElementById('mNome').textContent=c.nome;document.getElementById('mTipo').textContent=p.tipo;document.getElementById('mDia').textContent=data.split('-').reverse().join('/');document.getElementById('mPeriodo').textContent=`${p.inicio.split('-').reverse().join('/')} a ${p.fim.split('-').reverse().join('/')} (${p.totalDias} dias)`;
@@ -421,30 +512,42 @@ async function alterarEstado(novo){
   const {p,data}=selecionado;
   document.querySelectorAll('.modal-actions .btn').forEach(b=>b.disabled=true);
   try{
+    if(novo==='rejeitado') await arquivarPedidoRejeitado(p,data);
     await guardarEstadoPersistido(p,data,novo);
     if(!p.estadosDia)p.estadosDia={};
     p.estadosDia[data]=novo;
+    if(novo==='rejeitado')diasRejeitados.add(chaveDiaRejeitado(p.id,data));
+    else diasRejeitados.delete(chaveDiaRejeitado(p.id,data));
     fecharModal();
     render();
-    toast(novo==='aprovado'?'Dia aprovado e guardado no Supabase.':novo==='rejeitado'?'Dia rejeitado e guardado no Supabase.':'Dia voltou a submetido e foi guardado no Supabase.');
+    toast(novo==='aprovado'?'Dia aprovado e guardado no Supabase.':novo==='rejeitado'?'Dia rejeitado e retirado do mapa; os restantes dias do pedido mantêm-se.':'Dia voltou a submetido e foi guardado no Supabase.');
   }catch(err){console.error(err);toast(`Não foi possível guardar no Supabase. ${err.message}`,false)}
   finally{document.querySelectorAll('.modal-actions .btn').forEach(b=>b.disabled=false)}
 }
 function atualizarStats(){
   let pedidos=0,dias=0,pend=0,apDias=0;const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),inicioMes=new Date(y,m,1),fimMes=new Date(y,m,diasMes(y,m));
-  colaboradores.forEach(c=>c.pedidos.forEach(p=>{if(!visivel(p))return;const a=new Date(p.inicio+'T00:00:00'),b=new Date(p.fim+'T00:00:00');if(b<inicioMes||a>fimMes)return;if(paginaAtual==='submetidos'){pedidos++;const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){dias++;const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='submetido')pend++}}else{const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='aprovado')apDias++}}}));
+  colaboradores.forEach(c=>c.pedidos.forEach(p=>{if(!visivel(p))return;const a=new Date(p.inicio+'T00:00:00'),b=new Date(p.fim+'T00:00:00');if(b<inicioMes||a>fimMes)return;if(paginaAtual==='submetidos'){pedidos++;const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){dias++;const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(!diaRejeitado(p,data)&&((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='submetido')pend++}}}));
   if(paginaAtual==='submetidos'){document.getElementById('totalPedidos').textContent=pedidos;document.getElementById('totalDias').textContent=dias;document.getElementById('totalPendentes').textContent=pend}else{document.getElementById('aprovadosTotal').textContent=apDias;document.getElementById('aprovadosDias').textContent=apDias}
 }
-function render(){document.getElementById('mesAtual').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;criarMapa();atualizarStats()}
+function render(){if(dataAtual.getFullYear()!==2027)dataAtual=new Date(2027,0,1);document.getElementById('mesAtual').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;const ant=document.getElementById('mesAnterior'),seg=document.getElementById('mesSeguinte');if(ant){ant.disabled=dataAtual.getMonth()===0;ant.style.opacity=ant.disabled?'.35':'1';ant.style.cursor=ant.disabled?'default':'pointer'}if(seg){seg.disabled=dataAtual.getMonth()===11;seg.style.opacity=seg.disabled?'.35':'1';seg.style.cursor=seg.disabled?'default':'pointer'}if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;if(paginaAtual==='submetidos'){criarMapa();atualizarStats()}}
 function criarFiltros(){document.getElementById('filtrosTipos').innerHTML=`<button class="filter active" onclick="filtrarTipo('TODOS',this)">Todos</button>${TIPOS.map(t=>`<button class="filter" onclick="filtrarTipo('${t}',this)">${t}</button>`).join('')}`}
 
 function normalizarCabecalho(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
 function obterColuna(obj,tipos){const keys=Object.keys(obj);for(const k of keys){const nk=normalizarCabecalho(k);if(tipos.includes(nk))return obj[k]}return ''}
 function num(v){if(v===null||v===undefined||v==='')return 0;const n=Number(String(v).replace(',','.').replace(/[^0-9.-]/g,''));return Number.isFinite(n)?Math.max(0,Math.round(n)):0}
+function numeroCH(v){
+  if(v===null||v===undefined||String(v).trim()==='')return null;
+  const n=Number(String(v).trim().replace(',','.').replace(/[^0-9.-]/g,''));
+  return Number.isFinite(n)&&[1,0.5,0.75].includes(n)?n:null;
+}
 function linhaAutorizada(row){
   const nome=String(obterColuna(row,['nome','colaborador','colaboradora','name'])).trim();if(!nome)return null;
+  const equipa=String(obterColuna(row,['equipa','team','grupo'])).trim();
+  const ch=numeroCH(obterColuna(row,['ch','cargahoraria','cargahorariafracao','fracao','percentagemhorario']));
   return {
     nome,
+    equipa:equipa||null,
+    ch,
     dias_pendentes_2026:num(obterColuna(row,['diaspendentesde2026','diaspendentes2026','diaspendentes','pendentes2026'])),
     dias_autorizados_2027:num(obterColuna(row,['diasautorizadosde2027','diasautorizados2027','diasautorizados','autorizados2027']))
   };
@@ -453,7 +556,7 @@ async function carregarExcelAutorizados(){
   const file=document.getElementById('excelAutorizados').files[0];if(!file){toast('Seleciona primeiro o Excel.',false);return}
   try{
     const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(ws,{defval:''}),dados=rows.map(linhaAutorizada).filter(Boolean);
-    if(!dados.length)throw new Error('Não encontrei linhas válidas. Confirma os cabeçalhos: Nome, Dias pendentes de 2026 e Dias autorizados de 2027.');
+    if(!dados.length)throw new Error('Não encontrei linhas válidas. Confirma os cabeçalhos: Nome, Equipa, CH, Dias pendentes de 2026 e Dias autorizados de 2027.');
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?on_conflict=nome`,{method:'POST',headers:headers({'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify(dados.map(x=>({...x,updated_at:new Date().toISOString()})))});
     if(!r.ok)throw new Error(await r.text());
     toast(`${dados.length} colaboradores carregados no Supabase.`);await carregarAutorizados();await carregarControlo();
@@ -504,11 +607,92 @@ async function carregarCotas(){
 }
 async function carregarAutorizados(){
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,dias_pendentes_2026,dias_autorizados_2027&order=nome.asc`,{headers:headers({Accept:'application/json'})});if(!r.ok)throw new Error(await r.text());autorizados=await r.json();renderAutorizados()
-  }catch(e){document.getElementById('tabelaAutorizados').innerHTML=`<tr><td colspan="4" class="empty">Não foi possível carregar ${AUT_TABLE}. Verifica se a tabela foi criada no Supabase.</td></tr>`;console.warn(e)}
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,equipa,ch,dias_pendentes_2026,dias_autorizados_2027&order=nome.asc`,{headers:headers({Accept:'application/json'})});if(!r.ok)throw new Error(await r.text());autorizados=await r.json();renderAutorizados()
+  }catch(e){document.getElementById('tabelaAutorizados').innerHTML=`<tr><td colspan="6" class="empty">Não foi possível carregar ${AUT_TABLE}. Verifica se a tabela foi criada no Supabase.</td></tr>`;console.warn(e)}
 }
 function renderAutorizados(){
-  let total=0;document.getElementById('tabelaAutorizados').innerHTML=autorizados.map(x=>{const a=num(x.dias_pendentes_2026),b=num(x.dias_autorizados_2027),t=a+b;total+=t;return `<tr><td>${esc(x.nome)}</td><td class="num">${a}</td><td class="num">${b}</td><td class="num"><b>${t}</b></td></tr>`}).join('')||'<tr><td colspan="4" class="empty">Sem dados carregados.</td></tr>';document.getElementById('autColab').textContent=autorizados.length;document.getElementById('autTotal').textContent=total
+  let total=0;document.getElementById('tabelaAutorizados').innerHTML=autorizados.map(x=>{const a=num(x.dias_pendentes_2026),b=num(x.dias_autorizados_2027),t=a+b;total+=t;return `<tr><td>${esc(x.nome)}</td><td>${esc(x.equipa||'—')}</td><td>${x.ch===null||x.ch===undefined?'—':String(x.ch).replace('.',',')}</td><td class="num">${a}</td><td class="num">${b}</td><td class="num"><b>${t}</b></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">Sem dados carregados.</td></tr>';document.getElementById('autColab').textContent=autorizados.length;document.getElementById('autTotal').textContent=total
+}
+async function arquivarPedidoRejeitado(p,data){
+  const registo={
+    pedido_id:String(p.id),nome:String(p.nome||'').trim(),tipo_dias:String(p.tipo||''),
+    data_inicio:data,data_fim:data,total_dias:1,
+    data_rejeitada:data,data_registo:new Date().toISOString()
+  };
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${REJEITADOS_TABLE}?on_conflict=pedido_id,data_rejeitada`,{
+    method:'POST',
+    headers:headers({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=minimal'}),
+    body:JSON.stringify(registo)
+  });
+  if(!r.ok)throw new Error(`Não foi possível guardar o histórico de rejeições (erro ${r.status}): ${await r.text()}. Confirma que a tabela ${REJEITADOS_TABLE} foi criada e tem permissões de escrita.`);
+}
+async function carregarPedidosRejeitados(){
+  const tbody=document.getElementById('tabelaRejeitados');if(!tbody)return;
+  tbody.innerHTML='<tr><td colspan="6" class="empty">A carregar histórico...</td></tr>';
+  try{
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${REJEITADOS_TABLE}?select=*&order=data_registo.desc,nome.asc`,{headers:headers({Accept:'application/json'})});
+    if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
+    const dados=await r.json();pedidosRejeitados=Array.isArray(dados)?dados:[];
+    renderPedidosRejeitados();
+  }catch(e){
+    console.error(e);
+    document.getElementById('contagemRejeitados').textContent='Não foi possível carregar o histórico.';
+    tbody.innerHTML=`<tr><td colspan="6" class="empty">Erro ao carregar ${REJEITADOS_TABLE}: ${esc(e.message)}. Cria a tabela e configura as permissões no Supabase.</td></tr>`;
+  }
+}
+function renderPedidosRejeitados(){
+  const tbody=document.getElementById('tabelaRejeitados');if(!tbody)return;
+  const termo=String(document.getElementById('pesquisaRejeitados')?.value||'').trim().toLocaleLowerCase('pt-PT');
+  const dados=pedidosRejeitados.filter(p=>!termo||[p.pedido_id,p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+  document.getElementById('contagemRejeitados').textContent=termo?`${dados.length} de ${pedidosRejeitados.length} registos encontrados.`:`${pedidosRejeitados.length} registos no histórico permanente.`;
+  tbody.innerHTML=dados.map(p=>`<tr><td>${esc(p.pedido_id)}</td><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td><td>${esc(formatarDataSNAT(p.data_rejeitada))}</td><td>${esc(p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):'—')}</td><td><button type="button" class="btn btn-primary" onclick="voltarPedidoSubmetido('${esc(String(p.pedido_id))}','${esc(String(p.data_rejeitada||'').slice(0,10))}')">Voltar a submetido</button></td></tr>`).join('')||`<tr><td colspan="6" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'Ainda não existem pedidos rejeitados.'}</td></tr>`;
+}
+function exportarRejeitadosExcel(){
+  try{
+    if(typeof XLSX==='undefined')throw new Error('A biblioteca Excel não carregou. Verifica a ligação à Internet e volta a abrir o ficheiro.');
+    const termo=String(document.getElementById('pesquisaRejeitados')?.value||'').trim().toLocaleLowerCase('pt-PT');
+    const dados=pedidosRejeitados.filter(p=>!termo||[p.pedido_id,p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+    if(!dados.length){toast('Não existem registos de rejeitados para exportar.',false);return;}
+    const linhas=[['ID do pedido','Nome','Tipo de dias','Dia rejeitado','Data de início','Data de fim','Total de dias','Data de registo'],...dados.map(p=>[
+      p.pedido_id??'',p.nome??'',p.tipo_dias??'',p.data_rejeitada?formatarDataSNAT(String(p.data_rejeitada).slice(0,10)):'',p.data_inicio?formatarDataSNAT(String(p.data_inicio).slice(0,10)):'',p.data_fim?formatarDataSNAT(String(p.data_fim).slice(0,10)):'',p.total_dias??'',p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):''
+    ])];
+    const ws=XLSX.utils.aoa_to_sheet(linhas);
+    ws['!cols']=[{wch:16},{wch:28},{wch:18},{wch:16},{wch:16},{wch:16},{wch:14},{wch:23}];
+    ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length-1,c:linhas[0].length-1}})};
+    const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pedidos Rejeitados');
+    const hoje=new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb,`Pedidos_Rejeitados_${hoje}.xlsx`);
+    toast(`${dados.length} registos exportados para Excel.`);
+  }catch(e){console.error(e);toast('Não foi possível exportar os rejeitados: '+(e?.message||e),false);}
+}
+
+async function voltarPedidoSubmetido(pedidoIdParam,dataParam){
+  const registo=pedidosRejeitados.find(x=>String(x.pedido_id)===String(pedidoIdParam)&&String(x.data_rejeitada||'').slice(0,10)===String(dataParam).slice(0,10));
+  if(!registo)return;
+  const pedidoId=String(registo.pedido_id),data=String(registo.data_rejeitada||'').slice(0,10);
+  if(!data){toast('O registo não tem uma data rejeitada válida.',false);return;}
+  const confirmar=confirm(`Queres retirar ${registo.nome||'este pedido'} de Pedidos Rejeitados e voltar a colocar o dia ${formatarDataSNAT(data)} como Submetido no mapa?`);
+  if(!confirmar)return;
+  try{
+    let existe=colaboradores.flatMap(c=>c.pedidos).find(p=>String(p.id)===pedidoId);
+    // Se o registo original já tiver sido apagado da fid_SNAT, recriá-lo a partir do histórico.
+    if(!existe){
+      const dadosOriginais={id:registo.pedido_id,nome:registo.nome,tipo_dias:registo.tipo_dias,data_inicio:registo.data_inicio,data_fim:registo.data_fim,total_dias:registo.total_dias};
+      const recriar=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=id`,{method:'POST',headers:headers({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(dadosOriginais)});
+      if(!recriar.ok)throw new Error(`Não foi possível devolver o pedido à tabela ${SUPABASE_TABLE} (erro ${recriar.status}): ${await recriar.text()}`);
+      await guardarEstadoPersistido({id:registo.pedido_id,nome:registo.nome,inicio:String(registo.data_inicio||'').slice(0,10),fim:String(registo.data_fim||'').slice(0,10)},data,'submetido');
+    }else{
+      await guardarEstadoPersistido(existe,data,'submetido');
+    }
+    const del=await fetch(`${SUPABASE_URL}/rest/v1/${REJEITADOS_TABLE}?pedido_id=eq.${encodeURIComponent(pedidoId)}&data_rejeitada=eq.${encodeURIComponent(data)}`,{method:'DELETE',headers:headers({Prefer:'return=minimal'})});
+    if(!del.ok)throw new Error(`Não foi possível retirar o registo do histórico (erro ${del.status}): ${await del.text()}`);
+    diasRejeitados.delete(chaveDiaRejeitado(pedidoId,data));
+    pedidosRejeitados=pedidosRejeitados.filter(x=>!(String(x.pedido_id)===pedidoId&&String(x.data_rejeitada||'').slice(0,10)===data));
+    if(existe){if(!existe.estadosDia)existe.estadosDia={};existe.estadosDia[data]='submetido';}
+    await carregarDadosSupabase();
+    renderPedidosRejeitados();render();
+    toast('Dia retirado dos rejeitados e devolvido ao mapa como Submetido.');
+  }catch(e){console.error(e);toast(`Não foi possível voltar a submetido: ${e.message}`,false)}
 }
 function formatarDataSNAT(v){
   const s=String(v??'').slice(0,10);
@@ -541,48 +725,99 @@ function renderGestaoPedidos(){
     <td>${esc(p.id)}</td><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td>
     <td>${esc(formatarDataSNAT(p.data_inicio))}</td><td>${esc(formatarDataSNAT(p.data_fim))}</td>
     <td class="num">${esc(p.total_dias)}</td>
-    <td><button type="button" class="btn btn-eliminar-pedido" data-pedido-id="${esc(p.id)}" data-pedido-nome="${esc(p.nome)}">Eliminar linha</button></td>
+    <td><button type="button" class="btn btn-eliminar-pedido" data-pedido-id="${esc(p.id)}" data-pedido-nome="${esc(p.nome)}">Eliminar dia</button></td>
   </tr>`).join('')||`<tr><td colspan="7" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
+}
+function somarDiasISO(data, quantidade){
+  const d=new Date(String(data).slice(0,10)+'T00:00:00');
+  d.setDate(d.getDate()+quantidade);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function diferencaDiasInclusiva(inicio,fim){
+  const a=new Date(String(inicio).slice(0,10)+'T00:00:00');
+  const b=new Date(String(fim).slice(0,10)+'T00:00:00');
+  return Math.max(0,Math.round((b-a)/86400000)+1);
+}
+async function respostaAlteracaoSNAT(res, descricao){
+  const texto=await res.text();
+  if(!res.ok)throw new Error(`${descricao} (erro ${res.status}): ${texto||res.statusText}`);
+  // PostgREST pode responder sem erro mas sem alterar linhas (por exemplo, por RLS ou filtro ID).
+  if(res.status!==204){
+    let linhas=null;
+    try{linhas=texto?JSON.parse(texto):null}catch{}
+    if(Array.isArray(linhas)&&linhas.length===0)throw new Error(`${descricao}: o Supabase não alterou nenhum registo. Confirma o ID do pedido e as permissões de UPDATE/DELETE na tabela fid_SNAT (RLS).`);
+    if(Array.isArray(linhas)&&linhas.length>0)return linhas;
+  }
+  return null;
+}
+function normalizarDataEliminacao(valor){
+  const s=String(valor??'').trim();
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m)return `${m[1]}-${m[2]}-${m[3]}`;
+  m=s.match(/^(\d{2})[\/.-](\d{2})[\/.-](\d{4})$/);
+  if(m)return `${m[3]}-${m[2]}-${m[1]}`;
+  return s;
 }
 async function eliminarPedidoSNAT(id,nome){
   const identificador=String(id??'').trim();
-  if(!identificador){toast('Este registo não tem um ID válido; não foi eliminado.',false);return;}
-  const confirmado=confirm(`ATENÇÃO: vais eliminar definitivamente o pedido de férias de ${nome||'(nome não disponível)'} (ID ${identificador}) da tabela fid_SNAT.\n\nEsta ação não pode ser anulada. O pedido deixará de aparecer nas submissões e nas férias aprovadas. Queres continuar?`);
+  if(!identificador){toast('Este registo não tem um ID válido; não foi alterado.',false);return;}
+  const pedido=pedidosSNATAdmin.find(p=>String(p.id)===identificador);
+  if(!pedido){toast('Não encontrei o pedido selecionado. Atualiza a lista e tenta novamente.',false);return;}
+  const inicio=String(pedido.data_inicio||'').slice(0,10), fim=String(pedido.data_fim||'').slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(inicio)||!/^\d{4}-\d{2}-\d{2}$/.test(fim)||inicio>fim){toast('O pedido não tem um período de datas válido.',false);return;}
+  const data=prompt(`Pedido de ${nome||pedido.nome||'colaborador'} (${formatarDataSNAT(inicio)} a ${formatarDataSNAT(fim)}).\n\nIndica o dia que queres eliminar. Podes usar AAAA-MM-DD ou DD/MM/AAAA.`,inicio);
+  if(data===null)return;
+  const dia=normalizarDataEliminacao(data);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(dia)||dia<inicio||dia>fim){toast('Indica uma data válida dentro do período do pedido (AAAA-MM-DD ou DD/MM/AAAA).',false);return;}
+  const confirmado=confirm(`Vais eliminar apenas o dia ${formatarDataSNAT(dia)} do pedido de ${nome||pedido.nome||'colaborador'}.\n\nO período e o campo total_dias serão atualizados na fid_SNAT. Os restantes dias serão mantidos. Queres continuar?`);
   if(!confirmado)return;
   const botoes=document.querySelectorAll('#tabelaGestaoPedidos button[data-pedido-id]');
   botoes.forEach(b=>{if(b.dataset.pedidoId===identificador)b.disabled=true;});
   try{
-    const urlDelete=`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${encodeURIComponent(identificador)}`;
-    const r=await fetch(urlDelete,{method:'DELETE',headers:headers({Accept:'application/json',Prefer:'return=representation'})});
-    const resposta=await r.text();
-    if(!r.ok)throw new Error(`O Supabase recusou a eliminação (erro ${r.status}): ${resposta}. Confirma se existe uma política RLS que permita DELETE na tabela fid_SNAT.`);
-    let apagados=[];
-    try{apagados=resposta?JSON.parse(resposta):[]}catch{apagados=[]}
-    if(!Array.isArray(apagados)||apagados.length===0){
-      // Algumas configurações do PostgREST podem não devolver a representação do DELETE.
-      // Confirmamos consultando o ID: se já não existe, a eliminação foi concluída.
-      const verificar=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?id=eq.${encodeURIComponent(identificador)}&select=id`,{headers:headers({Accept:'application/json'})});
-      if(!verificar.ok)throw new Error(`O DELETE não devolveu linhas e não foi possível verificar o ID (erro ${verificar.status}). ${await verificar.text()}`);
-      const aindaExiste=await verificar.json();
-      if(Array.isArray(aindaExiste)&&aindaExiste.length>0){
-        throw new Error(`O pedido com ID ${identificador} continua na fid_SNAT. A API está a permitir a leitura, mas o DELETE não foi aplicado. Executa no SQL Editor o ficheiro SQL de permissões DELETE para fid_SNAT; confirma também GRANT DELETE e a política RLS para o papel anon.`);
+    const base=`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}`;
+    const headersJson=headers({'Content-Type':'application/json',Prefer:'return=representation'});
+    const filtro=`?id=eq.${encodeURIComponent(identificador)}&select=id,data_inicio,data_fim,total_dias`;
+    const totalOriginal=Math.max(1,Number(pedido.total_dias)||diferencaDiasInclusiva(inicio,fim));
+    if(inicio===fim){
+      const r=await fetch(`${base}${filtro}`,{method:'DELETE',headers:headersJson});
+      const alterados=await respostaAlteracaoSNAT(r,'Não foi possível eliminar o único dia do pedido');
+      if(!alterados)throw new Error('O Supabase não confirmou a eliminação do registo.');
+    }else if(dia===inicio){
+      const novoInicio=somarDiasISO(inicio,1);
+      const r=await fetch(`${base}${filtro}`,{method:'PATCH',headers:headersJson,body:JSON.stringify({data_inicio:novoInicio,total_dias:Math.max(1,totalOriginal-1)})});
+      const alterados=await respostaAlteracaoSNAT(r,'Não foi possível atualizar a data inicial e o total de dias');
+      if(!alterados)throw new Error('O Supabase não confirmou a alteração da data inicial.');
+    }else if(dia===fim){
+      const novoFim=somarDiasISO(fim,-1);
+      const r=await fetch(`${base}${filtro}`,{method:'PATCH',headers:headersJson,body:JSON.stringify({data_fim:novoFim,total_dias:Math.max(1,totalOriginal-1)})});
+      const alterados=await respostaAlteracaoSNAT(r,'Não foi possível atualizar a data final e o total de dias');
+      if(!alterados)throw new Error('O Supabase não confirmou a alteração da data final.');
+    }else{
+      const fimAnterior=somarDiasISO(dia,-1), inicioPosterior=somarDiasISO(dia,1);
+      const totalAnterior=diferencaDiasInclusiva(inicio,fimAnterior);
+      const totalPosterior=diferencaDiasInclusiva(inicioPosterior,fim);
+      const patch=await fetch(`${base}${filtro}`,{method:'PATCH',headers:headersJson,body:JSON.stringify({data_fim:fimAnterior,total_dias:totalAnterior})});
+      const alterados=await respostaAlteracaoSNAT(patch,'Não foi possível atualizar o período anterior');
+      if(!alterados)throw new Error('O Supabase não confirmou a atualização do período anterior.');
+      const novoPedido={nome:pedido.nome,tipo_dias:pedido.tipo_dias,data_inicio:inicioPosterior,data_fim:fim,total_dias:totalPosterior};
+      const post=await fetch(base,{method:'POST',headers:headersJson,body:JSON.stringify(novoPedido)});
+      try{await respostaAlteracaoSNAT(post,'Não foi possível criar o intervalo posterior');}
+      catch(e){
+        const restaurar=await fetch(`${base}${filtro}`,{method:'PATCH',headers:headersJson,body:JSON.stringify({data_fim:fim,total_dias:totalOriginal})});
+        let restaurado=false;try{const rr=await restaurar.json();restaurado=restaurar.ok&&Array.isArray(rr)&&rr.length>0}catch{}
+        throw new Error(`${e.message}${restaurado?' O pedido original foi restaurado.':' ATENÇÃO: confirma o pedido na fid_SNAT, pois a restauração automática não foi confirmada.'}`);
       }
-      // Se já não é visível pela API, atualiza a aplicação; estados órfãos serão limpos abaixo.
     }
-    let avisoEstados='';
-    try{
-      const re=await fetch(`${SUPABASE_URL}/rest/v1/${ESTADOS_TABLE}?pedido_id=eq.${encodeURIComponent(identificador)}`,{method:'DELETE',headers:headers({Prefer:'return=minimal'})});
-      if(!re.ok)avisoEstados=' O pedido foi eliminado, mas não foi possível limpar os estados antigos associados.';
-    }catch{avisoEstados=' O pedido foi eliminado, mas não foi possível limpar os estados antigos associados.';}
     await carregarDadosSupabase();
     await carregarGestaoPedidos();
-    renderControlo();
-    if(avisoEstados)toast('Pedido eliminado da fid_SNAT.'+avisoEstados,false);
-    else toast(`Pedido de ${nome||'colaborador'} eliminado da fid_SNAT. Já não aparece nos restantes mapas.`);
+    if(typeof carregarControlo==='function')await carregarControlo();
+    if(typeof renderControlo==='function')renderControlo();
+    render();
+    toast(`Dia ${formatarDataSNAT(dia)} eliminado. A alteração foi confirmada pelo Supabase.`);
   }catch(e){
     console.error(e);
-    toast(e.message||'Não foi possível eliminar o pedido.',false);
-    carregarGestaoPedidos();
+    toast(e.message||'Não foi possível eliminar o dia.',false);
+    await carregarGestaoPedidos();
   }
 }
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -604,9 +839,12 @@ function renderControlo(){
   const sub=diasSubmetidosPorTipo(), subMap=new Map();
   sub.forEach(x=>{const ano=(x.tipo==='FT26'||x.tipo==='FE26')?'2026':((x.tipo==='FP27'||x.tipo==='FE27'||x.tipo==='F27')?'2027':null);if(!ano)return;const k=`${x.nome}|${ano}`;if(!subMap.has(k))subMap.set(k,new Set());subMap.get(k).add(x.data)});
   let linhas=[],totAut=0,totSub=0;
-  autorizados.forEach(a=>['2026','2027'].forEach(ano=>{if(filtroControlo!=='TODOS'&&filtroControlo!==ano)return;const aut=num(ano==='2026'?a.dias_pendentes_2026:a.dias_autorizados_2027),s=subMap.get(`${a.nome}|${ano}`)?.size||0,falta=Math.max(0,aut-s);totAut+=aut;totSub+=s;linhas.push({nome:a.nome,tipo:ano,aut,s,falta,pct:aut?Math.min(100,Math.round(s/aut*100)):0})}));
+  autorizados.forEach(a=>['2026','2027'].forEach(ano=>{if(filtroControlo!=='TODOS'&&filtroControlo!==ano)return;const aut=num(ano==='2026'?a.dias_pendentes_2026:a.dias_autorizados_2027),s=subMap.get(`${a.nome}|${ano}`)?.size||0,falta=Math.max(0,aut-s);linhas.push({nome:a.nome,tipo:ano,aut,s,falta,pct:aut?Math.min(100,Math.round(s/aut*100)):0})}));
+  const termo=String(document.getElementById('pesquisaControlo')?.value||'').trim().toLocaleLowerCase('pt-PT');
+  linhas=linhas.filter(x=>!termo||String(x.nome||'').toLocaleLowerCase('pt-PT').includes(termo));
+  linhas.forEach(x=>{totAut+=x.aut;totSub+=x.s});
   document.getElementById('ctrlAut').textContent=totAut;document.getElementById('ctrlSub').textContent=totSub;document.getElementById('ctrlFalta').textContent=linhas.reduce((a,x)=>a+x.falta,0);
-  document.getElementById('tabelaControlo').innerHTML=linhas.map(x=>`<tr><td>${esc(x.nome)}</td><td>${x.tipo}</td><td class="num">${x.aut}</td><td class="num">${x.s}</td><td class="num ${x.falta===0?'pill-ok':'pill-warn'}">${x.falta}</td><td><div class="progress"><span style="width:${x.pct}%"></span></div><div class="note">${x.pct}%</div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sem dados.</td></tr>';
+  document.getElementById('tabelaControlo').innerHTML=linhas.map(x=>`<tr><td>${esc(x.nome)}</td><td>${x.tipo}</td><td class="num">${x.aut}</td><td class="num">${x.s}</td><td class="num ${x.falta===0?'pill-ok':'pill-warn'}">${x.falta}</td><td><div class="progress"><span style="width:${x.pct}%"></span></div><div class="note">${x.pct}%</div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sem dados para este filtro.</td></tr>';
 }
 function obterMapaFeriasAprovadas(){
   // A extração é sempre o ano civil completo do ano atualmente apresentado no mapa,
@@ -703,6 +941,7 @@ function extrairAprovadas(){
 
 document.getElementById('senhaAdmin').addEventListener('keydown',event=>{if(event.key==='Enter')validarSenhaAdmin()});
 document.getElementById('pesquisaPedidosSNAT').addEventListener('input',renderGestaoPedidos);
+document.getElementById('pesquisaRejeitados').addEventListener('input',renderPedidosRejeitados);
 document.getElementById('tabelaGestaoPedidos').addEventListener('click',event=>{
   const botao=event.target.closest('button[data-pedido-id]');
   if(botao)eliminarPedidoSNAT(botao.dataset.pedidoId,botao.dataset.pedidoNome);
