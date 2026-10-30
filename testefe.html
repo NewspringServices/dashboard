@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -12,6 +13,42 @@
 @media(max-width:1000px){.sidebar{width:210px}.main{margin-left:210px;width:calc(100% - 210px);padding:20px}.stats{grid-template-columns:repeat(2,1fr)}.info-grid{grid-template-columns:1fr}.admin-grid{grid-template-columns:1fr}}
 
 .resumo-equipa-card{margin-bottom:16px}.resumo-legenda{font-size:12px;color:var(--cinza)}.resumo-equipa{display:grid;min-width:max-content;grid-auto-rows:minmax(36px,auto);font-size:11px}.resumo-cell{display:flex;align-items:center;justify-content:center;min-width:42px;padding:7px 5px;border-right:1px solid #EDF0F2;border-bottom:1px solid #EDF0F2;background:#fff;text-align:center}.resumo-head{background:#FAFAFA;font-weight:700;position:sticky;top:0;z-index:2}.resumo-team{min-width:450px;width:450px;justify-content:flex-start;padding-left:14px;position:sticky;left:0;z-index:1;font-weight:700;background:#fff}.resumo-head.resumo-team{z-index:3;background:#FAFAFA}.resumo-numero{font-weight:700;color:#8A6200;background:#FFF8E1}.resumo-zero{color:#B0B7BD;background:#fff}.resumo-vazio{padding:18px;color:var(--cinza);font-size:12px}
+
+/* Ajuste visual: mais contraste no mapa e nos cabeçalhos */
+:root{--fundo:#F0F3F2;--borda:#D3DCD8;--texto:#263832;--cinza:#5F6F68;--verde-claro:#DCEFE2}
+body{background:var(--fundo)}
+.sidebar{background:#F8FAF9;border-right-color:#D0D9D4}
+.menu-title{color:#78877F}
+.main{background:var(--fundo)}
+.header{border-bottom:1px solid #D8E0DC;padding-bottom:16px}
+.subtitle{color:#63736B}
+.stat,.admin-card,.map-card{background:#FCFDFC;border-color:#D3DCD8;box-shadow:0 2px 7px rgba(35,55,44,.035)}
+.map-header{background:#E7EEEA;border-bottom-color:#D0D9D4}
+.map-title{color:#294638}
+.cell{background:#FCFDFC;border-right-color:#DDE4E0;border-bottom-color:#DDE4E0}
+.header-cell{background:#DDE7E1!important;color:#263F33;border-right-color:#C7D3CC;border-bottom-color:#C7D3CC}
+.header-cell .day-number{font-size:13px;font-weight:800;color:#263F33}
+.header-cell .day-name{color:#52665A}
+.header-cell .cota-dia{color:#245A45}
+.header-cell .pedidos-dia{color:#46584E}
+.name-cell{background:#F0F5F1;}
+.team-cell,.ch-cell{background:#EAF0EC;color:#3F5147}
+.header-cell.team-cell,.header-cell.ch-cell{background:#D5E1D9!important;color:#2E4638}
+.corner{background:#C9D9CF!important;color:#203D2D}
+.weekend,.holiday{background:#D9DEDB!important;color:#4C5B53}
+.weekend .day-name,.holiday .day-name{color:#4C5B53}
+.today{background:#CDE8D5!important;color:#205B36}
+.resumo-cell{background:#F8FAF8;border-right-color:#DDE4E0;border-bottom-color:#DDE4E0}
+.resumo-head{background:#DDE7E1!important;color:#2D4437}
+.resumo-team{background:#EEF3EF;font-weight:700;color:#30483A}
+.resumo-head.resumo-team{background:#C9D9CF!important;color:#203D2D}
+.resumo-numero{color:#775A08;background:#F5E9BF}
+.resumo-zero{color:#8A9690;background:#F4F6F4}
+.admin-table th{background:#E4EBE7;color:#3E5147;border-bottom-color:#D1DBD5}
+.admin-table td{background:#FCFDFC;border-bottom-color:#E0E6E2}
+.filter,.admin-tab,.month-controls button{border-color:#D0DAD4}
+.filter,.admin-tab{background:#F8FAF8}
+.upload-zone{background:#F0F4F1;border-color:#B5C4BA}
 </style>
 </head>
 <body>
