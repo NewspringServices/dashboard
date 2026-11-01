@@ -172,7 +172,15 @@ function atualizarDiasCalculados() {
     }
 }
 
-document.getElementById("dataInicio").addEventListener("change", atualizarDiasCalculados);
+document.getElementById("dataInicio").addEventListener("change", () => {
+    const dataInicio = document.getElementById("dataInicio").value;
+    const campoFim = document.getElementById("dataFim");
+    campoFim.min = dataInicio || "";
+    if (dataInicio && campoFim.value && campoFim.value < dataInicio) {
+        campoFim.value = "";
+    }
+    atualizarDiasCalculados();
+});
 document.getElementById("dataFim").addEventListener("change", atualizarDiasCalculados);
 
 async function verificarDatasDuplicadas(nome,dataInicio,dataFim){
@@ -218,8 +226,8 @@ async function verificarLimites(nome,tipoDias,diasNovo){
 
 // Períodos bloqueados
 const bloqueios = [
-    { inicio: "2027-12-01", fim: "2027-12-31", excecao: "2027-12-24" }, // Deze
-    { inicio: "2028-01-01", fim: "2028-01-15" } // Janeiro 1ª quinzena
+    { inicio: "2027-01-01", fim: "2027-01-15" }, // Janeiro 2027 - 1.ª quinzena
+    { inicio: "2027-12-01", fim: "2027-12-31" }  // Dezembro 2027 - mês completo
 ];
 
 function intervaloBloqueado(d1, d2, bloqueios){
@@ -245,6 +253,13 @@ document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
     const dataInicio = document.getElementById("dataInicio").value;
     const dataFim = document.getElementById("dataFim").value;
 
+    if (dataInicio && dataFim && dataFim < dataInicio) {
+        document.getElementById("errorMessages").innerText =
+            "❌ A data de fim não pode ser anterior à data de início.";
+        document.getElementById("errorMessages").style.display = "block";
+        return;
+    }
+
     if(tipoDias === "F26"){
         const limiteF26 = "2027-04-30";
         if(dataInicio > limiteF26 || dataFim > limiteF26){
@@ -257,7 +272,7 @@ document.getElementById("reservaForm").addEventListener("submit", async(e)=>{
 
     if(intervaloBloqueado(dataInicio, dataFim, bloqueios)){
         document.getElementById("errorMessages").innerText =
-        "❌ Datas bloqueadas (Mês de Dezembro, exceto 24/12/2027).";
+        "❌ Datas bloqueadas: 1.ª quinzena de janeiro de 2027 e todo o mês de dezembro de 2027.";
         document.getElementById("errorMessages").style.display="block";
         return;
     }
