@@ -204,7 +204,7 @@ body{background:var(--fundo)}
         <input class="field" id="senhaExtracao" type="password" placeholder="Palavra-passe">
         <button class="btn btn-primary" onclick="extrairAprovadas()">Extrair Excel</button>
       </div>
-      <div class="note">Inclui apenas dias com estado <b>Aprovado</b>. Não altera os dados no Supabase.</div>
+      <div class="note">Extrai o mapa <b>integral de 2027</b>: Janeiro a Dezembro, com todos os dias do ano. Nos dias de férias aprovadas é apresentado o respetivo código; os restantes dias ficam em branco. Não altera os dados no Supabase.</div>
     </div>
   </div>
 
@@ -885,77 +885,73 @@ function renderControlo(){
   document.getElementById('tabelaControlo').innerHTML=linhas.map(x=>`<tr><td>${esc(x.nome)}</td><td>${x.tipo}</td><td class="num">${x.aut}</td><td class="num">${x.s}</td><td class="num ${x.falta===0?'pill-ok':'pill-warn'}">${x.falta}</td><td><div class="progress"><span style="width:${x.pct}%"></span></div><div class="note">${x.pct}%</div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sem dados para este filtro.</td></tr>';
 }
 function obterMapaFeriasAprovadas(){
-  // A extração é sempre o ano civil completo do ano atualmente apresentado no mapa,
-  // independentemente do mês visível e das datas das cotas carregadas.
-  const anoExtracao = dataAtual.getFullYear();
+  // A extração é um espelho integral do mapa: todos os pedidos/dias que estão
+  // efetivamente marcados na aplicação são levados para o Excel, independentemente
+  // de estarem Submetidos, Aprovados ou Rejeitados.
+  const anoExtracao = 2027;
   const inicio = new Date(anoExtracao, 0, 1);
   const mesesN = 12;
-  const fim = new Date(anoExtracao, 11, 31);
-  // Map: nome do colaborador -> Map(data -> códigos aprovados nesse dia)
   const colaboradoresMapa = new Map();
 
-  colaboradores.forEach(c => c.pedidos.forEach(p => {
-    const a = new Date(p.inicio + 'T00:00:00');
-    const b = new Date(p.fim + 'T00:00:00');
-    const da = a < inicio ? new Date(inicio) : a;
-    const db = b > fim ? new Date(fim) : b;
-    if (da > db) return;
+  colaboradores.forEach(c => {
+    if(!colaboradoresMapa.has(c.nome)) colaboradoresMapa.set(c.nome, new Map());
+    const dias = colaboradoresMapa.get(c.nome);
+    c.pedidos.forEach(p => {
+      const a = new Date(p.inicio + 'T00:00:00');
+      const b = new Date(p.fim + 'T00:00:00');
+      const inicioPeriodo = new Date(anoExtracao, 0, 1);
+      const fimPeriodo = new Date(anoExtracao, 11, 31);
+      const da = a < inicioPeriodo ? new Date(inicioPeriodo) : a;
+      const db = b > fimPeriodo ? new Date(fimPeriodo) : b;
+      if(da > db) return;
 
-    for (let d = new Date(da); d <= db; d.setDate(d.getDate() + 1)) {
-      const data = iso(d.getFullYear(), d.getMonth(), d.getDate());
-      const estado = String((p.estadosDia && p.estadosDia[data]) || p.estado || 'submetido').trim().toLowerCase();
-      if (estado !== 'aprovado') continue;
-      if (!colaboradoresMapa.has(c.nome)) colaboradoresMapa.set(c.nome, new Map());
-      const dias = colaboradoresMapa.get(c.nome);
-      if (!dias.has(data)) dias.set(data, new Set());
-      dias.get(data).add(p.tipo);
-    }
-  }));
-  return { inicio, mesesN, colaboradoresMapa };
+      for(let d=new Date(da); d<=db; d.setDate(d.getDate()+1)){
+        const data=iso(d.getFullYear(),d.getMonth(),d.getDate());
+        const estado=String((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido').trim().toLowerCase();
+        if(diaRejeitado(p,data) || estado==='rejeitado') continue;
+        if(!dias.has(data)) dias.set(data,new Set());
+        dias.get(data).add(p.tipo);
+      }
+    });
+  });
+  return {inicio,mesesN,colaboradoresMapa};
 }
 
 function extrairAprovadas(){
-  try {
-    if(document.getElementById('senhaExtracao').value !== 'TRosa'){
-      toast('Palavra-passe incorreta.', false);
-      return;
+  try{
+    if(document.getElementById('senhaExtracao').value!=='TRosa'){
+      toast('Palavra-passe incorreta.',false); return;
     }
-    if (typeof XLSX === 'undefined') throw new Error('A biblioteca Excel não carregou. Verifica a ligação à Internet e volta a abrir o ficheiro.');
-    // A extração usa exatamente os estados por dia que já estão carregados na aplicação e alimentam o mapa Férias Aprovadas.
-    // Não consulta novamente nenhuma tabela ao gerar o Excel nem tenta validar associações externas.
-    const { inicio, mesesN, colaboradoresMapa } = obterMapaFeriasAprovadas();
-    if(!colaboradoresMapa.size){
-      toast('O mapa de Férias Aprovadas não contém dias aprovados para o ano apresentado.', false);
-      return;
-    }
+    if(typeof XLSX==='undefined') throw new Error('A biblioteca Excel não carregou.');
 
-    const cabecalhoMeses = ['Nome'];
-    const cabecalhoDias = [''];
-    const merges = [{s:{r:0,c:0},e:{r:1,c:0}}];
-    let col = 1;
-    for(let i=0; i<mesesN; i++){
-      const dt = new Date(inicio.getFullYear(), inicio.getMonth()+i, 1);
-      const total = diasMes(dt.getFullYear(), dt.getMonth());
-      const rotulo = `${meses[dt.getMonth()]} ${dt.getFullYear()}`;
-      const inicioBloco = col;
-      for(let dia=1; dia<=total; dia++){
-        cabecalhoMeses.push(rotulo);
-        cabecalhoDias.push(dia);
-        col++;
+    const {inicio,mesesN,colaboradoresMapa}=obterMapaFeriasAprovadas();
+    if(!colaboradoresMapa.size){toast('Não existem colaboradores/dias marcados no mapa de 2027.',false);return;}
+
+    const cabecalhoMeses=['Nome'];
+    const cabecalhoDias=[''];
+    const merges=[{s:{r:0,c:0},e:{r:1,c:0}}];
+    let col=1;
+    for(let i=0;i<mesesN;i++){
+      const dt=new Date(2027,i,1);
+      const total=diasMes(2027,i);
+      const rotulo=`${meses[i]} 2027`;
+      const inicioBloco=col;
+      for(let dia=1;dia<=total;dia++){
+        cabecalhoMeses.push(rotulo); cabecalhoDias.push(dia); col++;
       }
       merges.push({s:{r:0,c:inicioBloco},e:{r:0,c:col-1}});
     }
 
-    const dados = [cabecalhoMeses, cabecalhoDias];
+    const dados=[cabecalhoMeses,cabecalhoDias];
     [...colaboradoresMapa.keys()].sort((a,b)=>a.localeCompare(b,'pt-PT')).forEach(nome=>{
       const linha=[nome];
-      const diasAprovados = colaboradoresMapa.get(nome);
-      for(let i=0; i<mesesN; i++){
-        const dt=new Date(inicio.getFullYear(),inicio.getMonth()+i,1);
-        for(let dia=1; dia<=diasMes(dt.getFullYear(),dt.getMonth()); dia++){
-          const data=iso(dt.getFullYear(),dt.getMonth(),dia);
-          const codigos = diasAprovados.get(data);
-          linha.push(codigos ? [...codigos].sort().join(' / ') : '');
+      const diasMarcados=colaboradoresMapa.get(nome);
+      for(let i=0;i<mesesN;i++){
+        const total=diasMes(2027,i);
+        for(let dia=1;dia<=total;dia++){
+          const data=iso(2027,i,dia);
+          const codigos=diasMarcados.get(data);
+          linha.push(codigos?[...codigos].sort().join(' / '):'');
         }
       }
       dados.push(linha);
@@ -967,15 +963,12 @@ function extrairAprovadas(){
     ws['!freeze']={xSplit:1,ySplit:2};
     const wb=XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb,ws,'Mapa de Férias');
-    const ini=`${inicio.getFullYear()}-${String(inicio.getMonth()+1).padStart(2,'0')}`;
-    XLSX.writeFile(wb,`Mapa_Ferias_Aprovadas_${ini}_${mesesN}meses.xlsx`);
+    XLSX.writeFile(wb,'Mapa_Ferias_2027_Integral.xlsx');
     document.getElementById('senhaExtracao').value='';
-    toast(`Mapa exportado: ${colaboradoresMapa.size} colaboradores com férias aprovadas.`);
-  } catch (err) {
-    console.error(err);
-    toast('Não foi possível extrair o Excel: ' + (err && err.message ? err.message : err), false);
-  }
+    toast(`Mapa de 2027 exportado: ${colaboradoresMapa.size} colaboradores.`);
+  }catch(err){console.error(err);toast('Não foi possível extrair o Excel: '+(err?.message||err),false)}
 }
+
 
 document.getElementById('senhaAdmin').addEventListener('keydown',event=>{if(event.key==='Enter')validarSenhaAdmin()});
 document.getElementById('pesquisaPedidosSNAT').addEventListener('input',renderGestaoPedidos);
