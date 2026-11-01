@@ -173,17 +173,22 @@ const supabaseClient = createClient(
 );
 
 const feriados = [
-    "2026-01-01", // 01/01/2026 - Ano Novo
-    "2026-04-03", // 03/04/2026 - Sexta-feira Santa
-    "2026-05-01", // 01/05/2025 - Dia do Trabalhador
-    "2026-06-04", // 04/06/2026 - Corpo de Deus
-    "2026-06-10", // 10/06/2026 - Dia de Portugal, Camões e Comunidades Portuguesas
-    "2026-10-05", // 05/10/2026 - Implantação da República
-    "2026-12-01", // 01/12/2026 - Restauração da Independência
-    "2026-12-08", // 08/12/2026 - Imaculada Conceição
-    "2026-12-25"  // 25/12/2026 - Natal
+    "2027-01-01", // 01/01/2027 - Dia de Ano Novo
+    "2027-03-26", // 26/03/2027 - Sexta-feira Santa
+    "2027-03-28", // 28/03/2027 - Domingo de Páscoa
+    "2027-04-25", // 25/04/2027 - Dia da Liberdade
+    "2027-05-01", // 01/05/2027 - Dia do Trabalhador
+    "2027-05-27", // 27/05/2027 - Corpo de Deus
+    "2027-06-10", // 10/06/2027 - Dia de Portugal, de Camões e das Comunidades Portuguesas
+    "2027-08-15", // 15/08/2027 - Assunção de Nossa Senhora
+    "2027-10-05", // 05/10/2027 - Implantação da República
+    "2027-11-01", // 01/11/2027 - Dia de Todos os Santos
+    "2027-12-01", // 01/12/2027 - Restauração da Independência
+    "2027-12-08", // 08/12/2027 - Dia da Imaculada Conceição
+    "2027-12-25"  // 25/12/2027 - Natal
 ];
 
+    
 
 function listarConflitosFDS_FERIADOS(dataInicio,dataFim){
     let conflitos = [];
@@ -247,66 +252,10 @@ async function verificarDatasDuplicadas(nome,dataInicio,dataFim){
 
 async function verificarLimites(nome,tipoDias,diasNovo){
     const limites = {
-"Adriana Cartas Luzia": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Ana Patricia Pombeiro Da Silva": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Anabela Conceicao Cortes Costa": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"André Nico Cabaço": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Bruna Cristina Vindinha Fanica": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Bruno José Rodrigues da Silva": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carla Alexandra Pinto Moreno": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carlos Manuel Dias Delgado": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carmen de Jesus Silva Cardoso": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carmen Jesus Santos Banha": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carmen Susana Chica Caldeirinha": { "F25": 22, "Preferenciais": 0, "Não Preferenciais": 0 },
-"Catarina Alexandra da Silva Ludovico": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Cátia Marina Barbosa Mendes": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Chineida Helena Soares Corte Real": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Claudia Patricia Oliveira Covas": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Cristiana Filipa Magalhães Floro": { "F25": 5, "Preferenciais": 7, "Não Preferenciais": 0 },
-"Cristina Alexandra Canhoto Correia Boeiro": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Fábio André Figueiredo": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Helena Cristina Gomes Lince Condeço": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Jéssica Sofia Loura Carapeto": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Maria Margarida Romão Gouveia": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Maria Zorila": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Mariana Pires Ferreira": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Martinha Maria de Sousa Costa": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Mónica Filipa dos Santos Bairradeiro": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Nádia Isabel de Abreu Filipe": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Nádia Maria Crispim Fialho": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Otilia Maria Maia Torres": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Paula Cristina Fernandes Pinheiro": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
+"Telma Sofia Pereira Rosa": { "F26": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
+"Andreia Alexandra Maltinha Gralha": { "F26": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
+"Rosa Maria Freire Carapinha": { "F26": 0, "Preferenciais": 10, "Não Preferenciais": 12 }
 
-"Raquel André Correia Leal": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Ricardo David Pires Torradas": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Rosa de Jesus Marques Luís": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Tania Isabel Rodrigues Galiano": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Telma Feliciano Braz": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Vera Paula Barreto Carona Almeida": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Catarina Alexandra Eustáquio Nunes": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Daniela Maria dos Santos Teixeira": { "F25": 7, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Maria Antonieta de Sousa Moreira": { "F25": 7, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Pedro Miguel Moreira Mendes Mota": { "F25": 2, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Carla Correia Kroner Torres": { "F25": 7, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Rodrigo Lopes de Matos": { "F25": 11, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Tânia Patricia Jerónimo Pinto": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 11 },
-"Ana Margarida Ventura Rodrigues Augusto Caçador": { "F25": 11, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Daniela Messias Letras": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Ludmila João Caritas Piteira": { "F25": 5, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Ana Raquel Eustáquio Paiva": { "F25": 11, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Maria João Simões Moreira Leitão": { "F25": 12, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Teresa Sofia Moleiro Ventura Gato": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Ana Sofia Z. S. de Brito Lopes": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Joana Filipa Carvalho Antunes": { "F25": 8, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Vanessa Alexandra Gouveia de Matos Faria": { "F25": 4, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Vera Lúcia Baptista Sardinheiro": { "F25": 8, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Maria do Sameiro Fernandes da Silva": { "F25": 10, "Preferenciais": 10, "Não Preferenciais": 12 },
-"Diogo Dinis Canhoto Carretas": { "F25": 17, "Preferenciais": 5, "Não Preferenciais": 0 },
-"Carolina Antunes Pinto": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 10 },
-"Catarina Sofia Figueira de Oliveira": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 10 },
-"Elisabete Patricia Soares Pereira Valente": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 10 },
-"Jessica Duarte de Melo e Freire": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 10 },
-"Sara Andreia Gomes Ferreira": { "F25": 0, "Preferenciais": 10, "Não Preferenciais": 10 }
 
 
     };
@@ -328,8 +277,8 @@ async function verificarLimites(nome,tipoDias,diasNovo){
 
 // Períodos bloqueados
 const bloqueios = [
-    { inicio: "2026-12-01", fim: "2026-12-31", excecao: "2026-12-24" }, // Deze
-    { inicio: "2026-01-01", fim: "2026-01-15" } // Janeiro 1ª quinzena
+    { inicio: "2027-12-01", fim: "2027-12-31", excecao: "2026-12-24" }, // Deze
+    { inicio: "2028-01-01", fim: "2028-01-15" } // Janeiro 1ª quinzena
 ];
 
 function intervaloBloqueado(d1, d2, bloqueios){
