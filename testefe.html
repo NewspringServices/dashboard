@@ -125,6 +125,7 @@ body{background:var(--fundo)}
         <button class="filter" onclick="filtrarControlo('2026',this)">2026</button>
         <button class="filter" onclick="filtrarControlo('2027',this)">2027</button>
         <button class="btn btn-secondary" onclick="carregarControlo()">Atualizar</button>
+        <button class="btn btn-primary" onclick="exportarControloExcel()">Extrair para Excel</button>
       </div>
       <div class="stats" style="grid-template-columns:repeat(3,1fr)">
         <div class="stat"><div class="stat-label">Dias autorizados</div><div class="stat-value green" id="ctrlAut">0</div></div>
@@ -927,6 +928,73 @@ function renderControlo(){
   linhas.forEach(x=>{totAut+=x.aut;totSub+=x.s});
   document.getElementById('ctrlAut').textContent=totAut;document.getElementById('ctrlSub').textContent=totSub;document.getElementById('ctrlFalta').textContent=linhas.reduce((a,x)=>a+x.falta,0);
   document.getElementById('tabelaControlo').innerHTML=linhas.map(x=>`<tr><td>${esc(x.nome)}</td><td>${x.tipo}</td><td class="num">${x.aut}</td><td class="num">${x.s}</td><td class="num ${x.falta===0?'pill-ok':'pill-warn'}">${x.falta}</td><td><div class="progress"><span style="width:${x.pct}%"></span></div><div class="note">${x.pct}%</div></td></tr>`).join('')||'<tr><td colspan="6" class="empty">Sem dados para este filtro.</td></tr>';
+}
+function exportarControloExcel(){
+  try{
+    if(typeof XLSX==='undefined')throw new Error('A biblioteca Excel não carregou.');
+
+    const sub=diasSubmetidosPorTipo(), subMap=new Map();
+    sub.forEach(x=>{
+      const ano=x.tipo==='F26'?'2026':(['FP27','F27'].includes(x.tipo)?'2027':null);
+      if(!ano)return;
+      const k=`${x.nome}|${ano}`;
+      if(!subMap.has(k))subMap.set(k,new Set());
+      subMap.get(k).add(x.data);
+    });
+
+    let linhas=[];
+    autorizados.forEach(a=>['2026','2027'].forEach(ano=>{
+      if(filtroControlo!=='TODOS'&&filtroControlo!==ano)return;
+      const aut=num(ano==='2026'?a.dias_pendentes_2026:a.dias_autorizados_2027);
+      const s=subMap.get(`${a.nome}|${ano}`)?.size||0;
+      const falta=Math.max(0,aut-s);
+      const pct=aut?Math.min(100,Math.round(s/aut*100)):0;
+      linhas.push({nome:a.nome,tipo:ano,aut,s,falta,pct});
+    }));
+
+    const termo=String(document.getElementById('pesquisaControlo')?.value||'').trim().toLocaleLowerCase('pt-PT');
+    linhas=linhas.filter(x=>!termo||String(x.nome||'').toLocaleLowerCase('pt-PT').includes(termo));
+
+    const dados=linhas.map(x=>({
+      'Nome':x.nome,
+      'Tipo':x.tipo,
+      'Autorizados':x.aut,
+      'Já submeteu':x.s,
+      'Faltam':x.falta,
+      'Progresso':`${x.pct}%`
+    }));
+
+    const totalAut=linhas.reduce((a,x)=>a+x.aut,0);
+    const totalSub=linhas.reduce((a,x)=>a+x.s,0);
+    const totalFalta=linhas.reduce((a,x)=>a+x.falta,0);
+
+    const ws=XLSX.utils.json_to_sheet(dados);
+    ws['!cols']=[
+      {wch:32},{wch:10},{wch:14},{wch:14},{wch:12},{wch:12}
+    ];
+
+    const resumo=[
+      {'Indicador':'Filtro de ano','Valor':filtroControlo==='TODOS'?'Todos':filtroControlo},
+      {'Indicador':'Pesquisa por nome','Valor':document.getElementById('pesquisaControlo')?.value||''},
+      {'Indicador':'Dias autorizados','Valor':totalAut},
+      {'Indicador':'Dias já submetidos','Valor':totalSub},
+      {'Indicador':'Dias em falta','Valor':totalFalta},
+      {'Indicador':'Registos exportados','Valor':linhas.length}
+    ];
+    const wsResumo=XLSX.utils.json_to_sheet(resumo);
+    wsResumo['!cols']=[{wch:28},{wch:24}];
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Controlo Submissões');
+    XLSX.utils.book_append_sheet(wb,wsResumo,'Resumo');
+
+    const ano=filtroControlo==='TODOS'?'2026_2027':filtroControlo;
+    XLSX.writeFile(wb,`Controlo_Submissoes_${ano}.xlsx`);
+    toast(`Excel criado com ${linhas.length} registos.`);
+  }catch(e){
+    console.error(e);
+    toast('Não foi possível criar o Excel: '+e.message,false);
+  }
 }
 function obterMapaFeriasAprovadas(){
   // A extração é um espelho integral do mapa: todos os pedidos/dias que estão
