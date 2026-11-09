@@ -87,7 +87,6 @@ body{background:var(--fundo)}
   </div>
   <div class="stats">
     <div class="stat"><div class="stat-label">Colaboradores</div><div class="stat-value" id="totalColaboradores">0</div></div>
-    <div class="stat"><div class="stat-label">Pedidos no mês</div><div class="stat-value green" id="totalPedidos">0</div></div>
     <div class="stat"><div class="stat-label">Dias pedidos</div><div class="stat-value" id="totalDias">0</div></div>
     <div class="stat"><div class="stat-label">Por decidir</div><div class="stat-value" id="totalPendentes">0</div></div>
   </div>
@@ -610,7 +609,7 @@ async function alterarEstado(novo){
 function atualizarStats(){
   let pedidos=0,dias=0,pend=0,apDias=0;const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),inicioMes=new Date(y,m,1),fimMes=new Date(y,m,diasMes(y,m));
   colaboradores.filter(colaboradorVisivel).forEach(c=>c.pedidos.forEach(p=>{if(!visivel(p))return;const a=new Date(p.inicio+'T00:00:00'),b=new Date(p.fim+'T00:00:00');if(b<inicioMes||a>fimMes)return;if(paginaAtual==='submetidos'){pedidos++;const ar=a<inicioMes?inicioMes:a,br=b>fimMes?fimMes:b;for(let d=new Date(ar);d<=br;d.setDate(d.getDate()+1)){dias++;const data=iso(d.getFullYear(),d.getMonth(),d.getDate());if(!diaRejeitado(p,data)&&((p.estadosDia&&p.estadosDia[data])||p.estado||'submetido')==='submetido')pend++}}}));
-  if(paginaAtual==='submetidos'){document.getElementById('totalPedidos').textContent=pedidos;document.getElementById('totalDias').textContent=dias;document.getElementById('totalPendentes').textContent=pend}else{document.getElementById('aprovadosTotal').textContent=apDias;document.getElementById('aprovadosDias').textContent=apDias}
+  if(paginaAtual==='submetidos'){document.getElementById('totalDias').textContent=dias;document.getElementById('totalPendentes').textContent=pend}else{document.getElementById('aprovadosTotal').textContent=apDias;document.getElementById('aprovadosDias').textContent=apDias}
 }
 function render(){if(dataAtual.getFullYear()!==2027)dataAtual=new Date(2027,0,1);document.getElementById('mesAtual').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;const ant=document.getElementById('mesAnterior'),seg=document.getElementById('mesSeguinte');if(ant){ant.disabled=dataAtual.getMonth()===0;ant.style.opacity=ant.disabled?'.35':'1';ant.style.cursor=ant.disabled?'default':'pointer'}if(seg){seg.disabled=dataAtual.getMonth()===11;seg.style.opacity=seg.disabled?'.35':'1';seg.style.cursor=seg.disabled?'default':'pointer'}if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;if(paginaAtual==='submetidos'){criarMapa();atualizarStats();const totalEl=document.getElementById('totalColaboradores');if(totalEl)totalEl.textContent=colaboradores.filter(colaboradorVisivel).length}}
 function criarFiltros(){document.getElementById('filtrosTipos').innerHTML=`<button class="filter active" onclick="filtrarTipo('TODOS',this)">Todos</button>${TIPOS.map(t=>`<button class="filter" onclick="filtrarTipo('${t}',this)">${t}</button>`).join('')}`}
