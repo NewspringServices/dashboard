@@ -97,7 +97,6 @@ body{background:var(--fundo)}
 <section class="page" id="paginaRejeitados">
   <div class="admin-card">
     <h3>Pedidos Rejeitados</h3>
-    <p>Registo independente dos pedidos rejeitados. Esta lista é guardada numa tabela própria e mantém-se mesmo que o pedido seja eliminado da fid_SNAT.</p>
     <div class="toolbar">
       <input class="field" id="pesquisaRejeitados" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
       <button class="btn btn-secondary" onclick="carregarPedidosRejeitados()">Atualizar lista</button>
@@ -138,13 +137,13 @@ body{background:var(--fundo)}
   <div class="admin-panel" id="adminPedidos">
     <div class="admin-card">
       <h3>Gestão de pedidos submetidos</h3>
-      <p>Esta lista espelha os registos da tabela <b>fid_SNAT</b>. Usa «Eliminar dia» para retirar apenas uma data do período e atualizar o total de dias. Se a data estiver no meio do período, o pedido será dividido para preservar os restantes dias.</p>
       <div class="toolbar">
-        <input class="field" id="pesquisaPedidosSNAT" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
+        <input class="field" id="pesquisaPedidosSNAT" type="search" placeholder="Pesquisar por nome, tipo ou data" style="min-width:280px;flex:1">
         <button class="btn btn-secondary" onclick="carregarGestaoPedidos()">Atualizar lista</button>
+        <button class="btn btn-primary" onclick="exportarGestaoPedidosExcel()">Exportar tabela para Excel</button>
       </div>
       <div class="note" id="contagemPedidosSNAT">A carregar registos...</div>
-      <div class="table-scroll"><table class="admin-table"><thead><tr><th>ID</th><th>Nome</th><th>Tipo de dias</th><th>Data de início</th><th>Data de fim</th><th class="num">Total de dias</th><th>Ação</th></tr></thead><tbody id="tabelaGestaoPedidos"><tr><td colspan="7" class="empty">A carregar registos da fid_SNAT...</td></tr></tbody></table></div>
+      <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th>Tipo de dias</th><th>Data de início</th><th>Data de fim</th><th class="num">Total de dias</th><th>Ação</th></tr></thead><tbody id="tabelaGestaoPedidos"><tr><td colspan="6" class="empty">A carregar registos da fid_SNAT...</td></tr></tbody></table></div>
     </div>
   </div>
 </section>
@@ -783,7 +782,7 @@ function formatarDataSNAT(v){
 async function carregarGestaoPedidos(){
   const tbody=document.getElementById('tabelaGestaoPedidos');
   if(!tbody)return;
-  tbody.innerHTML='<tr><td colspan="7" class="empty">A carregar registos da fid_SNAT...</td></tr>';
+  tbody.innerHTML='<tr><td colspan="6" class="empty">A carregar registos da fid_SNAT...</td></tr>';
   try{
     const r=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=id,nome,tipo_dias,data_inicio,data_fim,total_dias&order=data_inicio.asc,nome.asc`,{headers:headers({Accept:'application/json'})});
     if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
@@ -793,22 +792,41 @@ async function carregarGestaoPedidos(){
   }catch(e){
     console.error(e);
     document.getElementById('contagemPedidosSNAT').textContent='Não foi possível carregar a tabela fid_SNAT.';
-    tbody.innerHTML=`<tr><td colspan="7" class="empty">Erro ao carregar fid_SNAT: ${esc(e.message)}. Confirma as permissões de leitura no Supabase.</td></tr>`;
+    tbody.innerHTML=`<tr><td colspan="6" class="empty">Erro ao carregar fid_SNAT: ${esc(e.message)}. Confirma as permissões de leitura no Supabase.</td></tr>`;
   }
 }
 function renderGestaoPedidos(){
   const tbody=document.getElementById('tabelaGestaoPedidos');
   if(!tbody)return;
   const termo=String(document.getElementById('pesquisaPedidosSNAT')?.value||'').trim().toLocaleLowerCase('pt-PT');
-  const dados=pedidosSNATAdmin.filter(p=>!termo||[p.id,p.nome,p.tipo_dias,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+  const dados=pedidosSNATAdmin.filter(p=>!termo||[p.nome,p.tipo_dias,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
   const n=dados.length,total=pedidosSNATAdmin.length;
   document.getElementById('contagemPedidosSNAT').textContent=termo?`${n} de ${total} registos encontrados.`:`${total} registos na tabela fid_SNAT.`;
   tbody.innerHTML=dados.map(p=>`<tr>
-    <td>${esc(p.id)}</td><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td>
+    <td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td>
     <td>${esc(formatarDataSNAT(p.data_inicio))}</td><td>${esc(formatarDataSNAT(p.data_fim))}</td>
     <td class="num">${esc(p.total_dias)}</td>
     <td><button type="button" class="btn btn-eliminar-pedido" data-pedido-id="${esc(p.id)}" data-pedido-nome="${esc(p.nome)}">Eliminar dia</button></td>
-  </tr>`).join('')||`<tr><td colspan="7" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
+  </tr>`).join('')||`<tr><td colspan="6" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
+}
+function exportarGestaoPedidosExcel(){
+  try{
+    const termo=String(document.getElementById('pesquisaPedidosSNAT')?.value||'').trim().toLocaleLowerCase('pt-PT');
+    const dados=pedidosSNATAdmin.filter(p=>!termo||[p.nome,p.tipo_dias,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+    if(!dados.length){toast('Não existem registos para exportar.',false);return;}
+    const linhas=[
+      ['Nome','Tipo de dias','Data de início','Data de fim','Total de dias'],
+      ...dados.map(p=>[p.nome,p.tipo_dias,formatarDataSNAT(p.data_inicio),formatarDataSNAT(p.data_fim),Number(p.total_dias)||0])
+    ];
+    const ws=XLSX.utils.aoa_to_sheet(linhas);
+    ws['!cols']=[{wch:30},{wch:18},{wch:16},{wch:16},{wch:14}];
+    ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length-1,c:linhas[0].length-1}})};
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Gestão de pedidos');
+    const hoje=new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb,`Gestao_Pedidos_${hoje}.xlsx`);
+    toast(`${dados.length} registo(s) exportado(s), sem a coluna ID.`);
+  }catch(e){console.error(e);toast(`Não foi possível exportar: ${e.message}`,false)}
 }
 function somarDiasISO(data, quantidade){
   const d=new Date(String(data).slice(0,10)+'T00:00:00');
