@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
@@ -98,12 +97,12 @@ body{background:var(--fundo)}
   <div class="admin-card">
     <h3>Pedidos Rejeitados</h3>
     <div class="toolbar">
-      <input class="field" id="pesquisaRejeitados" type="search" placeholder="Pesquisar por nome, tipo, data ou ID" style="min-width:280px;flex:1">
+      <input class="field" id="pesquisaRejeitados" type="search" placeholder="Pesquisar por nome, tipo ou data" style="min-width:280px;flex:1">
       <button class="btn btn-secondary" onclick="carregarPedidosRejeitados()">Atualizar lista</button>
       <button class="btn btn-primary" onclick="exportarRejeitadosExcel()">Exportar rejeitados para Excel</button>
     </div>
     <div class="note" id="contagemRejeitados">A carregar pedidos rejeitados...</div>
-    <div class="table-scroll"><table class="admin-table"><thead><tr><th>ID do pedido</th><th>Nome</th><th>Tipo de dias</th><th>Dia rejeitado</th><th>Data de registo</th><th>Ação</th></tr></thead><tbody id="tabelaRejeitados"><tr><td colspan="6" class="empty">A carregar...</td></tr></tbody></table></div>
+    <div class="table-scroll"><table class="admin-table"><thead><tr><th>Nome</th><th>Tipo de dias</th><th>Dia rejeitado</th><th>Data de registo</th><th>Ação</th></tr></thead><tbody id="tabelaRejeitados"><tr><td colspan="5" class="empty">A carregar...</td></tr></tbody></table></div>
   </div>
 </section>
 
@@ -724,21 +723,21 @@ async function carregarPedidosRejeitados(){
 function renderPedidosRejeitados(){
   const tbody=document.getElementById('tabelaRejeitados');if(!tbody)return;
   const termo=String(document.getElementById('pesquisaRejeitados')?.value||'').trim().toLocaleLowerCase('pt-PT');
-  const dados=pedidosRejeitados.filter(p=>!termo||[p.pedido_id,p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+  const dados=pedidosRejeitados.filter(p=>!termo||[p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
   document.getElementById('contagemRejeitados').textContent=termo?`${dados.length} de ${pedidosRejeitados.length} registos encontrados.`:`${pedidosRejeitados.length} registos no histórico permanente.`;
-  tbody.innerHTML=dados.map(p=>`<tr><td>${esc(p.pedido_id)}</td><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td><td>${esc(formatarDataSNAT(p.data_rejeitada))}</td><td>${esc(p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):'—')}</td><td><button type="button" class="btn btn-primary" onclick="voltarPedidoSubmetido('${esc(String(p.pedido_id))}','${esc(String(p.data_rejeitada||'').slice(0,10))}')">Voltar a submetido</button></td></tr>`).join('')||`<tr><td colspan="6" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'Ainda não existem pedidos rejeitados.'}</td></tr>`;
+  tbody.innerHTML=dados.map(p=>`<tr><td>${esc(p.nome)}</td><td>${esc(p.tipo_dias)}</td><td>${esc(formatarDataSNAT(p.data_rejeitada))}</td><td>${esc(p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):'—')}</td><td><button type="button" class="btn btn-primary" onclick="voltarPedidoSubmetido('${esc(String(p.pedido_id))}','${esc(String(p.data_rejeitada||'').slice(0,10))}')">Voltar a submetido</button></td></tr>`).join('')||`<tr><td colspan="5" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'Ainda não existem pedidos rejeitados.'}</td></tr>`;
 }
 function exportarRejeitadosExcel(){
   try{
     if(typeof XLSX==='undefined')throw new Error('A biblioteca Excel não carregou. Verifica a ligação à Internet e volta a abrir o ficheiro.');
     const termo=String(document.getElementById('pesquisaRejeitados')?.value||'').trim().toLocaleLowerCase('pt-PT');
-    const dados=pedidosRejeitados.filter(p=>!termo||[p.pedido_id,p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
+    const dados=pedidosRejeitados.filter(p=>!termo||[p.nome,p.tipo_dias,p.data_rejeitada,p.data_inicio,p.data_fim,p.total_dias].some(v=>String(v??'').toLocaleLowerCase('pt-PT').includes(termo)));
     if(!dados.length){toast('Não existem registos de rejeitados para exportar.',false);return;}
-    const linhas=[['ID do pedido','Nome','Tipo de dias','Dia rejeitado','Data de início','Data de fim','Total de dias','Data de registo'],...dados.map(p=>[
-      p.pedido_id??'',p.nome??'',p.tipo_dias??'',p.data_rejeitada?formatarDataSNAT(String(p.data_rejeitada).slice(0,10)):'',p.data_inicio?formatarDataSNAT(String(p.data_inicio).slice(0,10)):'',p.data_fim?formatarDataSNAT(String(p.data_fim).slice(0,10)):'',p.total_dias??'',p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):''
+    const linhas=[['Nome','Tipo de dias','Dia rejeitado','Data de início','Data de fim','Total de dias','Data de registo'],...dados.map(p=>[
+      p.nome??'',p.tipo_dias??'',p.data_rejeitada?formatarDataSNAT(String(p.data_rejeitada).slice(0,10)):'',p.data_inicio?formatarDataSNAT(String(p.data_inicio).slice(0,10)):'',p.data_fim?formatarDataSNAT(String(p.data_fim).slice(0,10)):'',p.total_dias??'',p.data_registo?new Date(p.data_registo).toLocaleString('pt-PT'):''
     ])];
     const ws=XLSX.utils.aoa_to_sheet(linhas);
-    ws['!cols']=[{wch:16},{wch:28},{wch:18},{wch:16},{wch:16},{wch:16},{wch:14},{wch:23}];
+    ws['!cols']=[{wch:28},{wch:18},{wch:16},{wch:16},{wch:16},{wch:14},{wch:23}];
     ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:0,c:0},e:{r:linhas.length-1,c:linhas[0].length-1}})};
     const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Pedidos Rejeitados');
     const hoje=new Date().toISOString().slice(0,10);
@@ -810,7 +809,7 @@ function renderGestaoPedidos(){
     <td>${esc(formatarDataSNAT(p.data_inicio))}</td><td>${esc(formatarDataSNAT(p.data_fim))}</td>
     <td class="num">${esc(p.total_dias)}</td>
     <td><button type="button" class="btn btn-eliminar-pedido" data-pedido-id="${esc(p.id)}" data-pedido-nome="${esc(p.nome)}">Eliminar dia</button></td>
-  </tr>`).join('')||`<tr><td colspan="6" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
+  </tr>`).join('')||`<tr><td colspan="5" class="empty">${termo?'Não existem registos que correspondam à pesquisa.':'A tabela fid_SNAT não tem registos.'}</td></tr>`;
 }
 function exportarGestaoPedidosExcel(){
   try{
