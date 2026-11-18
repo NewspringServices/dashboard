@@ -755,16 +755,19 @@ async function voltarPedidoSubmetido(pedidoIdParam,dataParam){
   const confirmar=confirm(`Queres retirar ${registo.nome||'este pedido'} de Pedidos Rejeitados e voltar a colocar o dia ${formatarDataSNAT(data)} como Submetido no mapa?`);
   if(!confirmar)return;
   try{
-    let existe=colaboradores.flatMap(c=>c.pedidos).find(p=>String(p.id)===pedidoId);
-    // Se o registo original já tiver sido apagado da fid_SNAT, recriá-lo a partir do histórico.
-    if(!existe){
-      const dadosOriginais={id:registo.pedido_id,nome:registo.nome,tipo_dias:registo.tipo_dias,data_inicio:registo.data_inicio,data_fim:registo.data_fim,total_dias:registo.total_dias};
-      const recriar=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?on_conflict=id`,{method:'POST',headers:headers({'Content-Type':'application/json',Prefer:'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(dadosOriginais)});
-      if(!recriar.ok)throw new Error(`Não foi possível devolver o pedido à tabela ${SUPABASE_TABLE} (erro ${recriar.status}): ${await recriar.text()}`);
-      await guardarEstadoPersistido({id:registo.pedido_id,nome:registo.nome,inicio:String(registo.data_inicio||'').slice(0,10),fim:String(registo.data_fim||'').slice(0,10)},data,'submetido');
-    }else{
-      await guardarEstadoPersistido(existe,data,'submetido');
+    // Confirma diretamente na tabela principal para evitar decisões com base
+    // numa cópia local desatualizada.
+    const consulta=await fetch(`${SUPABASE_URL}/rest/v1/${SUPABASE_TABLE}?select=id& id=eq.${encodeURIComponent(pedidoId)}`.replace('& id=','&id='),{headers:headers({Accept:'application/json'})});
+    if(!consulta.ok)throw new Error(`Não foi possível confirmar a existência do pedido em ${SUPABASE_TABLE} (erro ${consulta.status}): ${await consulta.text()}`);
+    const registosAtuais=await consulta.json();
+    const existe=colaboradores.flatMap(c=>c.pedidos).find(p=>String(p.id)===pedidoId);
+    // O histórico é permanente. Se o pedido já não existir na fid_SNAT,
+    // não pode ser recriado nem devolvido ao mapa a partir do registo rejeitado.
+    if(!Array.isArray(registosAtuais)||registosAtuais.length===0||!existe){
+      alert('Este pedido não pode voltar a ser colocado como Submetido, uma vez que já foi rejeitado e eliminado da base de dados. O registo mantém-se no histórico de Pedidos Rejeitados.');
+      return;
     }
+    await guardarEstadoPersistido(existe,data,'submetido');
     const del=await fetch(`${SUPABASE_URL}/rest/v1/${REJEITADOS_TABLE}?pedido_id=eq.${encodeURIComponent(pedidoId)}&data_rejeitada=eq.${encodeURIComponent(data)}`,{method:'DELETE',headers:headers({Prefer:'return=minimal'})});
     if(!del.ok)throw new Error(`Não foi possível retirar o registo do histórico (erro ${del.status}): ${await del.text()}`);
     diasRejeitados.delete(chaveDiaRejeitado(pedidoId,data));
