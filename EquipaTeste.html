@@ -5,53 +5,193 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pedido de Férias 2026</title>
 <style>
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding-top: 40px;
+:root {
+    --ink: #183b30;
+    --muted: #687d72;
+    --accent: #45ad7b;
+    --accent-dark: #287a55;
+    --glass: rgba(255,255,255,.94);
+    --line: rgba(20,45,58,.12);
+}
+* { box-sizing: border-box; }
 
-    /* 🔥 IMAGEM DE FUNDO */
-    background-image: url("FUNDO.jpg");
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-attachment: fixed;
-    color: #0f3d2e;
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: 42px 20px;
+    display: grid;
+    place-items: center;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    color: var(--ink);
+    background:
+        linear-gradient(125deg, rgba(13,42,29,.72), rgba(28,76,48,.48)),
+        url("FUNDO.jpg") center/cover fixed no-repeat,
+        #244b37;
 }
+
 #passwordPrompt, #formContainer {
-    background-color: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(15, 61, 46, 0.2);
-    max-width: 400px;
-    width: 100%;
-    margin-bottom: 20px;
+    width: min(620px, 100%);
+    padding: clamp(22px, 4vw, 34px);
+    margin: 0 auto;
+    border: 1px solid rgba(255,255,255,.58);
+    border-radius: 24px;
+    background: var(--glass);
+    box-shadow: 0 24px 70px rgba(0,0,0,.23);
+    backdrop-filter: blur(16px);
 }
-label { display: block; margin-bottom: 10px; color: #0f3d2e; }
+
+#passwordPrompt {
+    width: min(440px, 100%);
+    text-align: center;
+}
+
+#passwordPrompt::before, #formContainer::before {
+    content: "PORTAL DE ACESSO";
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 13px;
+    padding: 8px 13px;
+    border: 1px solid rgba(25,166,160,.20);
+    border-radius: 99px;
+    background: rgba(25,166,160,.08);
+    color: var(--accent-dark);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+h1 {
+    margin: 4px 0 24px;
+    color: var(--ink);
+    text-align: center;
+    font-size: clamp(25px, 4vw, 32px);
+    font-weight: 750;
+    letter-spacing: -.035em;
+}
+
+label {
+    display: block;
+    margin: 0 0 8px;
+    color: #3f5e4d;
+    font-size: 13px;
+    font-weight: 700;
+}
+
 select, input[type="date"], input[type="password"] {
-    padding: 8px; margin-bottom: 15px; width: 100%;
-    border: 1px solid #0f3d2e; border-radius: 6px;
-    background-color: #f8fdfb; color: #0f3d2e;
+    width: 100%;
+    min-height: 46px;
+    margin: 0 0 18px;
+    padding: 11px 13px;
+    border: 1px solid rgba(20,45,58,.17);
+    border-radius: 11px;
+    outline: none;
+    background: #fff;
+    color: var(--ink);
+    font: 14px Inter, "Segoe UI", Arial, sans-serif;
+    transition: border-color .2s, box-shadow .2s;
 }
+
+select:focus, input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(25,166,160,.12);
+}
+
 button {
-    padding: 10px 15px; background-color: #0f3d2e; color: white;
-    border: none; border-radius: 6px; cursor: pointer; margin-top: 10px;
+    min-height: 45px;
+    padding: 11px 20px;
+    border: 0;
+    border-radius: 11px;
+    background: var(--accent-dark);
+    color: #fff;
+    font: 700 13px Inter, "Segoe UI", Arial, sans-serif;
+    cursor: pointer;
+    transition: transform .2s, background .2s, box-shadow .2s;
 }
-button:hover { background-color: #0c3326; }
-.error { color: #a33; margin-top: 10px; display: none; }
-.success { color: green; font-weight: bold; margin-top: 15px; }
+
+button:hover {
+    background: #206744;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 18px rgba(35,105,66,.16);
+}
+
+#btnEntrar { width: 100%; margin-top: 2px; }
 #formContainer { display: none; }
-h1, h2 { text-align: center; }
+
+#reservaForm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 16px;
+    align-items: end;
+}
+
+#reservaForm label { margin-top: 2px; }
+#reservaForm select, #reservaForm input { min-width: 0; }
+
+#diasCalculados {
+    grid-column: 1 / -1;
+    margin: 0 0 16px;
+    padding: 13px 15px;
+    border: 1px solid rgba(25,166,160,.20);
+    border-radius: 11px;
+    background: rgba(25,166,160,.08);
+    color: var(--accent-dark);
+    font-size: 13px;
+    font-weight: 800;
+}
+
+#errorMessages, #successMessage {
+    grid-column: 1 / -1;
+    margin: 0 0 14px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.error {
+    display: none;
+    border: 1px solid rgba(163,51,51,.18);
+    background: #fff4f3;
+    color: #a33;
+}
+
+.success {
+    border: 1px solid rgba(8,126,123,.20);
+    background: #effaf7;
+    color: #287a55;
+    font-weight: 700;
+}
+
+#reservaForm button[type="submit"] {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 0;
+}
+
+#resumoPedidos {
+    margin-top: 22px;
+    color: var(--ink);
+    font-size: 13px;
+}
+
+#resumoPedidos:empty { display: none; }
+
 #resumoPedidos div {
-    border: 1px solid #0f3d2e;
-    padding: 10px;
     margin-top: 10px;
-    border-radius: 6px;
-    background-color: #e6ffec;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #f7fcfb;
+    line-height: 1.7;
+}
+
+@media (max-width: 620px) {
+    body { padding: 24px 14px; background-attachment: scroll; }
+    #passwordPrompt, #formContainer { border-radius: 19px; }
+    #reservaForm { grid-template-columns: 1fr; }
+    #diasCalculados, #errorMessages, #successMessage,
+    #reservaForm button[type="submit"] { grid-column: 1; }
 }
 </style>
 </head>
