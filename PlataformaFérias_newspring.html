@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#102c3a">
+  <title>Portal | Plataforma Férias</title>
+  <style>
+    :root {
+      --ink: #142d3a;
+      --muted: #627783;
+      --accent: #19a6a0;
+      --accent-dark: #087e7b;
+      --glass: rgba(255,255,255,.91);
+      --line: rgba(20,45,58,.10);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(125deg, rgba(7,31,44,.74), rgba(9,53,65,.48)),
+        url("FUNDO.jpg") center/cover fixed no-repeat,
+        #183b49;
+      display: grid;
+      place-items: center;
+      padding: 42px 20px;
+    }
+    .shell { width: min(1040px, 100%); }
+    .header { color: #fff; text-align: center; margin-bottom: 30px; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 9px;
+      padding: 8px 14px; border: 1px solid rgba(255,255,255,.3);
+      border-radius: 99px; background: rgba(255,255,255,.10);
+      text-transform: uppercase; letter-spacing: .16em;
+      font-size: 10px; font-weight: 700;
+    }
+    .eyebrow:before { content:""; width:7px; height:7px; border-radius:50%; background:#63ded0; }
+    h1 { margin: 18px 0 8px; font-size: clamp(30px, 5vw, 48px); font-weight: 650; letter-spacing: -.04em; }
+    .subtitle { margin: 0; color: rgba(255,255,255,.78); font-size: 15px; }
+    .panel {
+      background: var(--glass); border: 1px solid rgba(255,255,255,.55);
+      border-radius: 24px; padding: clamp(18px, 3vw, 30px);
+      box-shadow: 0 24px 70px rgba(0,0,0,.23);
+      backdrop-filter: blur(16px);
+    }
+    .section-label {
+      margin: 2px 0 14px 4px; color: var(--muted);
+      font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase;
+    }
+    .menu { display: grid; gap: 12px; }
+    .group { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: rgba(255,255,255,.72); }
+    .group-trigger {
+      width: 100%; border: 0; background: transparent; color: var(--ink);
+      display: flex; align-items: center; gap: 15px; padding: 19px 20px;
+      text-align: left; cursor: pointer; transition: background .2s ease;
+    }
+    .group-trigger:hover, .group-trigger[aria-expanded="true"] { background: rgba(25,166,160,.075); }
+    .icon {
+      flex: 0 0 42px; height: 42px; display: grid; place-items: center;
+      border-radius: 13px; color: var(--accent-dark);
+      background: rgba(25,166,160,.12); font-size: 19px;
+    }
+    .trigger-copy { flex: 1; min-width: 0; }
+    .trigger-title { display:block; font-size: 17px; font-weight: 700; }
+    .trigger-note { display:block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+    .chevron {
+      width: 9px; height: 9px; border-right: 2px solid #6e838d;
+      border-bottom: 2px solid #6e838d; transform: rotate(45deg);
+      transition: transform .2s ease; margin: 0 5px 5px 12px;
+    }
+    .group-trigger[aria-expanded="true"] .chevron { transform: rotate(225deg); margin-top: 8px; }
+    .content { display: none; padding: 0 20px 20px 77px; }
+    .content.open { display: block; animation: reveal .22s ease-out; }
+    @keyframes reveal { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+    .items { display: grid; grid-template-columns: 1fr; gap: 9px; }
+    .item {
+      min-height: 48px; display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 12px 14px; border: 1px solid var(--line);
+      border-radius: 11px; background: #fff; color: #294653;
+      font-size: 13px; font-weight: 600; text-decoration: none;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .item:after { content:"›"; color: var(--accent-dark); font-size: 21px; line-height: 12px; }
+    .item:hover { border-color: rgba(25,166,160,.55); transform: translateY(-2px); box-shadow: 0 7px 18px rgba(13,83,88,.08); }
+    .subgroup { grid-column: 1 / -1; border: 1px solid rgba(25,166,160,.22); border-radius: 12px; overflow: hidden; background: #f7fcfb; }
+    .sub-trigger {
+      width: 100%; border: 0; background: transparent; padding: 13px 14px;
+      display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+      color:#294653; font:600 13px Inter, "Segoe UI", Arial, sans-serif; text-align:left;
+    }
+    .sub-trigger:after { content:"＋"; color:var(--accent-dark); font-size:17px; }
+    .sub-trigger[aria-expanded="true"]:after { content:"−"; }
+    .sub-items { display:none; padding: 0 12px 12px; grid-template-columns:1fr; gap:8px; }
+    .sub-items.open { display:grid; }
+    .sub-items .item { min-height:43px; font-size:12px; padding:10px; }
+    .footer { text-align:center; color:rgba(255,255,255,.72); font-size:11px; margin-top:20px; letter-spacing:.04em; }
+    @media (max-width: 620px) {
+      body { padding: 28px 14px; background-attachment: scroll; }
+      .items { grid-template-columns: 1fr; }
+      .content { padding-left: 18px; }
+      .sub-items { grid-template-columns:1fr; }
+      .trigger-title { font-size:15px; }
+      .panel { border-radius:19px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="header">
+      <div class="eyebrow">Portal de acesso</div>
+      <h1>Pedido de Férias 2026/2027</h1>
+      <p class="subtitle">Selecione a equipa que pretende agendar.</p>
+    </header>
+
+    <section class="panel" aria-label="Áreas de serviço">
+      <p class="section-label">Projetos</p>
+      <div class="menu">
+        <section class="group">
+          <button class="group-trigger" type="button" aria-expanded="false" aria-controls="administrativos">
+            <span class="icon" aria-hidden="true">▤</span>
+            <span class="trigger-copy">
+              <span class="trigger-title">Serviços Administrativos</span>
+              <span class="trigger-note">Aceder aos serviços administrativos</span>
+            </span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="content" id="administrativos">
+            <div class="items">
+              <a class="item" href="BPO_Fidelidade.html">BPO Fidelidade</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="group">
+          <button class="group-trigger" type="button" aria-expanded="false" aria-controls="contactcenter">
+            <span class="icon" aria-hidden="true">◫</span>
+            <span class="trigger-copy">
+              <span class="trigger-title">Contact Center Fidelidade</span>
+              <span class="trigger-note">Consultar equipas e áreas de operação</span>
+            </span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="content" id="contactcenter">
+            <div class="items">
+              <div class="subgroup">
+                <button class="sub-trigger" type="button" aria-expanded="false" aria-controls="sinistros">Sinistros</button>
+                <div class="sub-items" id="sinistros">
+                  <a class="item" href="Acidentes_Trabalho.html">Acidentes Trabalho</a>
+                  <a class="item" href="Automovel.html">Automóvel</a>
+                  <a class="item" href="Multirriscos.html">Multirriscos</a>
+                </div>
+              </div>
+              <a class="item" href="Apoio_Cliente.html">Apoio Cliente</a>
+              <a class="item" href="Vendas.html">Vendas</a>
+              <a class="item" href="Coordenacao_Gestao.html">Coordenação e Gestão</a>
+              <a class="item" href="Supervisao_Collab.html">Supervisão e Collab</a>
+              <a class="item" href="DCH.html">DCH</a>
+              <a class="item" href="Distribuicao.html">Distribuição</a>
+              <a class="item" href="Indexacao.html">Indexação</a>
+              <a class="item" href="Suporte.html">Suporte</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="group">
+          <button class="group-trigger" type="button" aria-expanded="false" aria-controls="projetoteste">
+            <span class="icon" aria-hidden="true">✧</span>
+            <span class="trigger-copy">
+              <span class="trigger-title">Projeto Teste</span>
+              <span class="trigger-note">Aceder à Equipa Teste</span>
+            </span>
+            <span class="chevron" aria-hidden="true"></span>
+          </button>
+          <div class="content" id="projetoteste">
+            <div class="items">
+              <a class="item" href="EquipaTeste.html">Equipa Teste</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+    <div class="footer">Newspring Services</div>
+  </main>
+
+  <script>
+    document.querySelectorAll(".group-trigger").forEach(button => {
+      button.addEventListener("click", () => {
+        const content = document.getElementById(button.getAttribute("aria-controls"));
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!isOpen));
+        content.classList.toggle("open", !isOpen);
+      });
+    });
+
+    document.querySelectorAll(".sub-trigger").forEach(button => {
+      button.addEventListener("click", () => {
+        const content = document.getElementById(button.getAttribute("aria-controls"));
+        const isOpen = button.getAttribute("aria-expanded") === "true";
+        button.setAttribute("aria-expanded", String(!isOpen));
+        content.classList.toggle("open", !isOpen);
+      });
+    });
+  </script>
+</body>
+</html>
