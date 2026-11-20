@@ -610,7 +610,17 @@ function atualizarStats(){
   if(paginaAtual==='submetidos'){document.getElementById('totalDias').textContent=dias;document.getElementById('totalPendentes').textContent=pend}else{document.getElementById('aprovadosTotal').textContent=apDias;document.getElementById('aprovadosDias').textContent=apDias}
 }
 function render(){if(dataAtual.getFullYear()!==2027)dataAtual=new Date(2027,0,1);document.getElementById('mesAtual').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;const ant=document.getElementById('mesAnterior'),seg=document.getElementById('mesSeguinte');if(ant){ant.disabled=dataAtual.getMonth()===0;ant.style.opacity=ant.disabled?'.35':'1';ant.style.cursor=ant.disabled?'default':'pointer'}if(seg){seg.disabled=dataAtual.getMonth()===11;seg.style.opacity=seg.disabled?'.35':'1';seg.style.cursor=seg.disabled?'default':'pointer'}if(document.getElementById('extracaoInicio'))document.getElementById('extracaoInicio').textContent=`${meses[dataAtual.getMonth()]} ${dataAtual.getFullYear()}`;if(paginaAtual==='submetidos'){criarMapa();atualizarStats();const totalEl=document.getElementById('totalColaboradores');if(totalEl)totalEl.textContent=colaboradores.filter(colaboradorVisivel).length}}
-function criarFiltros(){document.getElementById('filtrosTipos').innerHTML=`<button class="filter active" onclick="filtrarTipo('TODOS',this)">Todos</button>${TIPOS.map(t=>`<button class="filter" onclick="filtrarTipo('${t}',this)">${t}</button>`).join('')}`}
+function criarFiltros(){document.getElementById('filtrosTipos').innerHTML=`<button class="filter active" onclick="filtrarTipo('TODOS',this)">Todos</button>${TIPOS.map(t=>`<button class="filter" onclick="filtrarTipo('${t}',this)">${t}</button>`).join('')}<button class="btn btn-secondary" id="btnAtualizarMapa" type="button" onclick="atualizarMapaFerias()">↻ Atualizar mapa</button>`}
+async function atualizarMapaFerias(){
+  const botao=document.getElementById('btnAtualizarMapa');
+  if(botao){botao.disabled=true;botao.dataset.textoOriginal=botao.textContent;botao.textContent='A atualizar...';}
+  try{
+    const sucesso=await carregarDadosSupabase();
+    if(!sucesso)throw new Error('Não foi possível atualizar os pedidos. Confirma a ligação e as permissões no Supabase.');
+    toast('Mapa de férias atualizado com os pedidos mais recentes.');
+  }catch(e){console.error(e);toast(e.message||'Não foi possível atualizar o mapa de férias.',false);}
+  finally{if(botao){botao.disabled=false;botao.textContent=botao.dataset.textoOriginal||'↻ Atualizar mapa';}}
+}
 
 function normalizarCabecalho(v){return String(v??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]/g,'')}
 function obterColuna(obj,tipos){const keys=Object.keys(obj);for(const k of keys){const nk=normalizarCabecalho(k);if(tipos.includes(nk))return obj[k]}return ''}
@@ -687,8 +697,19 @@ async function carregarCotas(){
 }
 async function carregarAutorizados(){
   try{
-    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,equipa,ch,dias_pendentes_2026,dias_autorizados_2027&order=nome.asc`,{headers:headers({Accept:'application/json'})});if(!r.ok)throw new Error(await r.text());autorizados=await r.json();renderAutorizados()
-  }catch(e){document.getElementById('tabelaAutorizados').innerHTML=`<tr><td colspan="6" class="empty">Não foi possível carregar ${AUT_TABLE}. Verifica se a tabela foi criada no Supabase.</td></tr>`;console.warn(e)}
+    const r=await fetch(`${SUPABASE_URL}/rest/v1/${AUT_TABLE}?select=nome,equipa,ch,dias_pendentes_2026,dias_autorizados_2027&order=nome.asc`,{headers:headers({Accept:'application/json'})});
+    if(!r.ok)throw new Error(`Erro ${r.status}: ${await r.text()}`);
+    const dados=await r.json();
+    autorizados=Array.isArray(dados)?dados:[];
+    renderAutorizados();
+    return true;
+  }catch(e){
+    autorizados=[];
+    const tabela=document.getElementById('tabelaAutorizados');
+    if(tabela)tabela.innerHTML=`<tr><td colspan="6" class="empty">Não foi possível carregar ${AUT_TABLE}: ${esc(e.message)}.</td></tr>`;
+    console.error('Erro ao atualizar dias autorizados:',e);
+    return false;
+  }
 }
 function renderAutorizados(){
   let total=0;document.getElementById('tabelaAutorizados').innerHTML=autorizados.map(x=>{const a=num(x.dias_pendentes_2026),b=num(x.dias_autorizados_2027),t=a+b;total+=t;return `<tr><td>${esc(x.nome)}</td><td>${esc(x.equipa||'—')}</td><td>${x.ch===null||x.ch===undefined?'—':String(x.ch).replace('.',',')}</td><td class="num">${a}</td><td class="num">${b}</td><td class="num"><b>${t}</b></td></tr>`}).join('')||'<tr><td colspan="6" class="empty">Sem dados carregados.</td></tr>';document.getElementById('autColab').textContent=autorizados.length;document.getElementById('autTotal').textContent=total
@@ -936,7 +957,29 @@ function diasSubmetidosPorTipo(){
   return [...out.values()];
 }
 function filtrarControlo(t,b){filtroControlo=t;document.querySelectorAll('#adminControlo .filter').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderControlo()}
-function carregarControlo(){renderControlo()}
+async function carregarControlo(){
+  const botao=document.querySelector('#adminControlo button[onclick="carregarControlo()"]');
+  const textoOriginal=botao?.textContent||'Atualizar';
+  if(botao){botao.disabled=true;botao.textContent='A atualizar...';}
+  const tabela=document.getElementById('tabelaControlo');
+  if(tabela)tabela.innerHTML='<tr><td colspan="6" class="empty">A atualizar dados do Supabase...</td></tr>';
+  try{
+    // Atualiza as duas fontes usadas no controlo: pedidos submetidos e dias autorizados.
+    const [pedidosOk,autorizadosOk]=await Promise.all([
+      carregarDadosSupabase(),
+      carregarAutorizados()
+    ]);
+    if(!pedidosOk||!autorizadosOk)throw new Error('Uma ou mais fontes de dados não puderam ser atualizadas. Verifica a ligação e as permissões no Supabase.');
+    renderControlo();
+    toast('Controlo de submissões atualizado com sucesso.');
+  }catch(e){
+    console.error('Erro ao atualizar o controlo de submissões:',e);
+    if(tabela)tabela.innerHTML=`<tr><td colspan="6" class="empty">${esc(e.message||'Não foi possível atualizar os dados.')}</td></tr>`;
+    toast('Não foi possível atualizar o controlo de submissões.',false);
+  }finally{
+    if(botao){botao.disabled=false;botao.textContent=textoOriginal;}
+  }
+}
 function renderControlo(){
   const sub=diasSubmetidosPorTipo(), subMap=new Map();
   sub.forEach(x=>{const ano=x.tipo==='F26'?'2026':(['FP27','F27'].includes(x.tipo)?'2027':null);if(!ano)return;const k=`${x.nome}|${ano}`;if(!subMap.has(k))subMap.set(k,new Set());subMap.get(k).add(x.data)});
