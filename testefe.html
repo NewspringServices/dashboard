@@ -108,6 +108,13 @@ body{background:#CADCCB}
 .resumo-cota-sub-heading-full{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;padding:7px 12px 7px 14px;min-height:42px;background:#DCE9DE;color:#294638;font-size:11px;font-weight:800;border-top:2px solid #AFC7B5}
 .resumo-cota-sub-heading-full .cota-toggle-todas{margin-left:auto}
 
+/* Resumo dos pedidos de férias por dia, ponderado pela CH. */
+.resumo-pedidos-geral{background:#245A45!important;color:#fff!important;font-weight:800!important}
+.resumo-pedidos-geral-valor{background:#EAF3EC!important;color:#245A45;font-weight:800}
+.resumo-pedidos-equipa-nome{background:#F0F5F1!important;color:#30483A!important;font-weight:700}
+.resumo-pedidos-equipa-valor{background:#F7FAF7!important;color:#30483A;font-weight:700}
+.resumo-pedidos-ocultos{display:none!important}
+
 </style>
 </head>
 <body>
@@ -142,7 +149,7 @@ body{background:#CADCCB}
     </div>
   </div>
   <div class="map-card resumo-equipa-card"><div class="map-header"><div><div class="map-title">Cotas definidas na equipa</div><div class="resumo-legenda">Cota geral e cotas atribuídas a cada subequipa</div></div><button type="button" id="toggleTodasCotasBtn" class="cota-toggle-todas" onclick="alternarTodasCotasSubequipas()">Minimizar todas</button></div><div class="table-scroll" id="resumoFeriasScroll"><div id="resumoFeriasEquipa" class="resumo-equipa"></div></div></div>
-  <div class="map-card dimensao-equipa-card"><div class="map-header"><div class="map-title">Dimensão da equipa</div><button type="button" id="toggleDimensaoEquipasBtn" class="cota-toggle-todas" onclick="alternarDimensaoSubequipas()">Minimizar todas</button></div><div id="dimensaoEquipaConteudo" class="dimensao-equipa-conteudo"></div></div>
+  <div class="map-card resumo-pedidos-equipa-card"><div class="map-header"><div class="map-title">Férias pedidas por equipa</div><button type="button" id="toggleTodasFeriasBtn" class="cota-toggle-todas" onclick="alternarTodasFeriasSubequipas()">Minimizar todas</button></div><div class="table-scroll" id="resumoPedidosScroll"><div id="resumoFeriasPedidos" class="resumo-equipa"></div></div></div>
   <div class="map-card"><div class="map-header"><div class="map-title">Mapa Pedidos de Férias</div><div class="legend"><div class="legend-item"><span class="legend-box" style="background:#E9C46A"></span>F26</div><div class="legend-item"><span class="legend-box" style="background:#246B45"></span>FP27</div><div class="legend-item"><span class="legend-box" style="background:#BFE3C8"></span>F27</div><div class="legend-item"><span class="legend-box" style="background:#3977B8"></span>Aprovado</div><div class="legend-item"><span class="legend-box legend-rejeitado"></span>Rejeitado</div></div></div><div class="table-scroll" id="mapaSubmetidosScroll"><div class="calendar" id="mapaSubmetidos"></div></div></div>
 </section>
 
@@ -623,13 +630,17 @@ function consumoCotasNoDia(data,equipaAlvo=null){
   return total;
 }
 function sincronizarScrollResumoMapa(){
-  const resumo=document.getElementById('resumoFeriasScroll');
   const mapa=document.getElementById('mapaSubmetidosScroll');
-  if(!resumo||!mapa||resumo.dataset.syncAtivo==='1')return;
-  resumo.dataset.syncAtivo='1';mapa.dataset.syncAtivo='1';
+  const resumos=['resumoFeriasScroll','resumoPedidosScroll'].map(id=>document.getElementById(id)).filter(Boolean);
+  if(!mapa||mapa.dataset.syncAtivo==='1')return;
+  mapa.dataset.syncAtivo='1';
   let aSincronizar=false;
-  resumo.addEventListener('scroll',()=>{if(aSincronizar)return;aSincronizar=true;mapa.scrollLeft=resumo.scrollLeft;aSincronizar=false;},{passive:true});
-  mapa.addEventListener('scroll',()=>{if(aSincronizar)return;aSincronizar=true;resumo.scrollLeft=mapa.scrollLeft;aSincronizar=false;},{passive:true});
+  const sincronizar=(origem,destinos)=>origem.addEventListener('scroll',()=>{
+    if(aSincronizar)return;
+    aSincronizar=true;destinos.forEach(destino=>{if(destino!==origem)destino.scrollLeft=origem.scrollLeft;});aSincronizar=false;
+  },{passive:true});
+  sincronizar(mapa,resumos);
+  resumos.forEach(resumo=>{resumo.dataset.syncAtivo='1';sincronizar(resumo,[mapa,...resumos]);});
 }
 function renderResumoFeriasEquipa(){
   const el=document.getElementById('resumoFeriasEquipa');if(!el)return;
@@ -688,68 +699,59 @@ function renderResumoFeriasEquipa(){
       el.appendChild(cel);
     }
   });
-  renderDimensaoEquipa();
+  renderResumoFeriasPedidos();
 }
-function renderDimensaoEquipa(){
-  const el=document.getElementById('dimensaoEquipaConteudo');
-  if(!el)return;
+function renderResumoFeriasPedidos(){
+  const el=document.getElementById('resumoFeriasPedidos');if(!el)return;
+  const y=dataAtual.getFullYear(),m=dataAtual.getMonth(),total=diasMes(y,m);
+  el.className='resumo-equipa';
+  el.style.gridTemplateColumns=`450px repeat(${total},64px)`;
   el.innerHTML='';
 
-  // Contabiliza cada colaborador uma única vez, usando a CH e a equipa da fid_teste.
-  const porColaborador=new Map();
-  infoEquipaCH.forEach(registo=>{
-    const nome=String(registo.nome||'').trim();
-    const chave=normalizarNome(nome);
-    if(!chave||porColaborador.has(chave))return;
-    const ch=Number(String(registo.ch??'').trim().replace(',','.'));
-    const carga=Number.isFinite(ch)?Math.max(0,ch):0;
-    const equipa=String(registo.equipa||'').trim()||'Sem equipa definida';
-    porColaborador.set(chave,{nome,equipa,ch:carga});
-  });
-
-  const porEquipa=new Map();
-  let totalCH=0;
-  porColaborador.forEach(pessoa=>{
-    totalCH+=pessoa.ch;
-    const chave=normalizarNome(pessoa.equipa);
-    const atual=porEquipa.get(chave)||{equipa:pessoa.equipa,ch:0,colaboradores:0};
-    atual.ch+=pessoa.ch;
-    atual.colaboradores++;
-    porEquipa.set(chave,atual);
-  });
-
   const geral=document.createElement('div');
-  geral.className='dimensao-equipa-geral';
-  geral.innerHTML=`<strong>DIMENSÃO TOTAL DA EQUIPA</strong><span class="dimensao-equipa-valor">${formatarCota(totalCH)}</span>`;
-  geral.title='Soma da carga horária de todos os colaboradores únicos registados na fid_teste';
+  geral.className='resumo-cell resumo-team resumo-pedidos-geral';
+  geral.textContent='TOTAL GERAL DE FÉRIAS';
   el.appendChild(geral);
+  for(let d=1;d<=total;d++){
+    const data=iso(y,m,d),consumo=consumoCotasNoDia(data),cel=document.createElement('div');
+    cel.className='resumo-cell resumo-pedidos-geral-valor';
+    cel.textContent=formatarCota(consumo);
+    cel.title=`Total de férias neste dia, ponderado pela CH: ${formatarCota(consumo)}`;
+    el.appendChild(cel);
+  }
 
   const heading=document.createElement('div');
-  heading.className='dimensao-equipa-sub-heading';
-  const titulo=document.createElement('span');titulo.textContent='DIMENSÃO POR SUBEQUIPA';heading.appendChild(titulo);
+  heading.className='resumo-cota-sub-heading-full';
+  heading.textContent='FÉRIAS POR SUBEQUIPA';
   el.appendChild(heading);
-  const toggleDimensao=document.getElementById('toggleDimensaoEquipasBtn');
-  if(toggleDimensao){
-    toggleDimensao.textContent=dimensaoSubequipasOcultas?'Expandir equipas':'Minimizar todas';
-    toggleDimensao.title=dimensaoSubequipasOcultas?'Mostrar novamente a dimensão de todas as subequipas':'Esconder todas as linhas da dimensão das subequipas';
+
+  const toggle=document.getElementById('toggleTodasFeriasBtn');
+  if(toggle){
+    toggle.textContent=feriasSubequipasOcultas?'Expandir equipas':'Minimizar todas';
+    toggle.title=feriasSubequipasOcultas?'Mostrar novamente todas as linhas de férias das subequipas':'Esconder todas as linhas de férias das subequipas';
   }
 
-  [...porEquipa.values()].sort((a,b)=>a.equipa.localeCompare(b.equipa,'pt-PT')).forEach(item=>{
-    const linha=document.createElement('div');
-    linha.className='dimensao-equipa-linha'+(dimensaoSubequipasOcultas?' dimensao-oculta':'');
-    linha.innerHTML=`<span>${item.equipa}</span><strong>${formatarCota(item.ch)}</strong>`;
-    linha.title=`${item.equipa}: ${formatarCota(item.ch)} de carga horária total em ${item.colaboradores} colaboradores`;
-    el.appendChild(linha);
+  const equipas=[...new Set(infoEquipaCH.map(x=>String(x.equipa||'').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'pt-PT'));
+  equipas.forEach(equipa=>{
+    const nome=document.createElement('div');
+    nome.className='resumo-cell resumo-team resumo-pedidos-equipa-nome'+(feriasSubequipasOcultas?' resumo-pedidos-ocultos':'');
+    nome.textContent=equipa;nome.title=`Férias pedidas na equipa ${equipa}, ponderadas pela CH`;el.appendChild(nome);
+    for(let d=1;d<=total;d++){
+      const data=iso(y,m,d),consumo=consumoCotasNoDia(data,equipa),cel=document.createElement('div');
+      cel.className='resumo-cell resumo-pedidos-equipa-valor'+(feriasSubequipasOcultas?' resumo-pedidos-ocultos':'');
+      cel.textContent=consumo>0?formatarCota(consumo):'—';
+      cel.title=`${equipa} | ${data}: ${formatarCota(consumo)} de férias (CH)`;
+      el.appendChild(cel);
+    }
   });
-  if(!porEquipa.size){
-    const vazio=document.createElement('div');vazio.className='dimensao-equipa-linha';vazio.textContent='Ainda não existem dados de equipa e carga horária na fid_teste.';el.appendChild(vazio);
+  if(!equipas.length){
+    const vazio=document.createElement('div');vazio.className='resumo-vazio';vazio.textContent='Não existem equipas identificadas para apresentar.';el.appendChild(vazio);
   }
 }
-let dimensaoSubequipasOcultas=false;
-
-function alternarDimensaoSubequipas(){
-  dimensaoSubequipasOcultas=!dimensaoSubequipasOcultas;
-  renderDimensaoEquipa();
+let feriasSubequipasOcultas=false;
+function alternarTodasFeriasSubequipas(){
+  feriasSubequipasOcultas=!feriasSubequipasOcultas;
+  renderResumoFeriasPedidos();
 }
 
 let cotasSubequipasOcultas = false;
@@ -1489,5 +1491,6 @@ criarFiltros();atualizarOpcoesFiltroEquipa();render();carregarDadosSupabase();ca
 </script>
 </body>
 </html>
+
 
 
