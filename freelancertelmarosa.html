@@ -42,7 +42,7 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:6px}.field{marg
 <div class="card"><div class="muted">Concluídos</div><div class="metric" id="count-done">0</div></div>
 <div class="card"><div class="muted">Total de projetos</div><div class="metric" id="count-all">0</div></div>
 <div class="card"><div class="muted">Projetos concluídos</div><div class="metric" id="completed-count">0</div></div>
-<div class="card"><div class="muted">Valor total entregue</div><div class="metric" id="completed-value">0,00 €</div></div>
+<div class="card"><div class="muted">Valor total entregue</div><div class="metric" id="completed-total">0,00 €</div></div>
 </div>
 <div class="toolbar"><h2 style="margin:0">Fila de trabalho</h2><select id="filter" style="max-width:220px"><option value="all">Todos os estados</option><option value="Por iniciar">Por iniciar</option><option value="Em execução">Em execução</option><option value="Concluído">Concluído</option></select></div>
 <div id="projects"></div>
@@ -74,7 +74,7 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:6px}.field{marg
 <div class="formgrid">
 <div class="field"><label for="completed-title">Nome do projeto *</label><input id="completed-title" required placeholder="Ex.: Cartões de visita"></div>
 <div class="field"><label for="completed-type">Tipo de projeto *</label><input id="completed-type" required placeholder="Ex.: Impressão, design, montagem"></div>
-<div class="field"><label for="completed-value">Valor do projeto (€) *</label><input id="completed-value" type="number" min="0" step="0.01" required placeholder="Ex.: 125,00"></div>
+<div class="field"><label for="completed-value">Valor do projeto (€) *</label><input id="completed-value" type="text" inputmode="decimal" required placeholder="Ex.: 30,00"></div>
 <div class="field"><label for="completed-date">Data de conclusão</label><input id="completed-date" type="date"></div>
 <div class="field wide"><label for="completed-notes">Observações</label><textarea id="completed-notes" rows="2" placeholder="Informação adicional"></textarea></div>
 </div>
@@ -105,9 +105,43 @@ function save(){localStorage.setItem(KEY,JSON.stringify(projects));render()}
 function saveCompleted(){localStorage.setItem(COMPLETED_KEY,JSON.stringify(completedProjects));render()}
 function show(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));}
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+function parseEuro(value){
+ // Aceita montantes inteiros ou decimais, com vírgula ou ponto,
+ // separadores de milhares, espaços e símbolo de euro.
+ let raw=String(value).trim().replace(/[\s\u00a0€]/g,'');
+ if(!raw)return NaN;
+ raw=raw.replace(/[^0-9,.'+-]/g,'');
+ if(!raw || !/[0-9]/.test(raw))return NaN;
+ const comma=raw.lastIndexOf(',');
+ const dot=raw.lastIndexOf('.');
+ if(comma!==-1 && dot!==-1){
+   // O último separador é considerado decimal; o outro, milhares.
+   const decimal=comma>dot?',':'.';
+   const thousands=decimal===','? /\./g : /,/g;
+   raw=raw.replace(thousands,'');
+   if(decimal===',')raw=raw.replace(',', '.');
+ }else if(comma!==-1){
+   // Vírgula como decimal; vírgulas anteriores podem ser milhares.
+   raw=raw.replace(/,/g,'');
+   const last=String(value).trim().replace(/[\s\u00a0€]/g,'').lastIndexOf(',');
+   const compact=String(value).trim().replace(/[\s\u00a0€]/g,'');
+   raw=compact.slice(0,last).replace(/,/g,'') + '.' + compact.slice(last+1);
+ }else if(dot!==-1){
+   const compact=raw;
+   const last=compact.lastIndexOf('.');
+   raw=compact.slice(0,last).replace(/\./g,'') + '.' + compact.slice(last+1);
+ }
+ return Number(raw);
+}
 $('complete-form').addEventListener('submit',e=>{
  e.preventDefault();
- completedProjects.unshift({id:Date.now(),title:$('completed-title').value.trim(),type:$('completed-type').value.trim(),value:Number($('completed-value').value),date:$('completed-date').value,notes:$('completed-notes').value.trim()});
+ const value=parseEuro($('completed-value').value);
+ if(!Number.isFinite(value)||value<0){
+  alert('Indica um valor válido, por exemplo 30,00 ou 30.00.');
+  $('completed-value').focus();
+  return;
+ }
+ completedProjects.unshift({id:Date.now(),title:$('completed-title').value.trim(),type:$('completed-type').value.trim(),value,date:$('completed-date').value,notes:$('completed-notes').value.trim()});
  saveCompleted();e.target.reset();
 });
 $('project-form').addEventListener('submit',e=>{
@@ -123,7 +157,7 @@ function render(){
  $('count-done').textContent=projects.filter(p=>p.status==='Concluído').length;
  $('count-all').textContent=projects.length;
  $('completed-count').textContent=completedProjects.length;
- $('completed-value').textContent=completedProjects.reduce((sum,p)=>sum+(Number(p.value)||0),0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
+ $('completed-total').textContent=completedProjects.reduce((sum,p)=>sum+(Number(p.value)||0),0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
  const completedList=$('completed-projects');
  if(!completedProjects.length){completedList.innerHTML='<div class="empty">Ainda não registaste projetos concluídos.</div>';}else{completedList.innerHTML=completedProjects.map(p=>`<article class="project"><div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${esc(p.type)}${p.date?' · Concluído em '+esc(p.date):''}</div></div><strong>${(Number(p.value)||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}</strong></div>${p.notes?`<p class="muted">${esc(p.notes)}</p>`:''}<div class="actions"><button class="btn danger" onclick="removeCompleted(${p.id})">Apagar registo</button></div></article>`).join('')}
 
