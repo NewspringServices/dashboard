@@ -12,6 +12,10 @@ header .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opa
 nav{display:flex;gap:8px;max-width:1120px;margin:20px auto 0;padding:0 20px;flex-wrap:wrap}
 nav button,.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:650;cursor:pointer}
 nav button{background:#e8eef5;color:#24415e}nav button.active,.btn.primary{background:var(--green);color:white}
+#support-menu{display:flex;gap:8px;flex-wrap:wrap}
+#support-menu[hidden]{display:none}
+#support-menu button{background:#fff;border:1px solid var(--line);color:#24415e}
+#support-menu button:hover{background:#eaf1f8}
 main{max-width:1120px;margin:20px auto;padding:0 20px 40px}.view{display:none}.view.active{display:block}
 .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}.card,.panel,.project{background:white;border:1px solid var(--line);border-radius:14px;padding:17px}
 .metric{font-size:28px;font-weight:750;margin-top:4px}.muted{color:var(--muted);font-size:13px}
@@ -29,10 +33,13 @@ label{display:block;font-weight:650;font-size:13px;margin-bottom:6px}.field{marg
 </head>
 <body>
 <header><div class="header-inner"><label class="profile-photo" id="profile-photo" for="profile-upload" tabindex="0" role="button" aria-label="Adicionar ou alterar fotografia de perfil"><img id="profile-image" alt="Fotografia de perfil"><span>Adicionar<br>fotografia</span></label><input id="profile-upload" type="file" accept="image/*"><div class="header-copy"><div class="eyebrow">Área de trabalho - Gráfica São Francisco</div><h1>Freelancer Telma Rosa</h1><p>Os teus projetos, organizados num só lugar.</p></div></div></header>
-<nav>
+<nav aria-label="Navegação principal">
 <button class="active" data-view="dashboard">Dashboard e fila</button>
-<button data-view="new">Submeter projeto</button>
-<button data-view="complete">Concluir projeto</button>
+<button id="support-toggle" type="button" aria-expanded="false" aria-controls="support-menu">Suporte ▾</button>
+<div id="support-menu" hidden aria-label="Opções de suporte">
+<button type="button" data-view="new">Submeter projeto</button>
+<button type="button" data-view="complete">Concluir projeto</button>
+</div>
 </nav>
 <main>
 <section id="dashboard" class="view active">
@@ -103,8 +110,23 @@ try{projects=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){projects=[]}
 const $=id=>document.getElementById(id);
 function save(){localStorage.setItem(KEY,JSON.stringify(projects));render()}
 function saveCompleted(){localStorage.setItem(COMPLETED_KEY,JSON.stringify(completedProjects));render()}
-function show(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));}
-document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+const supportToggle=$('support-toggle');
+const supportMenu=$('support-menu');
+supportToggle.addEventListener('click',()=>{
+  const isOpen=!supportMenu.hidden;
+  supportMenu.hidden=isOpen;
+  supportToggle.setAttribute('aria-expanded',String(!isOpen));
+});
+function show(view){
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));
+  document.querySelectorAll('nav button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
+  supportToggle.classList.toggle('active',view==='new'||view==='complete');
+  if(view==='dashboard'){
+    supportMenu.hidden=true;
+    supportToggle.setAttribute('aria-expanded','false');
+  }
+}
+document.querySelectorAll('nav button[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
 function parseEuro(value){
  // Aceita montantes inteiros ou decimais, com vírgula ou ponto,
  // separadores de milhares, espaços e símbolo de euro.
@@ -162,7 +184,7 @@ function render(){
  if(!completedProjects.length){completedList.innerHTML='<div class="empty">Ainda não registaste projetos concluídos.</div>';}else{completedList.innerHTML=completedProjects.map(p=>`<article class="project"><div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${esc(p.type)}${p.date?' · Concluído em '+esc(p.date):''}</div></div><strong>${(Number(p.value)||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}</strong></div>${p.notes?`<p class="muted">${esc(p.notes)}</p>`:''}<div class="actions"><button class="btn danger" onclick="removeCompleted(${p.id})">Apagar registo</button></div></article>`).join('')}
 
  const f=$('filter').value;const list=projects.filter(p=>f==='all'||p.status===f);
- if(!list.length){$('projects').innerHTML='<div class="empty">Ainda não há projetos nesta lista.<br>Adiciona um pedido em “Submeter projeto”.</div>';return}
+ if(!list.length){$('projects').innerHTML='<div class="empty">Ainda não há projetos nesta lista.<br>Adiciona um pedido através de Suporte.</div>';return}
  $('projects').innerHTML=list.map(p=>`<article class="project">
  <div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${[p.requester,p.type,p.quantity].filter(Boolean).map(esc).join(' · ')||'Sem detalhes adicionais'}</div></div><span class="tag ${p.status==='Em execução'?'doing':p.status==='Concluído'?'done':''}">${esc(p.status)}</span></div>
  ${p.description?`<p>${esc(p.description)}</p>`:''}
