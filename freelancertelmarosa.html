@@ -117,6 +117,7 @@ supportToggle.addEventListener('click',()=>{
   supportToggle.setAttribute('aria-expanded',String(!isOpen));
 });
 function show(view){
+  if(view==='dashboard') $('filter').value='all';
   document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));
   document.querySelectorAll('nav button[data-view]').forEach(x=>x.classList.toggle('active',x.dataset.view===view));
   supportToggle.classList.toggle('active',view==='new'||view==='complete');
@@ -173,17 +174,23 @@ $('project-form').addEventListener('submit',e=>{
 $('filter').addEventListener('change',render);
 function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function render(){
- $('count-new').textContent=projects.filter(p=>p.status==='Por iniciar').length;
- $('count-doing').textContent=projects.filter(p=>p.status==='Em execução').length;
- $('count-done').textContent=projects.filter(p=>p.status==='Concluído').length;
+ const statusOf=p=>String(p.status||'').trim();
+ $('count-new').textContent=projects.filter(p=>statusOf(p)==='Por iniciar').length;
+ $('count-doing').textContent=projects.filter(p=>statusOf(p)==='Em execução').length;
  $('count-all').textContent=projects.length;
  $('completed-count').textContent=completedProjects.length;
  $('completed-total').textContent=completedProjects.reduce((sum,p)=>sum+(Number(p.value)||0),0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
  const completedList=$('completed-projects');
  if(!completedProjects.length){completedList.innerHTML='<div class="empty">Ainda não registaste projetos concluídos.</div>';}else{completedList.innerHTML=completedProjects.map(p=>`<article class="project"><div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${esc(p.type)}${p.date?' · Concluído em '+esc(p.date):''}</div></div><strong>${(Number(p.value)||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}</strong></div>${p.notes?`<p class="muted">${esc(p.notes)}</p>`:''}<div class="actions"><button class="btn danger" onclick="removeCompleted(${p.id})">Apagar registo</button></div></article>`).join('')}
 
- const f=$('filter').value;const list=projects.filter(p=>f==='all'||p.status===f);
- if(!list.length){$('projects').innerHTML='<div class="empty">Ainda não há projetos nesta lista.<br>Adiciona um pedido através de Suporte.</div>';return}
+ const f=$('filter').value;
+ const list=projects.filter(p=>f==='all'||statusOf(p)===f);
+ if(!list.length){
+   $('projects').innerHTML=projects.length
+     ? '<div class="empty">Não há projetos neste estado. Seleciona “Todos os estados” para ver a fila completa.</div>'
+     : '<div class="empty">Ainda não há projetos nesta lista.<br>Adiciona um pedido através de Suporte.</div>';
+   return;
+ }
  $('projects').innerHTML=list.map(p=>`<article class="project">
  <div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${[p.requester,p.type,p.quantity].filter(Boolean).map(esc).join(' · ')||'Sem detalhes adicionais'}</div></div><span class="tag ${p.status==='Em execução'?'doing':p.status==='Concluído'?'done':''}">${esc(p.status)}</span></div>
  ${p.description?`<p>${esc(p.description)}</p>`:''}
@@ -195,6 +202,7 @@ function render(){
 window.removeCompleted=id=>{if(confirm('Queres apagar este registo?')){completedProjects=completedProjects.filter(x=>x.id!==id);saveCompleted()}};
 window.setStatus=(id,status)=>{const p=projects.find(x=>x.id===id);if(p){p.status=status;save()}};
 window.removeProject=id=>{if(confirm('Queres apagar este projeto?')){projects=projects.filter(x=>x.id!==id);save()}};
+$('filter').value='all';
 render();
 </script>
 </body>
