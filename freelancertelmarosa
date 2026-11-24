@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Freelancer Telma Rosa</title>
+<style>
+:root{--green:#102a43;--green2:#163a5f;--pale:#eaf1f8;--ink:#172333;--muted:#657487;--line:#dce4ec;--bg:#f4f7fb}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#0b1f35,#163a5f);color:white;padding:26px max(20px,calc((100% - 1120px)/2))} .header-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:18px}.profile-photo{width:82px;height:82px;flex:0 0 82px;border-radius:50%;border:2px solid rgba(255,255,255,.75);background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;color:#e6eef7;text-align:center;font-size:11px;line-height:1.25}.profile-photo img{width:100%;height:100%;object-fit:cover;display:none}.profile-photo.has-photo img{display:block}.profile-photo.has-photo span{display:none}.profile-photo:focus-visible{outline:3px solid #fff;outline-offset:3px}.header-copy{min-width:0}#profile-upload{display:none}
+header .eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;opacity:.8}h1{margin:4px 0;font-size:clamp(25px,4vw,36px)}header p{margin:4px 0 0;color:#dceaf7}
+nav{display:flex;gap:8px;max-width:1120px;margin:20px auto 0;padding:0 20px;flex-wrap:wrap}
+nav button,.btn{border:0;border-radius:10px;padding:11px 16px;font-weight:650;cursor:pointer}
+nav button{background:#e8eef5;color:#24415e}nav button.active,.btn.primary{background:var(--green);color:white}
+main{max-width:1120px;margin:20px auto;padding:0 20px 40px}.view{display:none}.view.active{display:block}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}.card,.panel,.project{background:white;border:1px solid var(--line);border-radius:14px;padding:17px}
+.metric{font-size:28px;font-weight:750;margin-top:4px}.muted{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:18px 0}
+input,select,textarea{width:100%;border:1px solid #d4ddd6;border-radius:9px;padding:11px;background:white;font:inherit;color:inherit}
+label{display:block;font-weight:650;font-size:13px;margin-bottom:6px}.field{margin-bottom:14px}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.wide{grid-column:1/-1}
+.project{margin-bottom:10px}.projecttop{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.project h3{margin:0 0 5px;font-size:17px}
+.tag{display:inline-block;background:#fff1d6;color:#855b12;border-radius:99px;padding:4px 9px;font-size:12px;font-weight:700}.tag.doing{background:#e1ecf8;color:#214f83}.tag.done{background:#e5edf7;color:#163a5f}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.btn{background:#e8eef5;color:#24415e}.btn.danger{background:#fee2e2;color:#991b1b}
+.empty{text-align:center;padding:35px;color:var(--muted);background:white;border:1px dashed #cbd5ce;border-radius:14px}
+.note{background:#eef4fa;border:1px solid #cbdced;color:#24415e;padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:16px}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,1fr)}.formgrid{grid-template-columns:1fr}.wide{grid-column:auto}.projecttop{display:block}}
+</style>
+</head>
+<body>
+<header><div class="header-inner"><label class="profile-photo" id="profile-photo" for="profile-upload" tabindex="0" role="button" aria-label="Adicionar ou alterar fotografia de perfil"><img id="profile-image" alt="Fotografia de perfil"><span>Adicionar<br>fotografia</span></label><input id="profile-upload" type="file" accept="image/*"><div class="header-copy"><div class="eyebrow">Área de trabalho - Gráfica São Francisco</div><h1>Freelancer Telma Rosa</h1><p>Os teus projetos, organizados num só lugar.</p></div></div></header>
+<nav>
+<button class="active" data-view="dashboard">Dashboard e fila</button>
+<button data-view="new">Submeter projeto</button>
+<button data-view="complete">Concluir projeto</button>
+</nav>
+<main>
+<section id="dashboard" class="view active">
+<div class="cards">
+<div class="card"><div class="muted">Por iniciar</div><div class="metric" id="count-new">0</div></div>
+<div class="card"><div class="muted">Em execução</div><div class="metric" id="count-doing">0</div></div>
+<div class="card"><div class="muted">Concluídos</div><div class="metric" id="count-done">0</div></div>
+<div class="card"><div class="muted">Total de projetos</div><div class="metric" id="count-all">0</div></div>
+<div class="card"><div class="muted">Projetos concluídos</div><div class="metric" id="completed-count">0</div></div>
+<div class="card"><div class="muted">Valor total entregue</div><div class="metric" id="completed-value">0,00 €</div></div>
+</div>
+<div class="toolbar"><h2 style="margin:0">Fila de trabalho</h2><select id="filter" style="max-width:220px"><option value="all">Todos os estados</option><option value="Por iniciar">Por iniciar</option><option value="Em execução">Em execução</option><option value="Concluído">Concluído</option></select></div>
+<div id="projects"></div>
+</section>
+<section id="new" class="view">
+<div class="panel">
+<h2 style="margin-top:0">Novo pedido de projeto</h2>
+<p class="muted">Preenche os dados e adiciona o pedido à tua fila de trabalho.</p>
+<form id="project-form">
+<div class="formgrid">
+<div class="field"><label for="title">Nome do projeto *</label><input id="title" required placeholder="Ex.: Preparação de encomenda"></div>
+<div class="field"><label for="requester">Quem solicita</label><input id="requester" placeholder="Nome da pessoa ou cliente"></div>
+<div class="field"><label for="type">Tipo de projeto</label><input id="type" placeholder="Ex.: Produção, revisão, montagem"></div>
+<div class="field"><label for="quantity">Quantidade</label><input id="quantity" placeholder="Ex.: 150 unidades"></div>
+<div class="field"><label for="due">Prazo</label><input id="due" type="date"></div>
+<div class="field"><label for="priority">Prioridade</label><select id="priority"><option>Normal</option><option>Alta</option><option>Urgente</option><option>Baixa</option></select></div>
+<div class="field wide"><label for="description">Descrição / instruções</label><textarea id="description" rows="4" placeholder="O que é necessário fazer?"></textarea></div>
+<div class="field wide"><label for="notes">Observações</label><textarea id="notes" rows="2" placeholder="Informação adicional"></textarea></div>
+</div>
+<button class="btn primary" type="submit">Adicionar à fila</button>
+</form>
+</div>
+</section>
+<section id="complete" class="view">
+<div class="panel">
+<h2 style="margin-top:0">Registar projeto concluído</h2>
+<p class="muted">Regista os projetos entregues e o valor correspondente.</p>
+<form id="complete-form">
+<div class="formgrid">
+<div class="field"><label for="completed-title">Nome do projeto *</label><input id="completed-title" required placeholder="Ex.: Cartões de visita"></div>
+<div class="field"><label for="completed-type">Tipo de projeto *</label><input id="completed-type" required placeholder="Ex.: Impressão, design, montagem"></div>
+<div class="field"><label for="completed-value">Valor do projeto (€) *</label><input id="completed-value" type="number" min="0" step="0.01" required placeholder="Ex.: 125,00"></div>
+<div class="field"><label for="completed-date">Data de conclusão</label><input id="completed-date" type="date"></div>
+<div class="field wide"><label for="completed-notes">Observações</label><textarea id="completed-notes" rows="2" placeholder="Informação adicional"></textarea></div>
+</div>
+<button class="btn primary" type="submit">Guardar projeto concluído</button>
+</form>
+</div>
+<div class="toolbar"><h2 style="margin:0">Projetos entregues</h2></div>
+<div id="completed-projects"></div>
+</section>
+</main>
+<script>
+const KEY='telmaRosaProjects_v1';
+const COMPLETED_KEY='telmaRosaCompletedProjects_v1';
+let completedProjects=[];
+try{completedProjects=JSON.parse(localStorage.getItem(COMPLETED_KEY)||'[]')}catch(e){completedProjects=[]}
+const PHOTO_KEY='telmaRosaProfilePhoto_v1';
+const photoInput=document.getElementById('profile-upload');
+const photoImage=document.getElementById('profile-image');
+const photoFrame=document.getElementById('profile-photo');
+function showProfilePhoto(src){photoImage.src=src;photoFrame.classList.add('has-photo')}
+try{const savedPhoto=localStorage.getItem(PHOTO_KEY);if(savedPhoto)showProfilePhoto(savedPhoto)}catch(e){}
+photoInput.addEventListener('change',()=>{const file=photoInput.files&&photoInput.files[0];if(!file)return;if(!file.type.startsWith('image/')){alert('Escolhe um ficheiro de imagem.');return}const reader=new FileReader();reader.onload=()=>{try{localStorage.setItem(PHOTO_KEY,reader.result);showProfilePhoto(reader.result)}catch(e){alert('Não foi possível guardar a fotografia. Experimenta uma imagem mais pequena.')}};reader.readAsDataURL(file)});
+photoFrame.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();photoInput.click()}});
+let projects=[];
+try{projects=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){projects=[]}
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(projects));render()}
+function saveCompleted(){localStorage.setItem(COMPLETED_KEY,JSON.stringify(completedProjects));render()}
+function show(view){document.querySelectorAll('.view').forEach(x=>x.classList.toggle('active',x.id===view));document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('active',x.dataset.view===view));}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+$('complete-form').addEventListener('submit',e=>{
+ e.preventDefault();
+ completedProjects.unshift({id:Date.now(),title:$('completed-title').value.trim(),type:$('completed-type').value.trim(),value:Number($('completed-value').value),date:$('completed-date').value,notes:$('completed-notes').value.trim()});
+ saveCompleted();e.target.reset();
+});
+$('project-form').addEventListener('submit',e=>{
+ e.preventDefault();
+ projects.unshift({id:Date.now(),title:$('title').value.trim(),requester:$('requester').value.trim(),type:$('type').value.trim(),quantity:$('quantity').value.trim(),due:$('due').value,priority:$('priority').value,description:$('description').value.trim(),notes:$('notes').value.trim(),status:'Por iniciar',created:new Date().toISOString()});
+ save();e.target.reset();show('dashboard');
+});
+$('filter').addEventListener('change',render);
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function render(){
+ $('count-new').textContent=projects.filter(p=>p.status==='Por iniciar').length;
+ $('count-doing').textContent=projects.filter(p=>p.status==='Em execução').length;
+ $('count-done').textContent=projects.filter(p=>p.status==='Concluído').length;
+ $('count-all').textContent=projects.length;
+ $('completed-count').textContent=completedProjects.length;
+ $('completed-value').textContent=completedProjects.reduce((sum,p)=>sum+(Number(p.value)||0),0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'});
+ const completedList=$('completed-projects');
+ if(!completedProjects.length){completedList.innerHTML='<div class="empty">Ainda não registaste projetos concluídos.</div>';}else{completedList.innerHTML=completedProjects.map(p=>`<article class="project"><div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${esc(p.type)}${p.date?' · Concluído em '+esc(p.date):''}</div></div><strong>${(Number(p.value)||0).toLocaleString('pt-PT',{style:'currency',currency:'EUR'})}</strong></div>${p.notes?`<p class="muted">${esc(p.notes)}</p>`:''}<div class="actions"><button class="btn danger" onclick="removeCompleted(${p.id})">Apagar registo</button></div></article>`).join('')}
+
+ const f=$('filter').value;const list=projects.filter(p=>f==='all'||p.status===f);
+ if(!list.length){$('projects').innerHTML='<div class="empty">Ainda não há projetos nesta lista.<br>Adiciona um pedido em “Submeter projeto”.</div>';return}
+ $('projects').innerHTML=list.map(p=>`<article class="project">
+ <div class="projecttop"><div><h3>${esc(p.title)}</h3><div class="muted">${[p.requester,p.type,p.quantity].filter(Boolean).map(esc).join(' · ')||'Sem detalhes adicionais'}</div></div><span class="tag ${p.status==='Em execução'?'doing':p.status==='Concluído'?'done':''}">${esc(p.status)}</span></div>
+ ${p.description?`<p>${esc(p.description)}</p>`:''}
+ <div class="muted">${p.due?'Prazo: '+esc(p.due):'Sem prazo definido'} · Prioridade: ${esc(p.priority)}</div>
+ ${p.notes?`<p class="muted">Observações: ${esc(p.notes)}</p>`:''}
+ <div class="actions"><select aria-label="Estado do projeto" onchange="setStatus(${p.id},this.value)" style="width:auto"><option ${p.status==='Por iniciar'?'selected':''}>Por iniciar</option><option ${p.status==='Em execução'?'selected':''}>Em execução</option><option ${p.status==='Concluído'?'selected':''}>Concluído</option></select><button class="btn danger" onclick="removeProject(${p.id})">Apagar</button></div>
+ </article>`).join('');
+}
+window.removeCompleted=id=>{if(confirm('Queres apagar este registo?')){completedProjects=completedProjects.filter(x=>x.id!==id);saveCompleted()}};
+window.setStatus=(id,status)=>{const p=projects.find(x=>x.id===id);if(p){p.status=status;save()}};
+window.removeProject=id=>{if(confirm('Queres apagar este projeto?')){projects=projects.filter(x=>x.id!==id);save()}};
+render();
+</script>
+</body>
+</html>
